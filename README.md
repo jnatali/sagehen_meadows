@@ -16,7 +16,7 @@ field-collected data for four meadows in Sagehen Creek basin, includes groundwat
 #### instrumentation
 includes geospatial data related to field instruments such as wells, stream gages, weather-related devices
 
-### transects_geophysical
+#### transects_geophysical
 contains data related to subsurface geophysical imaging of meadow transects.
 
 #### remote
