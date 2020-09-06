@@ -73,43 +73,65 @@ airqualityS <- airquality %>%
 summary(airqualityS)
 airqualityS
 #view(airqualityS)
-plt_O_week <-  ggplot(airquality, aes(as.factor(week), airquality$Ozone))+
+
+plot_ozone <- ggplot(airquality, aes(as.factor(week), Ozone))+
+  geom_point()+
+  geom_boxplot(fill=NA)+
+  theme_bw()+
+  labs(x="Week")
+plot_ozone
+
+plt_O_week <-  ggplot(airqualityS, aes(week, Ozone_mean, group = week))+
   geom_point()+
   geom_boxplot(fill=NA)+
   theme_bw()+
   labs(x="Week")
 plt_O_week
 
-airquality2 <- airquality
-airqualityS[2]
-  
-plt_O_week_mean <-  ggplot(airquality, aes(Date, Ozone_mean))+
-   geom_point()+
-  geom_smooth()+
-  theme_bw()+
-  scale_x_date(date_breaks = "1 week")+
-  theme(axis.text.x = element_text(angle=90, vjust=0.5))
-plt_O_week_mean
 ```
-Your text here
+Data completeness has improved to 0% because we have averaged out by week, and there is at least one data point per week. 
 
 ### 4) Is there any trend in the mean weekly ozone series? Would you say it is monotonic? 
 ```{r code chunk 4}
 # your code here
-num_points <- nrow(o_wout_NAs)
-mean_ozone <- sum(o_wout_NAs$Ozone)/num_points
+acf(airqualityS$Ozone_mean, lag.max = 30)
 
-print(mean_ozone)
+cor(airqualityS$week, airqualityS$Ozone_mean, method="pearson")
+cor(airqualityS$week, airqualityS$Ozone_mean, method="spearman")
+cor(airqualityS$week, airqualityS$Ozone_mean, method="kendall")
 
-auto_covariance <- function(k) 
-  
-  return()
+cor(airquality$Temp, airquality$Ozone, method = "pearson", use = "complete.obs")
+cor(airquality$Temp, airquality$Ozone, method = "spearman", use = "complete.obs")
+cor(airquality$Temp, airquality$Ozone, method = "kendall", use = "complete.obs")
+
+cor(airquality$Solar.R, airquality$Ozone, method = "pearson", use = "complete.obs")
+cor(airquality$Solar.R, airquality$Ozone, method = "spearman", use = "complete.obs")
+cor(airquality$Solar.R, airquality$Ozone, method = "kendall", use = "complete.obs")
 ```
-Your text here
-
+because the tau values are so small as shown in the cor of week and ozone mean, it doesn't seem like there is a strong trend, although perhaps a slight possitive monotonicity trend.
 ### 5) Convert the weekly series into a 'matrix' object in the long format (i.e., time over columns).
 ```{r code chunk 5}
-# your code here
+ozone_week <- airqualityS %>% 
+  select(week, Ozone_mean)
+
+ozone_week_w <- ozone_week %>% # w is for wide
+  pivot_wider(
+    id_cols = week,
+    names_from = week, # this is the unique index
+    values_from = Ozone_mean
+  )
+head(ozone_week_w)
+
+#long format
+ozone_week_l <- ozone_week_w %>% # l is for long
+  pivot_longer(
+    cols = "0":"21", # wide format columns to pivot back into long format
+    names_to = "week", # specify new name for month column
+    values_to = "Ozone_mean" # specify new name for ozone column
+  )
+head(ozone_week_l)
+ozone_week_w_mat <- as.matrix(airqualityS$Ozone_mean)
+ozone_week_w_mat
 ```
 
 ### Any notes (optional)
