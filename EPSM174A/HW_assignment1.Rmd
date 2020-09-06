@@ -1,0 +1,116 @@
+---
+title: "ESPM 174A - Homework assignment 1"
+author: "Julia Nicholson"
+date: "Sep 4th, 2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+### Instructions
+Work on the exercise below, due September 9 (before midnight) on bCourses. 
+Please write a **short** answer or interpretation of results (in "your text here"), as well as the R code you used to get there (in "your code here"). 
+
+When you are done you can can knit this script into a PDF using the "Knit" function of the knitr package (see drop down in tool bar). To complete this assignment you will also need the packages we saw in class (tidyr, dplyr, lubridate).
+
+Here is a helpful tutorial by the creator of RMarkdown: 
+https://bookdown.org/yihui/rmarkdown/
+
+And here is a link to RStudio cheat sheets for tidyverse packages:
+https://rstudio.com/resources/cheatsheets/
+
+And in particular the lubridate package:
+https://rawgit.com/rstudio/cheatsheets/master/lubridate.pdf
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE) # knits results only from code chunks
+```
+
+### Load packages
+```{r code chunk 0}
+library(tidyverse) # a universe of tidy data packages
+```
+
+### Exercise
+### 1) Load the 'airquality' dataset we explored in class, and plot a time series of ozone concentration. What is the span and frequency of the series, and what is the % of NA's?
+```{r code chunk 1}
+airquality <- datasets::airquality
+airquality$Date <- lubridate::as_date(paste(1973, airquality$Month, airquality$Day, sep= ' '))
+head(airquality)
+o_wout_NAs <- airquality[ !is.na(airquality$Ozone), ]
+num_points <- nrow(airquality)
+perc_NAs <- round((nrow(airquality) - nrow(o_wout_NAs))/nrow(airquality)*100, digits=0) 
+plot_ozone <- ggplot(airquality, aes(Date, Ozone))+
+  geom_point()+
+  geom_smooth()+
+  theme(axis.text.x = element_blank())+
+  scale_x_date(date_breaks = "1 week")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.5))
+#span = 5 months
+#frequency = 1 data point/day
+plot_ozone
+view(perc_NAs)
+
+```
+as shown above, span = 5 months, frequency = 30.5 data point/month, and %NAs is 24%.
+
+### 2) Plot an ACF of the ozone time series. What do you see?
+```{r code chunk 2}
+acf(o_wout_NAs$Ozone, lag.max = 100)
+```
+There is no significant autocorrelation after about 4 days, so the Ozone is somewhat dependent on the past few days'values for Ozone, but beyond that it is not related.
+
+### 3) Now summarize mean ozone concentration values by week, and plot the resulting time series. How has data completeness (% of non-NA's) improved? 
+```{r code chunk 3}
+# your code here
+airquality$week <- ((airquality$Month - 5)*30 + (airquality$Month %% 2) + airquality$Day) %/%7
+#view(airquality)
+airqualityS <- airquality %>% 
+  group_by(week) %>% # group by category
+  summarize(Ozone_mean=mean(Ozone, na.rm = TRUE), 
+            Temp_mean=mean(Temp, na.rm = TRUE), 
+            Solar_mean=mean(Solar.R, na.rm = TRUE))
+summary(airqualityS)
+airqualityS
+#view(airqualityS)
+plt_O_week <-  ggplot(airquality, aes(as.factor(week), airquality$Ozone))+
+  geom_point()+
+  geom_boxplot(fill=NA)+
+  theme_bw()+
+  labs(x="Week")
+plt_O_week
+
+airquality2 <- airquality
+airqualityS[2]
+  
+plt_O_week_mean <-  ggplot(airquality, aes(Date, Ozone_mean))+
+   geom_point()+
+  geom_smooth()+
+  theme_bw()+
+  scale_x_date(date_breaks = "1 week")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.5))
+plt_O_week_mean
+```
+Your text here
+
+### 4) Is there any trend in the mean weekly ozone series? Would you say it is monotonic? 
+```{r code chunk 4}
+# your code here
+num_points <- nrow(o_wout_NAs)
+mean_ozone <- sum(o_wout_NAs$Ozone)/num_points
+
+print(mean_ozone)
+
+auto_covariance <- function(k) 
+  
+  return()
+```
+Your text here
+
+### 5) Convert the weekly series into a 'matrix' object in the long format (i.e., time over columns).
+```{r code chunk 5}
+# your code here
+```
+
+### Any notes (optional)
+If you need to add any additional text, please do so here.
