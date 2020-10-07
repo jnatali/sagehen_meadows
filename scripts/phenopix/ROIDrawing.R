@@ -12,6 +12,7 @@ vi.path=paste(getwd(),"/VI",sep='')
 #Create ROI(s) for each meadow
 #windows() #- not using, mine pops up under 'Plots' window
 DrawMULTIROI(path_img_ref = path_img_ref,path_ROIs = roi.path, 
-             nroi=3,file.type=".JPG")
-load(paste(roi.path,'/roi.data.Rdata',sep=''))
+             nroi=2,file.type=".JPG")
+#load(paste(roi.path,'/roi.data.Rdata',sep=''))
+load(paste(getwd(),'/roi.data.Rdata',sep=''))
 
