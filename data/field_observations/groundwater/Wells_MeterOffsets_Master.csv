@@ -1,4 +1,4 @@
-﻿MeterName,Date,Offset_cm,StdDev
+﻿meter_id,date,offset,std_dev
 v6,9/2/19,2.99,0.555443284
 bamboo speaker wire,9/2/19,2.65,0.744983221
 v2,7/15/18,4.595,0.211448638

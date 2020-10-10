@@ -1,4 +1,4 @@
-Well_Name,Time,WellTop_To_Ground(cm),Full_Well_Length(cm)
+well_id,time,welltop_to_ground,full_well_length
 EEF-1,6/1/18 7:45,59.3725,
 EEF-1,6/18/18 8:32,59.69,
 EEF-1,6/30/18 8:55,59.4525,
