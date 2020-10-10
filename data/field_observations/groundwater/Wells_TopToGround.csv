@@ -1,4 +1,4 @@
-Well Name,Time,TopToGround(cm),FullWellLength(cm)
+Well_Name,Time,WellTop_To_Ground(cm),Full_Well_Length(cm)
 EEF-1,6/1/18 7:45,59.3725,
 EEF-1,6/18/18 8:32,59.69,
 EEF-1,6/30/18 8:55,59.4525,
@@ -180,6 +180,6 @@ KRH-XD1S,8/7/20,73.1,147
 KRH-XD1S,8/7/20,74,146.7
 KRH-XD1S,8/7/20,73.8,147.5
 KRH-XD1S,8/7/20,72.1,
-EWR-XB4N,8/7/20,154.8,
-EWR-XB4N,8/7/20,154.8,
-EWR-XB4N,8/7/20,154.8,
+EWR-XB4N,8/7/20,,154.8
+EWR-XB4N,8/7/20,,154.8
+EWR-XB4N,8/7/20,,154.8
