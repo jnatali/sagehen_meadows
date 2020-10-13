@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="en"><Esri><CreaDate>20200717</CreaDate><CreaTime>12020900</CreaTime><ArcGISFormat>1.0</ArcGISFormat><SyncOnce>TRUE</SyncOnce><DataProperties><lineage><Process ToolSource="c:\program files (x86)\arcgis\desktop10.7\ArcToolbox\Toolboxes\3D Analyst Tools.tbx\InterpolateShape" Date="20200717" Time="120209">InterpolateShape sage1mdem Survey_Lines "C:\Users\allis\Desktop\Meadows 2.0\3DSurveyLines.shp" # 1 BILINEAR DENSIFY 0 EXCLUDE</Process></lineage></DataProperties></Esri></metadata>
