@@ -2,6 +2,7 @@
 #Author: Julia Nicholson
 library(tidyverse) # a universe of tidy data packages
 library(patchwork)
+library(hash)
 
 
 biweekly_raw <- read.csv("C:/Users/Hugh/Desktop/Riverlab/sagehen_meadows/data/field_observations/groundwater/Groundwater_BiWeekly_RAW.csv")
@@ -61,5 +62,30 @@ test_ground[cond2, "ground_to_water"] <- test_ground[cond2, "diff"]
 
 groundwater_biweekly <- test_ground[, c(2, 3, 5, 11)]
 groundwater_biweekly_full <- test_ground
+
+
+#
+#
+#
+#playing with individual wells
+EEF1 <- groundwater_biweekly[groundwater_biweekly$well_id == "EEF-1",]
+
+
+individual_wells <- hash()
+for (wellname in unique(groundwater_biweekly$well_id)){
+  individual_wells[[wellname]] <- groundwater_biweekly[groundwater_biweekly$well_id == wellname,]
+}
+
+observations_per_well <- hash()
+for (wellname in names(individual_wells)){
+  observations_per_well[[wellname]] <- nrow(individual_wells[[wellname]])
+}
+
+wells_with_20_obs <- hash()
+for (wellname in names(individual_wells)){
+  if (observations_per_well[[wellname]] == 20 ){
+    wells_with_20_obs[[wellname]] <- individual_wells[[wellname]]
+  }
+}
 
 
