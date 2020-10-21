@@ -2,9 +2,9 @@
 
 
 
-Groundwater data was collected from  meadows in Sagehen Basin during the growing season: May/June to Oct/Nov in 2018-2019.
+This directory contains groundwater level measurements for several meadows in Sagehen Basin during the growing season: May/June to Oct/Nov in 2018-2019.
 
-Groundwater was sampled from three meadows (meadow_id). Within each meadow, wells were located in a mapped hydrogeomorphic zone (HGMZ) and plant functional type (PFT)
+Groundwater levels were sampled from three meadows (meadow_id). Within each meadow, shallow groundwater wells were located in a mapped hydrogeomorphic zone (HGMZ) and plant functional type (PFT). Some wells had been installed by a previous researcher (Allen-Diaz 1991) in randomly located cross-meadow transects, labeled A-E. See the key below plus description of Wells_Unique_Id.txt for naming conventions. Georeferenced well locations are defined in the data/instrumentation/Sagehen_Wells_Natali_3941.geojson file.
 
 meadow_id:
 
