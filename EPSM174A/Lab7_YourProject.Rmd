@@ -1,0 +1,171 @@
+---
+title: "ESPM 174A - Lab 7 & Homework Assignment 4"
+author: "Julia Nicholson"
+date: "10/27/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+### Instructions
+In this lab we will advance the final project. We will specify a model to fit your own data, we will fit the model, and interpret the results. This lab is meant to build on Homework Assignment 2 (HW2), and get you closer to the final model or set of models you will be using for your project. 
+
+Almost all of you will be fitting MAR or MARSS models. If so, answer questions 1-5 below. If in my grading of HW2 I recommended that you use some method other than MAR on MARSS, please focus on question 6 alone.
+
+Submit the completed lab on bCourses as a knitted R Markdown (html or pdf) by Wednesday, Oct 28 before midnight. 
+This submission will be the 4th and last Homework Assignment (HW4).
+
+### Questions
+Question 1) In your individual project, what is (are) your variate(s), also known as response(s)? Create the object (or recover it from HW2), and name it 'dat'. If you have many variates, you do not need to analyze here the whole dataset in this lab/HW4. However, the closer the resemblance of this data set to the one you will end up analyzing, the better. E.g., if your question is at the community level, then include several species; if you would like to compare a particular physical variable across different sites, then include several sites. If you have multivariate responses, name rows appropriately so that you can keep track of each state. Do you need to further clean and/or transform these data for analysis (e.g., log-transform, z-score)? If so, do it below (and name this new object 'transformed_dat'). [1 point]
+```{r code chunk 1}
+library(MARSS)
+dat <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/groundwater_binned_by_BIWEEK.csv"), stringsAsFactors=FALSE, header=FALSE)
+
+#don't want to zscone bi_week_fac
+by_week_fac <- dat[,2]
+
+transformed_dat <- zscore(dat)
+transformed_dat[,2] <- by_week_fac
+dat_75 <- transformed_dat[,(colSums(is.na(dat)) < 5)]
+groundwater_variates <- dat_75[,3:21]
+#19 wells have at least 75% completeness. At least for now, I will be using the wells with at least 75% completeness.
+
+```
+Your text here (<100 words).
+
+
+Question 2) What is (are) your covariate(s), aka driver(s), if any? Z-score them and make sure they have no missing data (MARSS does not allow NA's in covariate data). [1 point]
+```{r code chunk 2}
+# your code here
+# covariates for now are temperature and/or sagehen creek discharge.
+install.packages(c('rgdal','sp','forecast','imputeTS','dataRetrieval'))
+install.packages('remotes')
+remotes::install_github("hrbrmstr/albersusa")  #requires 'remotes' to be installed
+#1-Maps
+library(albersusa); library(rgdal); library(sp)
+
+us <- usa_composite(proj = "aeqd") 
+library(forecast); library(imputeTS) 
+#3-US National Water Information System
+library(dataRetrieval)
+sagehenINFO <- readNWISsite("10343500")
+sagehenINFO
+
+dailyDataAvailable <- whatNWISdata(siteNumber ="10343500") 
+dailyDataAvailable
+
+sagenum <- "10343500"
+
+#choice of discharge time-series, daily values ("dv") and only mean values ("00003")
+dailyDataAvailable <- whatNWISdata(siteNumber = sagenum,
+                    parameterCd="00060",service="dv", statCd="00003")
+dailyDataAvailable
+
+parameterCd <- "00060"
+#Specify a time frame 
+startDate <- "2018-05-31"
+endDate <- "2019-10-21"
+
+#Download the data
+discharge <- readNWISdv(sagenum, 
+                    parameterCd, startDate, endDate)
+sagehen_discharge <- discharge[, 3:4] %>%
+  rename(timestamp = Date, Flow = X_00060_00003)
+  
+#Bin discharge data into bi_weeks for averaging:
+###FIXME: for now, we are using averages of the weeks themselves as the covariates.
+###       however, this is allowing discharge in the future to drive groundwater levels in the past. 
+#assinging days to bins of every two weeks
+test2 <-  sagehen_discharge%>% 
+  mutate(bi_week_fac=factor((lubridate::week(timestamp) + (lubridate::year(timestamp) - 2018)*52)%/%2))
+
+#cleaning up so separate observations are not in the same biweek, to match groundwater data:
+test3 <- within(test2, bi_week_fac[timestamp == as.Date("2018-10-01")] <- factor(19))
+test3 <- within(test3, bi_week_fac[timestamp == as.Date("2019-08-04") | timestamp == as.Date("2019-08-05")] <- factor(42)) 
+test3 <- within(test3, bi_week_fac[timestamp == as.Date("2019-09-02")] <- factor(44)) 
+sagehen_discharge <- test3
+
+#average by biweekly factor
+sagehen_discharge <- sagehen_discharge[, 2:3] %>%
+  group_by(bi_week_fac) %>%
+  summarize(mean_Flow = mean(Flow))
+#remove biweeks for which we don't have observations
+sagehen_discharge <- sagehen_discharge[c(seq(1, 10), 13, seq(27, 29), seq(31, 37)),]
+
+discharge_covariates <- sagehen_discharge$mean_Flow
+```
+Your text here (<100 words).
+
+
+Question 3) Is each observation suppposed to be modeled as a different state, or do you have 'replicate' observations, i.e. more than one observations being funneled into a single state (via the Z matrix)? 
+What are the dimensions of your Y's (observations x time steps) and X's (states x time steps)? 
+Build the Z matrix you need, or specify it using a shortcut (e.g., Z = "identity"). [1 point]
+```{r code chunk 3}
+#Hyptohesis 1: Every well is its own state;
+#In this case, Z will be the 19 by 19 identity matrix.
+Z_1 = "identity"
+
+#Hypothesis 2: four states by plant functional type: E = sedge, H = mixed herbaceous, W = willow ,F = mixed pine forest
+Z_2 = matrix(NA, nrow = 4, ncol = 0)
+for (wellname in colnames(groundwater_variates)){
+  plant_type <- substring(wellname, 2, 2)
+  if (plant_type == "E"){
+    col <- c(1, 0, 0, 0)
+  } else if (plant_type == "H"){
+    col <- c(0, 1, 0, 0)
+  } else if (plant_type == "W"){
+    col <- c(0, 0, 1, 0)
+  } else {
+    col <- c(0, 0, 0, 1)
+  }
+  Z_2 <- cbind(Z_2, col)
+}
+
+#Hypothesis 3: 3 states are the Hydrogeomorphic zones: R = riparian, F = fan, T = terrace
+Z_3 = matrix(NA, nrow = 3, ncol = 0)
+for (wellname in colnames(groundwater_variates)){
+  HGMZ <- substring(wellname, 3, 3)
+  if (HGMZ == "R"){
+    col <- c(1, 0, 0)
+  } else if (HGMZ == "F"){
+    col <- c(0, 1, 0)
+  } else if (HGMZ == "T"){
+    col <- c(0, 0, 1)
+  }
+  Z_3 <- cbind(Z_3, col)
+}
+```
+I plan to test multiple hypothesis, but these are some to start with. One other hypothesis I want to test is having 12 states, one for each (plantfunctional type, Hydrogeomorphic zone) pair. Another is to have different states be how far away from Sagehen the different wells are, as a pseudo replication of Allen-Diaz's study again.
+
+
+Question 4) Specify the rest of your MARSS parameters using the MARSS model list we have been using so far: R (based on the number of observations), and U, B, C, Q (based on the number of states). Remember what we have learned over the past few weeksm e.g. if you want to focus on the B matrix (e.g. species interactions) then it is best to fix U (long-term trend) to zero, which you can do after demeaning the variate data.
+If you are building custom matrices R and Q need to be symmetrical, but B does not. R, Q, and B need to be square; all other matrices may be rectangular.
+If you would like to fit MAR instead of MARSS, set R to "zero". If you plan on comparing models, start with a simple model structure (e.g., Q = "diagonal and equal" instead of "unconstrained"), and make it progressively more complex. 
+If you have covariate data, assign it here as well to the model list ("c"). [1 point]
+```{r code chunk 4}
+# your code here
+```
+Your text here (<100 words).
+
+Question 5) Fit the model. If you get errors or warnings, first check that the model specification is right (e.g., number of dimensions of each matrix). If dimensions are right, but the model does not converge, increase number of iterations using the agument 'maxit'. If it still does not converge, check if the model you are fitting does not make sense given the data (e.g. perhaps you are fitting a stationary model to a non-stationary process), and re-specify the model accordingly, in step 5.
+If you are fitting MARSS and one of the variances goes to zero (Q or R), try fitting a MAR model instead.
+If errors persist, check the MARSS User Fuide ("Appendix A - Warnings and errors", page 309). 
+Once it does work: bootstrap the model(s). What do you obtain? Is it what you expected?
+What are the next steps to complete analyses for your final project? [1 point]
+```{r code chunk 5}
+# your code here
+```
+Your text here (<100 words).
+
+Question 6) [ONLY FOR THE FEW OF YOU WHO CANNOT USE MARSS]: Discuss with Albert and find an appropriate model to use.  
+Follow the equivalent steps 1-5 above by reading in your response and driver data (if any), transforming it (if necessary),
+and specifying a model (e.g, ARIMA, Discrete Fast Fourier Transform) that gets at your question.
+Fit the model, if you can (if not, let's troubleshoot together). What did you learn? 
+What are the next steps to complete analyses for your final project? [5 points]
+```{r code chunk 6}
+# your code here
+```
+Your text here (<100 words).
+
+### Any notes (optional)
+If you need to add any additional text, please do so here (<100 words).
