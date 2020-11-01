@@ -19,13 +19,13 @@ This submission will be the 4th and last Homework Assignment (HW4).
 Question 1) In your individual project, what is (are) your variate(s), also known as response(s)? Create the object (or recover it from HW2), and name it 'dat'. If you have many variates, you do not need to analyze here the whole dataset in this lab/HW4. However, the closer the resemblance of this data set to the one you will end up analyzing, the better. E.g., if your question is at the community level, then include several species; if you would like to compare a particular physical variable across different sites, then include several sites. If you have multivariate responses, name rows appropriately so that you can keep track of each state. Do you need to further clean and/or transform these data for analysis (e.g., log-transform, z-score)? If so, do it below (and name this new object 'transformed_dat'). [1 point]
 ```{r code chunk 1}
 library(MARSS)
-dat <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/groundwater_binned_by_BIWEEK.csv"), stringsAsFactors=FALSE, header=FALSE)
+dat <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period.csv"), stringsAsFactors=FALSE, header=FALSE)
 
 #don't want to zscone bi_week_fac
-by_week_fac <- dat[,2]
+observation_periods <- dat[,2]
 
 transformed_dat <- zscore(dat)
-transformed_dat[,2] <- by_week_fac
+transformed_dat[,2] <- observation_periods
 dat_75 <- transformed_dat[,(colSums(is.na(dat)) < 5)]
 groundwater_variates <- dat_75[,3:21]
 #19 wells have at least 75% completeness. At least for now, I will be using the wells with at least 75% completeness.
