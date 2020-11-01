@@ -116,6 +116,54 @@ for (wellname in keys(wells_with_18_or_more_obs)){
 
 ### binning observations as per Albert's advice:
 #i)
+#days_vec <- data.frame(matrix(NA, nrow = 509, ncol = 0))
+#days_vec["timestamp"] <- seq(as.Date("2018-05-31"), as.Date("2019-10-21"), "days") 
+
+#ii)
+#left joining with groundwater biweekly so the days that weren't measured have NAs
+#test <- left_join(days_vec, groundwater_biweekly, by = "timestamp")
+
+#iii)
+#assinging days to bins of every two weeks
+#test2 <- test %>% 
+ # mutate(week_fac=factor(lubridate::week(timestamp))) %>%
+  #mutate(bi_week_fac=factor((lubridate::week(timestamp) + (lubridate::year(timestamp) - 2018)*52)%/%2))
+
+#cleaning up so separate observations are not in the same biweek:
+#test2[test2$timestamp == as.Date("2018-10-01"),] <- 
+#test3 <- within(test2, bi_week_fac[timestamp == as.Date("2018-10-01")] <- factor(19))
+#test3 <- within(test3, bi_week_fac[timestamp == as.Date("2019-08-04") | timestamp == as.Date("2019-08-05")] <- factor(42)) 
+#test3 <- within(test3, bi_week_fac[timestamp == as.Date("2019-09-02")] <- factor(44)) 
+#groundwater_BY_BIWEEK <- test3
+
+#now, we want all the wells side by side...
+#side_by_side <- data.frame(matrix(NA, nrow = 37, ncol = 0))
+#side_by_side["bi_week_fac"] <- as.factor(seq(11, 47))
+#for (wellname in unique(groundwater_BY_BIWEEK$well_id)){
+ # if (!is.na(wellname)){
+  #  well_df_empty <- data.frame(matrix(NA, ncol = 0, nrow = 37))
+   # well_df_empty["bi_week_fac"] <- as.factor(seq(11, 47))
+    #well_df_vals <- groundwater_BY_BIWEEK[(!is.na(groundwater_BY_BIWEEK$well_id) & groundwater_BY_BIWEEK$well_id == wellname),][, c(4, 6)]
+    #well_df_vals <- well_df_vals %>% 
+     # group_by(bi_week_fac) %>%
+      #summarize(ground_to_water = mean(ground_to_water))
+#    well_df_vals <- as.data.frame(well_df_vals)
+ #   well_df <- left_join(well_df_empty, well_df_vals, by = "bi_week_fac")
+  #  names(well_df)[2] <- wellname
+   # side_by_side <- left_join(side_by_side, well_df, by = "bi_week_fac")
+  #}
+#}
+#remove the weeks where NO sites were observed:
+#side_by_side <- side_by_side[c(seq(1, 10), 13, seq(27, 29), seq(31, 37)),]
+#write.csv(side_by_side, "C:/Users/Hugh/Desktop/Riverlab/groundwater_binned_by_BIWEEK.csv")
+#write.csv(groundwater_BY_BIWEEK, "C:/Users/Hugh/Desktop/Riverlab/groundwater_with_biweeks.csv")
+
+
+
+###After meeting with Jen, we realized it would be better to chunk observations by weekends that were observed
+### "observation period", rather than bi-weekly groups. This makes finding the covariates easier too:
+
+#i)
 days_vec <- data.frame(matrix(NA, nrow = 509, ncol = 0))
 days_vec["timestamp"] <- seq(as.Date("2018-05-31"), as.Date("2019-10-21"), "days") 
 
@@ -123,34 +171,59 @@ days_vec["timestamp"] <- seq(as.Date("2018-05-31"), as.Date("2019-10-21"), "days
 #left joining with groundwater biweekly so the days that weren't measured have NAs
 test <- left_join(days_vec, groundwater_biweekly, by = "timestamp")
 
-#iii)
-#assinging days to bins of every two weeks
-test2 <- test %>% 
-  mutate(week_fac=factor(lubridate::week(timestamp))) %>%
-  mutate(bi_week_fac=factor((lubridate::week(timestamp) + (lubridate::year(timestamp) - 2018)*52)%/%2))
+#assigning each observation to its observation period:
+test$observation_period <- matrix(NA, nrow = 1099, ncol = 1)
 
-#cleaning up so separate observations are not in the same biweek:
-#test2[test2$timestamp == as.Date("2018-10-01"),] <- 
-test3 <- within(test2, bi_week_fac[timestamp == as.Date("2018-10-01")] <- factor(19))
-test3 <- within(test3, bi_week_fac[timestamp == as.Date("2019-08-04") | timestamp == as.Date("2019-08-05")] <- factor(42)) 
-test3 <- within(test3, bi_week_fac[timestamp == as.Date("2019-09-02")] <- factor(44)) 
-groundwater_BY_BIWEEK <- test3
+observation_df <- data.frame(matrix(NA, nrow = 39, ncol = 0))
+observation_df["timestamp"] <- as.Date(c("2018-05-31","2018-06-01",
+                                 "2018-06-18", "2018-06-19",
+                                 "2018-06-30", "2018-07-01",
+                                 "2018-07-16", "2018-07-17",
+                                 "2018-07-25", "2018-07-27",
+                                 "2018-08-10",
+                                 "2018-08-24", "2018-08-25",
+                                 "2018-09-16",
+                                 "2018-09-29", "2018-10-01",
+                                 "2018-10-14",
+                                 "2018-11-18",
+                                 "2019-06-02", "2019-06-03",
+                                 "2019-06-17", "2019-06-18",
+                                 "2019-07-05", "2019-07-06", "2019-07-07",
+                                 "2019-07-26",
+                                 "2019-08-04", "2019-08-05", "2019-08-06",
+                                 "2019-08-20",
+                                 "2019-09-02", "2019-09-03", "2019-09-04", "2019-09-05",
+                                 "2019-09-21",
+                                 "2019-10-05",
+                                 "2019-10-19", "2019-10-20", "2019-10-21"))
+observation_df["observation_period"] <- as.factor(c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10, 11, 12, 12, 13, 13, 14, 14, 14, 15, 16, 16, 16, 17, 18, 18, 18, 18, 19, 20, 21, 21, 21))
 
-#now, we want all the wells side by side...
-side_by_side <- data.frame(matrix(NA, nrow = 37, ncol = 0))
-side_by_side["bi_week_fac"] <- as.factor(seq(11, 47))
-for (wellname in unique(groundwater_BY_BIWEEK$well_id)){
-  well_df_empty <- data.frame(matrix(NA, ncol = 0, nrow = 37))
-  well_df_empty["bi_week_fac"] <- as.factor(seq(11, 47))
-  well_df_vals <- groundwater_BY_BIWEEK[(!is.na(groundwater_BY_BIWEEK$well_id) & groundwater_BY_BIWEEK$well_id == wellname),][, c(4, 6)]
-  well_df_vals <- well_df_vals %>% 
-    group_by(bi_week_fac) %>%
-    summarize(ground_to_water = mean(ground_to_water))
-  well_df_vals <- as.data.frame(well_df_vals)
-  well_df <- left_join(well_df_empty, well_df_vals, by = "bi_week_fac")
-  names(well_df)[2] <- wellname
-  side_by_side <- left_join(side_by_side, well_df, by = "bi_week_fac")
+test_new <- left_join(test, observation_df, by = "timestamp")
+gw_by_obs_period <- test_new[!is.na(test_new$observation_period),]
+
+#now to group by wells so they are side by side:
+side_by_side <- data.frame(matrix(NA, nrow = 21, ncol = 0))
+side_by_side["observation_period"] <- as.factor(seq(1, 21))
+for (wellname in unique(gw_by_obs_period$well_id)){
+  if (!is.na(wellname)){
+    #well_df_empty <- data.frame(matrix(NA, ncol = 0, nrow = 21))
+    #well_df_empty["observation_period"] <- as.factor(seq(1, 21))
+    well_df <- gw_by_obs_period[(!is.na(gw_by_obs_period$well_id) & gw_by_obs_period$well_id == wellname),][, c(4, 5)]
+    well_df <- well_df %>% 
+      group_by(observation_period) %>%
+      summarize(ground_to_water = mean(ground_to_water))
+    well_df <- as.data.frame(well_df)
+    #well_df <- left_join(well_df_empty, well_df_vals, by = "")
+    names(well_df)[2] <- wellname
+    side_by_side <- left_join(side_by_side, well_df, by = "observation_period")
+  }
 }
-#remove the weeks where NO sites were observed:
-side_by_side <- side_by_side[c(seq(1, 10), 13, seq(27, 29), seq(31, 37)),]
+
+write.csv(side_by_side, "C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period.csv")
+write.csv(gw_by_obs_period, "C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period_unbinned.csv")
+write.csv(observation_df, "C:/Users/Hugh/Desktop/Riverlab/gw_dates_with_obs_periods.csv")
+
+
+
+
 
