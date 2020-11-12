@@ -19,6 +19,7 @@ This submission will be the 4th and last Homework Assignment (HW4).
 Question 1) In your individual project, what is (are) your variate(s), also known as response(s)? Create the object (or recover it from HW2), and name it 'dat'. If you have many variates, you do not need to analyze here the whole dataset in this lab/HW4. However, the closer the resemblance of this data set to the one you will end up analyzing, the better. E.g., if your question is at the community level, then include several species; if you would like to compare a particular physical variable across different sites, then include several sites. If you have multivariate responses, name rows appropriately so that you can keep track of each state. Do you need to further clean and/or transform these data for analysis (e.g., log-transform, z-score)? If so, do it below (and name this new object 'transformed_dat'). [1 point]
 ```{r code chunk 1}
 library(MARSS)
+library(tidyverse)
 dat <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period.csv"), stringsAsFactors=FALSE, header=FALSE)
 
 #don't want to zscone bi_week_fac
@@ -27,11 +28,11 @@ observation_periods <- dat[,2]
 transformed_dat <- zscore(dat)
 transformed_dat[,2] <- observation_periods
 dat_75 <- transformed_dat[,(colSums(is.na(dat)) < 5)]
-groundwater_variates <- dat_75[,3:21]
+groundwater_variates <- t(dat_75[,3:21])
 #19 wells have at least 75% completeness. At least for now, I will be using the wells with at least 75% completeness.
 
 ```
-Your text here (<100 words).
+For now, we are z-scoring. data is 19 wells, each with 21 observations.
 
 
 Question 2) What is (are) your covariate(s), aka driver(s), if any? Z-score them and make sure they have no missing data (MARSS does not allow NA's in covariate data). [1 point]
@@ -73,28 +74,53 @@ sagehen_discharge <- discharge[, 3:4] %>%
   rename(timestamp = Date, Flow = X_00060_00003)
   
 #Bin discharge data into bi_weeks for averaging:
-###FIXME: for now, we are using averages of the weeks themselves as the covariates.
-###       however, this is allowing discharge in the future to drive groundwater levels in the past. 
-#assinging days to bins of every two weeks
-test2 <-  sagehen_discharge%>% 
-  mutate(bi_week_fac=factor((lubridate::week(timestamp) + (lubridate::year(timestamp) - 2018)*52)%/%2))
+observation_df <- data.frame(matrix(NA, nrow = 39, ncol = 0))
+###FIXME: For now, observation_df holds the observation period days OFFSET BY ONE DAY.
+###       For example, if Jen observed groundwater levels on 2018-05-31 and 2018-06-01, This observation 
+###       Dataframe holds 2018-05-30 and 2018-05-31. The idea here is perhaps the discharge will take one day
+###       to affect groundwater levels. 
+###       This isn't perfect, because technically by averaging over those two days, we are allowing the 
+###       second observation day to effect groundwater observed on the first day. I'm thinking this is 
+###       probably fine because the days are all within 3 days of eachother, and sagehen discharge doesn't
+###       change much in that time period. 
+observation_df["timestamp"] <- as.Date(c("2018-05-30","2018-05-31",
+                                 "2018-06-17", "2018-06-18",
+                                 "2018-06-29", "2018-06-30",
+                                 "2018-07-15", "2018-07-16",
+                                 "2018-07-24", "2018-07-26",
+                                 "2018-08-09",
+                                 "2018-08-23", "2018-08-24",
+                                 "2018-09-15",
+                                 "2018-09-28", "2018-09-29",
+                                 "2018-10-13",
+                                 "2018-11-17",
+                                 "2019-06-01", "2019-06-02",
+                                 "2019-06-16", "2019-06-17",
+                                 "2019-07-04", "2019-07-05", "2019-07-06",
+                                 "2019-07-25",
+                                 "2019-08-03", "2019-08-04", "2019-08-05",
+                                 "2019-08-19",
+                                 "2019-09-01", "2019-09-03", "2019-09-04", "2019-09-02",
+                                 "2019-09-20",
+                                 "2019-10-04",
+                                 "2019-10-18", "2019-10-20", "2019-10-19"))
+observation_df["observation_period"] <- as.factor(c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10, 11, 12, 12, 13, 13, 14, 14, 14, 15, 16, 16, 16, 17, 18, 18, 18, 18, 19, 20, 21, 21, 21))
 
-#cleaning up so separate observations are not in the same biweek, to match groundwater data:
-test3 <- within(test2, bi_week_fac[timestamp == as.Date("2018-10-01")] <- factor(19))
-test3 <- within(test3, bi_week_fac[timestamp == as.Date("2019-08-04") | timestamp == as.Date("2019-08-05")] <- factor(42)) 
-test3 <- within(test3, bi_week_fac[timestamp == as.Date("2019-09-02")] <- factor(44)) 
-sagehen_discharge <- test3
+test_new <- left_join(sagehen_discharge, observation_df, by = "timestamp")
+discharge_by_obs_period <- test_new[!is.na(test_new$observation_period),]
+test_2 <- discharge_by_obs_period %>% 
+  group_by(observation_period) %>%
+  summarize(mean_flow = mean(Flow))
+discharge_by_obs_period <- data.frame(test_2)
 
-#average by biweekly factor
-sagehen_discharge <- sagehen_discharge[, 2:3] %>%
-  group_by(bi_week_fac) %>%
-  summarize(mean_Flow = mean(Flow))
-#remove biweeks for which we don't have observations
-sagehen_discharge <- sagehen_discharge[c(seq(1, 10), 13, seq(27, 29), seq(31, 37)),]
-
-discharge_covariates <- sagehen_discharge$mean_Flow
+discharge_covariates <- discharge_by_obs_period$mean_flow
+discharge_covariates <- zscore(discharge_covariates)
 ```
-Your text here (<100 words).
+For now, observation_df holds the observation period days OFFSET BY ONE DAY.       For example, if Jen observed groundwater levels on 2018-05-31 and 2018-06-01, This observation 
+       Dataframe holds 2018-05-30 and 2018-05-31. The idea here is perhaps the discharge will take one day
+      to affect groundwater levels. 
+       This isn't perfect, because technically by averaging over those two days, we are allowing the 
+      second observation day to effect groundwater observed on the first day. I'm thinking this is       probably fine because the days are all within 3 days of eachother, and sagehen discharge doesn't      change much in that time period. .
 
 
 Question 3) Is each observation suppposed to be modeled as a different state, or do you have 'replicate' observations, i.e. more than one observations being funneled into a single state (via the Z matrix)? 
@@ -106,36 +132,125 @@ Build the Z matrix you need, or specify it using a shortcut (e.g., Z = "identity
 Z_1 = "identity"
 
 #Hypothesis 2: four states by plant functional type: E = sedge, H = mixed herbaceous, W = willow ,F = mixed pine forest
-Z_2 = matrix(NA, nrow = 4, ncol = 0)
-for (wellname in colnames(groundwater_variates)){
+Z_2 = matrix(NA, nrow = 0, ncol = 4)
+for (wellname in rownames(groundwater_variates)){
   plant_type <- substring(wellname, 2, 2)
   if (plant_type == "E"){
-    col <- c(1, 0, 0, 0)
+    row <- c(1, 0, 0, 0)
   } else if (plant_type == "H"){
-    col <- c(0, 1, 0, 0)
+    row <- c(0, 1, 0, 0)
   } else if (plant_type == "W"){
-    col <- c(0, 0, 1, 0)
+    row <- c(0, 0, 1, 0)
   } else {
-    col <- c(0, 0, 0, 1)
+    row <- c(0, 0, 0, 1)
   }
-  Z_2 <- cbind(Z_2, col)
+  Z_2 <- rbind(Z_2, row)
 }
 
 #Hypothesis 3: 3 states are the Hydrogeomorphic zones: R = riparian, F = fan, T = terrace
-Z_3 = matrix(NA, nrow = 3, ncol = 0)
-for (wellname in colnames(groundwater_variates)){
+Z_3 = matrix(NA, nrow = 0, ncol = 3)
+for (wellname in rownames(groundwater_variates)){
   HGMZ <- substring(wellname, 3, 3)
   if (HGMZ == "R"){
-    col <- c(1, 0, 0)
+    row <- c(1, 0, 0)
   } else if (HGMZ == "F"){
-    col <- c(0, 1, 0)
+    row <- c(0, 1, 0)
   } else if (HGMZ == "T"){
-    col <- c(0, 0, 1)
+    row <- c(0, 0, 1)
   }
-  Z_3 <- cbind(Z_3, col)
+  Z_3 <- rbind(Z_3, row)
+}
+
+#Hypothesis 4: 12 states: one state per pair of (plant, HGMZ)
+Z_4 = matrix(NA, nrow = 0, ncol = 12)
+for (wellname in rownames(groundwater_variates)){
+  HGMZ <- substring(wellname, 3, 3)
+  plant <- substring(wellname, 2, 2)
+  plant_type <- substring(wellname, 2, 2)
+  if (plant_type == "E" & HGMZ == "R"){
+    row <- c(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+  } else if (plant_type == "E" & HGMZ == "F"){
+    row <- c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+  } else if (plant_type == "E" & HGMZ == "T"){
+    row <- c(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+  } else if (plant_type == "H" & HGMZ == "R"){
+    row <- c(0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+  } else if (plant_type == "H" & HGMZ == "F"){
+    row <- c(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)
+  } else if (plant_type == "H" & HGMZ == "T"){
+    row <- c(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0)
+  } else if (plant_type == "W" & HGMZ == "R"){
+    row <- c(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0)
+  } else if (plant_type == "W" & HGMZ == "F"){
+    row <- c(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+  } else if (plant_type == "W" & HGMZ == "T"){
+    row <- c(0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
+  } else if (plant_type == "F" & HGMZ == "R"){
+    row <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
+  } else if (plant_type == "F" & HGMZ == "F"){
+    row <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
+  } else if (plant_type == "F" & HGMZ == "T"){
+    row <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)
+  } 
+  Z_4 <- rbind(Z_4, row)
+}
+
+#Hypothesis 5: Every well is part of the same picture:
+Z_5 = matrix(rep(1, 19), nrow = 19, ncol = 1)
+
+#Hypothesis 6: 2 states: Kiln and East:
+Z_6 = matrix(NA, nrow = 0, ncol = 2)
+for (wellname in rownames(groundwater_variates)){
+  meadow <- substring(wellname, 1, 1)
+  if (meadow == "E"){
+    row <- c(1, 0)
+  } else if (meadow == "K"){
+    row <- c(0, 1)
+  }
+  Z_6 <- rbind(Z_6, row)
+}
+
+#Hypothesis 7: Hydrogeomorphic zone, only clumping fan and terrace together:
+Z_7 <- matrix(NA, nrow = 0, ncol = 2)
+for (wellname in rownames(groundwater_variates)){
+  HGMZ <- substring(wellname, 3, 3)
+  if (HGMZ == "R"){
+    row <- c(1, 0)
+  } else if (HGMZ == "F" | HGMZ == "T"){
+    row <- c(0, 1)
+  }
+  Z_7 <- rbind(Z_7, row)
+}
+
+#Hypothesis 8: Each well remains its own state, but wells are restricted in their REACTIONS to covariates depending on their HGMZ (This is like hypothesis 3, ecept we are keeping the Z matrix as identity, and instead changing the C matrix)
+Z_8 = "identity"
+C_8 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates)){
+  HGMZ <- substring(wellname, 3, 3)
+  C_8 <- rbind(C_8, c(HGMZ))
+}
+
+#Hypothesis 8.5: same as 8, but restricting according to (riparian OR (fan or terrace))
+Z_8.5 = "identity"
+C_8.5 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates)){
+  HGMZ <- substring(wellname, 3, 3)
+  if (HGMZ == "F" | HGMZ == "T") {
+    C_8.5 <- rbind(C_8.5, c("Fan or Terrace"))
+  } else if (HGMZ == "R"){
+    C_8.5 <- rbind(C_8.5, c("riparian"))
+  }
+}
+
+#Hypothesis 9: identity Z, but restricting C matrix according to plant functional type. (To compare to Hypothesis 8)
+Z_9 = "identity"
+C_9 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates)){
+  HGMZ <- substring(wellname, 2, 2)
+  C_9 <- rbind(C_9, c(HGMZ))
 }
 ```
-I plan to test multiple hypothesis, but these are some to start with. One other hypothesis I want to test is having 12 states, one for each (plantfunctional type, Hydrogeomorphic zone) pair. Another is to have different states be how far away from Sagehen the different wells are, as a pseudo replication of Allen-Diaz's study again.
+I plan to test multiple hypothesis, but these are some to start with. One other hypothesis I want to test is having 12 states, one for each (plantfunctional type, Hydrogeomorphic zone) pair. Another is to have different states be how far away from Sagehen the different wells are, as a pseudo replication of Allen-Diaz's study again. Also, kiln vs. east meadows. Also, panmictic.
 
 
 Question 4) Specify the rest of your MARSS parameters using the MARSS model list we have been using so far: R (based on the number of observations), and U, B, C, Q (based on the number of states). Remember what we have learned over the past few weeksm e.g. if you want to focus on the B matrix (e.g. species interactions) then it is best to fix U (long-term trend) to zero, which you can do after demeaning the variate data.
@@ -143,7 +258,22 @@ If you are building custom matrices R and Q need to be symmetrical, but B does n
 If you would like to fit MAR instead of MARSS, set R to "zero". If you plan on comparing models, start with a simple model structure (e.g., Q = "diagonal and equal" instead of "unconstrained"), and make it progressively more complex. 
 If you have covariate data, assign it here as well to the model list ("c"). [1 point]
 ```{r code chunk 4}
-# your code here
+#Assuming equal observation error for all states, whether those states are under hypothesis 1, 2, or 3
+R. <- "diagonal and equal"
+#Assuming no overall trend in data:
+U. <- "zero"
+#assuming wells do not interact with oneanother, and no density dependence, since we zscored.
+#
+B. <- "identity"
+#Assuming equal process error 
+###FIXME: should process error be unequal?
+Q. <- "diagonal and equal"
+#Letting each state respond to covariates in a different way:
+C. <- "unequal"
+A. <- "zero"
+#discharge_covariates uploaded and manipulated in chunk 2.
+c. <- matrix(discharge_covariates, nrow = 1) 
+
 ```
 Your text here (<100 words).
 
@@ -153,9 +283,57 @@ If errors persist, check the MARSS User Fuide ("Appendix A - Warnings and errors
 Once it does work: bootstrap the model(s). What do you obtain? Is it what you expected?
 What are the next steps to complete analyses for your final project? [1 point]
 ```{r code chunk 5}
-# your code here
+#Hypothesis 1: Every well is it's own state:
+model_1 <- MARSS(groundwater_variates, model = list(Z = Z_1, R = R., U=U., B=B., Q=Q., C=C., c=c., A= A.), control=list(maxit=10000))
+#AICc: 633.5898
+#got convergence warnings
+#AICc: 628.438 <- after adding maxit = 10000 parameter. 
+
+#Hypothesis 2: four states by plant functional type:
+model_2 <- MARSS(groundwater_variates, model = list(Z = Z_2, R = R., U=U., B=B., Q=Q., C=C., c=c., A= A.))
+# AICc: 886.8667
+
+#Hypothesis 3: 3 states are the Hydrogeomorphic zones:
+model_3 <- MARSS(groundwater_variates, model = list(Z = Z_3, R = R., U=U., B=B., Q=Q., C=C., c=c., A = A.))
+#AICc: 796.9625
+
+#Hypothesis 4: 12 states: one state per pair of (plant, HGMZ)
+model_4 <- MARSS(groundwater_variates, model = list(Z = Z_4, R = R., U = U., B = B., Q = Q., C=C., c =c., A=A.), inits = list(x0 = 0), control=list(maxit=10000))
+# error : Z B d_x0 is underconstrained: need to input inits? "the U (+ C) terms cannot be estimated"
+
+#Hypothesis 5: Every well is part of a universal state
+model_5 <- MARSS(groundwater_variates, model = list(Z = Z_5, R = R., U=U., B=B., Q=Q., C=C., c=c., A= A.))
+#AICc: 919.3704
+
+#Hypothesis 6: 2 states: Kiln and East:
+model_6 <- MARSS(groundwater_variates, model = list(Z = Z_6, R = R., U=U., B=B., Q=Q., C=C., c=c., A= A.))
+#AICc: 914.5163
+
+#Hypothesis 7: Hydrogeomorphic zone, only clumping fan and terrace together:
+model_7 <- MARSS(groundwater_variates, model = list(Z = Z_7, R = R., U=U., B=B., Q=Q., C=C., c=c., A= A.))
+#AICc: 886.4137 
+#Intersting that this one is so close to the plant functional type one, hyp. 2.
+
+#Hypothesis 8: 19 states, but C-matrix restricted according to HGMZ:
+model_8 <- MARSS(groundwater_variates, model = list(Z = Z_8, R = R., U=U., B=B., Q=Q., C=C_8, c=c., A= A.), control=list(maxit=10000))
+# AICc: 659.0826 (But then got convergence errors)
+# AICc: 655.0361 after adding maxit parameter.
+
+#Hypothesis 8.5: restrained C-matrix counting Riparian against fan and terrace as a pair:
+model_8.5 <- MARSS(groundwater_variates, model = list(Z = Z_8.5, R = R., U=U., B=B., Q=Q., C=C_8.5, c=c., A= A.), control=list(maxit=10000))
+#AICc: 654.7505
+
+#Hypothesis 8: 19 states, but C-matrix restricted according to Plant functional type:
+model_9 <- MARSS(groundwater_variates, model = list(Z = Z_9, R = R., U=U., B=B., Q=Q., C=C_9, c=c., A= A.), control = list(maxit=10000))
+#AICc: 654.6688 
 ```
-Your text here (<100 words).
+Out of these three hypotheses, the one that considered each well as a different state did the best. Next was hydrogeomorphic zones. I am interested to compare these with other hypotheses, like considering states by distance from Sagehen creek, and hydrogeomorphic zone, plant funcitonal type pair, and a panmictic model as another baseline.
+
+```{r}
+#residuals:
+plot(model_1, plot.type = "acf.model.resids")
+```
+
 
 Question 6) [ONLY FOR THE FEW OF YOU WHO CANNOT USE MARSS]: Discuss with Albert and find an appropriate model to use.  
 Follow the equivalent steps 1-5 above by reading in your response and driver data (if any), transforming it (if necessary),
