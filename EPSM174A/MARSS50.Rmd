@@ -1,0 +1,358 @@
+---
+title: "groundwaterMARSS50"
+author: "Julia Nicholson"
+date: "11/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#Same process as Lab7, but increasing number of wells we allow:
+
+library(MARSS)
+library(tidyverse)
+dat <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period.csv"), stringsAsFactors=FALSE, header=FALSE)
+
+#don't want to zscone bi_week_fac
+observation_periods <- dat[,2]
+
+transformed_dat <- zscore(dat)
+transformed_dat[,2] <- observation_periods
+dat_50 <- transformed_dat[,(colSums(is.na(dat)) < 10)]
+groundwater_variates <- t(dat_50[,3:29])
+```
+```{r}
+# covariates for now are temperature and/or sagehen creek discharge.
+install.packages(c('rgdal','sp','forecast','imputeTS','dataRetrieval'))
+install.packages('remotes')
+remotes::install_github("hrbrmstr/albersusa")  #requires 'remotes' to be installed
+#1-Maps
+library(albersusa); library(rgdal); library(sp)
+
+us <- usa_composite(proj = "aeqd") 
+library(forecast); library(imputeTS) 
+#3-US National Water Information System
+library(dataRetrieval)
+sagehenINFO <- readNWISsite("10343500")
+sagehenINFO
+
+dailyDataAvailable <- whatNWISdata(siteNumber ="10343500") 
+dailyDataAvailable
+
+sagenum <- "10343500"
+
+#choice of discharge time-series, daily values ("dv") and only mean values ("00003")
+dailyDataAvailable <- whatNWISdata(siteNumber = sagenum,
+                    parameterCd="00060",service="dv", statCd="00003")
+dailyDataAvailable
+
+parameterCd <- "00060"
+#Specify a time frame 
+startDate <- "2018-05-31"
+endDate <- "2019-10-21"
+
+#Download the data
+discharge <- readNWISdv(sagenum, 
+                    parameterCd, startDate, endDate)
+sagehen_discharge <- discharge[, 3:4] %>%
+  rename(timestamp = Date, Flow = X_00060_00003)
+  
+#Bin discharge data into bi_weeks for averaging:
+observation_df <- data.frame(matrix(NA, nrow = 39, ncol = 0))
+###FIXME: For now, observation_df holds the observation period days OFFSET BY ONE DAY.
+###       For example, if Jen observed groundwater levels on 2018-05-31 and 2018-06-01, This observation 
+###       Dataframe holds 2018-05-30 and 2018-05-31. The idea here is perhaps the discharge will take one day
+###       to affect groundwater levels. 
+###       This isn't perfect, because technically by averaging over those two days, we are allowing the 
+###       second observation day to effect groundwater observed on the first day. I'm thinking this is 
+###       probably fine because the days are all within 3 days of eachother, and sagehen discharge doesn't
+###       change much in that time period. 
+observation_df["timestamp"] <- as.Date(c("2018-05-30","2018-05-31",
+                                 "2018-06-17", "2018-06-18",
+                                 "2018-06-29", "2018-06-30",
+                                 "2018-07-15", "2018-07-16",
+                                 "2018-07-24", "2018-07-26",
+                                 "2018-08-09",
+                                 "2018-08-23", "2018-08-24",
+                                 "2018-09-15",
+                                 "2018-09-28", "2018-09-29",
+                                 "2018-10-13",
+                                 "2018-11-17",
+                                 "2019-06-01", "2019-06-02",
+                                 "2019-06-16", "2019-06-17",
+                                 "2019-07-04", "2019-07-05", "2019-07-06",
+                                 "2019-07-25",
+                                 "2019-08-03", "2019-08-04", "2019-08-05",
+                                 "2019-08-19",
+                                 "2019-09-01", "2019-09-03", "2019-09-04", "2019-09-02",
+                                 "2019-09-20",
+                                 "2019-10-04",
+                                 "2019-10-18", "2019-10-20", "2019-10-19"))
+observation_df["observation_period"] <- as.factor(c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10, 11, 12, 12, 13, 13, 14, 14, 14, 15, 16, 16, 16, 17, 18, 18, 18, 18, 19, 20, 21, 21, 21))
+
+test_new <- left_join(sagehen_discharge, observation_df, by = "timestamp")
+discharge_by_obs_period <- test_new[!is.na(test_new$observation_period),]
+test_2 <- discharge_by_obs_period %>% 
+  group_by(observation_period) %>%
+  summarize(mean_flow = mean(Flow))
+discharge_by_obs_period <- data.frame(test_2)
+
+discharge_covariates <- discharge_by_obs_period$mean_flow
+discharge_covariates <- zscore(discharge_covariates)
+```
+
+
+```{r}
+#Model specification: MAR:
+#Hypothesis 1: Each well responds uniquely
+C_1 = "unequal"
+#Hypothesis 5: Every well is part of a universal state
+C_5 = "equal"
+#Hypothesis 6: Kiln and East restrict C
+C_6 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates)){
+  meadow <- substring(wellname, 1, 1)
+  C_6 <- rbind(C_6, c(meadow))
+}
+
+#Hypothesis 8: HGMZ restrict C
+C_8 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates)){
+  HGMZ <- substring(wellname, 3, 3)
+  C_8 <- rbind(C_8, c(HGMZ))
+}
+#Hypothesis 8.5 : HGMZ restrict C, only fan and terrace are counted together.
+C_8.5 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates)){
+  HGMZ <- substring(wellname, 3, 3)
+  if (HGMZ == "F" | HGMZ == "T") {
+    C_8.5 <- rbind(C_8.5, c("Fan or Terrace"))
+  } else if (HGMZ == "R"){
+    C_8.5 <- rbind(C_8.5, c("riparian"))
+  }
+}
+#Hypothesis 9: plant functional type affecting C matrix:
+C_9 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates)){
+  plant <- substring(wellname, 2, 2)
+  C_9 <- rbind(C_9, c(plant))
+}
+
+#Hypothesis 10: plant/HGMZ pair:
+C_10 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates)){
+  plant <- substring(wellname, 2, 2)
+  HGMZ <- substring(wellname, 3, 3)
+  C_10 <- rbind(C_10, c(paste(plant, HGMZ)))
+}
+
+```
+
+
+```{r}
+#djdkdk
+R. <- "zero"
+#Assuming no overall trend in data:
+U. <- "zero"
+#assuming wells do not interact with oneanother, and no density dependence, since we zscored.
+B. <- "identity"
+#Assuming equal process error 
+###FIXME: should process error be unequal?
+Q. <- "diagonal and unequal"
+A. <- "zero"
+#discharge_covariates uploaded and manipulated in chunk 2.
+c. <- matrix(discharge_covariates, nrow = 1) 
+Z. <- "identity"
+```
+```{r}
+#Models:
+#Hyp. #1: every well responds its own way
+model_1 <- MARSS(groundwater_variates, model = list(Z = Z., R = R., U=U., B=B., C=C_1, c=c., A= A., Q ="diagonal and unequal"), control=list(maxit=10000))
+# AICc: 1002.745 Q diagonal and equal
+#AICc: 680.4154 Q diagonal and unequal
+
+#Hypothesis 5: Every well is part of a universal state
+model_5 <- MARSS(groundwater_variates, model = list(Z = Z., R = R., U=U., B=B., C=C_5, c=c., A= A., Q = "diagonal and unequal"))
+#AICc: 985.16 Q diagonal and equal
+# AICc: 689.2232 Q diagonal and unequal
+
+#Hypothesis 6: Kiln and East restrict C:
+model_6 <- MARSS(groundwater_variates, model = list(Z = Z., R = R., U=U., B=B., C=C_6, c=c., A= A., Q = "diagonal and unequal"))
+#AICc: 974.1982 Q diagonal and equal
+# AICc: 668.8699 Q diagonal and unequal
+
+#Hypothesis 8: HGMZ restrict C
+model_8 <- MARSS(groundwater_variates, model = list(Z = Z., R = R., U=U., B=B., C=C_8, c=c., A= A., Q = "diagonal and unequal"))
+#AICc: 983.8582 Q diag and equal
+#AICc: 677.4209 Q d and unewual
+
+#Hypothesis 8.5 : HGMZ restrict C, only fan and terrace are counted together.
+model_8.5 <- MARSS(groundwater_variates, model = list(Z = Z., R = R., U=U., B=B., C=C_8.5, c=c., A= A., Q = "diagonal and unequal"))
+#AICc: 985.6888 Q diag and equal
+#AICc: 685.7831 Q diag and unequal
+
+#Hypothesis 9: plant functional type affecting C matrix:
+model_9 <- MARSS(groundwater_variates, model = list(Z = Z., R = R., U=U., B=B., C=C_9, c=c., A= A., Q = "diagonal and equal"))
+#AICc: 987.4882 Q diag and equal
+#AICc: 682.6821 Q diag and unequal
+
+#Hypothesis 10:
+model_10 <- MARSS(groundwater_variates, model = list(Z = Z., R = R., U=U., B=B., C=C_10, c=c., A= A., Q = "diagonal and unequal"))
+#AICc: 991.1521 Q diag and equal
+#AICc: 680.9046 Q diag and unequal
+
+```
+
+
+```{r}
+#For 50% completeness, and covariate is sagehen discharge:
+#Best model: hypothesis 6
+#second best model: hypothesis 8
+#third best model: hypothesis 1
+
+#For 75% completeness, and covariate is sagehen discharge: (calculated below this chunk)
+#Best model: hypothesis 8
+#second best model: hypothesis 9
+#third best model: hypothesis 6
+
+#Comments: 
+# with more completeness, we get increasingly farther away from the base case.
+```
+
+
+```{r}
+###    75% completeness    ####
+dat_75 <- transformed_dat[,(colSums(is.na(dat)) < 5)]
+groundwater_variates_75 <- t(dat_50[,3:21])
+```
+
+
+```{r}
+#Model specification: MAR:
+#Hypothesis 1: Each well responds uniquely
+C_1 = "unequal"
+#Hypothesis 5: Every well is part of a universal state
+C_5 = "equal"
+#Hypothesis 6: Kiln and East restrict C
+C_6 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates_75)){
+  meadow <- substring(wellname, 1, 1)
+  C_6 <- rbind(C_6, c(meadow))
+}
+
+#Hypothesis 8: HGMZ restrict C
+C_8 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates_75)){
+  HGMZ <- substring(wellname, 3, 3)
+  C_8 <- rbind(C_8, c(HGMZ))
+}
+#Hypothesis 8.5 : HGMZ restrict C, only fan and terrace are counted together.
+C_8.5 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates_75)){
+  HGMZ <- substring(wellname, 3, 3)
+  if (HGMZ == "F" | HGMZ == "T") {
+    C_8.5 <- rbind(C_8.5, c("Fan or Terrace"))
+  } else if (HGMZ == "R"){
+    C_8.5 <- rbind(C_8.5, c("riparian"))
+  }
+}
+#Hypothesis 9: plant functional type affecting C matrix:
+C_9 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates_75)){
+  plant <- substring(wellname, 2, 2)
+  C_9 <- rbind(C_9, c(plant))
+}
+
+#Hypothesis 10: plant/HGMZ pair:
+C_10 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates_75)){
+  plant <- substring(wellname, 2, 2)
+  HGMZ <- substring(wellname, 3, 3)
+  C_10 <- rbind(C_10, c(paste(plant, HGMZ)))
+}
+```
+```{r}
+#Models for 75% completeness:
+#Hyp. #1: every well responds its own way
+model_1 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_1, c=c., A= A., Q ="diagonal and equal"), control=list(maxit=10000))
+# AICc: 775.1484Q diagonal and equal
+#AICc: 514.2968 Q diagonal and unequal
+
+#Hypothesis 5: Every well is part of a universal state
+model_5 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_5, c=c., A= A., Q = "diagonal and equal"))
+#AICc: 759.6559 Q diagonal and equal
+#AICc: 507.8407 Q diagonal and unequal
+
+#Hypothesis 6: Kiln and East restrict C:
+model_6 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_6, c=c., A= A., Q = "diagonal and equal"))
+#AICc: 754.6924 Q diagonal and equal
+#AICc: 504.4844 Q diagonal and unequal
+
+#Hypothesis 8: HGMZ restrict C
+model_8 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_8, c=c., A= A., Q = "diagonal and equal"))
+#ICc: 760.8268 Q diagonal and equal
+#AICc: 501.6249 Q d and unewual
+
+#Hypothesis 8.5 : HGMZ restrict C, only fan and terrace are counted together.
+model_8.5 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_8.5, c=c., A= A., Q = "diagonal and equal"))
+#AICc: 761.8886  Q diag and equal
+#AICc: 510.1381 Q diag and unequal
+
+#Hypothesis 9: plant functional type affecting C matrix:
+model_9 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_9, c=c., A= A., Q = "diagonal and equal"))
+#AICc: 758.6665 Q diag and equal
+#AICc: 502.846 Q diag and unequal
+
+#Hypothesis 10:
+model_10 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_10, c=c., A= A., Q = "diagonal and equal"))
+#AICc: 763.2323 Q diag and equal
+#AICc: 509.373 Q diag and unequal
+
+#Hypothesis 11
+model_11 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_11, c=c., A= A., Q = "diagonal and unequal"))
+#AICc: 1984.013
+#AICc: 1701.658
+```
+
+Now, upload TWI data to use to affect C matrix:
+```{r}
+characteristics <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/sagehen_meadows/data/field_observations/groundwater/Wells_Characteristics.csv"), stringsAsFactors=FALSE, header=FALSE)
+characteristics <- characteristics[!is.na(characteristics[,2]) & characteristics[,2]==" 1",]
+characteristics[,1] <- gsub("-", ".",characteristics[,1])
+
+#A dictionary for TWI of each well:
+library(hash)
+TWIs <- hash()
+for (rindex in 1:nrow(characteristics)){
+  TWIs[[characteristics[rindex, 1]]] <- characteristics[rindex, 7]
+}
+
+#Hypothesis 11: C effected by TWI of the well:
+C_11 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates_75)){
+  TWI <- as.numeric(TWIs[[wellname]])
+  bin <- 0
+  if (is.null(TWIs[[wellname]])){
+    bin <- 1
+    ###FIXME: some of the TWIs are not calculated, so I had to put in this case!
+  } else if (TWI < 2){
+    bin <- 1
+  } else if (TWI < 3){
+    bin <- 2
+  } else if (TWI < 4){
+    bin <- 3
+  } else if (TWI < 5){
+    bin <- 4
+  } else if (TWI < 6){
+    bin <- 5
+  } else if (TWI < 7){
+    bin <- 6
+  } else if (TWI < 20){
+    bin <- 7
+  } else if (TWI == 1000.0000000){
+    bin <- 8
+  }
+  C_11 <- rbind(C_11, c(bin))
+}
+
+
+```
