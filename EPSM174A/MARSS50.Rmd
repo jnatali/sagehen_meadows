@@ -311,6 +311,16 @@ model_10 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=
 model_11 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_11, c=c., A= A., Q = "diagonal and unequal"))
 #AICc: 1984.013
 #AICc: 1701.658
+
+#Hypothesis 12: C restricted by distance to main channel
+model_12 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_12, c=c., A= A., Q = "diagonal and equal"))
+#AICc: 1844.176  Q diag and equal
+#AICc: 1676.011 Q diag and unequal
+
+#Hypothesis 13: C restricted by distance to nearest channel
+model_13 <- MARSS(groundwater_variates_75, model = list(Z = Z., R = R., U=U., B=B., C=C_13, c=c., A= A., Q = "diagonal and unequal"))
+#AICc 1895.378 Q diag and equal
+#AICc: 1720.203 Q diag and equal
 ```
 
 Now, upload TWI data to use to affect C matrix:
@@ -318,6 +328,7 @@ Now, upload TWI data to use to affect C matrix:
 characteristics <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/sagehen_meadows/data/field_observations/groundwater/Wells_Characteristics.csv"), stringsAsFactors=FALSE, header=FALSE)
 characteristics <- characteristics[!is.na(characteristics[,2]) & characteristics[,2]==" 1",]
 characteristics[,1] <- gsub("-", ".",characteristics[,1])
+###FIMXME: not zscored, because of the 10000 entry.
 
 #A dictionary for TWI of each well:
 library(hash)
@@ -353,6 +364,72 @@ for (wellname in rownames(groundwater_variates_75)){
   }
   C_11 <- rbind(C_11, c(bin))
 }
+```
 
 
+```{r}
+#C matrix restricted according to binned distance from main channel:
+characteristics[,3] <- zscore(as.numeric(characteristics[,3]))
+mean_main <- mean(as.numeric(characteristics[,3]))
+#A dictionary for TWI of each well:
+dist_to_mains <- hash()
+for (rindex in 1:nrow(characteristics)){
+  dist_to_mains[[characteristics[rindex, 1]]] <- characteristics[rindex, 3]
+}
+
+#Hypothesis 12: C effected by distance to main chanel of the well:
+C_12 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates_75)){
+  distance <- as.numeric(dist_to_mains[[wellname]])
+  bin <- 0
+  if (is.null(dist_to_mains[[wellname]])){
+    bin <- 1
+    ###FIXME: some of the distances are not calculated, so I had to put in this case!
+  } else if (distance < -.5){
+    bin <- 2
+  } else if (distance < 0){
+    bin <- 3
+  } else if (distance < .5){
+    bin <- 4
+  } else if (distance < 1){
+    bin <- 5
+  } else {
+    bin <- 6
+  }
+  C_12 <- rbind(C_12, c(bin))
+}
+```
+
+
+```{r}
+#C matrix restricted according to binned distance from nearest channel:
+characteristics[,4] <- zscore(as.numeric(characteristics[,4]))
+mean_near <- mean(as.numeric(characteristics[,4]))
+#A dictionary for TWI of each well:
+dist_to_nears <- hash()
+for (rindex in 1:nrow(characteristics)){
+  dist_to_nears[[characteristics[rindex, 1]]] <- characteristics[rindex, 4]
+}
+
+#Hypothesis 13: C effected by distance to nearest chanel:
+C_13 = matrix(NA, nrow = 0, ncol = 1)
+for (wellname in rownames(groundwater_variates_75)){
+  distance <- as.numeric(dist_to_nears[[wellname]])
+  bin <- 0
+  if (is.null(dist_to_nears[[wellname]])){
+    bin <- 1
+    ###FIXME: some of the distances are not calculated, so I had to put in this case!
+  } else if (distance < -.5){
+    bin <- 2
+  } else if (distance < 0){
+    bin <- 3
+  } else if (distance < .5){
+    bin <- 4
+  } else if (distance < 1){
+    bin <- 5
+  } else {
+    bin <- 6
+  }
+  C_13 <- rbind(C_13, c(bin))
+}
 ```
