@@ -1,0 +1,248 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(grid)
+library(gridExtra)
+datt <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period.csv"), stringsAsFactors=FALSE, header=FALSE)
+unbinned <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period_unbinned.csv"), stringsAsFactors=FALSE, header=FALSE)
+```
+
+
+```{r}
+period_to_date <- hash()
+for (row in seq(1, nrow(unbinned), 1)){
+  per <- unbinned[row, 6]
+  date <- as.character(unbinned[row, 2])
+  period_to_date[per] <- date
+}
+dates <- c()
+for (per in keys(period_to_date)){
+  dates <- append(dates, period_to_date[[per]])
+}
+```
+indy_wells_plots is a hash of all the plots of groundwater of individual wells.
+```{r}
+#plotting an individual well's groundwater levels against time
+library(ggplot2)
+eer1 <- datt[,3]
+df <- data.frame(dates, eer1)
+ggplot(df, aes(dates, eer1))+geom_point()+theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+#plotting each individual well's groundwater levels against time
+indy_wells_plots <- hash()
+for (colnum in seq(3, ncol(datt), 1)){
+  groundwater_level <- datt[,colnum]
+  df <- data.frame(dates, groundwater_level)
+  p <- ggplot(df, aes(dates, groundwater_level))+geom_point()+theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  indy_wells_plots[[colnames(datt)[colnum]]] <- p
+}
+```
+```{r}
+library("cowplot")
+#plotting sagehen discharge...
+#as covariates (taken from MARSS50.Rmd calculations)
+avg_discharge <- c(12.700000, 5.980000,3.480000,2.290000,1.945000,1.610000,1.595000, 1.610000,1.660000, 1.950000,2.160000,58.750000,52.350000,12.733333,4.890000,3.420000,2.490000,2.197500,3.000000,2.920000, 2.853333)
+df <- data.frame(dates, avg_discharge)
+discrete_discharge_plot <-   p <- ggplot(df, aes(dates, avg_discharge))+geom_point()+theme(axis.text.x = element_text(angle = 60, hjust = 1))
+discrete_discharge_plot
+
+#average discharge and an individual well in the same plot:
+g <- ggplot(df, aes(dates))
+g <- g + geom_point(aes(y=eer1, color="red"))
+g <- g + geom_point(aes(y=avg_discharge, color="green"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+g <- g + scale_color_identity(name = "level",
+                          breaks = c("red", "green"),
+                          labels = c("EER1 groundwater level", "Sagehen average discharge"),
+                          guide = "legend")
+g
+
+```
+```{r}
+#discharge measured from USGS:
+remotes::install_github("hrbrmstr/albersusa")  #requires 'remotes' to be installed
+library(albersusa); library(rgdal); library(sp)
+us <- usa_composite(proj = "aeqd") 
+library(forecast); library(imputeTS) 
+library(dataRetrieval)
+dailyDataAvailable <- whatNWISdata(siteNumber ="10343500") 
+dailyDataAvailable
+sagenum <- "10343500"
+dailyDataAvailable <- whatNWISdata(siteNumber = sagenum,
+                    parameterCd="00060",service="dv", statCd="00003")
+parameterCd <- "00060"
+startDate <- "2018-05-31"
+endDate <- "2019-10-21"
+discharge <- readNWISdv(sagenum, 
+                    parameterCd, startDate, endDate)
+sagehen_discharge <- discharge[, 3:4] %>%
+  rename(timestamp = Date, Flow = X_00060_00003)
+sagehen_discharge
+
+many_dates <- sagehen_discharge$timestamp
+flow <- sagehen_discharge$Flow
+df <- data.frame(many_dates, flow)
+discharge_plot<-ggplot(df, aes(many_dates, flow))+geom_point()+theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+
+```{r}
+#eer1 groundwater levels, binned and averaged flow, and USGS measured flow all on one plot:
+#first, must make the first two the correct length, with many NAs.
+eer1_sparse <- rep(NA, length(many_dates))
+eer1_hash <- hash(dates, eer1)
+for (i in seq(1, length(many_dates), 1)){
+  j <- as.character(many_dates[i])
+  if (has.key(j, eer1_hash)){
+    eer1_sparse[i] <- eer1_hash[[j]]
+  }
+}
+#binned and averaged flow:
+avg_flow_sparse <- rep(NA, length(many_dates))
+avg_flow_hash <- hash(dates, avg_discharge)
+for (i in seq(1, length(many_dates), 1)){
+  j <- as.character(many_dates[i])
+  if (has.key(j, avg_flow_hash)){
+    avg_flow_sparse[i] <- avg_flow_hash[[j]]
+  }
+}
+
+#one plot with eer1 groundwater, binned and avged discharge, and USGS measured sagehen discharge:
+df <- data.frame(many_dates, avg_flow_sparse)
+g <- ggplot(df, aes(many_dates))
+g <- g + geom_point(aes(y=eer1_sparse, color="red"))
+g <- g + geom_point(aes(y=flow, color="blue"))
+g <- g + geom_point(aes(y=avg_flow_sparse, color="green"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+g <- g + scale_color_identity(name = "level",
+                          breaks = c("red", "blue", "green"),
+                          labels = c("EER1 groundwater level", "USGS measured discharge", "binned and averaged discharge"),
+                          guide = "legend")
+g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") 
+
+```
+```{r}
+#a hash, "wells_plots", keys: individual wells. values: plots for each well with that well's groundwater levels, USGS measured sagehen discharge, and binned and averaged discharge as used for covariates in MARSS.
+
+###SOMETHING IN THIS CHUNK IS MAKING EVERY VALUE IN WELLS_PLOTS EQUAL; assigning each to the last plot.
+wells_plots <- hash()
+plots <- c()
+for (colnum in seq(3, ncol(datt), 1)){
+  groundwater_level <- datt[,colnum]
+  well_sparse <- rep(NA, length(many_dates))
+  well_hash <- hash(dates, groundwater_level)
+  for (i in seq(1, length(many_dates), 1)){
+    j <- as.character(many_dates[i])
+    if (has.key(j, well_hash)){
+      well_sparse[i] <- well_hash[[j]]
+    }
+  }
+  df <- data.frame(many_dates, avg_flow_sparse)
+  g <- ggplot(df, aes(many_dates))
+  g <- g + geom_point(aes(y=well_sparse, color="red"))
+  g <- g + geom_point(aes(y=flow, color="blue"))
+  g <- g + geom_point(aes(y=avg_flow_sparse, color="green"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  g <- g + scale_color_identity(name = "level",
+                            breaks = c("red", "blue", "green"),
+                            labels = c(paste(colnames(datt)[colnum], "groundwater level", sep=" "), "USGS measured discharge", "binned and averaged discharge"),
+                            guide = "legend")
+  g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
+  plots <- append(plots, vectorize(g))
+}
+```
+```{r}
+#apply function rather than for loop:
+plot_data_column = function (colnum) {
+  groundwater_level <- datt[, colnum]
+  well_sparse <- rep(NA, length(many_dates))
+  well_hash <- hash(dates, groundwater_level)
+  for (i in seq(1, length(many_dates), 1)){
+    j <- as.character(many_dates[i])
+    if (has.key(j, well_hash)){
+      well_sparse[i] <- well_hash[[j]]
+    }
+  }
+  df <- data.frame(many_dates, avg_flow_sparse)
+  g <- ggplot(df, aes(many_dates))
+  g <- g + geom_point(aes(y=well_sparse, color="red"))
+  g <- g + geom_point(aes(y=flow, color="blue"))
+  g <- g + geom_point(aes(y=avg_flow_sparse, color="green"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  g <- g + scale_color_identity(name = "level",
+                            breaks = c("red", "blue", "green"),
+                            labels = c(colnum, "USGS measured discharge", "binned and averaged discharge"),
+                            guide = "legend")
+  g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
+  g
+}
+
+myplots <- lapply(colnames(datt)[3:50], plot_data_column)
+```
+
+
+```{r}
+#now, to average kiln and east meadows together as two groups:
+east_wells <- data.frame(datt[, substring(colnames(datt), 1, 1) == "E"])
+east_wells$mean_groundwater <- rowMeans(east_wells, na.rm = TRUE)
+east_wells
+kiln_wells <- data.frame(datt[, substring(colnames(datt), 1, 1) == "K"])
+kiln_wells$mean_groundwater <- rowMeans(kiln_wells, na.rm = TRUE)
+kiln_wells
+#Add them to the hash, well_plots:
+groundwater_level <- east_wells$mean_groundwater
+well_spars <- rep(NA, length(many_dates)) ###THIS LINE MESSES WITH THE OTHER VALUES!
+well_has <- hash(dates, groundwater_level)
+for (i in seq(1, length(many_dates), 1)){
+  j <- as.character(many_dates[i])
+  if (has.key(j, well_has)){
+    well_spars[i] <- well_has[[j]]
+  }
+}
+#above this point, somehow wells_plots is changed!
+df <- data.frame(many_dates, avg_flow_sparse)
+g <- ggplot(df, aes(many_dates))
+g <- g + geom_point(aes(y=well_spars, color="red"))
+g <- g + geom_point(aes(y=flow, color="blue"))
+g <- g + geom_point(aes(y=avg_flow_sparse, color="green"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+g <- g + scale_color_identity(name = "level",
+                          breaks = c("red", "blue", "green"),
+                          labels = c("east wells avg groundwater", "USGS measured discharge", "binned and averaged discharge"),
+                          guide = "legend")
+g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
+myplots <- append(myplots, list(g))
+
+oo <- kiln_wells$mean_groundwater
+well_spar <- rep(NA, length(many_dates))
+well_ha <- hash(dates, oo)
+for (i in seq(1, length(many_dates), 1)){
+  j <- as.character(many_dates[i])
+  if (has.key(j, well_ha)){
+    well_spar[i] <- well_ha[[j]]
+  }
+}
+df <- data.frame(many_dates, avg_flow_sparse)
+p <- ggplot(df, aes(many_dates))
+p <- p + geom_point(aes(y=well_spar, color="red"))
+p <- p + geom_point(aes(y=flow, color="blue"))
+p <- p + geom_point(aes(y=avg_flow_sparse, color="green"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+p <- p + scale_color_identity(name = "level",
+                          breaks = c("red", "blue", "green"),
+                          labels = c("kiln wells avg groundwater", "USGS measured discharge", "binned and averaged discharge"),
+                          guide = "legend")
+p <- p + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
+myplots <- append(myplots, list(p))
+
+```
+```{r}
+#exporting multiple plots:
+pdf(file="multiple_plots.pdf")
+par(mfrow=(c(2,3)))
+myplots
+dev.off()
+```
+
+
+
+
