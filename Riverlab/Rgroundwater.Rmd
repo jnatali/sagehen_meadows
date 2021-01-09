@@ -1,0 +1,75 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+install.packages("here")
+library("here")
+library(dplyr)
+
+groundwater <- read.csv('C:/Users/Hugh/Desktop/riverlab/sagehen_meadows/data/field_observations/groundwater/Groundwater_Manual_WaterLevel.csv')
+
+summary(groundwater)
+
+ground_by_well <- groundwater %>%
+  group_by(Well.Name) %>%
+  summarise_at(vars(Well.Top.To.Ground.cm.), mean, na.rm = TRUE)
+
+view(ground_by_well)
+
+ground_with_mean_height <- merge(groundwater, ground_by_well, by = "Well.Name") %>% 
+  rename(well_top_to_ground_mean = Well.Top.To.Ground.cm..y)
+
+ground_with_mean_height <- ground_with_mean_height[-c(6, 7, 9)] 
+  
+groundwater2 <- ground_with_mean_height
+groundwater2$water.relative.to.ground.by.mean.well.top.height <- ground_with_mean_height$well_top_to_ground_mean - ground_with_mean_height$Top.To.Water.cm.
+groundwater2 <- groundwater2[-c(5, 6)] %>% 
+  rename(water.relative.to.ground = water.relative.to.ground.by.mean.well.top.height)
+
+#now the water level is calculated based on the mean height of that well from the ground.
+head(groundwater2)
+
+groundwater3 <- groundwater2[-c(3:5)]
+view(groundwater3)
+
+observed <- groundwater3 %>% 
+  group_by(Well.Name, Time) %>% 
+  summarize_at(vars(water.relative.to.ground), mean, na.rm = TRUE) 
+
+observed$Time <- as.Date(observed$Time,format="%m/%d/%y %H:%M")
+
+#10/20/19 14:51
+observed <- observed[
+  with(observed, order(Well.Name, Time)),
+]
+groundwaterX <- observed %>% 
+  rename(Date = Time)
+
+view(groundwaterX)
+class(groundwaterX)
+
+write.csv(groundwaterX,"C:/Users/Hugh/Desktop/riverlab/sagehen_meadows/data/field_observations/groundwater/relative_roundwater.csv", row.names = FALSE)
+
+class(observed$Time)
+view(observed)
+
+EEF1 <- groundwaterX %>% 
+  filter(Well.Name == "EEF-1")
+
+view(EEF1)
+plot(EEF1$Date, EEF1$water.relative.to.ground)
+
+EEF1_TS <- ts(EEF1$water.relative.to.ground, frequency = 14, start = c(2018, 06, 01))
+EEF1_TS
+
+plot(EEF1_TS)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

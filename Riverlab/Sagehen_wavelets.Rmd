@@ -1,0 +1,63 @@
+---
+title: "Wavelet Practice"
+author: "Julia Nicholson"
+date: "11/17/2020"
+output: html_document
+---
+
+```{r}
+install.packages(c('rgdal','sp','forecast','imputeTS','dataRetrieval'))
+install.packages('remotes')
+remotes::install_github("hrbrmstr/albersusa")  #requires 'remotes' to be installed
+#1-Maps
+library(albersusa); library(rgdal); library(sp)
+
+us <- usa_composite(proj = "aeqd") 
+library(forecast); library(imputeTS) 
+#3-US National Water Information System
+library(dataRetrieval)
+sagehenINFO <- readNWISsite("10343500")
+sagehenINFO
+
+dailyDataAvailable <- whatNWISdata(siteNumber ="10343500") 
+dailyDataAvailable
+
+sagenum <- "10343500"
+
+#choice of discharge time-series, daily values ("dv") and only mean values ("00003")
+dailyDataAvailable <- whatNWISdata(siteNumber = sagenum,
+                    parameterCd="00060",service="dv", statCd="00003")
+dailyDataAvailable
+
+parameterCd <- "00060"
+#Specify a time frame 
+startDate <- "1960-01-01"
+endDate <- "2019-12-31"
+
+#Download the data
+discharge <- readNWISdv(sagenum, 
+                    parameterCd, startDate, endDate)
+sagehen_discharge <- discharge[, 3:4] %>%
+  rename(timestamp = Date, Flow = X_00060_00003)
+```
+
+
+```{r}
+library(WaveletComp)
+
+my.data <- data.frame(x = sagehen_discharge[,2]) # needs to be a data frame
+# Plot wavelet--using consistent intervals of wavelet power
+?analyze.wavelet # see arguments
+my.w <- analyze.wavelet(my.data, "x",
+                        loess.span = 0,
+                        dt = 1, # this is the time resolution, here 1 sample per day
+                        make.pval = TRUE, n.sim = 10) # number of simulations
+str(my.w)
+# Plot wavelet--using consistent intervals of wavelet power
+wt.image(my.w, color.key = "interval", n.levels = 250,
+         legend.params = list(lab = "wavelet power levels", mar = 4.7))
+# This will spread out the color palette across wavelet power quantiles
+wt.image(my.w, color.key = "quantile", n.levels = 250,
+         legend.params = list(lab = "wavelet power levels", mar = 4.7))
+```
+

@@ -75,7 +75,7 @@ sagenum <- "10343500"
 dailyDataAvailable <- whatNWISdata(siteNumber = sagenum,
                     parameterCd="00060",service="dv", statCd="00003")
 parameterCd <- "00060"
-startDate <- "2018-05-31"
+startDate <- "2016-05-31"
 endDate <- "2019-10-21"
 discharge <- readNWISdv(sagenum, 
                     parameterCd, startDate, endDate)
@@ -86,7 +86,7 @@ sagehen_discharge
 many_dates <- sagehen_discharge$timestamp
 flow <- sagehen_discharge$Flow
 df <- data.frame(many_dates, flow)
-discharge_plot<-ggplot(df, aes(many_dates, flow))+geom_point()+theme(axis.text.x = element_text(angle = 60, hjust = 1))
+discharge_plot<-ggplot(df, aes(many_dates, flow))+geom_point()+theme(axis.text.x = element_text(angle = 60, hjust = 1))+xlab("date") + ylab("flow") + scale_x_date(date_breaks = "1 year", date_labels =  "%Y")
 ```
 
 
@@ -124,35 +124,7 @@ g <- g + scale_color_identity(name = "level",
 g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") 
 
 ```
-```{r}
-#a hash, "wells_plots", keys: individual wells. values: plots for each well with that well's groundwater levels, USGS measured sagehen discharge, and binned and averaged discharge as used for covariates in MARSS.
 
-###SOMETHING IN THIS CHUNK IS MAKING EVERY VALUE IN WELLS_PLOTS EQUAL; assigning each to the last plot.
-wells_plots <- hash()
-plots <- c()
-for (colnum in seq(3, ncol(datt), 1)){
-  groundwater_level <- datt[,colnum]
-  well_sparse <- rep(NA, length(many_dates))
-  well_hash <- hash(dates, groundwater_level)
-  for (i in seq(1, length(many_dates), 1)){
-    j <- as.character(many_dates[i])
-    if (has.key(j, well_hash)){
-      well_sparse[i] <- well_hash[[j]]
-    }
-  }
-  df <- data.frame(many_dates, avg_flow_sparse)
-  g <- ggplot(df, aes(many_dates))
-  g <- g + geom_point(aes(y=well_sparse, color="red"))
-  g <- g + geom_point(aes(y=flow, color="blue"))
-  g <- g + geom_point(aes(y=avg_flow_sparse, color="green"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
-  g <- g + scale_color_identity(name = "level",
-                            breaks = c("red", "blue", "green"),
-                            labels = c(paste(colnames(datt)[colnum], "groundwater level", sep=" "), "USGS measured discharge", "binned and averaged discharge"),
-                            guide = "legend")
-  g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
-  plots <- append(plots, vectorize(g))
-}
-```
 ```{r}
 #apply function rather than for loop:
 plot_data_column = function (colnum) {
@@ -174,7 +146,7 @@ plot_data_column = function (colnum) {
                             breaks = c("red", "blue", "green"),
                             labels = c(colnum, "USGS measured discharge", "binned and averaged discharge"),
                             guide = "legend")
-  g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
+  g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "2 month", date_labels =  "%b %Y")
   g
 }
 
@@ -210,7 +182,7 @@ g <- g + scale_color_identity(name = "level",
                           breaks = c("red", "blue", "green"),
                           labels = c("east wells avg groundwater", "USGS measured discharge", "binned and averaged discharge"),
                           guide = "legend")
-g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
+g <- g + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "2 month", date_labels =  "%b %Y")
 myplots <- append(myplots, list(g))
 
 oo <- kiln_wells$mean_groundwater
@@ -231,15 +203,108 @@ p <- p + scale_color_identity(name = "level",
                           breaks = c("red", "blue", "green"),
                           labels = c("kiln wells avg groundwater", "USGS measured discharge", "binned and averaged discharge"),
                           guide = "legend")
-p <- p + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
+p <- p + xlab("date") + ylab("groundwater or flow") + scale_x_date(date_breaks = "2 month", date_labels =  "%b %Y")
 myplots <- append(myplots, list(p))
 
 ```
 ```{r}
 #exporting multiple plots:
-pdf(file="multiple_plots.pdf")
+pdf(file="multiple_plots2.pdf")
 par(mfrow=(c(2,3)))
 myplots
+dev.off()
+```
+```{r}
+#exporting discharge plot
+pdf(file="sagehen_discharge_plot.pdf")
+discharge_plot
+dev.off()
+```
+```{r}
+#plotting each individual well with 2019 and 2018 on top of eachother:
+#test: just for eer1:
+dates_18<- dates[1:11]     #dates in 2018
+dates_19 <- dates[12:21]    #dates in 2019
+#changing dates_19 so they look like they are in the same year as 2018
+for (i in seq(1, length(dates_19), 1)){
+  dates_19[i] <- substr(dates_19[i],6,10)
+}
+for (i in seq(1, length(dates_18), 1)){
+  dates_18[i] <- substr(dates_18[i],6,10)
+}
+eer1_18 <- eer1[1:11]       #obs in 2018
+eer1_19 <- eer1[12:21]      #obs in 2019
+df_18 <- data.frame(dates_18, eer1_18)
+df_19 <- data.frame(dates_19, eer1_19)
+
+ggplot() +
+  geom_point(data=df_18, aes(x=dates_18,y=eer1_18,color="red"))+
+  geom_point(data=df_19, aes(x=dates_19,y=eer1_19,color="blue"))+
+  scale_color_identity(name = "level",
+                          breaks = c("red", "blue"),
+                          labels = c("2018", "2019"),
+                          guide = "legend")+ 
+  xlab("date") + ylab("groundwater level") + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  
+```
+```{r}
+#plotting each individual well with 2019 and 2018 on top of eachother:
+plot_to_column = function (colnum) {
+  groundwater_level <- datt[, colnum]
+  levels_18 <- groundwater_level[1:11]       #obs in 2018
+  levels_19 <- groundwater_level[12:21]      #obs in 2019
+  df_18 <- data.frame(dates_18, levels_18)
+  df_19 <- data.frame(dates_19, levels_19)
+  
+  ggplot() +
+    geom_point(data=df_18, aes(x=dates_18,y=levels_18,color="red"))+
+    geom_point(data=df_19, aes(x=dates_19,y=levels_19,color="blue"))+
+    scale_color_identity(name = "level",
+                            breaks = c("red", "blue"),
+                            labels = c("2018", "2019"),
+                            guide = "legend")+ 
+    xlab("date") + ylab(paste(colnum,"groundwater level"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+}
+
+overlayed_plots <- lapply(colnames(datt)[3:50], plot_to_column)
+```
+```{r}
+#adding mean east and kiln
+groundwater_level <- kiln_wells$mean_groundwater
+  levels_18 <- groundwater_level[1:11]       #obs in 2018
+  levels_19 <- groundwater_level[12:21]      #obs in 2019
+  df_18 <- data.frame(dates_18, levels_18)
+  df_19 <- data.frame(dates_19, levels_19)
+  
+  g <- ggplot() +
+    geom_point(data=df_18, aes(x=dates_18,y=levels_18,color="red"))+
+    geom_point(data=df_19, aes(x=dates_19,y=levels_19,color="blue"))+
+    scale_color_identity(name = "level",
+                            breaks = c("red", "blue"),
+                            labels = c("2018", "2019"),
+                            guide = "legend")+ 
+    xlab("date") + ylab("mean kiln wells groundwater level")+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  groundwater_level <- east_wells$mean_groundwater
+  levels_18 <- groundwater_level[1:11]       #obs in 2018
+  levels_19 <- groundwater_level[12:21]      #obs in 2019
+  df_18 <- data.frame(dates_18, levels_18)
+  df_19 <- data.frame(dates_19, levels_19)
+  
+  p <- ggplot() +
+    geom_point(data=df_18, aes(x=dates_18,y=levels_18,color="red"))+
+    geom_point(data=df_19, aes(x=dates_19,y=levels_19,color="blue"))+
+    scale_color_identity(name = "level",
+                            breaks = c("red", "blue"),
+                            labels = c("2018", "2019"),
+                            guide = "legend")+ 
+    xlab("date") + ylab("mean east wells groundwater level")+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  overlayed_plots <- append(overlayed_plots, list(p))
+    overlayed_plots <- append(overlayed_plots, list(g))
+```
+```{r}
+#exporting overlayed plots
+pdf(file="overlayed_gw_plots.pdf")
+overlayed_plots
 dev.off()
 ```
 
