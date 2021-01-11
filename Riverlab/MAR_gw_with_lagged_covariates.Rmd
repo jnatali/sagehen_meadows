@@ -484,7 +484,7 @@ lags <- c(0,1,2,3,4,5,6,7,8,9,10,11,12)
 for (i in seq(1, length(lagged_dfs),1)){
   k<-lagged_dfs[[i]]
   k$model <- as.factor(k$model)
-  g<- ggplot(k, aes(as.factor(model_names), color=model))+geom_point(aes(y=AICc)) + xlab("model number")+ylab("AICc score")+scale_color_manual(name="Model",values=mycolors, labels=c("1: each well responds uniquely","5: universal state","6: meadow","8: HGMZ","8.5: HGMZ; fan and terrace together","9: PFT","10: PFT and HGMZ","11: TWI, 6 bins","11.5: TWI, 3 bins","12: distance to main channel, 6 bins","12.5:distance to main channel, 3 bins","13:distance to nearest channel, 6 bins","13.5: distance to nearest channel, 3 bins","14: meadow and HGMZ"))+ggtitle(paste("Covariate Discharge with a lag of ",as.character(lags[[i]])," weeks"))
+  g<- ggplot(k, aes(as.factor(model_names), color=model))+geom_point(aes(y=AICc)) + xlab("model number")+ylab("AICc score")+scale_color_manual(name="Model",values=mycolors, labels=c("1: indiviudal\n    well","5: universal\n   state","6: meadow","8: HGMZ","8.5: HGMZ, fan\n and terrace as one","9: PFT","10: PFT and HGMZ","11: TWI, 6 bins","11.5: TWI, 3 bins","12: Distance to\n main channel, 6 bins","12.5: Distance to\n main channel, 3 bins","13: Distance to\n nearest channel,\n 6 bins","13.5: Distance to\n nearest channel, 3 bins","14: meadow + HGMZ"))+ggtitle(paste("Covariate Discharge with a lag of ",as.character(lags[[i]])," weeks"))
   lagged_plots<-append(lagged_plots, list(g))
 }
 ```
@@ -790,7 +790,7 @@ for (lag in seq(1, length(all_ods),1)){
   g<-ggplot(sagehen_discharge,aes(many_dates))+geom_point(aes(y=flow,color="blue"))+geom_point(aes(y=avg_flow_sparse,color="green"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))+ scale_color_identity(name = "level",
                             breaks = c("blue", "green"),
                             labels = c("USGS measured discharge", "avg. discharge (covariates)"), guide = "legend") + xlab("date") + ylab("Flow") + scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")
-  k<-lagged_plots_75[[lag]]
+  k<-lagged_plots[[lag]]
   t<-ggarrange(k,g,ncol=1)
   arranged_plots<-append(arranged_plots, list(t))
 }
@@ -798,7 +798,7 @@ for (lag in seq(1, length(all_ods),1)){
 ```
 Save all of these plots to pdf:
 ```{r}
-pdf(file="lagged_covariate_plots_75.pdf")
+pdf(file="lagged_covariate_plots_50.pdf")
 arranged_plots
 dev.off()
 ```

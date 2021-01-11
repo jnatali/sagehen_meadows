@@ -9,6 +9,8 @@ library(tidyverse)
 library(grid)
 library(gridExtra)
 datt <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period.csv"), stringsAsFactors=FALSE, header=FALSE)
+#removing a colnum with all nas:
+datt <- cbind(datt[,1:41],datt[,43:50])
 unbinned <- as.matrix(read.csv("C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period_unbinned.csv"), stringsAsFactors=FALSE, header=FALSE)
 ```
 
@@ -150,7 +152,7 @@ plot_data_column = function (colnum) {
   g
 }
 
-myplots <- lapply(colnames(datt)[3:50], plot_data_column)
+myplots <- lapply(colnames(datt)[3:49], plot_data_column)
 ```
 
 
@@ -164,7 +166,7 @@ kiln_wells$mean_groundwater <- rowMeans(kiln_wells, na.rm = TRUE)
 kiln_wells
 #Add them to the hash, well_plots:
 groundwater_level <- east_wells$mean_groundwater
-well_spars <- rep(NA, length(many_dates)) ###THIS LINE MESSES WITH THE OTHER VALUES!
+well_spars <- rep(NA, length(many_dates))
 well_has <- hash(dates, groundwater_level)
 for (i in seq(1, length(many_dates), 1)){
   j <- as.character(many_dates[i])
@@ -172,7 +174,7 @@ for (i in seq(1, length(many_dates), 1)){
     well_spars[i] <- well_has[[j]]
   }
 }
-#above this point, somehow wells_plots is changed!
+
 df <- data.frame(many_dates, avg_flow_sparse)
 g <- ggplot(df, aes(many_dates))
 g <- g + geom_point(aes(y=well_spars, color="red"))
@@ -238,8 +240,10 @@ df_18 <- data.frame(dates_18, eer1_18)
 df_19 <- data.frame(dates_19, eer1_19)
 
 ggplot() +
-  geom_point(data=df_18, aes(x=dates_18,y=eer1_18,color="red"))+
-  geom_point(data=df_19, aes(x=dates_19,y=eer1_19,color="blue"))+
+  geom_point(data=df_18[!is.na(df_18$eer1),], aes(x=dates_18,y=eer1_18,color="red"))+
+  geom_line(data=df_18[!is.na(df_18$eer1_18),], aes(x=dates_18,y=eer1_18,color="red", group=1))+
+  geom_point(data=df_19[!is.na(df_19$eer1_19),], aes(x=dates_19,y=eer1_19,color="blue"))+
+  geom_line(data=df_19[!is.na(df_19$eer1_19),], aes(x=dates_19,y=eer1_19,color="blue",group=1))+
   scale_color_identity(name = "level",
                           breaks = c("red", "blue"),
                           labels = c("2018", "2019"),
@@ -256,18 +260,43 @@ plot_to_column = function (colnum) {
   df_18 <- data.frame(dates_18, levels_18)
   df_19 <- data.frame(dates_19, levels_19)
   
-  ggplot() +
-    geom_point(data=df_18, aes(x=dates_18,y=levels_18,color="red"))+
+  #manuvering around aesthetics error:
+  if (all(is.na(df_18$levels_18))){
+    ggplot() +
     geom_point(data=df_19, aes(x=dates_19,y=levels_19,color="blue"))+
+    geom_line(data=df_19[!is.na(df_19$levels_19),], aes(x=dates_19,y=levels_19,color="blue",group=1))+
     scale_color_identity(name = "level",
                             breaks = c("red", "blue"),
                             labels = c("2018", "2019"),
                             guide = "legend")+ 
-    xlab("date") + ylab(paste(colnum,"groundwater level"))+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+    xlab("date") + ylab(paste(colnum," groundwater level")) + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  } else if (all(is.na(df_19$levels_19))){
+      ggplot() +
+      geom_point(data=df_18, aes(x=dates_18,y=levels_18,color="red"))+
+      geom_line(data=df_18[!is.na(df_18$levels_18),], aes(x=dates_18,y=levels_18,color="red", group=1))+
+      scale_color_identity(name = "level",
+                              breaks = c("red", "blue"),
+                              labels = c("2018", "2019"),
+                              guide = "legend")+ 
+      xlab("date") + ylab(paste(colnum," groundwater level")) + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  } else {
+    ggplot() +
+    geom_point(data=df_18, aes(x=dates_18,y=levels_18,color="red"))+
+    geom_line(data=df_18[!is.na(df_18$levels_18),], aes(x=dates_18,y=levels_18,color="red", group=1))+
+    geom_point(data=df_19, aes(x=dates_19,y=levels_19,color="blue"))+
+    geom_line(data=df_19[!is.na(df_19$levels_19),], aes(x=dates_19,y=levels_19,color="blue",group=1))+
+    scale_color_identity(name = "level",
+                            breaks = c("red", "blue"),
+                            labels = c("2018", "2019"),
+                            guide = "legend")+ 
+    xlab("date") + ylab(paste(colnum," groundwater level")) + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  }
 }
-
-overlayed_plots <- lapply(colnames(datt)[3:50], plot_to_column)
+overlayed_plots <- lapply(colnames(datt)[3:49], plot_to_column)
 ```
+
+Adding average kiln and avg east to overlayed_plots:
+
 ```{r}
 #adding mean east and kiln
 groundwater_level <- kiln_wells$mean_groundwater
@@ -278,32 +307,31 @@ groundwater_level <- kiln_wells$mean_groundwater
   
   g <- ggplot() +
     geom_point(data=df_18, aes(x=dates_18,y=levels_18,color="red"))+
+    geom_line(data=df_18[!is.na(df_18$levels_18),], aes(x=dates_18,y=levels_18,color="red", group=1))+
     geom_point(data=df_19, aes(x=dates_19,y=levels_19,color="blue"))+
+    geom_line(data=df_19[!is.na(df_19$levels_19),], aes(x=dates_19,y=levels_19,color="blue",group=1))+
     scale_color_identity(name = "level",
                             breaks = c("red", "blue"),
                             labels = c("2018", "2019"),
                             guide = "legend")+ 
-    xlab("date") + ylab("mean kiln wells groundwater level")+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
-  groundwater_level <- east_wells$mean_groundwater
-  levels_18 <- groundwater_level[1:11]       #obs in 2018
-  levels_19 <- groundwater_level[12:21]      #obs in 2019
-  df_18 <- data.frame(dates_18, levels_18)
-  df_19 <- data.frame(dates_19, levels_19)
+    xlab("date") + ylab("kiln mean groundwater level") + theme(axis.text.x = element_text(angle = 60, hjust = 1))
   
   p <- ggplot() +
     geom_point(data=df_18, aes(x=dates_18,y=levels_18,color="red"))+
+    geom_line(data=df_18[!is.na(df_18$levels_18),], aes(x=dates_18,y=levels_18,color="red", group=1))+
     geom_point(data=df_19, aes(x=dates_19,y=levels_19,color="blue"))+
+    geom_line(data=df_19[!is.na(df_19$levels_19),], aes(x=dates_19,y=levels_19,color="blue",group=1))+
     scale_color_identity(name = "level",
                             breaks = c("red", "blue"),
                             labels = c("2018", "2019"),
                             guide = "legend")+ 
-    xlab("date") + ylab("mean east wells groundwater level")+ theme(axis.text.x = element_text(angle = 60, hjust = 1))
+    xlab("date") + ylab("East mean groundwater level") + theme(axis.text.x = element_text(angle = 60, hjust = 1))
   overlayed_plots <- append(overlayed_plots, list(p))
     overlayed_plots <- append(overlayed_plots, list(g))
 ```
 ```{r}
 #exporting overlayed plots
-pdf(file="overlayed_gw_plots.pdf")
+pdf(file="overlayed_gw_plots_line.pdf")
 overlayed_plots
 dev.off()
 ```
