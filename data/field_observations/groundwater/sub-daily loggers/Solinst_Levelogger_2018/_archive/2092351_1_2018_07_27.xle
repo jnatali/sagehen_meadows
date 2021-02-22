@@ -1,0 +1,2071 @@
+<?xml version="1.0" ?>
+<Body_xle>
+    <File_info>
+        <Company></Company>
+        <LICENCE></LICENCE>
+        <Date>2018/07/27</Date>
+        <Time>21:05:04</Time>
+        <FileName></FileName>
+        <Created_by>Version 4.4.0</Created_by>
+    </File_info>
+    <Instrument_info>
+        <Instrument_type>LT_EDGE</Instrument_type>
+        <Model_number>M5      </Model_number>
+        <Instrument_state>Stopped</Instrument_state>
+        <Serial_number>2092351</Serial_number>
+        <Battery_level>100</Battery_level>
+        <Channel>2</Channel>
+        <Firmware>3.004</Firmware>
+    </Instrument_info>
+    <Instrument_info_data_header>
+        <Project_ID>ISEECI</Project_ID>
+        <Location>1</Location>
+        <Latitude>0.000</Latitude>
+        <Longtitude>0.000</Longtitude>
+        <Sample_rate>60000</Sample_rate>
+        <Sample_mode>0</Sample_mode>
+        <Event_ch>247</Event_ch>
+        <Event_threshold>0.000000</Event_threshold>
+        <Schedule />
+        <Start_time>2018/07/25 12:30:00</Start_time>
+        <Stop_time>2018/07/27 12:30:00</Stop_time>
+        <Num_log>289</Num_log>
+    </Instrument_info_data_header>
+    <Ch1_data_header>
+        <Identification>LEVEL</Identification>
+        <Unit>m</Unit>
+        <Parameters>
+            <Offset Val="0.0000" Unit="m" />
+        </Parameters>
+    </Ch1_data_header>
+    <Ch2_data_header>
+        <Identification>TEMPERATURE</Identification>
+        <Unit>°C</Unit>
+        <Parameters />
+    </Ch2_data_header>
+    <Data>
+        <Log id="1">
+            <Date>2018/07/25</Date>
+            <Time>12:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.1161</ch1>
+            <ch2>11.622</ch2>
+        </Log>
+        <Log id="2">
+            <Date>2018/07/25</Date>
+            <Time>12:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.1158</ch1>
+            <ch2>11.105</ch2>
+        </Log>
+        <Log id="3">
+            <Date>2018/07/25</Date>
+            <Time>12:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.1195</ch1>
+            <ch2>10.813</ch2>
+        </Log>
+        <Log id="4">
+            <Date>2018/07/25</Date>
+            <Time>13:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.1249</ch1>
+            <ch2>10.642</ch2>
+        </Log>
+        <Log id="5">
+            <Date>2018/07/25</Date>
+            <Time>13:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.1317</ch1>
+            <ch2>10.540</ch2>
+        </Log>
+        <Log id="6">
+            <Date>2018/07/25</Date>
+            <Time>13:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.1389</ch1>
+            <ch2>10.477</ch2>
+        </Log>
+        <Log id="7">
+            <Date>2018/07/25</Date>
+            <Time>13:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.1460</ch1>
+            <ch2>10.437</ch2>
+        </Log>
+        <Log id="8">
+            <Date>2018/07/25</Date>
+            <Time>13:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.1526</ch1>
+            <ch2>10.411</ch2>
+        </Log>
+        <Log id="9">
+            <Date>2018/07/25</Date>
+            <Time>13:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.1593</ch1>
+            <ch2>10.392</ch2>
+        </Log>
+        <Log id="10">
+            <Date>2018/07/25</Date>
+            <Time>14:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.1653</ch1>
+            <ch2>10.379</ch2>
+        </Log>
+        <Log id="11">
+            <Date>2018/07/25</Date>
+            <Time>14:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.1708</ch1>
+            <ch2>10.369</ch2>
+        </Log>
+        <Log id="12">
+            <Date>2018/07/25</Date>
+            <Time>14:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.1763</ch1>
+            <ch2>10.361</ch2>
+        </Log>
+        <Log id="13">
+            <Date>2018/07/25</Date>
+            <Time>14:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.1809</ch1>
+            <ch2>10.355</ch2>
+        </Log>
+        <Log id="14">
+            <Date>2018/07/25</Date>
+            <Time>14:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.1851</ch1>
+            <ch2>10.350</ch2>
+        </Log>
+        <Log id="15">
+            <Date>2018/07/25</Date>
+            <Time>14:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.1889</ch1>
+            <ch2>10.346</ch2>
+        </Log>
+        <Log id="16">
+            <Date>2018/07/25</Date>
+            <Time>15:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.1928</ch1>
+            <ch2>10.342</ch2>
+        </Log>
+        <Log id="17">
+            <Date>2018/07/25</Date>
+            <Time>15:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.1960</ch1>
+            <ch2>10.339</ch2>
+        </Log>
+        <Log id="18">
+            <Date>2018/07/25</Date>
+            <Time>15:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2005</ch1>
+            <ch2>10.337</ch2>
+        </Log>
+        <Log id="19">
+            <Date>2018/07/25</Date>
+            <Time>15:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2039</ch1>
+            <ch2>10.334</ch2>
+        </Log>
+        <Log id="20">
+            <Date>2018/07/25</Date>
+            <Time>15:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2075</ch1>
+            <ch2>10.332</ch2>
+        </Log>
+        <Log id="21">
+            <Date>2018/07/25</Date>
+            <Time>15:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2104</ch1>
+            <ch2>10.329</ch2>
+        </Log>
+        <Log id="22">
+            <Date>2018/07/25</Date>
+            <Time>16:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2134</ch1>
+            <ch2>10.328</ch2>
+        </Log>
+        <Log id="23">
+            <Date>2018/07/25</Date>
+            <Time>16:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2163</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="24">
+            <Date>2018/07/25</Date>
+            <Time>16:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2188</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="25">
+            <Date>2018/07/25</Date>
+            <Time>16:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2209</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="26">
+            <Date>2018/07/25</Date>
+            <Time>16:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2230</ch1>
+            <ch2>10.321</ch2>
+        </Log>
+        <Log id="27">
+            <Date>2018/07/25</Date>
+            <Time>16:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2245</ch1>
+            <ch2>10.321</ch2>
+        </Log>
+        <Log id="28">
+            <Date>2018/07/25</Date>
+            <Time>17:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2262</ch1>
+            <ch2>10.320</ch2>
+        </Log>
+        <Log id="29">
+            <Date>2018/07/25</Date>
+            <Time>17:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2280</ch1>
+            <ch2>10.318</ch2>
+        </Log>
+        <Log id="30">
+            <Date>2018/07/25</Date>
+            <Time>17:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2294</ch1>
+            <ch2>10.317</ch2>
+        </Log>
+        <Log id="31">
+            <Date>2018/07/25</Date>
+            <Time>17:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2310</ch1>
+            <ch2>10.316</ch2>
+        </Log>
+        <Log id="32">
+            <Date>2018/07/25</Date>
+            <Time>17:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2322</ch1>
+            <ch2>10.315</ch2>
+        </Log>
+        <Log id="33">
+            <Date>2018/07/25</Date>
+            <Time>17:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2336</ch1>
+            <ch2>10.315</ch2>
+        </Log>
+        <Log id="34">
+            <Date>2018/07/25</Date>
+            <Time>18:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2344</ch1>
+            <ch2>10.313</ch2>
+        </Log>
+        <Log id="35">
+            <Date>2018/07/25</Date>
+            <Time>18:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2357</ch1>
+            <ch2>10.313</ch2>
+        </Log>
+        <Log id="36">
+            <Date>2018/07/25</Date>
+            <Time>18:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2367</ch1>
+            <ch2>10.313</ch2>
+        </Log>
+        <Log id="37">
+            <Date>2018/07/25</Date>
+            <Time>18:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2374</ch1>
+            <ch2>10.312</ch2>
+        </Log>
+        <Log id="38">
+            <Date>2018/07/25</Date>
+            <Time>18:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2385</ch1>
+            <ch2>10.311</ch2>
+        </Log>
+        <Log id="39">
+            <Date>2018/07/25</Date>
+            <Time>18:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2393</ch1>
+            <ch2>10.310</ch2>
+        </Log>
+        <Log id="40">
+            <Date>2018/07/25</Date>
+            <Time>19:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2404</ch1>
+            <ch2>10.309</ch2>
+        </Log>
+        <Log id="41">
+            <Date>2018/07/25</Date>
+            <Time>19:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2423</ch1>
+            <ch2>10.306</ch2>
+        </Log>
+        <Log id="42">
+            <Date>2018/07/25</Date>
+            <Time>19:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2451</ch1>
+            <ch2>10.304</ch2>
+        </Log>
+        <Log id="43">
+            <Date>2018/07/25</Date>
+            <Time>19:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2467</ch1>
+            <ch2>10.303</ch2>
+        </Log>
+        <Log id="44">
+            <Date>2018/07/25</Date>
+            <Time>19:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2481</ch1>
+            <ch2>10.302</ch2>
+        </Log>
+        <Log id="45">
+            <Date>2018/07/25</Date>
+            <Time>19:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2492</ch1>
+            <ch2>10.302</ch2>
+        </Log>
+        <Log id="46">
+            <Date>2018/07/25</Date>
+            <Time>20:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2505</ch1>
+            <ch2>10.301</ch2>
+        </Log>
+        <Log id="47">
+            <Date>2018/07/25</Date>
+            <Time>20:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2515</ch1>
+            <ch2>10.300</ch2>
+        </Log>
+        <Log id="48">
+            <Date>2018/07/25</Date>
+            <Time>20:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2524</ch1>
+            <ch2>10.299</ch2>
+        </Log>
+        <Log id="49">
+            <Date>2018/07/25</Date>
+            <Time>20:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2535</ch1>
+            <ch2>10.299</ch2>
+        </Log>
+        <Log id="50">
+            <Date>2018/07/25</Date>
+            <Time>20:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2544</ch1>
+            <ch2>10.298</ch2>
+        </Log>
+        <Log id="51">
+            <Date>2018/07/25</Date>
+            <Time>20:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2555</ch1>
+            <ch2>10.298</ch2>
+        </Log>
+        <Log id="52">
+            <Date>2018/07/25</Date>
+            <Time>21:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2564</ch1>
+            <ch2>10.297</ch2>
+        </Log>
+        <Log id="53">
+            <Date>2018/07/25</Date>
+            <Time>21:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2576</ch1>
+            <ch2>10.296</ch2>
+        </Log>
+        <Log id="54">
+            <Date>2018/07/25</Date>
+            <Time>21:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2583</ch1>
+            <ch2>10.296</ch2>
+        </Log>
+        <Log id="55">
+            <Date>2018/07/25</Date>
+            <Time>21:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2592</ch1>
+            <ch2>10.296</ch2>
+        </Log>
+        <Log id="56">
+            <Date>2018/07/25</Date>
+            <Time>21:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2605</ch1>
+            <ch2>10.296</ch2>
+        </Log>
+        <Log id="57">
+            <Date>2018/07/25</Date>
+            <Time>21:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2611</ch1>
+            <ch2>10.295</ch2>
+        </Log>
+        <Log id="58">
+            <Date>2018/07/25</Date>
+            <Time>22:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2623</ch1>
+            <ch2>10.295</ch2>
+        </Log>
+        <Log id="59">
+            <Date>2018/07/25</Date>
+            <Time>22:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2630</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="60">
+            <Date>2018/07/25</Date>
+            <Time>22:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2638</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="61">
+            <Date>2018/07/25</Date>
+            <Time>22:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2649</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="62">
+            <Date>2018/07/25</Date>
+            <Time>22:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2652</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="63">
+            <Date>2018/07/25</Date>
+            <Time>22:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2660</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="64">
+            <Date>2018/07/25</Date>
+            <Time>23:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2661</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="65">
+            <Date>2018/07/25</Date>
+            <Time>23:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2668</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="66">
+            <Date>2018/07/25</Date>
+            <Time>23:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2671</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="67">
+            <Date>2018/07/25</Date>
+            <Time>23:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2673</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="68">
+            <Date>2018/07/25</Date>
+            <Time>23:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2681</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="69">
+            <Date>2018/07/25</Date>
+            <Time>23:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2684</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="70">
+            <Date>2018/07/26</Date>
+            <Time>00:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2686</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="71">
+            <Date>2018/07/26</Date>
+            <Time>00:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2692</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="72">
+            <Date>2018/07/26</Date>
+            <Time>00:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2689</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="73">
+            <Date>2018/07/26</Date>
+            <Time>00:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2689</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="74">
+            <Date>2018/07/26</Date>
+            <Time>00:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2694</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="75">
+            <Date>2018/07/26</Date>
+            <Time>00:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2691</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="76">
+            <Date>2018/07/26</Date>
+            <Time>01:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2695</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="77">
+            <Date>2018/07/26</Date>
+            <Time>01:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2695</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="78">
+            <Date>2018/07/26</Date>
+            <Time>01:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2695</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="79">
+            <Date>2018/07/26</Date>
+            <Time>01:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2694</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="80">
+            <Date>2018/07/26</Date>
+            <Time>01:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2695</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="81">
+            <Date>2018/07/26</Date>
+            <Time>01:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2695</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="82">
+            <Date>2018/07/26</Date>
+            <Time>02:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2691</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="83">
+            <Date>2018/07/26</Date>
+            <Time>02:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2690</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="84">
+            <Date>2018/07/26</Date>
+            <Time>02:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2693</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="85">
+            <Date>2018/07/26</Date>
+            <Time>02:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2687</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="86">
+            <Date>2018/07/26</Date>
+            <Time>02:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2687</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="87">
+            <Date>2018/07/26</Date>
+            <Time>02:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2683</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="88">
+            <Date>2018/07/26</Date>
+            <Time>03:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2681</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="89">
+            <Date>2018/07/26</Date>
+            <Time>03:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2678</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="90">
+            <Date>2018/07/26</Date>
+            <Time>03:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2676</ch1>
+            <ch2>10.292</ch2>
+        </Log>
+        <Log id="91">
+            <Date>2018/07/26</Date>
+            <Time>03:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2673</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="92">
+            <Date>2018/07/26</Date>
+            <Time>03:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2670</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="93">
+            <Date>2018/07/26</Date>
+            <Time>03:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2663</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="94">
+            <Date>2018/07/26</Date>
+            <Time>04:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2661</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="95">
+            <Date>2018/07/26</Date>
+            <Time>04:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2658</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="96">
+            <Date>2018/07/26</Date>
+            <Time>04:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2657</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="97">
+            <Date>2018/07/26</Date>
+            <Time>04:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2652</ch1>
+            <ch2>10.293</ch2>
+        </Log>
+        <Log id="98">
+            <Date>2018/07/26</Date>
+            <Time>04:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2646</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="99">
+            <Date>2018/07/26</Date>
+            <Time>04:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2643</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="100">
+            <Date>2018/07/26</Date>
+            <Time>05:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2641</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="101">
+            <Date>2018/07/26</Date>
+            <Time>05:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2638</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="102">
+            <Date>2018/07/26</Date>
+            <Time>05:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2635</ch1>
+            <ch2>10.294</ch2>
+        </Log>
+        <Log id="103">
+            <Date>2018/07/26</Date>
+            <Time>05:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2630</ch1>
+            <ch2>10.295</ch2>
+        </Log>
+        <Log id="104">
+            <Date>2018/07/26</Date>
+            <Time>05:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2630</ch1>
+            <ch2>10.295</ch2>
+        </Log>
+        <Log id="105">
+            <Date>2018/07/26</Date>
+            <Time>05:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2627</ch1>
+            <ch2>10.295</ch2>
+        </Log>
+        <Log id="106">
+            <Date>2018/07/26</Date>
+            <Time>06:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2629</ch1>
+            <ch2>10.295</ch2>
+        </Log>
+        <Log id="107">
+            <Date>2018/07/26</Date>
+            <Time>06:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2627</ch1>
+            <ch2>10.295</ch2>
+        </Log>
+        <Log id="108">
+            <Date>2018/07/26</Date>
+            <Time>06:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2625</ch1>
+            <ch2>10.295</ch2>
+        </Log>
+        <Log id="109">
+            <Date>2018/07/26</Date>
+            <Time>06:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2626</ch1>
+            <ch2>10.296</ch2>
+        </Log>
+        <Log id="110">
+            <Date>2018/07/26</Date>
+            <Time>06:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2626</ch1>
+            <ch2>10.296</ch2>
+        </Log>
+        <Log id="111">
+            <Date>2018/07/26</Date>
+            <Time>06:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2622</ch1>
+            <ch2>10.296</ch2>
+        </Log>
+        <Log id="112">
+            <Date>2018/07/26</Date>
+            <Time>07:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2620</ch1>
+            <ch2>10.296</ch2>
+        </Log>
+        <Log id="113">
+            <Date>2018/07/26</Date>
+            <Time>07:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2618</ch1>
+            <ch2>10.297</ch2>
+        </Log>
+        <Log id="114">
+            <Date>2018/07/26</Date>
+            <Time>07:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2620</ch1>
+            <ch2>10.297</ch2>
+        </Log>
+        <Log id="115">
+            <Date>2018/07/26</Date>
+            <Time>07:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2614</ch1>
+            <ch2>10.298</ch2>
+        </Log>
+        <Log id="116">
+            <Date>2018/07/26</Date>
+            <Time>07:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2612</ch1>
+            <ch2>10.298</ch2>
+        </Log>
+        <Log id="117">
+            <Date>2018/07/26</Date>
+            <Time>07:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2609</ch1>
+            <ch2>10.299</ch2>
+        </Log>
+        <Log id="118">
+            <Date>2018/07/26</Date>
+            <Time>08:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2604</ch1>
+            <ch2>10.299</ch2>
+        </Log>
+        <Log id="119">
+            <Date>2018/07/26</Date>
+            <Time>08:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2599</ch1>
+            <ch2>10.300</ch2>
+        </Log>
+        <Log id="120">
+            <Date>2018/07/26</Date>
+            <Time>08:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2596</ch1>
+            <ch2>10.301</ch2>
+        </Log>
+        <Log id="121">
+            <Date>2018/07/26</Date>
+            <Time>08:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2592</ch1>
+            <ch2>10.301</ch2>
+        </Log>
+        <Log id="122">
+            <Date>2018/07/26</Date>
+            <Time>08:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2587</ch1>
+            <ch2>10.302</ch2>
+        </Log>
+        <Log id="123">
+            <Date>2018/07/26</Date>
+            <Time>08:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2587</ch1>
+            <ch2>10.302</ch2>
+        </Log>
+        <Log id="124">
+            <Date>2018/07/26</Date>
+            <Time>09:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2578</ch1>
+            <ch2>10.303</ch2>
+        </Log>
+        <Log id="125">
+            <Date>2018/07/26</Date>
+            <Time>09:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2571</ch1>
+            <ch2>10.304</ch2>
+        </Log>
+        <Log id="126">
+            <Date>2018/07/26</Date>
+            <Time>09:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2566</ch1>
+            <ch2>10.304</ch2>
+        </Log>
+        <Log id="127">
+            <Date>2018/07/26</Date>
+            <Time>09:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2563</ch1>
+            <ch2>10.305</ch2>
+        </Log>
+        <Log id="128">
+            <Date>2018/07/26</Date>
+            <Time>09:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2554</ch1>
+            <ch2>10.305</ch2>
+        </Log>
+        <Log id="129">
+            <Date>2018/07/26</Date>
+            <Time>09:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2549</ch1>
+            <ch2>10.306</ch2>
+        </Log>
+        <Log id="130">
+            <Date>2018/07/26</Date>
+            <Time>10:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2543</ch1>
+            <ch2>10.307</ch2>
+        </Log>
+        <Log id="131">
+            <Date>2018/07/26</Date>
+            <Time>10:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2535</ch1>
+            <ch2>10.308</ch2>
+        </Log>
+        <Log id="132">
+            <Date>2018/07/26</Date>
+            <Time>10:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2526</ch1>
+            <ch2>10.309</ch2>
+        </Log>
+        <Log id="133">
+            <Date>2018/07/26</Date>
+            <Time>10:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2518</ch1>
+            <ch2>10.309</ch2>
+        </Log>
+        <Log id="134">
+            <Date>2018/07/26</Date>
+            <Time>10:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2510</ch1>
+            <ch2>10.310</ch2>
+        </Log>
+        <Log id="135">
+            <Date>2018/07/26</Date>
+            <Time>10:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2505</ch1>
+            <ch2>10.310</ch2>
+        </Log>
+        <Log id="136">
+            <Date>2018/07/26</Date>
+            <Time>11:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2493</ch1>
+            <ch2>10.311</ch2>
+        </Log>
+        <Log id="137">
+            <Date>2018/07/26</Date>
+            <Time>11:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2490</ch1>
+            <ch2>10.311</ch2>
+        </Log>
+        <Log id="138">
+            <Date>2018/07/26</Date>
+            <Time>11:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2478</ch1>
+            <ch2>10.312</ch2>
+        </Log>
+        <Log id="139">
+            <Date>2018/07/26</Date>
+            <Time>11:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2469</ch1>
+            <ch2>10.312</ch2>
+        </Log>
+        <Log id="140">
+            <Date>2018/07/26</Date>
+            <Time>11:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2462</ch1>
+            <ch2>10.314</ch2>
+        </Log>
+        <Log id="141">
+            <Date>2018/07/26</Date>
+            <Time>11:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2456</ch1>
+            <ch2>10.313</ch2>
+        </Log>
+        <Log id="142">
+            <Date>2018/07/26</Date>
+            <Time>12:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2450</ch1>
+            <ch2>10.314</ch2>
+        </Log>
+        <Log id="143">
+            <Date>2018/07/26</Date>
+            <Time>12:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2443</ch1>
+            <ch2>10.315</ch2>
+        </Log>
+        <Log id="144">
+            <Date>2018/07/26</Date>
+            <Time>12:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2434</ch1>
+            <ch2>10.315</ch2>
+        </Log>
+        <Log id="145">
+            <Date>2018/07/26</Date>
+            <Time>12:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2427</ch1>
+            <ch2>10.316</ch2>
+        </Log>
+        <Log id="146">
+            <Date>2018/07/26</Date>
+            <Time>12:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2419</ch1>
+            <ch2>10.317</ch2>
+        </Log>
+        <Log id="147">
+            <Date>2018/07/26</Date>
+            <Time>12:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2410</ch1>
+            <ch2>10.317</ch2>
+        </Log>
+        <Log id="148">
+            <Date>2018/07/26</Date>
+            <Time>13:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2399</ch1>
+            <ch2>10.317</ch2>
+        </Log>
+        <Log id="149">
+            <Date>2018/07/26</Date>
+            <Time>13:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2390</ch1>
+            <ch2>10.318</ch2>
+        </Log>
+        <Log id="150">
+            <Date>2018/07/26</Date>
+            <Time>13:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2379</ch1>
+            <ch2>10.319</ch2>
+        </Log>
+        <Log id="151">
+            <Date>2018/07/26</Date>
+            <Time>13:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2370</ch1>
+            <ch2>10.319</ch2>
+        </Log>
+        <Log id="152">
+            <Date>2018/07/26</Date>
+            <Time>13:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2361</ch1>
+            <ch2>10.320</ch2>
+        </Log>
+        <Log id="153">
+            <Date>2018/07/26</Date>
+            <Time>13:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2347</ch1>
+            <ch2>10.321</ch2>
+        </Log>
+        <Log id="154">
+            <Date>2018/07/26</Date>
+            <Time>14:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2341</ch1>
+            <ch2>10.321</ch2>
+        </Log>
+        <Log id="155">
+            <Date>2018/07/26</Date>
+            <Time>14:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2332</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="156">
+            <Date>2018/07/26</Date>
+            <Time>14:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2320</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="157">
+            <Date>2018/07/26</Date>
+            <Time>14:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2313</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="158">
+            <Date>2018/07/26</Date>
+            <Time>14:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2309</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="159">
+            <Date>2018/07/26</Date>
+            <Time>14:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2308</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="160">
+            <Date>2018/07/26</Date>
+            <Time>15:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2302</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="161">
+            <Date>2018/07/26</Date>
+            <Time>15:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2295</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="162">
+            <Date>2018/07/26</Date>
+            <Time>15:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2287</ch1>
+            <ch2>10.322</ch2>
+        </Log>
+        <Log id="163">
+            <Date>2018/07/26</Date>
+            <Time>15:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2279</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="164">
+            <Date>2018/07/26</Date>
+            <Time>15:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2270</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="165">
+            <Date>2018/07/26</Date>
+            <Time>15:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2263</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="166">
+            <Date>2018/07/26</Date>
+            <Time>16:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2255</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="167">
+            <Date>2018/07/26</Date>
+            <Time>16:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2251</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="168">
+            <Date>2018/07/26</Date>
+            <Time>16:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2249</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="169">
+            <Date>2018/07/26</Date>
+            <Time>16:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2246</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="170">
+            <Date>2018/07/26</Date>
+            <Time>16:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2238</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="171">
+            <Date>2018/07/26</Date>
+            <Time>16:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2233</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="172">
+            <Date>2018/07/26</Date>
+            <Time>17:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2226</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="173">
+            <Date>2018/07/26</Date>
+            <Time>17:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2224</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="174">
+            <Date>2018/07/26</Date>
+            <Time>17:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2218</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="175">
+            <Date>2018/07/26</Date>
+            <Time>17:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2213</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="176">
+            <Date>2018/07/26</Date>
+            <Time>17:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2205</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="177">
+            <Date>2018/07/26</Date>
+            <Time>17:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2200</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="178">
+            <Date>2018/07/26</Date>
+            <Time>18:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2195</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="179">
+            <Date>2018/07/26</Date>
+            <Time>18:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2190</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="180">
+            <Date>2018/07/26</Date>
+            <Time>18:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2188</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="181">
+            <Date>2018/07/26</Date>
+            <Time>18:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2179</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="182">
+            <Date>2018/07/26</Date>
+            <Time>18:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2177</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="183">
+            <Date>2018/07/26</Date>
+            <Time>18:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2172</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="184">
+            <Date>2018/07/26</Date>
+            <Time>19:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2168</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="185">
+            <Date>2018/07/26</Date>
+            <Time>19:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2169</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="186">
+            <Date>2018/07/26</Date>
+            <Time>19:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2163</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="187">
+            <Date>2018/07/26</Date>
+            <Time>19:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2162</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="188">
+            <Date>2018/07/26</Date>
+            <Time>19:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2162</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="189">
+            <Date>2018/07/26</Date>
+            <Time>19:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2162</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="190">
+            <Date>2018/07/26</Date>
+            <Time>20:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2163</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="191">
+            <Date>2018/07/26</Date>
+            <Time>20:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2162</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="192">
+            <Date>2018/07/26</Date>
+            <Time>20:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2164</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="193">
+            <Date>2018/07/26</Date>
+            <Time>20:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2165</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="194">
+            <Date>2018/07/26</Date>
+            <Time>20:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2166</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="195">
+            <Date>2018/07/26</Date>
+            <Time>20:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2167</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="196">
+            <Date>2018/07/26</Date>
+            <Time>21:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2168</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="197">
+            <Date>2018/07/26</Date>
+            <Time>21:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2170</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="198">
+            <Date>2018/07/26</Date>
+            <Time>21:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2176</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="199">
+            <Date>2018/07/26</Date>
+            <Time>21:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2177</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="200">
+            <Date>2018/07/26</Date>
+            <Time>21:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2181</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="201">
+            <Date>2018/07/26</Date>
+            <Time>21:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2188</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="202">
+            <Date>2018/07/26</Date>
+            <Time>22:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2191</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="203">
+            <Date>2018/07/26</Date>
+            <Time>22:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2196</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="204">
+            <Date>2018/07/26</Date>
+            <Time>22:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2201</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="205">
+            <Date>2018/07/26</Date>
+            <Time>22:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2205</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="206">
+            <Date>2018/07/26</Date>
+            <Time>22:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2209</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="207">
+            <Date>2018/07/26</Date>
+            <Time>22:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2215</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="208">
+            <Date>2018/07/26</Date>
+            <Time>23:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2215</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="209">
+            <Date>2018/07/26</Date>
+            <Time>23:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2216</ch1>
+            <ch2>10.323</ch2>
+        </Log>
+        <Log id="210">
+            <Date>2018/07/26</Date>
+            <Time>23:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2217</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="211">
+            <Date>2018/07/26</Date>
+            <Time>23:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2219</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="212">
+            <Date>2018/07/26</Date>
+            <Time>23:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2220</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="213">
+            <Date>2018/07/26</Date>
+            <Time>23:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2221</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="214">
+            <Date>2018/07/27</Date>
+            <Time>00:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2221</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="215">
+            <Date>2018/07/27</Date>
+            <Time>00:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2220</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="216">
+            <Date>2018/07/27</Date>
+            <Time>00:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2223</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="217">
+            <Date>2018/07/27</Date>
+            <Time>00:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2221</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="218">
+            <Date>2018/07/27</Date>
+            <Time>00:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2222</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="219">
+            <Date>2018/07/27</Date>
+            <Time>00:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2221</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="220">
+            <Date>2018/07/27</Date>
+            <Time>01:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2220</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="221">
+            <Date>2018/07/27</Date>
+            <Time>01:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2221</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="222">
+            <Date>2018/07/27</Date>
+            <Time>01:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2219</ch1>
+            <ch2>10.324</ch2>
+        </Log>
+        <Log id="223">
+            <Date>2018/07/27</Date>
+            <Time>01:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2215</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="224">
+            <Date>2018/07/27</Date>
+            <Time>01:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2216</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="225">
+            <Date>2018/07/27</Date>
+            <Time>01:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2214</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="226">
+            <Date>2018/07/27</Date>
+            <Time>02:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2208</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="227">
+            <Date>2018/07/27</Date>
+            <Time>02:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2210</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="228">
+            <Date>2018/07/27</Date>
+            <Time>02:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2208</ch1>
+            <ch2>10.325</ch2>
+        </Log>
+        <Log id="229">
+            <Date>2018/07/27</Date>
+            <Time>02:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2206</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="230">
+            <Date>2018/07/27</Date>
+            <Time>02:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2202</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="231">
+            <Date>2018/07/27</Date>
+            <Time>02:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2199</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="232">
+            <Date>2018/07/27</Date>
+            <Time>03:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2200</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="233">
+            <Date>2018/07/27</Date>
+            <Time>03:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2200</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="234">
+            <Date>2018/07/27</Date>
+            <Time>03:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2196</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="235">
+            <Date>2018/07/27</Date>
+            <Time>03:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2191</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="236">
+            <Date>2018/07/27</Date>
+            <Time>03:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2188</ch1>
+            <ch2>10.327</ch2>
+        </Log>
+        <Log id="237">
+            <Date>2018/07/27</Date>
+            <Time>03:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2190</ch1>
+            <ch2>10.326</ch2>
+        </Log>
+        <Log id="238">
+            <Date>2018/07/27</Date>
+            <Time>04:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2185</ch1>
+            <ch2>10.327</ch2>
+        </Log>
+        <Log id="239">
+            <Date>2018/07/27</Date>
+            <Time>04:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2183</ch1>
+            <ch2>10.327</ch2>
+        </Log>
+        <Log id="240">
+            <Date>2018/07/27</Date>
+            <Time>04:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2183</ch1>
+            <ch2>10.327</ch2>
+        </Log>
+        <Log id="241">
+            <Date>2018/07/27</Date>
+            <Time>04:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2181</ch1>
+            <ch2>10.327</ch2>
+        </Log>
+        <Log id="242">
+            <Date>2018/07/27</Date>
+            <Time>04:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2181</ch1>
+            <ch2>10.327</ch2>
+        </Log>
+        <Log id="243">
+            <Date>2018/07/27</Date>
+            <Time>04:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2175</ch1>
+            <ch2>10.328</ch2>
+        </Log>
+        <Log id="244">
+            <Date>2018/07/27</Date>
+            <Time>05:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2174</ch1>
+            <ch2>10.328</ch2>
+        </Log>
+        <Log id="245">
+            <Date>2018/07/27</Date>
+            <Time>05:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2171</ch1>
+            <ch2>10.328</ch2>
+        </Log>
+        <Log id="246">
+            <Date>2018/07/27</Date>
+            <Time>05:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2169</ch1>
+            <ch2>10.328</ch2>
+        </Log>
+        <Log id="247">
+            <Date>2018/07/27</Date>
+            <Time>05:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2167</ch1>
+            <ch2>10.329</ch2>
+        </Log>
+        <Log id="248">
+            <Date>2018/07/27</Date>
+            <Time>05:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2164</ch1>
+            <ch2>10.329</ch2>
+        </Log>
+        <Log id="249">
+            <Date>2018/07/27</Date>
+            <Time>05:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2167</ch1>
+            <ch2>10.329</ch2>
+        </Log>
+        <Log id="250">
+            <Date>2018/07/27</Date>
+            <Time>06:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2165</ch1>
+            <ch2>10.329</ch2>
+        </Log>
+        <Log id="251">
+            <Date>2018/07/27</Date>
+            <Time>06:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2164</ch1>
+            <ch2>10.329</ch2>
+        </Log>
+        <Log id="252">
+            <Date>2018/07/27</Date>
+            <Time>06:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2164</ch1>
+            <ch2>10.329</ch2>
+        </Log>
+        <Log id="253">
+            <Date>2018/07/27</Date>
+            <Time>06:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2163</ch1>
+            <ch2>10.330</ch2>
+        </Log>
+        <Log id="254">
+            <Date>2018/07/27</Date>
+            <Time>06:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2159</ch1>
+            <ch2>10.330</ch2>
+        </Log>
+        <Log id="255">
+            <Date>2018/07/27</Date>
+            <Time>06:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2158</ch1>
+            <ch2>10.330</ch2>
+        </Log>
+        <Log id="256">
+            <Date>2018/07/27</Date>
+            <Time>07:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2158</ch1>
+            <ch2>10.330</ch2>
+        </Log>
+        <Log id="257">
+            <Date>2018/07/27</Date>
+            <Time>07:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2159</ch1>
+            <ch2>10.331</ch2>
+        </Log>
+        <Log id="258">
+            <Date>2018/07/27</Date>
+            <Time>07:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2154</ch1>
+            <ch2>10.332</ch2>
+        </Log>
+        <Log id="259">
+            <Date>2018/07/27</Date>
+            <Time>07:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2151</ch1>
+            <ch2>10.332</ch2>
+        </Log>
+        <Log id="260">
+            <Date>2018/07/27</Date>
+            <Time>07:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2152</ch1>
+            <ch2>10.333</ch2>
+        </Log>
+        <Log id="261">
+            <Date>2018/07/27</Date>
+            <Time>07:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2153</ch1>
+            <ch2>10.333</ch2>
+        </Log>
+        <Log id="262">
+            <Date>2018/07/27</Date>
+            <Time>08:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2148</ch1>
+            <ch2>10.333</ch2>
+        </Log>
+        <Log id="263">
+            <Date>2018/07/27</Date>
+            <Time>08:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2167</ch1>
+            <ch2>10.341</ch2>
+        </Log>
+        <Log id="264">
+            <Date>2018/07/27</Date>
+            <Time>08:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2193</ch1>
+            <ch2>10.341</ch2>
+        </Log>
+        <Log id="265">
+            <Date>2018/07/27</Date>
+            <Time>08:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2211</ch1>
+            <ch2>10.338</ch2>
+        </Log>
+        <Log id="266">
+            <Date>2018/07/27</Date>
+            <Time>08:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2220</ch1>
+            <ch2>10.337</ch2>
+        </Log>
+        <Log id="267">
+            <Date>2018/07/27</Date>
+            <Time>08:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2230</ch1>
+            <ch2>10.337</ch2>
+        </Log>
+        <Log id="268">
+            <Date>2018/07/27</Date>
+            <Time>09:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2237</ch1>
+            <ch2>10.337</ch2>
+        </Log>
+        <Log id="269">
+            <Date>2018/07/27</Date>
+            <Time>09:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2243</ch1>
+            <ch2>10.337</ch2>
+        </Log>
+        <Log id="270">
+            <Date>2018/07/27</Date>
+            <Time>09:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2247</ch1>
+            <ch2>10.337</ch2>
+        </Log>
+        <Log id="271">
+            <Date>2018/07/27</Date>
+            <Time>09:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2244</ch1>
+            <ch2>10.338</ch2>
+        </Log>
+        <Log id="272">
+            <Date>2018/07/27</Date>
+            <Time>09:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2247</ch1>
+            <ch2>10.338</ch2>
+        </Log>
+        <Log id="273">
+            <Date>2018/07/27</Date>
+            <Time>09:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2243</ch1>
+            <ch2>10.339</ch2>
+        </Log>
+        <Log id="274">
+            <Date>2018/07/27</Date>
+            <Time>10:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2236</ch1>
+            <ch2>10.340</ch2>
+        </Log>
+        <Log id="275">
+            <Date>2018/07/27</Date>
+            <Time>10:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2233</ch1>
+            <ch2>10.340</ch2>
+        </Log>
+        <Log id="276">
+            <Date>2018/07/27</Date>
+            <Time>10:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2227</ch1>
+            <ch2>10.341</ch2>
+        </Log>
+        <Log id="277">
+            <Date>2018/07/27</Date>
+            <Time>10:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2220</ch1>
+            <ch2>10.342</ch2>
+        </Log>
+        <Log id="278">
+            <Date>2018/07/27</Date>
+            <Time>10:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2215</ch1>
+            <ch2>10.342</ch2>
+        </Log>
+        <Log id="279">
+            <Date>2018/07/27</Date>
+            <Time>10:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2210</ch1>
+            <ch2>10.343</ch2>
+        </Log>
+        <Log id="280">
+            <Date>2018/07/27</Date>
+            <Time>11:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2200</ch1>
+            <ch2>10.343</ch2>
+        </Log>
+        <Log id="281">
+            <Date>2018/07/27</Date>
+            <Time>11:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2192</ch1>
+            <ch2>10.344</ch2>
+        </Log>
+        <Log id="282">
+            <Date>2018/07/27</Date>
+            <Time>11:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2185</ch1>
+            <ch2>10.345</ch2>
+        </Log>
+        <Log id="283">
+            <Date>2018/07/27</Date>
+            <Time>11:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2176</ch1>
+            <ch2>10.345</ch2>
+        </Log>
+        <Log id="284">
+            <Date>2018/07/27</Date>
+            <Time>11:40:00</Time>
+            <ms>0</ms>
+            <ch1>8.2168</ch1>
+            <ch2>10.345</ch2>
+        </Log>
+        <Log id="285">
+            <Date>2018/07/27</Date>
+            <Time>11:50:00</Time>
+            <ms>0</ms>
+            <ch1>8.2161</ch1>
+            <ch2>10.346</ch2>
+        </Log>
+        <Log id="286">
+            <Date>2018/07/27</Date>
+            <Time>12:00:00</Time>
+            <ms>0</ms>
+            <ch1>8.2155</ch1>
+            <ch2>10.347</ch2>
+        </Log>
+        <Log id="287">
+            <Date>2018/07/27</Date>
+            <Time>12:10:00</Time>
+            <ms>0</ms>
+            <ch1>8.2146</ch1>
+            <ch2>10.348</ch2>
+        </Log>
+        <Log id="288">
+            <Date>2018/07/27</Date>
+            <Time>12:20:00</Time>
+            <ms>0</ms>
+            <ch1>8.2141</ch1>
+            <ch2>10.348</ch2>
+        </Log>
+        <Log id="289">
+            <Date>2018/07/27</Date>
+            <Time>12:30:00</Time>
+            <ms>0</ms>
+            <ch1>8.2133</ch1>
+            <ch2>10.349</ch2>
+        </Log>
+    </Data>
+</Body_xle>

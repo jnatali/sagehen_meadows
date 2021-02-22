@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<Body_DFT>
+    <File_info>
+        <Company></Company>
+        <LICENCE></LICENCE>
+        <Date>2018/07/17</Date>
+        <Time>14:58:24</Time>
+        <FileName></FileName>
+        <Created_by></Created_by>
+    </File_info>
+    <Instrument_info_settings>
+        <Instrument_type>LT_NG</Instrument_type>
+        <Channel>2</Channel>
+        <Project_ID>ISEECI</Project_ID>
+        <Location>1</Location>
+        <Latitude>0.000</Latitude>
+        <Longtitude>0.000</Longtitude>
+        <Sample_rate>60000</Sample_rate>
+        <Sample_mode>0</Sample_mode>
+        <Event_ch>247</Event_ch>
+        <Event_threshold>0.000000</Event_threshold>
+        <Schedule />
+    </Instrument_info_settings>
+    <Ch1_data_header>
+        <Identification>LEVEL</Identification>
+        <Unit>m</Unit>
+        <Parameters>
+            <Offset Val="0" Unit="m" />
+        </Parameters>
+    </Ch1_data_header>
+    <Ch2_data_header>
+        <Identification>TEMPERATURE</Identification>
+        <Unit>°C</Unit>
+        <Parameters />
+    </Ch2_data_header>
+</Body_DFT>
