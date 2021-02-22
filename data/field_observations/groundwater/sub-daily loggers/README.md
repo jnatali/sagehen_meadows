@@ -2,6 +2,11 @@
 
 This directory contains groundwater levle measurements for three meadows in Sagehen Basin during the growing season: May/June to Oct/Nov 2018-19 using *logging pressure transducers at a 10-min frequency*. 
 
+During this time, the study used:
+
+- six Solinst Levelogger (Model 3001) Pressure Transducers to monitor groundwater level in wells at East and Kiln meadows in 2018 and 2019 growing seasons. 
+- one [Solinst Barometer](https://www.solinst.com/products/dataloggers-and-telemetry/3001-levelogger-series/levelogger-edge/datasheet/barometric-compensation.php) to correct for atmospheric pressure effects on all the groundwater leveloggers, usually installed at Kiln during any time period when a pressure transducer was collecting data.
+
 The logger data contained in these folders are organized by year, 2018 and 2019. Each file represents a unique well and time period. The three file types are:
 
 1. .csv with comma separated values, not dependent on any particular software.
