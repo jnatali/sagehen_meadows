@@ -8,9 +8,7 @@ The logger data contained in these folders are organized by year, 2018 and 2019.
 2. .xle is only readable by Solinst Levelogger software.
 3. .lev is only readable by Solinst Levelogger software.
 
-Because the loggers were moved from well to well, especially during the summer of 2018, please consult 
+Because the loggers were moved from well to well, especially during the summer of 2018, please consult [this sheet](https://docs.google.com/spreadsheets/d/1AUDLyi7_ER2n2P46caTSbKDx0lcRPYqYAcefWkf2Hr0/edit#gid=258617925) for information about the data (well names, start + end times, field notes, logger ID and serial number).  We will track data processing progress in this file.
 
-[this sheet]: https://docs.google.com/spreadsheets/d/1AUDLyi7_ER2n2P46caTSbKDx0lcRPYqYAcefWkf2Hr0/edit#gid=258617925
-
-to understand the timespan and status for each file in these folders. 
+**IMPORTANT NOTE**: We don't want to overwrite the original .csv files. If you change the file, please save with a distinct file name. Please use git tools (such as the [github desktop app](https://desktop.github.com/), and see [help docs](https://docs.github.com/en/desktop) if needed) to sync files, upload with notes so we can track versions.
 
