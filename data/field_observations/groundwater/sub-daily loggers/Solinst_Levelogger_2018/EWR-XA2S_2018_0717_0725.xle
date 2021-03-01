@@ -4,13 +4,13 @@
         <Company></Company>
         <LICENCE></LICENCE>
         <Date>2018/07/25</Date>
-        <Time>11:18:15</Time>
+        <Time>11:19:09</Time>
         <FileName></FileName>
         <Created_by>Version 4.4.0</Created_by>
     </File_info>
     <Instrument_info>
         <Instrument_type>LT_EDGE</Instrument_type>
-        <Model_number>M5      </Model_number>
+        <Model_number>M5</Model_number>
         <Instrument_state>Stopped</Instrument_state>
         <Serial_number>2092350</Serial_number>
         <Battery_level>100</Battery_level>
