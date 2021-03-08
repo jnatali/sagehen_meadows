@@ -2,7 +2,7 @@
 
 ### Coordinate System for Sagehen Data
 
-EPSG:3491 (NAD83 NSRS 2008 / California Zone 2 State Plane Coordinate System)
+EPSG:6417 (NAD83 NSRS 2011 / California Zone 2 State Plane Coordinate System)
 
 *Note* California State Plane Coordinate System uses a Lambert Conformal Conic projection. Error must not exceed 0.01%.
 Zone 2: Sierra / Nevada / Placer counties (Sagehen)
@@ -29,7 +29,7 @@ GeoTiff is a cross-platform compatible, uncompressed, industry standard for rast
 [OGC GeoPackage](https://www.geopackage.org/) is an open stardard, server-less and self-contained SQLite db that can contain vectors, rasters, tiles, attributes and extensions. It appears to be compatible across platforms (e.g. QGIS, ESRI 10.2.2 ArcGIS desktop, GDAL, SpatialLite). Extension: .gpkg
 
 ### Naming Conventions
-`Sagehen_<ContentDescription>_<OwnerLastName>_<EPSGCode>`
+`Sagehen_<ContentDescription>_<EPSGCode>`
 
 ### Our Needs
 - Cross-compatibility (e.g. QGIS/ArcGIS/APIs)
@@ -41,17 +41,17 @@ GeoTiff is a cross-platform compatible, uncompressed, industry standard for rast
 ### Command-line Cheatsheet
 
 gdaltransform transforms coordinate systems of a file
-`gdaltransform -s_srs EPSG:XXXX -t_srs EPSG:3491 srcfilename Sagehen_<DESC>_Natali_3491.geojson`
+`gdaltransform -s_srs EPSG:XXXX -t_srs EPSG:6417 srcfilename Sagehen_<DESC>_Natali_6417.geojson`
 
 ogr2ogr converts between file formats
 `ogr2ogr -f GeoJSON filename.geojson filename.shp -lco RFC7496=YES`
 
 ogr2ogr can convert file formats + transform  coordinate systems
-`ogr2ogr -s_srs EPSG:XXXX -t_srs EPSG:3491 -f GEOJSON Sagehen_<DESC>_Natali_3491.geojson inputfilename`
+`ogr2ogr -s_srs EPSG:XXXX -t_srs EPSG:6417 -f GEOJSON Sagehen_<DESC>_Natali_6417.geojson inputfilename`
 
-`ogr2ogr -s_srs EPSG:1022423 -t_srs EPSG:3491 -f GEOJSON /Users/jnat/Box/gradSchool/Projects/SierraMeadows_Research/2018_ISEECI_Meadows/Data/Sagehen/Data/GIS/Sagehen_FieldChannels_Natali_3491.geojson /Users/jnat/Box/gradSchool/Projects/SierraMeadows_Research/2018_ISEECI_Meadows/Data/Sagehen/Data/GIS/Sagehen_Channels.geojson`
+`ogr2ogr -s_srs EPSG:1022423 -t_srs EPSG:6417 -f GEOJSON /Users/jnat/Box/gradSchool/Projects/SierraMeadows_Research/2018_ISEECI_Meadows/Data/Sagehen/Data/GIS/Sagehen_FieldChannels_Natali_6417.geojson /Users/jnat/Box/gradSchool/Projects/SierraMeadows_Research/2018_ISEECI_Meadows/Data/Sagehen/Data/GIS/Sagehen_Channels.geojson`
 
 For 102243 PROJ.4 definition
 
-`ogr2ogr -s_srs '+proj=lcc +lat_1=37.06666666666667 +lat_2=38.43333333333333 +lat_0=36.5 +lon_0=-120.5 +x_0=2000000 +y_0=500000 +ellps=GRS80 +units=m +no_defs 3' -t_srs EPSG:3491 -f GEOJSON /Users/jnat/Box/gradSchool/Projects/SierraMeadows_Research/2018_ISEECI_Meadows/Data/Sagehen/Data/GIS/Sagehen_Wells_Natali_3491.geojson /Users/jnat/Box/gradSchool/Projects/SierraMeadows_Research/2018_ISEECI_Meadows/Data/Sagehen/Data/GIS/Sagehen_Wells.gpkg`
+`ogr2ogr -s_srs '+proj=lcc +lat_1=37.06666666666667 +lat_2=38.43333333333333 +lat_0=36.5 +lon_0=-120.5 +x_0=2000000 +y_0=500000 +ellps=GRS80 +units=m +no_defs 3' -t_srs EPSG:6417 -f GEOJSON /Users/jnat/Box/gradSchool/Projects/SierraMeadows_Research/2018_ISEECI_Meadows/Data/Sagehen/Data/GIS/Sagehen_Wells_Natali_6417.geojson /Users/jnat/Box/gradSchool/Projects/SierraMeadows_Research/2018_ISEECI_Meadows/Data/Sagehen/Data/GIS/Sagehen_Wells.gpkg`
 
