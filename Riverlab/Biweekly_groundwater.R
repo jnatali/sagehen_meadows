@@ -1,37 +1,43 @@
 #RIVERLAB: Creating Groundwater_BiWeekly.csv
 #Author: Julia Nicholson
 library(tidyverse) # a universe of tidy data packages
+
 library(patchwork)
 library(hash)
 
+setwd("/Users/jnat/Documents/Github/sagehen_meadows/data/field_observations/groundwater/")
 
-biweekly_raw <- read.csv("C:/Users/Hugh/Desktop/Riverlab/sagehen_meadows/data/field_observations/groundwater/Groundwater_BiWeekly_RAW.csv")
-well_tops_to_ground <- read.csv("C:/Users/Hugh/Desktop/Riverlab/sagehen_meadows/data/field_observations/groundwater/Wells_Dimensions.csv")
-meter_offsets <- read.csv("C:/Users/Hugh/Desktop/Riverlab/sagehen_meadows/data/field_observations/groundwater/Wells_Meter_Offsets.csv")
+biweekly_raw <- read.csv(file = "bi-weekly manual/groundwater_biweekly_RAW.csv")
+well_tops_to_ground <- read.csv(file = "well_dimensions.csv")
+meter_offsets <- read.csv(file = "well_meter_offsets.csv")
 
 #change meter_id header
-meter_offsets <- meter_offsets %>% 
-  rename(
-    meter_id = ï..meter_id
+#meter_offsets <- meter_offsets %>% 
+#  rename(
+#    meter_id = ?..meter_id
   )
-#adding a row for when there is now water (nw)
+
+#adding a row for when there is no water (nw)
 nw_row <- data.frame("nw","10/13/20", 0.0, NA)
 names(nw_row) <-  c("meter_id", "date", "offset", "std_dev") 
 meter_offsets <- rbind(meter_offsets, nw_row)
 
-
-#averaging the well top to ground per well
+#averaging the well top to ground (and other variables) per well
 well_top_to_ground <- well_tops_to_ground %>%
   group_by(well_id) %>%
-  summarise_at(vars(welltop_to_ground, total_well_length), mean, na.rm = TRUE)
-well_top_to_ground <- as.data.table(well_top_to_ground)
+  summarise_at(vars(welltop_to_ground, total_well_length, ground_elevation, welltop_elevation), mean, na.rm = TRUE)
+
+#JN getting error on as.data.table, "could not find function"
+#well_top_to_ground <- as.data.table(well_top_to_ground)
 
 #averaging the three measurements for each day per well
 well_top_to_water <- biweekly_raw
-well_top_to_water$timestamp <- as.Date(well_top_to_water$timestamp,format="%m/%d/%y %H:%M")
+#well_top_to_water$day <- as.Date(well_top_to_water$timestamp,format="%m/%d/%y %H:%M")
+well_top_to_water$day_only <- as.Date(well_top_to_water$timestamp)
+#well_top_to_water$time <- chron(well_top_to_water$timestamp)
 
 well_top_to_water <- well_top_to_water %>%
-  group_by(well_id, timestamp, meter_id) %>% #keep the meter id. Assumes same meter per site per day
+  group_by(well_id, day_only, timestamp, meter_id) %>% #keep the meter id. Assumes same meter per site per day
   summarise_at(vars(welltop_to_water, water_binary), mean, na.rm = TRUE)
 
 #putting the meter and other data together, for calculating distance from ground to water
@@ -47,10 +53,12 @@ water_ground_col <- c()
 test_ground <- groundwater_biweekly
 test_ground$ground_to_water <- NA
 test_ground[is.na(test_ground$welltop_to_water), "ground_to_water"] <- NA
+
 #when there's no water in the well, we input the (ground to well height - full well height)
 cond1 <- (is.na(test_ground$welltop_to_water) & !is.na(test_ground$welltop_to_ground) & !is.na(test_ground$total_well_length) & (test_ground$meter_id == "nw" | (!is.na(test_ground$water_binary) & test_ground$water_binary == 0)))
 test_ground$diff <- -(test_ground$total_well_length - test_ground$welltop_to_ground)
 test_ground[cond1, "ground_to_water"] <- test_ground[cond1, "diff"] 
+
 #if we have all the appropriate measures, then calculate ground to water:
 cond2<- (!is.na(test_ground$welltop_to_water) & !is.na(test_ground$welltop_to_ground) & !is.na(test_ground$meter_id))
 test_ground$diff <- -(test_ground$welltop_to_water - test_ground$welltop_to_ground + test_ground$offset)
@@ -58,8 +66,8 @@ test_ground[cond2, "ground_to_water"] <- test_ground[cond2, "diff"]
 
 groundwater_biweekly <- test_ground[, c(2, 3, 5, 11)]
 groundwater_biweekly_full <- test_ground
-write.csv(groundwater_biweekly, "C:/Users/Hugh/Desktop/Riverlab/sagehen_meadows/data/field_observations/groundwater/groundwater_biweekly.csv")
-write.csv(groundwater_biweekly_full, "C:/Users/Hugh/Desktop/Riverlab/sagehen_meadows/data/field_observations/groundwater/groundwater_biweekly_full.csv")
+#write.csv(groundwater_biweekly, "bi-weekly manual/groundwater_biweekly.csv")
+write.csv(groundwater_biweekly_full, "bi-weekly manual/groundwater_biweekly_full.csv")
 
 
 #
@@ -219,9 +227,9 @@ for (wellname in unique(gw_by_obs_period$well_id)){
   }
 }
 
-write.csv(side_by_side, "C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period.csv")
-write.csv(gw_by_obs_period, "C:/Users/Hugh/Desktop/Riverlab/gw_by_obs_period_unbinned.csv")
-write.csv(observation_df, "C:/Users/Hugh/Desktop/Riverlab/gw_dates_with_obs_periods.csv")
+write.csv(side_by_side, "bi-weekly manual/gw_by_obs_period.csv")
+write.csv(gw_by_obs_period, "bi-weekly manual/gw_by_obs_period_unbinned.csv")
+write.csv(observation_df, "bi-weekly manual/gw_dates_with_obs_periods.csv")
 
 
 
