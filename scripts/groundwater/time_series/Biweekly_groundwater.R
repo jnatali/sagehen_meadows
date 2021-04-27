@@ -15,12 +15,14 @@ meter_offsets <- read.csv(file = "well_meter_offsets.csv")
 #meter_offsets <- meter_offsets %>% 
 #  rename(
 #    meter_id = ?..meter_id
-  )
+#  )
 
 #adding a row for when there is no water (nw)
 nw_row <- data.frame("nw","10/13/20", 0.0, NA)
 names(nw_row) <-  c("meter_id", "date", "offset", "std_dev") 
 meter_offsets <- rbind(meter_offsets, nw_row)
+#rename date columnn to distinguish from other dates and timestamps
+meter_offsets <- rename(meter_offsets,offset_date = date)
 
 #averaging the well top to ground (and other variables) per well
 well_top_to_ground <- well_tops_to_ground %>%
@@ -32,12 +34,15 @@ well_top_to_ground <- well_tops_to_ground %>%
 
 #averaging the three measurements for each day per well
 well_top_to_water <- biweekly_raw
-#well_top_to_water$day <- as.Date(well_top_to_water$timestamp,format="%m/%d/%y %H:%M")
-well_top_to_water$day_only <- as.Date(well_top_to_water$timestamp)
-#well_top_to_water$time <- chron(well_top_to_water$timestamp)
+
+#ensure the timestamp is included with date in output data (i.e. don't want to lose this info; so we can align with sub-daily logger data)
+well_top_to_water$timestamp <- as.POSIXct(well_top_to_water$timestamp,format="%m/%d/%y %H:%M", tz=Sys.timezone())
+
+#consider including a day_only variable for grouping observations (later in code, below line 70)
+#well_top_to_water$day_only <- as.Date(well_top_to_water$timestamp)
 
 well_top_to_water <- well_top_to_water %>%
-  group_by(well_id, day_only, timestamp, meter_id) %>% #keep the meter id. Assumes same meter per site per day
+  group_by(well_id, timestamp, meter_id) %>% #keep the meter id. Assumes same meter per site per day
   summarise_at(vars(welltop_to_water, water_binary), mean, na.rm = TRUE)
 
 #putting the meter and other data together, for calculating distance from ground to water
@@ -48,7 +53,6 @@ groundwater_biweekly <- groundwater_biweekly[
   ]
 
 water_ground_col <- c()
-
 
 test_ground <- groundwater_biweekly
 test_ground$ground_to_water <- NA
@@ -64,10 +68,14 @@ cond2<- (!is.na(test_ground$welltop_to_water) & !is.na(test_ground$welltop_to_gr
 test_ground$diff <- -(test_ground$welltop_to_water - test_ground$welltop_to_ground + test_ground$offset)
 test_ground[cond2, "ground_to_water"] <- test_ground[cond2, "diff"]
 
-groundwater_biweekly <- test_ground[, c(2, 3, 5, 11)]
+#save the full merged data set of manual bi-weekly readings, averaged per well per timestamp
 groundwater_biweekly_full <- test_ground
-#write.csv(groundwater_biweekly, "bi-weekly manual/groundwater_biweekly.csv")
 write.csv(groundwater_biweekly_full, "bi-weekly manual/groundwater_biweekly_full.csv")
+
+#option to save a simpler subset of data; but doesn't seem wise to have duplicates, just use the _full output
+#groundwater_biweekly <- test_ground[, c(2, 3, 5, 11)]
+#write.csv(groundwater_biweekly, "bi-weekly manual/groundwater_biweekly.csv")
+
 
 
 #
