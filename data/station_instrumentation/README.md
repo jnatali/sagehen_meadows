@@ -4,19 +4,19 @@
 
 This spreadsheet describes all the climate data collected from Sagehen Basin in terms of variables, instruments and sources.
 
-
-
-### Directory Description
-
 #### Dendra
 
 Dendra is the online source of Sagehen Field Station climate data (from Tower 1 at East Meadow), located at https://dendra.science/orgs/ucnrs/datastreams?isEnabled=true&stationId=58e68cacdf5ce600012602d1
 
 #### Hobo_temperature
 
-Separate from Dendra, the Sagehen Field Station deployed Hobo temperature (and relative humidity) loggers in a grid across Sagehen Basin. We downloaded data for the loggers nearest to our four study meadows: Logger #496 (at Kiln), 137, 125 (downstream of East), and 121. See Figures 1-4 for grid locations at each study meadow.
+Separate from Dendra, the Sagehen Field Station deployed Hobo loggers in a grid across Sagehen Basin. The loggers record temperature and relative humidity every 10 minutes. Dan Saylor collects this data, shared a Google Drive folder with Jen (she has in an email if we want to expand data set).
 
-Coordinates (Northing, Easting) in file ''*all temp plots w-elev.xls*'' are in UTM Zone 10, EPSG:26910
+We downloaded data for the loggers nearest  our four study meadows: Logger #496 (at Kiln), 137, 125 (downstream of East), and 121. See Figures 1-4 for grid locations at each study meadow.
+
+Coordinates (Northing, Easting) in file ''*all temp plots w-elev.xls*'' are in UTM Zone 10, EPSG:26910.
+
+
 
 ###### Figure 1. Loggers at East
 
