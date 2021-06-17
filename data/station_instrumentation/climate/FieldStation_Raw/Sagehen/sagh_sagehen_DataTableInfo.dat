@@ -1,0 +1,5 @@
+"TOA5","sagh_sagehen","CR1000","6586","CR1000.Std.32","CPU:sh_site1_2_7.CR1","32980","DataTableInfo"
+"TIMESTAMP","RECORD","DataTableName(1)","DataTableName(2)","DataTableName(3)","SkippedRecord(1)","SkippedRecord(2)","SkippedRecord(3)","DataRecordSize(1,1)","DataRecordSize(1,2)","DataRecordSize(2,1)","DataRecordSize(2,2)","DataRecordSize(3,1)","DataRecordSize(3,2)","SecsPerRecord(1)","SecsPerRecord(2)","SecsPerRecord(3)","DataFillDays(1,1)","DataFillDays(1,2)","DataFillDays(2,1)","DataFillDays(2,2)","DataFillDays(3,1)","DataFillDays(3,2)","DataFilled(1)","DataFilled(2)","DataFilled(3)"
+"TS","RN","","","","","","","records","records","records","records","records","records","","","","days","days","days","days","days","days","","",""
+"","","","","","","","","","","","","","","","","","","","","","","","","",""
+"2018-06-11 10:04:27.69",148019,"TenMin","Raw","Hydra",0,0,0,7678,0,7678,0,7678,0,600,600,600,53.31945,0,53.31945,0,53.31945,0,"filled, rung","filled, rung","filled, rung"
