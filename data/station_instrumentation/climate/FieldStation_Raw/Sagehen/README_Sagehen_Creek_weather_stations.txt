@@ -10,7 +10,7 @@ Sagehen was set up on Campbell Scientific's LoggerNet software for pulling data.
 Some files were split by water year using a python script.  These files may be found in subdirectories of this folder.  The headers are the same.
 
 At the time of the writing of this readme, the here is the LoggerNet status of the stations at Sagehen:
-Station1 (sagh_sagehen): online
+Station1 (sagh_sagehen): online (JN: this is the data from East meadow!)
 Station1_wx100: old CR10X logger disabled since 9/15/2017
 Station2_wx: disabled since 10/26/2009 
 Station3_wx: online
@@ -23,3 +23,5 @@ Station10_wx_CR10X, Station10wx_CR10XPB: disabled. possibly no data collected
 Station11_wx: online 
 
 Direct access to LoggerNet possible by request. Please contact Collin.
+
+JN: not sure if other station location data would be useful to us. Need to check if Station 3,4,7,8,11 are near any of our study meadows.

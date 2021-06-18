@@ -12,3 +12,5 @@ data/.DS_Store
 data/climate/~$climate_metadata.xlsx
 .DS_Store
 data/field_observations/groundwater/.Rhistory
+data/station_instrumentation/climate/FieldStation_Raw/Sagehen/sagh_sagehen_creek_dri.dat.csv
+data/station_instrumentation/climate/FieldStation_Raw/Sagehen/sagh_sagehen_creek_dri.dat
