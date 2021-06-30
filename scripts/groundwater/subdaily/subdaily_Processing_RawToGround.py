@@ -9,10 +9,10 @@ then applies to all subdaily readings for the appropriate time period.
 
 TODO: 
 * 2021_0624 FIX cut times for 1-2 wells, see cut_times_file for notes
-* 2021_0624 FIX missing baro data for 0715 to 0717 in 2018, file was not barometer data (see _BAD in baro_data_dir), consider using field station baro data 
+* 2021_0628 FIX save_fig flag and plot_water_level(), throwing a "view limit minimum" valueError
 * Look at barometric compensation script, why are 6 files empty?
 * Look at several files with zero overlapping manual readings (note: if +/- 30 mins, capture 5 more valid files)
-* EWR-1 2018-10-01 count: 0, KET-1 2019-09-04 count: 0, KWR-1 2018-10-01 count: 0, LHR-1 2019-10-05 count: 0
+* EWR-1 2018-10-01 count: 0, KET-1 2019-09-04 count: 0, KWR-1 2018-10-01 count: 0
 Created on Fri Jun 11 13:18:44 2021
 @author: jnatali, alopez, zdamico
 """
@@ -28,23 +28,27 @@ import re # regexpression library to extract well id from filenames
 ### SETUP FLAGS 
 ##  for processing, logging, debugging and data validation
 process_cut = False
+process_baro = True
 
 debug_cut = False
 debug_baro = False
-debug_gtw = False
+debug_gtw = True
+save_fig = False #not working yet, throwing error
 
 ### SETUP DIRECTORY + FILE NAMES
 project_dir = '/Users/jnat/Documents/Github/sagehen_meadows/'
 gw_data_dir = project_dir + 'data/field_observations/groundwater/'
 subdaily_dir = gw_data_dir + 'subdaily_loggers/Solinst_levelogger_all/'
 cut_dir = gw_data_dir + 'subdaily_loggers/cut/'
-baro_data_dir = gw_data_dir + 'subdaily_loggers/baro_data/'
+solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/baro_data/'
+station_baro_data_dir = project_dir + 'data/station_instrumentation/climate/Dendra/'
 compensated_dir = gw_data_dir + 'subdaily_loggers/baro_compensated/'
 gtw_logger_dir = gw_data_dir + 'subdaily_loggers/relative_to_ground/'
 os.makedirs(gtw_logger_dir,exist_ok=True)
 
 cut_times_file = gw_data_dir + 'subdaily_loggers/groundwater_logger_times.csv'
 cut_data_file = cut_dir+'cut_all_wells.csv'
+station_baro_file = station_baro_data_dir + 'Dendra_baro_2018_0701_2019_1201.csv'
 
 
 ### DEFINE FUNCTIONS 
@@ -56,6 +60,30 @@ def get_logger_dataframe():
         log_df = pd.concat([pd.read_csv(f, header=11, encoding='ISO-8859-1')])
     log_df['DT'] = pd.to_datetime(log_df['Date'] + ' ' + log_df['Time'])
     return log_df
+
+# Plot subdaily logger dataframe
+#  Assume dataframe has DT column converted to datetime
+def plot_water_level(logger,water_level_column_name,well_id):
+    fig, ax1 = plt.subplots(figsize=(10, 5), nrows=1, sharex=True)
+    ax1.plot(logger['DT'], logger[water_level_column_name])
+    ax1.set_ylabel('Water Level', size=12)
+    #ax2.plot(logger['DT'], logger['TEMPERATURE'])
+    #ax2.set_ylabel('Temperature', size=12)
+
+    for tick in ax1.yaxis.get_major_ticks():
+        tick.label.set_fontsize(9)
+#    for tick in ax2.yaxis.get_major_ticks():
+#        tick.label.set_fontsize(10)
+#    for tick in ax2.xaxis.get_major_ticks():
+#        tick.label.set_fontsize(10)
+
+    fig.suptitle('Groundwater Level at Well '+ well_id, size=12)
+    if save_fig: 
+        ax1.set_xticklabels(ax1.get_xticks(), rotation=90)
+        plot_file = gw_data_dir +'plots/gw_level_' + well_id + '.eps'
+        plt.savefig(plot_file, format='eps')
+    plt.show()
+    
 
 ## Plot subdaily logger dataframe
 #  Assume dataframe has DT column converted to datetime
@@ -272,7 +300,7 @@ def cut_logger_data():
     
 ## Consolidate all barometer CSV files into one dataframe
 ## Convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units
-def get_baro_dataframe():
+def get_baro_dataframe_solinst():
     """Consolidate all barometer CSV files into one dataframe, then convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units."""
     all_baro_data = pd.DataFrame()
     
@@ -296,9 +324,47 @@ def get_baro_dataframe():
 
     return all_baro_data
 
+## Consolidate all barometer CSV files into one dataframe
+## Convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units
+def get_baro_dataframe():
+    """Consolidate all barometer CSV files into one dataframe, then convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units."""
+    all_baro_data = pd.DataFrame()
+    
+    new_baro = pd.read_csv(station_baro_file)
+    new_baro['DateTime'] = pd.to_datetime(new_baro['Time'])
+    
+    if debug_baro: 
+        print(str(len(new_baro)))
+        str_b_range = 'min/max of new baro file time:' + str(min(new_baro['DateTime'])) + ' to ' + str(max(new_baro['DateTime']))
+        print(str_b_range)
+        
+    new_baro.drop(['Barometric Pressure Avg (mb)'], axis=1, inplace=True)
+    new_baro.rename(columns={'Barometric Pressure Avg (kPa)': 'baro_LEVEL_kPa'}, inplace=True)
+    #column_order = ['DateTime', 'baro_LEVEL_kPa']
+    #new_baro = new_baro.reindex(columns=column_order)
+
+    return new_baro
+
 ## Takes barometric pressure reading from the raw Solinst barologger
 ## and converts it from kPa of pressure to meters (m) of pressure
 def convert_baro(baro_df):
+    """Takes water level reading from the Dendra data, converts it from kPa of pressure to meters (m) above the sensor."""
+    
+    baro_df['baro_LEVEL_m'] = baro_df['baro_LEVEL_kPa'] * 0.101972
+   
+#    if debug_baro: 
+#        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
+#        print(str_b_range)
+    
+    # cleanup baro data so column names clear, not carrying unneeded data
+#    baro_df.drop(['Date', 'Time', 'ms'], axis=1, inplace=True)
+#    baro_df.rename(columns={'LEVEL': 'baro_LEVEL_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
+    
+    return baro_df
+
+## Takes barometric pressure reading from the raw Solinst barologger
+## and converts it from kPa of pressure to meters (m) of pressure
+def convert_baro_solinst(baro_df):
     """Takes water level reading from the raw Solinst levelogger data, converts it from kPa of pressure to meters (m) above the sensor."""
     
     baro_df['baro_LEVEL_m'] = baro_df['LEVEL'] * 0.101972
@@ -322,18 +388,19 @@ def compensate_baro(baro_df, gw_df):
     # merge baro and gw dataframes, only keeping relevant rows
     merge_df = baro_df.merge(gw_df, how='inner',on='DateTime')
     
-    if debug_baro: 
-        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
-        str_g_range = 'min/max of gw time:' + str(min(gw_df['DateTime'])) + ' to ' + str(max(gw_df['DateTime']))
-        print(str_b_range)
-        print(str_g_range)
-        print('lost gw records after merge with baro: ' + str(len(gw_df) - len(merge_df)))
+#    if debug_baro: 
+#        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
+#        str_g_range = 'min/max of gw time:' + str(min(gw_df['DateTime'])) + ' to ' + str(max(gw_df['DateTime']))
+#        print(str_b_range)
+#        print(str_g_range)
+#        print('lost gw records after merge with baro: ' + str(len(gw_df) - len(merge_df)))
     
     # subtract baro data from gw data
     merge_df['compensated_LEVEL_m'] = merge_df['raw_LEVEL_m'] - merge_df['baro_LEVEL_m']
     
     # cleanup column names + order so human readable and save as csv
-    merge_df.drop(['baro_LEVEL_kPa', 'baro_Temp_C'], axis=1, inplace=True)
+    #merge_df.drop(['baro_LEVEL_kPa', 'baro_Temp_C'], axis=1, inplace=True)
+    merge_df.drop(['baro_LEVEL_kPa'], axis=1, inplace=True)
     column_order = ['well_id', 'DateTime', 'raw_LEVEL_m', 'baro_LEVEL_m', 'compensated_LEVEL_m', 'Temp_c']
     merge_df = merge_df.reindex(columns=column_order)
     merge_df.to_csv(compensated_dir+'compensated_all_wells.csv', encoding='ISO-8859-1', index=False)
@@ -379,6 +446,13 @@ def convert_relativeToGround(subdaily_df):
         #g['deployment'] = g.diff_after.ne(10).cumsum()
         g.loc[:,'deployment'] = g.loc[:,'diff_after'].ne(10).cumsum()
         for d, deploy_g in g.groupby('deployment'):
+            
+            deployment_count += 1 
+            
+#            if debug_gtw: 
+#                deploy_g['DT'] = deploy_g['DateTime']
+#                water_level_column_name = 'compensated_LEVEL_m'
+#                plot_water_level(deploy_g,water_level_column_name,w)
             
             # get min+max time for each deployment; add/subtract 10 minutes from each to ensure we match all manual readings
             buffer = np.timedelta64(10,'m')
@@ -462,7 +536,11 @@ def convert_relativeToGround(subdaily_df):
             
             # append to singular all logger dataframe
             all_logger_df = all_logger_df.append(deploy_g)
-            deployment_count += 1
+            
+            if debug_gtw: 
+                deploy_g['DT'] = deploy_g['DateTime']
+                water_level_column_name = 'ground_to_water_m'
+                plot_water_level(deploy_g,water_level_column_name,w)
     
     ## END LOOP
     
@@ -471,7 +549,7 @@ def convert_relativeToGround(subdaily_df):
     column_order = ['well_id', 'DateTime', 'deployment', 'ground_to_water_m', 'raw_LEVEL_m', 'baro_LEVEL_m', 'compensated_LEVEL_m', 'Temp_c']
     all_logger_df = all_logger_df.reindex(columns=column_order)
     all_logger_df.to_csv(gw_data_dir + 'subdaily_loggers/groundwater_subdaily_full.csv', encoding='ISO-8859-1', index=False)
-    print ('GTW No Manual Entry ERRORS: ' + str(error_count) + ' of ' + str(file_count) + ' deployments.')
+    if debug_gtw: print('GTW No Manual Entry ERRORS: ' + str(error_count) + ' of ' + str(deployment_count) + ' deployments.')
 
 ## Convert baro-compensated water level from sensor 
 ## so that it's relative to the ground surface
@@ -607,7 +685,7 @@ else:
     waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
 
 ## 2. Compensate logger water level (m) based on barometer data (kPa)
-waterLevel_df = compensate_baro(convert_baro(get_baro_dataframe()), waterLevel_df)
+if process_baro: waterLevel_df = compensate_baro(convert_baro(get_baro_dataframe()), waterLevel_df)
 
 ## 3. Convert water level from 'relative to sensor' to 'relative to ground surface elevation'.
 convert_relativeToGround(waterLevel_df)
