@@ -190,9 +190,9 @@ KER-1,7/20/21 6:57 a.m.,4.85,4.85,4.84,FALSE,mud,
 E1N,7/20/21 7:04 a.m.,4.85,4.85,4.84,FALSE,,
 E1S,7/20/21 7:05 a.m.,4.27,4.27,4.26,FALSE,dry,
 E2S,7/20/21 7:06 a.m.,2.09,2.09,2.09,FALSE,,
-E3S,7/20/21 7:08 am,-4.2,-6.9,-7.8,FALSE,ponded water,in centimeters? not noted
+E3S,7/20/21 7:08,-4.2,-6.9,-7.8,FALSE,ponded water,in centimeters? not noted
 E4S,7/20/21 7:09 a.m.,4.65,4.65,4.65,FALSE,dry,mud at bottom
-E5S,7/20/21 7:11 am,3.27,3.27,3.27,FALSE,dry,
+E5S,7/20/21 7:11,3.27,3.27,3.27,FALSE,dry,
 E6S,7/20/21 7:13 a.m.,3.69,3.7,3.7,TRUE,dry,
 KET-1,7/20/21 7:17 a.m.,2.18,2.18,2.18,FALSE,dry,
 E7S,7/20/21 7:15 a.m.,,,,FALSE,dry,no water
@@ -230,3 +230,83 @@ B4N,7/20/21 8:57 a.m.,2.9,2.9,2.9,TRUE,dry,
 LHT-1,7/20/21 9:25 a.m.,4.58,4.59,4.59,FALSE,dry, mud
 LET-1,7/20/21 9:27 a.m.,4.7,4.7,4.7,FALSE,dry,
 LWT-1,7/20/21 9:28 a.m.,3.91,3.91,3.91,FALSE,dry,
+D6N,08/06/2021 7:54 a.m.,7.58,7.58,7.58,FALSE,,
+D5N,08/06/2021 6:40 a.m.,4.15,4.15,4.15,TRUE,,
+KHR-1,08/06/2021 6:42 a.m.,4.76,4.76,4.77,TRUE,,
+D1N,08/06/2021 6:44 a.m.,4.2,4.19,4.19,TRUE,,
+KER-1,08/06/2021 6:47 a.m.,,,,,,no water
+E1N,08/06/2021 6:53 a.m.,4.61,4.61,4.61,,,
+E1S,08/06/2021 6:55 a.m.,4.26,4.26,4.26,,,
+E2S,08/06/2021 6:56 a.m.,2.3,2.4,2.4,,"saturated, not standing water",
+E3S,08/06/2021 6:59 a.m.,,,,,,"7, 6, 11 cm deep"
+E4S,08/06/2021 7:00 a.m.,4.68,4.68,4.68,,,at bottom
+E5S,08/06/2021 7:03 a.m. ,4.13,4.13,4.13,,,
+E6S,08/06/2021 7:04 a.m. ,4.44,4.44,4.44,TRUE,,
+E7S,08/06/2021 7:06 a.m. ,,,,,,"no water, seems shallow"
+E8S,08/06/2021 7:09am,,,,,,no water
+KET-1,08/06/2021 7:05 a.m. ,2.62,2.62,2.62,,,logger #4 installed at 7:24 a.m.
+KWT-1,08/06/2021 7:11 a.m. ,5.77,5.77,5.77,,,"logger caked in mud at bottom, move logger to KET-1"
+D1S,08/06/2021 7:30 a.m. ,4.2,4.2,4.2,,,
+KEF-1,08/06/2021 7:38 a.m. ,1.89,1.89,1.9,TRUE,saturated,
+KHF-1,08/06/2021 7:37 a.m. ,4.95,4.95,4.95,TRUE,,
+KWF-1,08/06/2021 7:40 a.m. ,4.78,4.78,4.79,,,mud with sand
+KWR-1,08/06/2021 7:43 a.m.,3.43,3.43,3.43,,,
+EHR-1,08/06/2021 8:09 a.m. ,3.93,3.93,3.93,,,
+EER-1,08/06/2021 8:11 a.m.,4.15,4.16,4.16,,,
+EWR-1,08/06/2021 8:12 a.m.,3.83,3.83,3.83,,,
+A1N,08/06/2021 8:20 a.m.,4.94,4.94,4.94,,,mud
+A2N,08/06/2021 8:18 a.m.,2.6,2.6,2.6,,,
+A2S,08/06/2021 8:19 a.m.,,,,,,no water
+EWT-1,08/06/2021 8:24 a.m.,6.8,6.8,6.8,,,
+B6S,08/06/2021 8:29 a.m.,,,,,,no water
+B7S,08/06/2021 8:31 a.m.,4.47,4.47,4.47,,"not saturated, soil moist",
+EEF-1,08/06/2021 8:34 a.m.,4.55,4.55,4.55,TRUE,,near bottom
+EET-1,08/06/2021 8:37 a.m.,,,,TRUE,,no water
+C5S,08/06/2021 8:38 a.m.,,,,TRUE,,no water
+B4S,08/06/2021 8:42 a.m.,,,,FALSE,,no water
+B2S,08/06/20218:44 a.m.,5.05,5.05,5.05,FALSE,,
+B1S,08/06/2021 8:45 a.m.,4.66,4.66,4.66,FALSE,,
+B1N,08/06/2021 8:46 a.m.,4.96,4.96,4.96,FALSE,,
+B2N,08/06/2021 8:47 a.m.,2.27,2.27,2.27,FALSE,,
+B3N,08/06/2021 8:48 a.m.,3.87,3.87,3.88,FALSE,,
+B4N,08/06/2021 8:49 a.m.,3.05,3.06,3.06,FALSE,,
+LHT-1,08/06/2021 9:20 a.m.,4.56,4.56,4.56,FALSE,,near bottom
+LET-1,08/06/2021 9:22 a.m.,4.7,4.7,4.7,FALSE,,mud at bottom
+LWT-1,08/06/2021 9:25 a.m.,4.08,4.08,4.08,FALSE,,
+D6N,8/22/2021 11:37 a.m.,7.59,7.59,7.59,FALSE,,mud at bottom
+D5N,8/22/2021 11:39 a.m.,4.88,4.88,4.88,FALSE,,"wet mud, near bottom"
+KHR-1,8/22/2021 11:40 a.m.,4.78,4.78,4.78,FALSE,,mud at bottom
+D1N,8/22/2021 11:43 a.m.,4.2,4.2,4.2,FALSE,,
+D1S,8/22/2021 11:45 a.m.,4.21,4.21,4.21,FALSE,,
+E1N,8/22/2021 11:51 a.m.,4.62,4.62,4.63,FALSE,,"thalweg depth is 11.5 cm, between E1N to E1S - depth is 12-18.5 cm"
+E1S,8/22/2021 11:57 a.m.,4.21,4.21,4.22,FALSE,,
+E2S,8/22/2021 11:58 a.m.,2.04,2.05,2.05,FALSE,"saturated soil, standing water",
+E3S,8/22/2021 11:59 a.m.,,,,FALSE,,"5, 5, 7 cm above surface"
+E4S,8/22/2021 12:00 p.m.,,,,FALSE,,"no water, mud at bottom"
+E5S,8/22/2021 12:03 p.m.,4.12,4.12,4.12,FALSE,,grasshoppers
+KET-1,8/22/2021 12:07 p.m.,2.88,2.88,2.88,TRUE,,grasshoppers
+E6S,8/22/2021 12:05 p.m.,4.53,4.53,4.53,TRUE,,grasshoppers
+KWT-1,8/22/2021 12:11 p.m.,,,,TRUE,,"no water, increase height of well"
+KEF-1,8/22/2021 12:27 p.m.,1.88,1.88,1.88,TRUE,soil saturated,water at surface within 2 m distance
+KHF-1,8/22/2021 12:29 p.m.,3.98,3.98,3.99,TRUE,,grasshopper and butterfly
+KWF-1,8/22/2021 12:31 p.m.,4.83,4.83,4.83,FALSE,,mud at or near bottom
+KWR-1,8/22/2021 12:36 p.m.,3.39,3.39,3.4,FALSE,,"wet mud, near bottom"
+EHR-1,8/22/2021 9:24 a.m.,3.77,3.77,3.77,FALSE,,
+EER-1,8/22/2021 9:26 a.m.,4.02,4.03,4.03,FALSE,,
+EWR-1,8/22/2021 9:28 a.m.,3.79,3.79,3.79,FALSE,,
+A1N,8/22/2021 9:35 a.m.,2.56,2.56,2.57,FALSE,,
+A2N,8/22/2021 9:35 a.m.,4.88,4.88,4.88,FALSE,,
+EWT-1,8/22/2021 9:39 a.m.,6.9,6.9,6.9,TRUE,,"near bottom, needs more bentonite"
+B7S,8/22/2021 9:48 a.m.,4.62,4.62,4.62,FALSE,slightly moist,
+EEF-1,8/22/2021 9:51 a.m.,4.56,4.56,4.56,TRUE,,mud at bottom
+A5N,8/22/2021 9:40 a.m.,,,,FALSE,,"no water, moist at bottom"
+B2S,8/22/2021 10:03 a.m.,,,,FALSE,,no water
+B1S,8/22/2021 10:05 a.m.,4.69,4.69,4.7,FALSE,,
+B1N,8/22/2021 10:07 a.m.,4.78,4.78,4.79,FALSE,,
+B2N,8/22/2021 10:08 a.m.,2.17,2.17,2.18,FALSE,,
+B3N,8/22/2021 10:09 a.m.,3.68,3.69,3.69,FALSE,,
+B4N,8/22/2021 10:10 a.m.,2.98,2.98,2.98,FALSE,,
+LHT-1,8/22/2021 1:31 p.m.,4.74,4.74,4.74,FALSE,,mud at bottom
+LET-1,8/22/2021 1:32 p.m.,4.75,4.75,4.75,FALSE,,wet mud near bottom
+LWT-1,8/22/2021 1:34 p.m.,4.2,4.2,4.2,FALSE,,
+B4S,8/22/2021 10:02 a.m.,,,,FALSE,,no water
