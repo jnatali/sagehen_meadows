@@ -2,11 +2,11 @@
 
 ### Sub-Daily Loggers in Shallow wells
 
-This directory contains groundwater measurements for three meadows in Sagehen Basin during the growing season: May/June to Oct/Nov 2018-19 using *logging pressure transducers at a 10-min frequency*. 
+This directory contains groundwater measurements for three meadows in Sagehen Basin during the growing season: May/June to Oct/Nov 2018-19 and 2021 using *logging pressure transducers at a 10-min frequency*. 
 
 During this time, the study used:
 
-- six Solinst Levelogger (Model 3001) Pressure Transducers to monitor groundwater level in wells at East and Kiln meadows in 2018 and 2019 growing seasons. 
+- six Solinst Levelogger (Model 3001) Pressure Transducers to monitor groundwater level in wells at East and Kiln meadows in 2018, 2019 and 2021 growing seasons. 
 - one [Solinst Barometer](https://www.solinst.com/products/dataloggers-and-telemetry/3001-levelogger-series/levelogger-edge/datasheet/barometric-compensation.php) to correct for atmospheric pressure effects on all the groundwater leveloggers, usually installed at Kiln during any time period when a pressure transducer was collecting data.
 
 ### Important Data Files
@@ -38,8 +38,9 @@ Because the loggers were moved from well to well, especially during the summer o
 
 As we process the data, we'll record tasks and instructions in this [google docs file](https://docs.google.com/document/d/1SkeEyw_Hy92w4wKUREM5MnydNLWko_dcTGWOw4gq3G8/edit).
 
-**IMPORTANT NOTE**: We don't want to overwrite these original files. If you change the file, please save with a distinct file name. Please use git tools (such as the [github desktop app](https://desktop.github.com/), and see [help docs](https://docs.github.com/en/desktop) if needed) to sync files, upload with notes so we can track versions.
+**IMPORTANT NOTE**: Please do NOT overwrite the original files in the Solinst_Levelogger_ folders. If you change the file, please save in a different directory with a distinct file name. Please use git tools (such as the [github desktop app](https://desktop.github.com/), and see [help docs](https://docs.github.com/en/desktop) if needed) to sync files, upload with notes so we can track versions.
 
 #### Notebook scripts
 
+--TODO: Update this section with quick overview of scripts in R (not .ipynb notebooks)--
 Running all cells in the (which one?) .ipynb notebook will read every csv in the /data folder and cut the data using the rate of change. For each csv file, the script will plot and output how many rows were cut off of each end of the data (useful for validation). Can view plots in notebook and all are saved to plot folder. To run this script on new data, be sure to have the same directory setup.
