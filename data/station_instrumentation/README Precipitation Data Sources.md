@@ -14,5 +14,5 @@ Nearby SNOTEL stations are:
 
 
 
-Whether from Sagehen or these sources, would be great if we can get snowpack as Snow Water Equivalent (SWE), but to translate from snow depth to SWE we’d need data about the density of the snow.
+Whether from Sagehen or these sources, want to analyze snowpack as Snow Water Equivalent (SWE), but to translate from snow depth to SWE we’d need data about the density of the snow.
 
