@@ -27,18 +27,18 @@ import re # regexpression library to extract well id from filenames
 
 ### SETUP FLAGS 
 ##  for processing, logging, debugging and data validation
-process_cut = False
-process_baro = True
+process_cut = True
+process_baro = False
 
-debug_cut = False
+debug_cut = True
 debug_baro = False
-debug_gtw = True
+debug_gtw = False
 save_fig = False #not working yet, throwing error
 
 ### SETUP DIRECTORY + FILE NAMES
-project_dir = '/Users/jnat/Documents/Github/sagehen_meadows/'
+project_dir = '/Users/kbennett/Documents/Github/sagehen_meadows/'
 gw_data_dir = project_dir + 'data/field_observations/groundwater/'
-subdaily_dir = gw_data_dir + 'subdaily_loggers/Solinst_levelogger_all/'
+subdaily_dir = gw_data_dir + 'subdaily_loggers/Solinst_levelogger_2021/'
 cut_dir = gw_data_dir + 'subdaily_loggers/cut/'
 solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/baro_data/'
 station_baro_data_dir = project_dir + 'data/station_instrumentation/climate/Dendra/'
@@ -221,9 +221,9 @@ def cut_logger_data():
             
             ## ERROR HANDLING: only continue if one matching entry of start/stop times
             if well_time_df.shape[0] != 1:
-                warning_str = 'WARNING: More/less than one row in well_time_df for ' + well_id + ', not clear which one to use. Exiting cut process.'
+                warning_str = 'WARNING: More/less than one row in well_time_df for ' + well_id + ', not clear which one to use. Check date range in logger csv. Exiting cut process. '
                 print(warning_str)
-                break
+                # break
             
             
             # select logger data rows within start/end times from field notes
@@ -277,7 +277,8 @@ def cut_logger_data():
             )
             
             # append 
-            cut_count_df = cut_count_df.append(track_df)
+            # cut_count_df = cut_count_df.append(track_df)
+            cut_count_df = pd.concat([cut_count_df, track_df])
       
             # plot water level and temp for this well
             if debug_cut: plot_water_temp_compare(orig_log_df, manual_log_df, log_df,'raw_LEVEL_m',well_id)
@@ -287,7 +288,8 @@ def cut_logger_data():
             
             # identify well_id and add to complete data frame for all, and save as csv
             log_df.insert(0, 'well_id', well_id)
-            cut_logger_df = cut_logger_df.append(log_df)
+            # cut_logger_df = cut_logger_df.append(log_df)
+            cut_logger_df = pd.concat([cut_logger_df, log_df])
     
     # cleanup logger data to save in human-readable format
     cut_logger_df.drop(['Date', 'Time', 'ms', 'Rate of Change'], axis=1, inplace=True)
@@ -676,10 +678,11 @@ def convert_relativeToGround(subdaily_df):
 
 ## Starts with individual raw Solinst logger files in the 'subdaily_dir' directory
 ## Use dataframe to pass data between functions
-waterLevel_df = pd.DataFrame()
+#waterLevel_df = pd.DataFrame()
     
 ## 1. Cut logger entries when sensor not in the well, as indicated by temperature change
-if process_cut: waterLevel_df = cut_logger_data()
+if process_cut:
+    waterLevel_df = cut_logger_data()
 else: 
     waterLevel_df = pd.read_csv(cut_data_file)
     waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
@@ -689,4 +692,6 @@ if process_baro: waterLevel_df = compensate_baro(convert_baro(get_baro_dataframe
 
 ## 3. Convert water level from 'relative to sensor' to 'relative to ground surface elevation'.
 convert_relativeToGround(waterLevel_df)
+
+print(waterLevel_df)
     
