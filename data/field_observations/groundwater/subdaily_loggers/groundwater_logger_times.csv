@@ -51,11 +51,11 @@ logger_no,serial_no,well_id,start,end,temp_threshold,notes
 2,2092352,EEF-1,9/21/19 15:10,10/20/19 14:59,0.05,"""loose""; source 2015-19 Orange p140"
 5,2092377,EET-1,9/21/19 15:10,10/4/19 17:28,0.5,"mud at bottom, need to flush well?"
 1,2092351,LHT-1,10/5/19 12:00,10/20/19 9:13,0.1,source 2015-19 Orange p140
-1,2092351,KHT-E5S,6/5/21 12:00,7/3/21 8:50,0.5,source Fall 2029 Yellow p40
+1,2092351,KHT-XE5S,6/5/21 12:00,7/3/21 8:50,0.5,source Fall 2029 Yellow p40
 2,2092352,KWT-1,6/5/21 12:00,6/19/21 12:55,0.5,source Fall 2029 Yellow p40
 3,2092161,KEF-1,6/5/21 12:00,7/3/21 8:29,0.5,source Fall 2029 Yellow p40
 4,2091639,KHF-1,6/5/21 12:00,6/20/21 12:29,0.5,source Fall 2029 Yellow p40; changed file name but really it's a combined file with KHR-1 from 0620 to 0703
-5,2092377,EHT-A5S,6/5/21 16:02,7/3/21 11:19,0.5,source Fall 2029 Yellow p40
+5,2092377,EHT-XA5S,6/5/21 16:02,7/3/21 11:19,0.5,source Fall 2029 Yellow p40
 6,2092350,EWT-1,6/5/21 14:00,7/3/21 11:18,0.5,source Fall 2029 Yellow p40
 2,2092352,KWT-1,6/29/21 14:15,7/3/21 8:47,0.5,"source Fall 2029 Yellow p40; note says ""at new level, water depth = ~147 cm""; duplicate of KWT's 0506 to 0619 file"
 1,2092351,KET-1,7/3/21 12:00,7/5/21 12:00,0.5,"source Fall 2029 Yellow p64; note says ""rained in PM on 0702 + overnight"""
@@ -67,10 +67,10 @@ logger_no,serial_no,well_id,start,end,temp_threshold,notes
 6,2092350,EET-1,7/3/21 12:00,7/5/21 12:00,0.5,"source Fall 2029 Yellow p64; note says ""rained in PM on 0702 + overnight, EET-1 is near C xect"""
 5,2092377,EET-1,7/5/21 15:45,7/20/21 13:37,0.5,"source Fall 2029 Yellow p74; note says ""07/20 moved EET-1 (5) to EWT-1""; file is duplicate of EWT-1_2021_0720_1114"
 6,2092350,EEF-1,7/5/21 15:45,8/22/21 9:51,0.5,"source Fall 2029 Yellow p74; note says ""on 08/22 moist at bottom, logger stuck in mud (20 cm deep),  photo oiander cg"" (can't read last word); file is duplicate of EER-1_2021_0908_1114"
-3,2092161,KHT-E5S,7/5/21 18:00,7/16/21 13:20,0.5,"source Fall 2029 Yellow p74; note says ""water in well, remove well to deepen""; file is duplicate of KHT-E5S_2021_0719_1114"
+3,2092161,KHT-XE5S,7/5/21 18:00,7/16/21 13:20,0.5,"source Fall 2029 Yellow p74; note says ""water in well, remove well to deepen""; file is duplicate of KHT-E5S_2021_0719_1114"
 4,2091639,KWT-1,7/5/21 18:00,11/14/21 8:07,0.5,"source Fall 2029 Yellow p74, note says ""need longer cord to 150 cm, need dremel"""
 1,2092351,KEF-1,7/5/21 18:00,11/14/21 8:28,0.5,"source Fall 2029 Yellow p74; no entry for removal, guessing based on final well reading"
 2,2092352,KHF-1,7/5/21 18:00,11/14/21 8:25,0.5,"source Fall 2029 Yellow p74; note says ""took well level at 5:36 pm"" (on 07/04 presumably); no entry for removal, guessing based on final well reading"
 5,2092377,EWT-1,7/20/21 14:24,11/14/21 9:38,0.5,"source Fall 2029 Yellow p74; note says ""in new well"""
-3,2092161,KHT-E5S,7/19/21 11:57,11/14/21 7:50,0.5,"source Fall 2029 Yellow p74; no entry for removal, guessing based on final well reading"
+3,2092161,KHT-XE5S,7/19/21 11:57,11/14/21 7:50,0.5,"source Fall 2029 Yellow p74; no entry for removal, guessing based on final well reading"
 6,2092350,EER-1,9/8/21 14:41,11/14/21 9:07,0.5,"source Fall 2029 Yellow p74; no entry for removal, guessing based on final well reading"
