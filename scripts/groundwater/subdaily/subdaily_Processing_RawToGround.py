@@ -136,16 +136,14 @@ def plot_water_temp_compare(before_df, manual_df, after_df, water_level_column_n
     ax1.set_ylabel('Water Level', size=12)
     ax2.set_ylabel('Temperature', size=12)
 
+    ax1.plot(before_df['DT'], before_df[water_level_column_name], color="b", label="Cut due to date")
+    ax2.plot(before_df['DT'], before_df['TEMPERATURE'], color="b", label="Cut due to date")
     
-    ax1.plot(before_df['DT'], before_df[water_level_column_name])
-    ax2.plot(before_df['DT'], before_df['TEMPERATURE'])
+    ax1.plot(manual_df['DT'], manual_df[water_level_column_name], color="g", label="Cut due to Temp change")
+    ax2.plot(manual_df['DT'], manual_df['TEMPERATURE'], color="g", label="Cut due to Temp change")
     
-    ax1.plot(manual_df['DT'], manual_df[water_level_column_name],'g')
-    ax2.plot(manual_df['DT'], manual_df['TEMPERATURE'], 'g')
-    
-    ax1.plot(after_df['DT'], after_df[water_level_column_name],'r')
-    ax2.plot(after_df['DT'], after_df['TEMPERATURE'], 'r')
-    
+    ax1.plot(after_df['DT'], after_df[water_level_column_name], color="r", label="Remaining data")
+    ax2.plot(after_df['DT'], after_df['TEMPERATURE'], color="r", label="Remaining data")
 
     for tick in ax1.yaxis.get_major_ticks():
         tick.label.set_fontsize(10)
@@ -154,8 +152,11 @@ def plot_water_temp_compare(before_df, manual_df, after_df, water_level_column_n
     for tick in ax2.xaxis.get_major_ticks():
         tick.label.set_fontsize(10)
 
+    plt.legend()
     fig.suptitle('Before/After cut of GW Level and Temp at Well '+ well_id, size=12)
     plt.show()
+
+
 ## Cut or trim logger data at front/back end of data
 ## to account for when logger not in the well.
 ## 
@@ -165,8 +166,7 @@ def plot_water_temp_compare(before_df, manual_df, after_df, water_level_column_n
 ## 3. (next step) the manual well measurement
 def cut_logger_data():
     """Cut logger data at front/back to account for when logger not in the well."""
-    
-    
+
     ## new dataframes
     # to hold all well logger data
     cut_logger_df = pd.DataFrame()
