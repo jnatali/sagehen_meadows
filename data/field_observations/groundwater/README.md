@@ -1,12 +1,20 @@
 ### Sagehen Groundwater Data
 
+This directory contains groundwater level measurements in Sagehen Basin during the growing season: May/June to Oct/Nov in 2018-2019.
 
+Groundwater levels were sampled from three meadows (identified as *meadow_id*). 
 
-This directory contains groundwater level measurements for several meadows in Sagehen Basin during the growing season: May/June to Oct/Nov in 2018-2019.
+Within each meadow, shallow groundwater wells were located in a mapped hydrogeomorphic zone (HGMZ) and plant functional type (PFT). 
 
-Groundwater levels were sampled from three meadows (meadow_id). Within each meadow, shallow groundwater wells were located in a mapped hydrogeomorphic zone (HGMZ) and plant functional type (PFT). Some wells had been installed by a previous researcher (Allen-Diaz 1991) in randomly located cross-meadow transects, labeled A-E. See the key below plus description of Wells_Unique_Id.txt for naming conventions. Georeferenced well locations are defined in the data/instrumentation/Sagehen_Wells_Natali_3941.geojson file.
+Shallow groundwater wells were installed in each combination of HGMZs and PFTs. Some wells had been installed by a previous researcher (Allen-Diaz 1991) in randomly located cross-meadow transects, labeled A-E. 
 
-meadow_id:
+Georeferenced well locations are defined in the *data/instrumentation/Sagehen_Wells_Natali_3941.geojson* file.
+
+For groundwater well naming conventions, see the key below. All uniquely named wells are listed in *Wells_Unique_Id.txt*. 
+
+#### Abbreviations used in our data model
+
+##### meadow_id
 
 * E = East
 
@@ -14,13 +22,13 @@ meadow_id:
 
 * L = Lower
 
-HGMZ:
+##### HGMZ
 
 * R = riparian
 * F = fan
 * T = terrace
 
-PFT:
+##### PFT
 
 * E = sedge
 * H = mixed herbaceous
@@ -39,7 +47,7 @@ PFT:
 
 **in biweekly_manual**
 
-*groundwater_biweekly.csv* will contain the calculated groundwater level relative to the ground surface for each biweekly well measurement. The relative groundwater level will be an average of the three welltop_to_water readings in the *Groundwater_BiWeekly_RAW.csv*, subtract the welltop_to_ground level from *Wells_Dimensions.csv*  for the unique well_id and add the meter_offset from *Wells_Meter_Offsets.csv*  for the indicated meter_id.
+*groundwater_biweekly_full.csv* will contain the calculated groundwater level relative to the ground surface for each biweekly well measurement. The relative groundwater level will be an average of the three welltop_to_water readings in the *Groundwater_BiWeekly_RAW.csv*, subtract the welltop_to_ground level from *Wells_Dimensions.csv*  for the unique well_id and add the meter_offset from *Wells_Meter_Offsets.csv*  for the indicated meter_id.
 
 *groundwater_biweekly_RAW.csv*   contains unprocessed water level readings from the top of the well to the groundwater. Three readings were collected at each well on a bi-weekly basis. Each well has a unique id. Each reading has a timestamp and those with the same timestamp (listed in PDT, even if past official summer window) were collected within ~1 minute of each other. All readings should have occurred before 9am PDT. Some wells contained logging pressure transducers (then logger_binary = 1). Some wells were dry (then water_binary = 0). For each measurement, a meter_id is listed, which maps to an offset in the *wells_meterOffsets.csv* file. Variables in this file include: well_id, timestamp, welltop_to_water (in cm), logger_binary (true/false), water_binary (true/false) and meter_id.
 
