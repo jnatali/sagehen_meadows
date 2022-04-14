@@ -27,10 +27,10 @@ import re # regexpression library to extract well id from filenames
 
 ### SETUP FLAGS 
 ##  for processing, logging, debugging and data validation
-process_cut = True
-process_baro = False
+process_cut = False
+process_baro = True
 
-debug_cut = True
+debug_cut = False
 debug_baro = False
 debug_gtw = False
 save_fig = False #not working yet, throwing error
