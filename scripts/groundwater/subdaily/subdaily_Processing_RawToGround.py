@@ -31,7 +31,7 @@ process_cut = False
 process_baro = True
 
 debug_cut = False
-debug_baro = False
+debug_baro = True
 debug_gtw = False
 save_fig = False #not working yet, throwing error
 
@@ -423,7 +423,8 @@ def convert_relativeToGround(subdaily_df):
     all_logger_df = pd.DataFrame()
     
     ## import manual groundwater data + setup for analysis
-    biweek_df = pd.read_csv(gw_data_dir + 'biweekly_manual/groundwater_biweekly_full.csv')
+    #TODO: Needs adjustment in the file naming scheme to account for data from different years.
+    biweek_df = pd.read_csv(gw_data_dir + 'biweekly_manual/groundwater_biweekly_full_2018-2019.csv')
     biweek_df['timestamp'] = biweek_df['timestamp'].astype('datetime64[ns]')
     
 
@@ -437,7 +438,9 @@ def convert_relativeToGround(subdaily_df):
     #subdaily_df['diff_prev'] = subdaily_df.groupby(['well_id'])['DateTime'].diff(-1).astype('timedelta64[m]')
     
     # if consecutive, 'diff_after' should = 10
-    subdaily_df['diff_after'] = subdaily_df.groupby(['well_id'])['DateTime'].diff().astype('timedelta64[m]')
+
+    # 4/18/21 - Kaden edited this line out
+    #subdaily_df['diff_after'] = subdaily_df.groupby(['well_id'])['DateTime'].diff().astype('timedelta64[m]')
     
     #subdaily_df['check'] = np.where((subdaily_df.diff_prev==-10) | (subdaily_df.diff_after==10), True, False)
     #subdaily_df.to_csv(gw_data_dir+'test_groups.csv', encoding='ISO-8859-1', index=False)
