@@ -1,0 +1,76 @@
+logger_no,serial_no,well_id,start,end,temp_threshold,notes
+1,2092351,KER-1,7/15/18 14:30,7/17/18 14:06,0.5,source 2018-19 Black p 21
+2,2092352,KWR-1,7/15/18 15:52,7/17/18 14:24,0.4,"From top knot at sensor to well, need to add sensor length; source 2018-19 Black p 21"
+3,2092161,KHT-XE5S,7/15/18 14:55,7/17/18 13:52,0.5,"Sensor depth noted as ""not accurate""; source 2018-19 Black p 21"
+4,2091639,KWT-1,7/15/18 15:10,7/17/18 13:44,0.5,"From top knot at sensor to well, need to add sensor length; source 2018-19 Black p 21"
+5,2092377,KEF-1,7/15/18 15:33,7/17/18 13:44,1,"From top knot at sensor to well, need to add sensor length; source 2018-19 Black p 21"
+6,2092350,KFR-XE1S,7/15/18 14:22,7/17/18 13:48,,"wrong file, from sensor 5 on different dates"
+1,2092351,EER-1,7/17/18 17:00,7/25/18 10:50,0.5,source 2018-19 Black p 23
+2,2092352,EWR-1,7/17/18 17:00,7/25/18 11:00,0.5,source 2018-19 Black p 23
+3,2092161,EHT-XA5S,7/17/18 17:00,7/25/18 11:00,0.5,source 2018-19 Black p 23
+4,2091639,EEF-1,7/17/18 17:00,7/25/18 11:10,0.5,"10/05/2019 notes on ""current"" logger deployment; source 2015-19 Orange p130"
+5,2092377,EWF-XA2S,7/17/18 17:00,7/25/18 11:00,0.5,source 2018-19 Black p 23
+6,2092350,EET-1,7/17/18 17:00,7/25/18 11:10,0.5,source 2018-19 Black p 23
+1,2092351,KER-1,7/25/18 13:30,7/27/18 12:30,0.5,see 2018-19 Black p 23
+2,2092352,KWR-1,7/25/18 12:40,7/27/18 12:30,0.1,see 2018-19 Black p 23
+3,2092161,KHT-XE5S,7/25/18 12:30,7/27/18 12:30,0.5,see 2018-19 Black p 23
+4,2091639,KWF-1,7/25/18 12:30,7/27/18 12:30,0.05,see 2018-19 Black p 23
+5,2092377,KEF-1,7/25/18 12:30,7/27/18 12:30,0.5,see 2018-19 Black p 23
+6,2092350,KFR-XE1S,7/25/18 12:30,7/27/18 12:30,0.5,see 2018-19 Black p 23
+1,2092351,EER-1,7/27/18 15:00,8/24/18 11:50,0.1,see 2018-19 Black p 32
+2,2092352,EWR-1,7/27/18 15:00,8/24/18 11:50,0.01,see 2018-19 Black p 32
+3,2092161,EHF-XA3S,7/27/18 15:00,8/24/18 12:00,0.1,see 2018-19 Black p 32
+4,2091639,EEF-1,7/27/18 15:00,8/24/18 12:20,0.01,see 2018-19 Black p 32
+5,2092377,EWT-1,7/27/18 15:00,8/24/18 12:20,0.5,see 2018-19 Black p 32
+6,2092350,EHR-1,7/27/18 15:00,8/24/18 12:20,0.1,see 2018-19 Black p 32
+1,2092351,KER-1,8/24/18 14:40,8/26/18 14:30,0.5,see 2018-19 Black p 37
+2,2092352,KWR-1,8/24/18 14:30,8/26/18 14:30,0.5,
+3,2092161,KHT-XE4S,8/24/18 14:30,8/26/18 14:30,0.5,
+4,2091639,KWF-1,8/24/18 14:30,8/26/18 14:30,0.5,
+5,2092377,KEF-1,8/24/18 14:30,8/26/18 14:30,0.5,
+6,2092350,KFR-XE1S,8/24/18 14:30,8/26/18 14:30,0.5,
+1,2092351,EER-1,8/26/18 18:00,11/19/18 12:30,0.5,
+2,2092352,EWR-1,8/26/18 18:00,9/29/18 12:37,0.1,see 2018-19 Black p 38
+3,2092161,KWR-1,8/26/18 18:00,9/29/18 13:01,0.1,
+4,2091639,EEF-1,8/26/18 18:00,11/19/18 12:40,0.5,
+5,2092377,KEF-1,8/26/18 18:00,11/19/18 12:40,0.01,
+6,2092350,EHR-1,8/26/18 18:00,11/19/18 12:50,0.1,
+2,2092352,KHF-1,9/29/18 14:00,10/1/18 14:00,0.5,
+3,2092161,KWF-1,9/29/18 14:00,10/1/18 13:30,0.1,"changed stop time, was 10/1/18 14:00"
+2,2092352,EWR-1,10/1/18 15:00,11/19/18 12:20,0.5,
+3,2092161,KWR-1,10/1/18 15:00,11/19/18 12:20,0.1,
+1,2092351,EWT-1,6/2/19 10:39,7/26/19 11:52,0.5,see 2018-19 Black p 53
+2,2092352,EHT-XA5S,6/2/19 12:00,9/20/19,0.5,"around 09/03/2019, may have had no water, as indicated by temp; any manual readings around then?"
+3,2092161,KEF-1,6/3/19 13:02,10/20/19 12:06,0.1,mark on logger erased; source 2015-19 Orange p140; ??also see 2018-19 Black p 44??
+4,2091639,KHF-1,6/2/19 12:00,6/16/19 13:40,0.1,why are there separate files for 0602_0618 (csv) and 0618_0902 (xlsx); combine if they're continuous.
+5,2092377,KHT-XE5S,6/3/19 12:00,10/20/19 12:00,0.5,source 2015-19 Orange p140
+6,2092350,KWT-1,6/3/19 12:22,10/20/19 11:11,0.5,FIX NEEDED: script overcutting due to anomaly in temp data in mid-June; barometer was deployed here; source 2015-19 Orange p140
+4,2091639,KHF-1,6/18/19 14:30,9/2/19,0.05,start was 6/18/19 13:50 but changed to cutoff first entry
+1,2092351,EET-2,7/26/19 12:05,10/4/19 17:20,0.5,"well measurement at EET-2 at 12:04p 07/26/2019 was 119,121,121 (cm); source 2015-19 Orange pp88-89"
+4,2091639,KET-1,9/3/19 12:44,10/20/19 11:27,0.05,"5 cm ice chunk attached to cord, left sensor running for 16 min; source 2015-19 Orange p140"
+2,2092352,EEF-1,9/21/19 15:10,10/20/19 14:59,0.05,"""loose""; source 2015-19 Orange p140"
+5,2092377,EET-1,9/21/19 15:10,10/4/19 17:28,0.5,"mud at bottom, need to flush well?"
+1,2092351,LHT-1,10/5/19 12:00,10/20/19 9:13,0.1,source 2015-19 Orange p140
+1,2092351,KHT-XE5S,6/5/21 12:00,7/3/21 8:50,0.5,source Fall 2029 Yellow p40
+2,2092352,KWT-1,6/5/21 12:00,6/19/21 12:55,0.5,source Fall 2029 Yellow p40
+3,2092161,KEF-1,6/5/21 12:00,7/3/21 8:29,0.5,source Fall 2029 Yellow p40
+4,2091639,KHF-1,6/5/21 12:00,6/20/21 12:29,0.5,source Fall 2029 Yellow p40; changed file name but really it's a combined file with KHR-1 from 0620 to 0703
+5,2092377,EHT-XA5S,6/5/21 16:02,7/3/21 11:19,0.5,source Fall 2029 Yellow p40
+6,2092350,EWT-1,6/5/21 14:00,7/3/21 11:18,0.5,source Fall 2029 Yellow p40
+2,2092352,KWT-1,6/29/21 14:15,7/3/21 8:47,0.5,"source Fall 2029 Yellow p40; note says ""at new level, water depth = ~147 cm""; duplicate of KWT's 0506 to 0619 file"
+1,2092351,KET-1,7/3/21 12:00,7/5/21 12:00,0.5,"source Fall 2029 Yellow p64; note says ""rained in PM on 0702 + overnight"""
+2,2092352,KHR-1,7/3/21 19:36,7/5/21 12:00,2,"source Fall 2029 Yellow p64; note says ""rained in PM on 0702 + overnight"""
+3,2092161,EHR-1,7/3/21 12:28,7/5/21 12:00,0.5,"source Fall 2029 Yellow p64; note says ""rained in PM on 0702 + overnight"""
+4,2091639,KHR-1,6/20/21 15:06,7/3/21 8:59,1.0,"source Fall 2029 Yellow p40; note says ""moved from KHF-1 while well out""; changed file name but really it's a combined file with KHF-1 from 0605 to 0620"
+5,2092377,EER-1,7/3/21 12:25,7/5/21 12:00,0.5,"source Fall 2029 Yellow p64; note says ""rained in PM on 0702 + overnight"""
+4,2091639,EEF-1,7/3/21 12:00,7/5/21 12:00,0.5,"source Fall 2029 Yellow p64; note says ""rained in PM on 0702 + overnight, EEF-1 is fen"""
+6,2092350,EET-1,7/3/21 12:00,7/5/21 12:00,0.5,"source Fall 2029 Yellow p64; note says ""rained in PM on 0702 + overnight, EET-1 is near C xect"""
+5,2092377,EET-1,7/5/21 15:45,7/20/21 13:37,0.5,"source Fall 2029 Yellow p74; note says ""07/20 moved EET-1 (5) to EWT-1""; file is duplicate of EWT-1_2021_0720_1114"
+6,2092350,EEF-1,7/5/21 15:45,8/22/21 9:51,0.5,"source Fall 2029 Yellow p74; note says ""on 08/22 moist at bottom, logger stuck in mud (20 cm deep),  photo oiander cg"" (can't read last word); file is duplicate of EER-1_2021_0908_1114"
+3,2092161,KHT-XE5S,7/5/21 18:00,7/16/21 13:20,0.5,"source Fall 2029 Yellow p74; note says ""water in well, remove well to deepen""; file is duplicate of KHT-E5S_2021_0719_1114"
+4,2091639,KWT-1,7/5/21 18:00,11/14/21 8:07,0.5,"source Fall 2029 Yellow p74, note says ""need longer cord to 150 cm, need dremel"""
+1,2092351,KEF-1,7/5/21 18:00,11/14/21 8:28,0.5,"source Fall 2029 Yellow p74; no entry for removal, guessing based on final well reading"
+2,2092352,KHF-1,7/5/21 18:00,11/14/21 8:25,0.5,"source Fall 2029 Yellow p74; note says ""took well level at 5:36 pm"" (on 07/04 presumably); no entry for removal, guessing based on final well reading"
+5,2092377,EWT-1,7/20/21 14:24,11/14/21 9:38,0.5,"source Fall 2029 Yellow p74; note says ""in new well"""
+3,2092161,KHT-XE5S,7/19/21 11:57,11/14/21 7:50,0.5,"source Fall 2029 Yellow p74; no entry for removal, guessing based on final well reading"
+6,2092350,EER-1,9/8/21 14:41,11/14/21 9:07,0.05,"source Fall 2029 Yellow p74; no entry for removal, guessing based on final well reading"

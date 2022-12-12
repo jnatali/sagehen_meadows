@@ -1,0 +1,36 @@
+﻿Priority,Issue,Resolution
+0,EEF.1 URGENT: missing reading 08/06-09/21 in 2019?,"ok, readings exist, as dots indicate."
+0,EEF.XA2N URGENT: validate oddball low point on 10/05 in 2019,"ok, checks out in data file and field book"
+0,EHF.XA3S URGENT:  missing readings 10/01-11/18/2018 08/20-09/21/2019,"ok, confirmed in field book; missed readings in 2018 and 2019; no EAST readings on 10/14/2018; in 2019 assumed no water"
+0,EWF.XA2S URGENT: missing late-season reading 10/01-11/18/2018,"ok, confirmed in field book; no EAST readings on 10/14/2018"
+0,KER.1 URGENT: Missing readings afterr 08/25 in 2018,"ok, readings exist, as dots indicate."
+0,KET.1 URGENT: Why no readings for 2018?,"ok, well installed on 07/05/2019"
+0,KFR.XE2S URGENT: odd spikes on 07/01 and 08/10 in 2018,"ok, 07/01/18 thru 08/10/18 matches field book"
+0,KHF.1 URGENT: Validate positive reading on 06/18/2019,ok; confirmed in field book; notes say SSS = soil saturated at surface
+0,KWT.1 URGENT:  Validate low readings after 07/17 in 2018; was it floored?,"ok, readings indicate it was floored"
+1,"ALL URGENT: For 08/24/2018, check that when welltop_to_water=0 or NaN (no water) has meter id = nw",
+1,KHF.1 URGENT: missing readings betw 07/26-10/05 in 2019,need logger data to fill gaps!
+2,EEF.1 VALIDATE: Odd that 2018 higher than 2019?,
+2,EFF.XB7S VALIDATE: Why spike on 07/26 in 2019,
+2,"EWF.XA2S VALIDATE: hit floor or missing multiple readings? 07/27-10/01/2018, 08/06-09/21/2019",
+2,EWT.1 VALIDATE/CONSIDER: sharp drop from positive to neg betw 06/03-06/18 in 2019,
+2,KFF.XD6S VALIDATE: any late readings after 008/20 in 2019?,
+2,KFR.XE1S VALIDATE: kinda odd drop on 10/01/2018,
+2,KHT.CE6S VALIDATE: Any late readings after 10/05 in 2018 or 2019,
+2,KHT.XD6N VALIDATE: any late readings after 09/21/2018,
+2,kiln vs east mean VALIDATE: why are they the same plot?,
+2,KWR.1 VALIDATE: why rise betw 09/16-10/01,
+2,LWT.1 VALIDATE: Reading for 08.06 in 2019,
+3,"EER.1 CONSIDER: sharp rise, rainfall after 09/06/2019?",
+3,"EER.1 CONSIDER: small uptick between 07/17 to 07/27 in 2018, rainfall?",
+3,"EHR.1 CONSISTENT: sharp rise, rainfall after 09/06/2019?",
+3,"KEF.1 CONSIDER: seems wild, maybe it's a small difference between readings, looks jagged due to error?",
+3,KEF.1 CONSIDER: Why rise betw 07/27-08/10 in 2018?,
+3,"KER.1 CONSIDER: big difference between all 2018 vs 2019 readings, why large gap here?",
+3,KER.1 CONSISTENT: sharp rise after 09/06 in 2019,
+3,KER.XD5N URGENT: Why no readings for 2018?,
+4,KHR.XE2N NOTE: Could not find well in 2019.,
+C,EWT.1 URGENT: odd rise on 07/06/2019,CHANGED in GW_biweekly_RAW; water level misread from field book
+C,"KEF-XE3S URGENT: No entries for any dates, how to calculate","CHANGED in GW_biweekly_RAW, add aboveground readings as negative; will that work?"
+C,KEF.1 URGENT: Validate oddly low reading on 06/18/2019.,"CHANGED in GW_biweekly_RAW; field book entry matches, but note says ""flow at surface""; assume misreading of ruler at 64.5, 65.5, 65; shifted to 54.5, 55.5, 55."
+1,KHT.XE5S URGENT:  missing readings between 07/26-09/05 and 09/05-10/21 in 2019.,need logger data to fill gaps; otherwise CHANGED in GW_biweekly_RAW by adding 09/21/2019 NW reading 

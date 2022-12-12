@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<Body_xle>
+    <File_info>
+        <Company></Company>
+        <LICENCE></LICENCE>
+        <Date>2018/08/24</Date>
+        <Time>12:14:10</Time>
+        <FileName></FileName>
+        <Created_by>Version 4.4.0</Created_by>
+    </File_info>
+    <Instrument_info>
+        <Instrument_type>LT_EDGE</Instrument_type>
+        <Model_number>M5      </Model_number>
+        <Instrument_state>Stopped</Instrument_state>
+        <Serial_number>2092352</Serial_number>
+        <Battery_level>100</Battery_level>
+        <Channel>2</Channel>
+        <Firmware>3.003</Firmware>
+    </Instrument_info>
+    <Instrument_info_data_header>
+        <Project_ID>ISEECI</Project_ID>
+        <Location>2</Location>
+        <Latitude>0.000</Latitude>
+        <Longtitude>0.000</Longtitude>
+        <Sample_rate>60000</Sample_rate>
+        <Sample_mode>0</Sample_mode>
+        <Event_ch>107</Event_ch>
+        <Event_threshold>0.000000</Event_threshold>
+        <Schedule />
+        <Start_time>2018/07/25 12:30:00</Start_time>
+        <Stop_time>2018/07/25 11:27:42</Stop_time>
+        <Num_log>0</Num_log>
+    </Instrument_info_data_header>
+    <Ch1_data_header>
+        <Identification>LEVEL</Identification>
+        <Unit>m</Unit>
+        <Parameters>
+            <Offset Val="0.0000" Unit="m" />
+        </Parameters>
+    </Ch1_data_header>
+    <Ch2_data_header>
+        <Identification>TEMPERATURE</Identification>
+        <Unit>°C</Unit>
+        <Parameters />
+    </Ch2_data_header>
+    <Data />
+</Body_xle>

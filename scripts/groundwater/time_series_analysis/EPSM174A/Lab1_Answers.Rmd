@@ -1,0 +1,49 @@
+---
+title: "Exercise D answers"
+author: "Denise Colombano"
+date: "8/31/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## exercise 1 - summarize mean data values by day
+```{rcode chunk 23}
+
+# extract date in separate column using lubridate as_date
+df2$date <- lubridate::as_date(df2$datetime)
+
+ggplot(df2, aes(date, data))+
+  geom_point()
+
+# calculate mean daily values using group_by and summarize
+df_daily <- df2 %>% 
+  group_by(date) %>% 
+  summarize(data_mean=mean(data)) %>% 
+  mutate(ID=1:30)
+
+str(df_daily)
+summary(df_daily)
+head(df_daily)
+View(df_daily)
+
+# convert to wide format using pivot_wider
+df_daily_w <- df_daily %>%
+  select(ID, data_mean) %>% 
+  pivot_wider(
+    id_cols = ID,
+    names_from = ID, # this is the unique index for date
+    values_from = data_mean
+)
+
+str(df_daily_w)
+summary(df_daily_w)
+head(df_daily_w)
+View(df_daily_w)
+
+# matrix for time series
+df_daily_w_mat <- as.matrix(df_daily_w)
+```

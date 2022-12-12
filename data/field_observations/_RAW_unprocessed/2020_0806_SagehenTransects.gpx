@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="details.xsl"?>
+<gpx
+ version="1.1"
+ creator="BackCountry Navigator on Android"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns="http://www.topografix.com/GPX/1/1"
+ xmlns:topografix="http://www.topografix.com/GPX/Private/TopoGrafix/0/1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd">
+<wpt lat="39.43181713753703" lon="-120.23902449524978">
+<ele>1780.7</ele>
+<time>2020-08-06T21:13:52Z</time>
+<name><![CDATA[BN willows 6m on xect]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.431351612219736" lon="-120.2392630539577">
+<ele>1928.4</ele>
+<time>2020-08-06T21:27:33Z</time>
+<name><![CDATA[BS downed log best wells 1 + 2]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.431119618965866" lon="-120.23924535698453">
+<ele>1932.9</ele>
+<time>2020-08-06T21:33:26Z</time>
+<name><![CDATA[BS live pine 40 cm foam best wells 3+4]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.4307921293341" lon="-120.23908468705646">
+<ele>1932.5</ele>
+<time>2020-08-06T21:41:09Z</time>
+<name><![CDATA[BS thru grazing exclosure]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43028633074212" lon="-120.23891331480117">
+<ele>1937.1</ele>
+<time>2020-08-06T21:47:14Z</time>
+<name><![CDATA[Well B6S]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43020587184925" lon="-120.2388554318985">
+<ele>1940.3</ele>
+<time>2020-08-06T21:50:44Z</time>
+<name><![CDATA[BS downed wood hazard, slow, clear with bandsaw and breaking branches]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.429919268161846" lon="-120.23897320186582">
+<ele>1935</ele>
+<time>2020-08-06T22:17:22Z</time>
+<name><![CDATA[mini stream, few cm deep, semi paved]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.42960600762802" lon="-120.2392292452577">
+<ele>1938.2</ele>
+<time>2020-08-06T22:21:41Z</time>
+<name><![CDATA[mini channel, no stones, dark organic silt bed]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.42886611298269" lon="-120.23917646840013">
+<ele>1956.8</ele>
+<time>2020-08-06T22:31:28Z</time>
+<name><![CDATA[hillside above den, near surface water indicated by veg]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.42880234821449" lon="-120.23903394402848">
+<ele>1958.1</ele>
+<time>2020-08-06T22:34:08Z</time>
+<name><![CDATA[squishy ground, corn lily]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.4288065404387" lon="-120.23843295562749">
+<ele>1954.2</ele>
+<time>2020-08-06T22:39:32Z</time>
+<name><![CDATA[Well B9S]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.42887857293955" lon="-120.23841087821773">
+<ele>1956</ele>
+<time>2020-08-06T22:41:26Z</time>
+<name><![CDATA[transducer in well]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.42914461756331" lon="-120.23828519459563">
+<ele>1953.5</ele>
+<time>2020-08-06T22:45:00Z</time>
+<name><![CDATA[spongy and mounded]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43081708137789" lon="-120.23627701154356">
+<ele>1933.8</ele>
+<time>2020-08-06T23:11:29Z</time>
+<name><![CDATA[a5s to a4s is 336 degrees from N]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43068329352061" lon="-120.23634580425157">
+<ele>1932.4</ele>
+<time>2020-08-06T23:17:52Z</time>
+<name><![CDATA[16:17]]></name>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.4306738771046" lon="-120.23628703829853">
+<ele>1931.4</ele>
+<time>2020-08-06T23:20:05Z</time>
+<name><![CDATA[AS, alt xect direction, Perl to Hillsboro from A5s]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.430396303327655" lon="-120.23576483269699">
+<ele>1936.9</ele>
+<time>2020-08-06T23:27:15Z</time>
+<name><![CDATA[AS tree that is 80m slope of well A5S, even slope uphill]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43041839666363" lon="-120.23584581672326">
+<ele>1944.3</ele>
+<time>2020-08-06T23:30:08Z</time>
+<name><![CDATA[80m slope from well A5S, more peep to Hillsboro than flagged?]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.430438153135746" lon="-120.23588532283597">
+<ele>1944.3</ele>
+<time>2020-08-06T23:32:30Z</time>
+<name><![CDATA[A,xect, big Siam blocking tree on hillsope]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43103757364426" lon="-120.23641959949161">
+<ele>1936.1</ele>
+<time>2020-08-06T23:36:59Z</time>
+<name><![CDATA[AS downed logs, probly ok with div e min clearing]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43149867039363" lon="-120.23650303467655">
+<ele>1934.3</ele>
+<time>2020-08-06T23:44:01Z</time>
+<name><![CDATA[AS beta creek edge and A2S, big willow on slope with trig, bumpy, needs cutting back]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43174222838214" lon="-120.23659397138543">
+<ele>1937.5</ele>
+<time>2020-08-06T23:55:36Z</time>
+<name><![CDATA[slope of A2N, thicket of willow and prickly gooseberry, downed tree. impenetrable.]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43363614211489" lon="-120.26300862454075">
+<ele>1983.2</ele>
+<time>2020-08-07T19:18:16Z</time>
+<name><![CDATA[E at co, less than 1m wide but gravel bar on left side]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43353824587931" lon="-120.26309149302284">
+<ele>1980.5</ele>
+<time>2020-08-07T19:20:30Z</time>
+<name><![CDATA[S saturated at surface 3cm deep]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.433406591394615" lon="-120.26314389423064">
+<ele>1982.5</ele>
+<time>2020-08-07T19:23:17Z</time>
+<name><![CDATA[E4S to E1S is 30m. Beyond E4S is open meadow for at least 100m]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43220945095675" lon="-120.26365449903244">
+<ele>1983.8</ele>
+<time>2020-08-07T19:36:47Z</time>
+<name><![CDATA[ES gap beta trees, wide open]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43125839593239" lon="-120.2649599994209">
+<ele>2002.5</ele>
+<time>2020-08-07T20:08:38Z</time>
+<name><![CDATA[Left edge of fan? ashen to right not left]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.4328291220772" lon="-120.2598688607133">
+<ele>1975.7</ele>
+<time>2020-08-07T20:35:54Z</time>
+<name><![CDATA[DS pine groveling gaps]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.432719620311715" lon="-120.25993775976782">
+<ele>1976.7</ele>
+<time>2020-08-07T20:37:46Z</time>
+<name><![CDATA[DS dense boulders]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43250421394202" lon="-120.26004387186691">
+<ele>1980.7</ele>
+<time>2020-08-07T20:40:51Z</time>
+<name><![CDATA[DS boulder patch, more than 1m but gaps]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43237985185274" lon="-120.26008582619774">
+<ele>1981.1</ele>
+<time>2020-08-07T20:44:06Z</time>
+<name><![CDATA[DS pines raised roots more than 1m, can veer left]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.432200766944106" lon="-120.26018313945077">
+<ele>1983.9</ele>
+<time>2020-08-07T20:45:43Z</time>
+<name><![CDATA[DS pines and corn Lily, green grass]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43204344632223" lon="-120.26024982482473">
+<ele>1984</ele>
+<time>2020-08-07T20:49:31Z</time>
+<name><![CDATA[DS slight veer left to avoid downed logs, at toe of slope. terrace above]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43414405432707" lon="-120.25915989089758">
+<ele>1977.4</ele>
+<time>2020-08-07T21:47:33Z</time>
+<name><![CDATA[DN about 3m slope of D6S. Edge of pines, no boulders at surface]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.43422325760553" lon="-120.25927510733995">
+<ele>1976.2</ele>
+<time>2020-08-07T21:49:02Z</time>
+<name><![CDATA[DN first blades at surf]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<wpt lat="39.434310604316465" lon="-120.25929279490379">
+<ele>1984.8</ele>
+<time>2020-08-07T21:50:36Z</time>
+<name><![CDATA[DN end, blades about 1m diam]]></name>
+<cmt><![CDATA[]]></cmt>
+<desc><![CDATA[]]></desc>
+<sym><![CDATA[triangle_green]]></sym>
+</wpt>
+<trk>
+<name><![CDATA[edge beta surface stones and none (clay)]]></name>
+<number>1</number>
+<extensions><topografix:color>ff000066</topografix:color></extensions>
+<trkseg>
+<trkpt lat="39.42997360229492" lon="-120.23889923095703">
+<ele>1915.5</ele>
+<time>2020-08-06T22:15:13Z</time>
+</trkpt>
+<trkpt lat="39.429931640625" lon="-120.23893737792969">
+<ele>1935.2</ele>
+<time>2020-08-06T22:17:06Z</time>
+</trkpt>
+<trkpt lat="39.42990493774414" lon="-120.2389907836914">
+<ele>1936</ele>
+<time>2020-08-06T22:17:52Z</time>
+</trkpt>
+<trkpt lat="39.429813385009766" lon="-120.23904418945313">
+<ele>1937.8</ele>
+<time>2020-08-06T22:18:10Z</time>
+</trkpt>
+<trkpt lat="39.42971420288086" lon="-120.23906707763672">
+<ele>1936.4</ele>
+<time>2020-08-06T22:19:18Z</time>
+</trkpt>
+<trkpt lat="39.429683685302734" lon="-120.23912048339844">
+<ele>1936.6</ele>
+<time>2020-08-06T22:19:31Z</time>
+</trkpt>
+<trkpt lat="39.42964172363281" lon="-120.23919677734375">
+<ele>1937.6</ele>
+<time>2020-08-06T22:19:38Z</time>
+</trkpt>
+<trkpt lat="39.42959976196289" lon="-120.2392349243164">
+<ele>1938.3</ele>
+<time>2020-08-06T22:21:44Z</time>
+</trkpt>
+<trkpt lat="39.4295539855957" lon="-120.23926544189453">
+<ele>1940.1</ele>
+<time>2020-08-06T22:23:36Z</time>
+</trkpt>
+<trkpt lat="39.42949676513672" lon="-120.23928833007813">
+<ele>1939.8</ele>
+<time>2020-08-06T22:23:58Z</time>
+</trkpt>
+<trkpt lat="39.42945098876953" lon="-120.23933410644531">
+<ele>1941.2</ele>
+<time>2020-08-06T22:24:16Z</time>
+</trkpt>
+<trkpt lat="39.42941665649414" lon="-120.23937225341797">
+<ele>1942.4</ele>
+<time>2020-08-06T22:24:34Z</time>
+</trkpt>
+<trkpt lat="39.42936706542969" lon="-120.23941040039063">
+<ele>1943.3</ele>
+<time>2020-08-06T22:24:50Z</time>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>

@@ -1,0 +1,408 @@
+---
+title: "ESPM 174A data wRangling basics"
+author: "Denise Colombano & Albert Ruhi"
+date: "8/31/2020"
+output: html_document
+---
+ESPM 174A Applied Time Series Analysis for Ecology and Environmental Sciences
+
+This RMarkdown script is intended to provide basic pointers for wrangling
+time series data. This .Rmd script can be "knitted" into a PDF using the 
+knitr package's "Knit" function (see drop down in tool bar).
+
+Here is a helpful tutorial by the creator of RMarkdown: https://bookdown.org/yihui/rmarkdown/
+
+Here is the link to RStudio cheat sheets for tidyverse packages used in this script:
+https://rstudio.com/resources/cheatsheets/
+
+- 1. tidyr and dplyr: import, reshape, transform data
+- 2. lubridate: manipulate dates and times
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE) # knits results only from code chunks
+```
+
+# load packages
+```{r code chunk 1}
+library(tidyverse) # a universe of tidy data packages
+library(patchwork) # for multipanel plots
+```
+
+
+Example dataset: Daily air quality measurements in New York, May to September 1973.
+
+# A) prepare data
+
+## load and inspect data
+```{r code chunk 2}
+# load dataset and get familiar with observed values, including NAs
+airquality <- datasets::airquality # load dataset
+
+str(airquality) # examine data structure: column types
+summary(airquality) # summarize data: min, mean, max, NAs
+head(airquality) # preview six rows of data
+View(airquality) # view separately
+print(class(airquality))
+```
+
+## add a column for date
+```{r code chunk 3}
+# we know that the data was collected in 1973 so let's add a Year column
+airquality$Year <- as.integer(1973)
+
+# use lubridate to manually create a date column in YYYY-MM-DD standard format
+airquality$Date <- lubridate::as_date(paste(airquality$Year, airquality$Month, airquality$Day, sep= ' '))
+
+#print(class(airquality$Date))
+
+head(airquality)
+
+```
+
+## add a column for site
+```{r code chunk 4}
+# we also know the data were recorded in New York so let's add a Site column
+airquality$Site <- "New York"
+head(airquality)
+```
+
+## subset data for analysis
+```{r code chunk 5}
+# let's focus on ozone, solar, and temperature data (remove wind)
+# format is df[row, column] where a negative sign (-) removes a specific column
+airquality <- airquality[ , -3]
+
+head(airquality)
+```
+
+## check for missing data
+```{r code chunk 6}
+# identify missing values that create incomplete cases (where one or more variables
+# have missing values in a given row)
+missing_data <- airquality[!complete.cases(airquality),]
+View(missing_data)
+
+# calculate proportion missing data
+round(42/153*100, digits=0) 
+
+# result: 42 out of 153 rows have missing values in one or more variables
+# this is approximately 27% of the dataset
+# this is an important consideration for time series analyses which require
+# evenly spaced time stamps
+```
+
+\newpage
+
+
+
+# B) data exploration through visualization
+
+## plot observations over time
+```{r code chunk 7}
+# Daily ozone
+plot_ozone <- ggplot(airquality, aes(Date, Ozone))+
+  geom_point()+
+  geom_smooth()+
+  theme(axis.text.x = element_blank())+
+  scale_x_date(date_breaks = "1 week")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.5))
+plot_ozone
+
+
+## check the warning messages in your console: what are the origins of the 37
+## rows that were removed? double check data frame and identify --> NAs
+missing_data_ozone <- airquality[!complete.cases(airquality$Ozone),]
+View(missing_data_ozone)
+```
+
+
+### daily time steps
+
+```{r code chunk 8}
+# Daily temperature
+plot_temp <- ggplot(airquality, aes(Date, Temp))+
+  geom_point()+
+  geom_smooth()+
+  theme_bw()+
+  scale_x_date(date_breaks = "1 week")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.5))
+plot_temp
+```
+
+```{r code chunk 9}
+# Daily Solar.R
+plot_Solar.R <- ggplot(airquality, aes(Date, Solar.R))+
+  geom_point()+
+  geom_smooth()+
+  theme_bw()+
+  scale_x_date(date_breaks = "1 week")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.5))
+plot_Solar.R
+
+#what do the 7 rows errors mean/why do they happen? - oh, it's because solar.R column has 7 NAs.
+```
+
+
+### monthly time steps
+
+```{r code chunk 10}
+# Monthly ozone
+plot_ozone2 <- ggplot(airquality, aes(as.factor(Month), Ozone))+
+  geom_point()+
+  geom_boxplot(fill=NA)+
+  theme_bw()+
+  labs(x="Month")
+plot_ozone2
+```
+
+```{r code chunk 11}
+# Monthly temperature
+plot_temp2 <- ggplot(airquality, aes(as.factor(Month), Temp))+
+  geom_point()+
+  geom_boxplot(fill=NA)+
+  theme_bw()+
+  labs(x="Month")
+plot_temp2
+```
+
+```{r code chunk 12}
+# Monthly Solar.R
+plot_Solar.R2 <- ggplot(airquality, aes(as.factor(Month), Solar.R))+
+  geom_point()+
+  geom_boxplot(fill=NA)+
+  theme_bw()+
+  labs(x="Month")
+plot_Solar.R2
+```
+
+
+### compile and compare
+
+```{r code chunk 13}
+## compare daily vs. monthly plots using the "patchwork" package
+
+# multipanel plot 1 - Daily
+plot_ozone + plot_temp + plot_Solar.R + patchwork::plot_layout(nrow=3, ncol=1)
+
+# multipanel plot 2 - Monthly
+plot_ozone2 + plot_temp2 + plot_Solar.R2 + patchwork::plot_layout(nrow=3, ncol=1)
+
+# multipanel plot 3 - Side by side comparison
+(plot_ozone / plot_temp / plot_Solar.R ) | (plot_ozone2 / plot_temp2 / plot_Solar.R2)
+
+#??? how to use the below function?
+# pro tip: use the function "theme(axis.text.x = element_blank())" to remove
+# redundant dates in the top two daily plots
+```
+
+\newpage
+
+
+
+# C) data wRangling
+
+## example 1 - data wrangling with pipes ( %>% )
+
+Purpose: Calculate mean monthly values using pipes to create a dataframe with 
+evenly spaced monthly time steps. 
+```{r code chunk 14}
+# learn to use pipe operators with the package "magrittr" in the tidyverse
+# 1) rename column
+airquality1 <- airquality %>% # shortcut: ctrl-shift-m (PC) or cmd-shift-m (Mac)
+  rename(Solar=Solar.R) # because coding Solar.R over and over is tedious
+head(airquality1)
+
+
+# 2) create a column with month as a factor instead of integer
+airquality2 <- airquality1 %>% 
+  mutate(Month_fac=factor(Month)) # an ordered category
+head(airquality2)
+```
+
+```{r code chunk 15}
+# 3) summarize average and coefficient of variation of Ozone measurements by month
+
+# definition: The coefficient of variation (CV) is the ratio of the standard deviation to the mean. The higher the coefficient of variation, the greater the level of dispersion around the mean. It is generally expressed as a percentage.
+
+CV <- function(x, ...){(sd(x, ...)/mean(x, ...))*100} # specify a function for CV
+
+## a) calculate means and standard errors with NAs present
+airquality3a <- airquality2 %>% 
+  group_by(Month_fac) %>% # group by category
+  summarize(Ozone_mean=mean(Ozone), Ozone_CV=CV(Ozone), 
+            Temp_mean=mean(Temp), Temp_CV=CV(Temp), 
+            Solar_mean=mean(Solar), Solar_CV=CV(Solar))
+summary(airquality3a)
+
+## b) calculate means and standard errors with NAs removed
+airquality3b <- airquality2 %>% 
+  group_by(Month_fac) %>% 
+  summarize(Ozone_mean=mean(Ozone, na.rm=T), Ozone_CV=CV(Ozone, na.rm=T),
+            Temp_mean=mean(Temp, na.rm=T), Temp_CV=CV(Temp, na.rm=T),
+            Solar_mean=mean(Solar, na.rm=T), Solar_CV=CV(Solar, na.rm=T))
+summary(airquality3b)
+
+# Removing the NAs allows us to calculate monthly mean and CV
+```
+
+```{r code chunk 16}
+# summarize monthly data by running all pipes in one chunk 
+airquality_month <- airquality %>% 
+  rename(Solar=Solar.R) %>% 
+  mutate(Month_fac=factor(Month)) %>% 
+  group_by(Month_fac) %>% # Site would go here if there were >1 in the dataset
+  summarize(Ozone_mean=mean(Ozone, na.rm=T), Ozone_CV=CV(Ozone, na.rm=T),
+            Temp_mean=mean(Temp, na.rm=T), Temp_CV=CV(Temp, na.rm=T),
+            Solar_mean=mean(Solar, na.rm=T), Solar_CV=CV(Solar, na.rm=T))
+head(airquality_month)
+```
+
+```{r code chunk 17}
+# check for missing data again
+
+# identify missing values that create incomplete cases (where one or more variables
+# have missing values in a given row)
+missing_data_bin <- airquality_month[!complete.cases(airquality_month),]
+View(missing_data_bin)
+
+# no more missing data for monthly time stamps - now we have evenly spaced data
+```
+
+### exercise on your own: now plot the monthly dataset
+```{r code chunk 18}
+# your awesome plots here
+plot_ozone_mean <- ggplot(airquality_month, aes(as.Date(Month_fac), Ozone_mean))+
+  geom_point()+
+  geom_smooth()+
+  theme(axis.text.x = element_blank())+
+  scale_x_date(date_breaks = "1 week")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.5))
+plot_ozone_mean
+
+```
+
+
+
+## example 2 - reshaping data frames (long to wide to long)
+```{r code chunk 19}
+# airquality is in a "tidy" long format which has unique records in rows and 
+# variables in columns - but MARSS requires wide format
+
+# widen dataframe using pivot_wider function 
+# pro tip: use the ? before a function to view documentation and examples
+?pivot_wider
+
+
+# simple example using mean monthly ozone data
+# first filter out column
+ozone_month <- airquality_month %>% 
+  select(Month_fac, Ozone_mean)
+
+ozone_month_w <- ozone_month %>% # w is for wide
+  pivot_wider(
+    id_cols = Month_fac,
+    names_from = Month_fac, # this is the unique index
+    values_from = Ozone_mean
+  )
+head(ozone_month_w)
+
+# now go back to long format
+ozone_month_l <- ozone_month_w %>% # l is for long
+  pivot_longer(
+    cols = "5":"9", # wide format columns to pivot back into long format
+    names_to = "Month_fac", # specify new name for month column
+    values_to = "Ozone_mean" # specify new name for ozone column
+  )
+head(ozone_month_l)
+
+# pro tip: for datasets with distinct sites, transform your site column using the 
+# function column_to_rownames(var="Site") 
+# before pivoting to wide format to get a unique row name for each site, 
+# this prepares the dataframe to be turned into a matrix object
+```
+
+
+## example 3 - convert data frames to data matrices suitable for MARSS analysis
+```{r code chunk 20}
+# convert a wide-format dataframe into a matrix object
+ozone_month_w_mat <- as.matrix(ozone_month_w)
+# now go back
+ozone_month_w_df <- as_data_frame(ozone_month_w_mat)
+ozone_month_w_df
+# et voila! you are now a data wRangler! you have loaded, inspected, visualized, summarized, piped, reformatted, and matrix-ed data using the tidyverse.
+```
+
+\newpage
+
+
+# D) more exercises on your own
+
+## load and inspect data
+```{r code chunk 21}
+# first we will generate a df with 30 days of data taken at 15 min intervals
+df <- data.frame(datetime = seq(lubridate::ymd_hms('2019-01-21 00:00:00'), 
+                                by = '15 min',length.out=(60*24*30/15)), 
+                 data = rnorm(60*24*30/15),
+                 ID = 1:2880)
+
+str(df) # examine data structure: column types
+summary(df) # summarize data: min, mean, max, NAs
+head(df) # preview six rows of data
+View(df) # view separately
+```
+
+## create a realistic df with 100 randomly missing rows
+```{r code chunk 22}
+# then for the sake of the exercise we will remove rows from the dataframe to
+# simulate missing measurements that are common with field sensors
+
+remove <- tibble(ID= runif(100, min=1, max=2880)) %>%  # generate random IDs to remove
+  round(digits=0) # specify whole numbers
+
+df2 <- df %>% 
+  anti_join(remove, by="ID") # remove rows that they have in common - now 2780 rows
+
+head(df2)
+```
+
+## exercise 1 - summarize mean data values by day
+```{r code chunk 23}
+
+# extract date in separate column using lubridate as_date
+?as_date
+df$date <- lubridate::as_date(df$datetime)
+df
+# calculate mean daily values using group_by and summarize
+df_mean_daily <- df %>% 
+  group_by(date) %>% 
+  summarize(mean_value = mean(data))
+df_mean_daily
+
+# convert to wide format using pivot_wider
+df_daily_w <- df_mean_daily %>% # w is for wide
+  pivot_wider(
+    id_cols = date,
+    names_from = date, # this is the unique index
+    values_from = mean_value
+  )
+head(df_daily_w)
+
+#now to plot:
+mean_plot <- ggplot(df_mean_daily, aes(date, mean_value))+
+  geom_point()+
+  theme_bw()+
+  scale_x_date(date_breaks = "1 week")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.5))
+
+daily_plot <- ggplot(df, aes(date, data))+
+   geom_point()+
+  theme_bw()+
+  scale_x_date(date_breaks = "1 week")+
+  theme(axis.text.x = element_text(angle=90, vjust=0.5))
+
+mean_plot + daily_plot
+
+
+```
+
