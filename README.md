@@ -16,11 +16,13 @@ field-collected data for four meadows in Sagehen Creek basin, includes:
 - groundwater measurement (manual and loggers)
 - mapped hydrologic delineations (e.g. springs, channels)
 - soil observations at new wells
-- phenocam imagery
 - phenology descriptions through 2018-2019 growing season. The "raw" data include unprocessed field observations as a starting-point and archive.
 
 #### instrumentation
 files in this folder contain geospatial data related to field instruments such as wells, stream gages, weather-related devices
+
+#### phenocam data
+Until July 2024, these image files (and status sheet) live on Jen's UCB Google Drive in /GoogleDrive/PhD/Manuscripts/2018_ISEECI Sagehen GW Pheno/Analysis/Data/Phenology/phenocam/
 
 #### transects_geophysical
 files in this folder contain data related to subsurface geophysical imaging of meadow transects.
