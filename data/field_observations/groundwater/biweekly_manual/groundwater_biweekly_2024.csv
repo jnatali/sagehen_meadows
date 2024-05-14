@@ -1,0 +1,9 @@
+﻿,,water_level_1_cm,water_level_1_cm,water_level_1_cm,,,,
+well,datetime,water_level_1_ft,water_level_2_ft,water_level_3_ft,water_binary,logger?,soil moisture,notes
+EER-1,05/20/2021 7:38am,3.29,3.29,3.29,1,FALSE,dry,
+,,,,,,,moist to dry,
+,,,,,,,moist,
+,,,,,,,moist to saturated,
+,,,,,,,saturated,
+,,,,,,,ponded,
+,,,,,,,dew,
