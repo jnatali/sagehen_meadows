@@ -1,6 +1,6 @@
 ### Sagehen Groundwater Data
 
-This directory contains groundwater level measurements in Sagehen Basin during the growing season: May/June to Oct/Nov in 2018-2019.
+This directory contains groundwater level measurements in Sagehen Basin during the growing season, May to Nov in 2018-2019. NOTE: 2021 data exists, location not verified.
 
 Groundwater levels were sampled from three meadows (identified as *meadow_id*). 
 
