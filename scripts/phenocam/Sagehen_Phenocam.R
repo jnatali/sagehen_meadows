@@ -1,9 +1,6 @@
 library(phenopix)
 library(raster)
 
-library(phenopix)
-library(raster)
-
 # Wrapper function to draw multiple ROIs
 DrawMULTIROI_Wrapper <- function(path_img_ref, path_ROIs, nroi = 1, roi.names = NULL, file.type = ".jpg") {
   if (is.null(roi.names)) 
@@ -19,6 +16,7 @@ DrawMULTIROI_Wrapper <- function(path_img_ref, path_ROIs, nroi = 1, roi.names = 
     img <- brick(file)
     img_rois <- list()
     for (i in seq_len(nroi)) {
+      quartz()
       plotRGB(img)
       mtext(paste("ROI ", i, " - ", roi.names[i], " \n a) n left mouse button clicks on ROI vertices (n>=3) \n b) 1 right mouse button click to close the polygon", 
                   sep = ""), side = 3, line = -5)
@@ -70,4 +68,3 @@ vi.path <- "/Users/play/Documents/GitHub/sagehen_meadows/data/phenocam/phenopix/
 
 # Create ROI(s) for each meadow
 DrawMULTIROI_Wrapper(path_img_ref = path_img_ref, path_ROIs = roi.path, nroi = 3, file.type = ".jpg")
-
