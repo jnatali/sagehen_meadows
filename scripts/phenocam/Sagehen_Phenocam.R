@@ -74,21 +74,49 @@ load('ROI/roi.data.Rdata')
 
 #EDIT BELOW
 
+extractVIs(img.path=img.path,roi.path=roi.path,vi.path=vi.path,plot=TRUE,begin="sagee1_2018_05_16_1323",
+           date.code="yyyy_mm_dd_HHMM",file.type=".jpg",npixels=3)
+
 load("/Users/play/Documents/GitHub/sagehen_meadows/data/phenocam/phenopix/RGB/VI/VI.data.Rdata")
 
+# Extract the date from the formatted filename
+filename <- 'sagee1_2018_05_16_1323.jpg'
+extractDateFilename(filename, date.code='yyyy_mm_dd_HHMM')
 
 class(VI.data[[1]])
-
 head(names(VI.data[[1]]))
 
+# Check the structure of VI.data
 str(VI.data[[1]][[1]])
 
-#having trouble here with filtering data... the rest is example and unedited
+# Define the path where you want to save the CSV
+csv_file_path <- "VI_data.csv"
+
+# Write the data frame to a CSV file
+write.csv(VI.data, file = csv_file_path, row.names = FALSE)
+
+
+## when running this, it seems there is nothing in spatial.list, meaning I don't think VI is being extracted correctly. I should also see red, green, blue data columns
+spatialFilter(spatial.list, filter = c("night", "spline", "max"),
+          filter.options = NULL, ncores = "all", log.file = NULL)
+
+
+
+
+
+
+
+
+
+
 
 
 #Autofilter
-df=as.data.frame(VI.data$roi1) #creates a dataframe from vegetation indices
-names(df)
+df <- as.data.frame(VI.data$`2018_05_16_1323`) #creates a dataframe from vegetation indices
+str(df)
+colnames(df)
+
+# Apply the autoFilter function
 
 filtered.data <- autoFilter(df,filter=c('night','max'),plot=TRUE,na.fill=TRUE) #removes noise in vegetation indices
 #Night filter removes value below gcc of 0.2
@@ -125,3 +153,5 @@ plot(df.2018$DOY,df.2018$bcc,pch=16,col="royalblue3",xlab="DOY",ylab="BCC")
 plot(df.2018$DOY,df.2018$max.filtered,pch=16,col="springgreen3",xlab="DOY",ylab="GCC")
 plot(df.2018$DOY,df.2018$rcc,pch=16,col="red3",xlab="DOY",ylab="RCC")
 plot(df.2018$DOY,df.2018$grR,pch=16,col="black",xlab="DOY",ylab="Green-Red Ratio")
+
+
