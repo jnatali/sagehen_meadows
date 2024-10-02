@@ -57,7 +57,7 @@ For groundwater well naming conventions, see the key below. All uniquely named w
 
 **in Archive**
 
-*Wells_Missing_Data.xlsx* is an archived administrative file to help track needed data (well dimensions) to process all groundwater levels. Working file is in Google Drive as [well_missing_data sheet}(https://docs.google.com/spreadsheets/d/1VWjpe0lL2xAhl1Ogh15oLD59Xz053aVFRRPRLHZuETo/edit?gid=1784805402#gid=1784805402).
+*Wells_Missing_Data.xlsx* is an archived administrative file to help track needed data (well dimensions) to process all groundwater levels. Working file is in Google Drive as [well_missing_data sheet](https://docs.google.com/spreadsheets/d/1VWjpe0lL2xAhl1Ogh15oLD59Xz053aVFRRPRLHZuETo/edit?gid=1784805402#gid=1784805402).
 
 
 
