@@ -37,6 +37,18 @@ For groundwater well naming conventions, see the key below. All uniquely named w
 
 #### Files and Data Model
 
+##### Naming Convention
+
+In 2024, starting new naming convention, not yet fully applied:
+
+* _RAW = data straight from the field (notebook or recording)
+* _WORK = data that's being processed, not yet validated
+* _FULL = data that's been processed but NOT validated
+* _FINAL = data that's been processed and validated
+
+
+##### Groundater Files and Contents
+
 *well_meter_offsets.csv*  contains the offset (in cm) that needs to be added to manual well measurements due to the gap between the water level meter and the ruler used to measure the groundwater level from the welltop. The offset was averaged from at least 30 measurements with the meter inserted into a glass container of water to determine the gap between the meter top and the water level. Variables in this file include: meter_id, date, offset (in cm) and std_dev (in cm).  
 
 *well_dimensions.csv*  contains measurements of the total_well_length in cm (from top to subsurface depth) and welltop_to_ground in cm from the top of the well to the ground surface. For   each well, multiple measurements may have been made so that an average can be used to calculate groundwater depth from the *average ground surface level*. The ground surface around each well was not level or smooth.
@@ -45,17 +57,17 @@ For groundwater well naming conventions, see the key below. All uniquely named w
 
 *well_characteristics.csv* contains info about each well, such as elevation.
 
-**in biweekly_manual**
+###### in biweekly_manual
 
 *groundwater_biweekly_full.csv* will contain the calculated groundwater level relative to the ground surface for each biweekly well measurement. The relative groundwater level will be an average of the three welltop_to_water readings in the *Groundwater_BiWeekly_RAW.csv*, subtract the welltop_to_ground level from *Wells_Dimensions.csv*  for the unique well_id and add the meter_offset from *Wells_Meter_Offsets.csv*  for the indicated meter_id.
 
 *groundwater_biweekly_RAW.csv*   contains unprocessed water level readings from the top of the well to the groundwater. Three readings were collected at each well on a bi-weekly basis. Each well has a unique id. Each reading has a timestamp and those with the same timestamp (listed in PDT, even if past official summer window) were collected within ~1 minute of each other. All readings should have occurred before 9am PDT. Some wells contained logging pressure transducers (then logger_binary = 1). Some wells were dry (then water_binary = 0). For each measurement, a meter_id is listed, which maps to an offset in the *wells_meterOffsets.csv* file. Variables in this file include: well_id, timestamp, welltop_to_water (in cm), logger_binary (true/false), water_binary (true/false) and meter_id.
 
-**in subdaily loggers**
+###### in subdaily loggers
 
 
 
-**in Archive**
+###### in archive
 
 *Wells_Missing_Data.xlsx* is an archived administrative file to help track needed data (well dimensions) to process all groundwater levels. Working file is in Google Drive as [well_missing_data sheet](https://docs.google.com/spreadsheets/d/1VWjpe0lL2xAhl1Ogh15oLD59Xz053aVFRRPRLHZuETo/edit?gid=1784805402#gid=1784805402).
 
