@@ -40,6 +40,21 @@ from datetime import datetime
 
 # --- INITIALIZE FILE VARIABLES ---
 
+# Setup directory structure and file names based on structure in github
+gw_data_dir = '../../data/field_observations/groundwater/biweekly_manual/'
+gw_plot_dir = '../../data/field_observations/groundwater/plots/biweekly_manual/'
+
+# Input (source data) files
+gw_in_filename = gw_data_dir + 'groundwater_biweekly_RAW.csv'
+well_dimension_filename = gw_data_dir + 'well_dimensions.csv'
+meter_offset_filename = gw_data_dir + 'well_dimensions.csv'
+
+# Output files
+gw_out_filename = gw_data_dir + 'groundwater_biweekly_FULL.csv'
+gw_plot_filename = gw_plot_dir + 'groundwater_biweekly_2018-2021.pdf'
+
+
+
 
 # --- UTILITY FUNCTIONS ---
 def SAMPLE_get_poly_area(x, y) -> float:
