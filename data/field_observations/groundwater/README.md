@@ -1,6 +1,6 @@
 ### Sagehen Groundwater Data
 
-This directory contains groundwater level measurements in Sagehen Basin during the growing season, May to Nov in 2018-2019. NOTE: 2021 data exists, location not verified.
+This directory contains groundwater level measurements in Sagehen Basin during the growing season, May to Nov in 2018-2024.
 
 Groundwater levels were sampled from three meadows (identified as *meadow_id*). 
 
@@ -17,9 +17,7 @@ For groundwater well naming conventions, see the key below. All uniquely named w
 ##### meadow_id
 
 * E = East
-
 * K = Kiln
-
 * L = Lower
 
 ##### HGMZ
@@ -37,12 +35,9 @@ For groundwater well naming conventions, see the key below. All uniquely named w
 
 #### Files and Data Model
 
-##### Naming Convention
-
-In 2024, starting new naming convention, not yet fully applied:
-
+##### File Naming Convention  
 * _RAW = data straight from the field (notebook or recording)
-* _WORK = data that's being processed, not yet validated
+* _WORK = data that's being processed (in progress), not yet validated
 * _FULL = data that's been processed but NOT validated
 * _FINAL = data that's been processed and validated
 
@@ -59,9 +54,21 @@ In 2024, starting new naming convention, not yet fully applied:
 
 ###### in biweekly_manual
 
-*groundwater_biweekly_full.csv* will contain the calculated groundwater level relative to the ground surface for each biweekly well measurement. The relative groundwater level will be an average of the three welltop_to_water readings in the *Groundwater_BiWeekly_RAW.csv*, subtract the welltop_to_ground level from *Wells_Dimensions.csv*  for the unique well_id and add the meter_offset from *Wells_Meter_Offsets.csv*  for the indicated meter_id.
+*groundwater_biweekly_FULL_Year.csv*  
+Will contain the calculated groundwater level relative to the ground surface for each biweekly well measurement. 
 
-*groundwater_biweekly_RAW.csv*   contains unprocessed water level readings from the top of the well to the groundwater. Three readings were collected at each well on a bi-weekly basis. Each well has a unique id. Each reading has a timestamp and those with the same timestamp (listed in PDT, even if past official summer window) were collected within ~1 minute of each other. All readings should have occurred before 9am PDT. Some wells contained logging pressure transducers (then logger_binary = 1). Some wells were dry (then water_binary = 0). For each measurement, a meter_id is listed, which maps to an offset in the *wells_meterOffsets.csv* file. Variables in this file include: well_id, timestamp, welltop_to_water (in cm), logger_binary (true/false), water_binary (true/false) and meter_id.
+The relative groundwater level will be an average of the three welltop_to_water readings in the *Groundwater_BiWeekly_RAW.csv*, subtract the welltop_to_ground level from *Wells_Dimensions.csv* for the unique well_id and add the meter_offset from *Wells_Meter_Offsets.csv* for the indicated meter_id.
+
+*groundwater_biweekly_RAW_Year.csv*  
+Contains unprocessed water level readings from the top of the well to the groundwater for the year(s) specified.
+
+Variables in this file include: 
+- well_id; each well has a unique id.
+- date-timestamp; records date and time of well measurement.
+- welltop_to_water (in cm); three readings were collected at each well on a bi-weekly basis. Each reading has a timestamp and those with the same timestamp (listed in PDT, even if past official summer window) were collected within ~1 minute of each other. All readings should have occurred before 9am PDT. 
+- logger_binary (true/false); some wells contained logging pressure transducers (then logger_binary = 1).
+- water_binary (true/false); some wells were dry at time of measurement (then water_binary = 0).
+- meter_id; for each measurement, a meter_id is listed, which maps to an offset in the *wells_meterOffsets.csv* file.
 
 ###### in subdaily loggers
 
