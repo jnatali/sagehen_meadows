@@ -64,7 +64,7 @@ groundwater_data = pd.read_csv(groundwater_rawdata_filename)
 meter_offset = pd.read_csv(meter_offset_filename)
 
 # Setup dataframe for groundwater entries with no matching well height
-groundwater_no_wellheight = pd.DataFrame(columns=["well_id", "date"])
+# groundwater_no_wellheight = pd.DataFrame(columns=["well_id", "date"])
 
 # # --- FUNCTIONS ---
 # def SAMPLE_get_poly_area(x, y) -> float:
@@ -148,12 +148,12 @@ def calculate_groundwater_level(groundwater_data, well_dimension) -> pd.DataFram
     
     # Setup groundwater_data with date and timestamp
     groundwater_data["timestamp"] = pd.to_datetime(groundwater_data["timestamp"])
-    groundwater_data["date"] = [d.date() for d in groundwater_data["timestamp"]]
+    #groundwater_data["date"] = [d.date() for d in groundwater_data["timestamp"]]
 
     
     # Setup well_dimension for selection by date
-    well_dimension["timestamp"] = pd.to_datetime(well_dimension["timestamp"])
-    well_dimension["date"] = [d.date() for d in well_dimension["timestamp"]]
+    well_dimension["effective_timestamp"] = pd.to_datetime(well_dimension["effective_timestamp"])
+    #well_dimension["date"] = [d.date() for d in well_dimension["effective_timestamp"]]
     
     
     # 2. Logic for determining appropriate well height:
@@ -174,19 +174,21 @@ def calculate_groundwater_level(groundwater_data, well_dimension) -> pd.DataFram
         
         # filter and sort well_dimension row(s) by matching groudwater date
         well_dimension_filtered = well_dimension_filtered[
-            well_dimension_filtered["date"] <= row["date"]].sort_values(by="date")
+            well_dimension_filtered["effective_timestamp"] <= row["timestamp"]].sort_values(by="effective_timestamp")
         
         if well_dimension_filtered.empty:
-            print('WARNING: No well height for %s on %s' % 
-                (row['well_id'],row["date"]))
+            print("WARNING: No well height for %s on %s" % 
+                (row["well_id"],row["timestamp"]))
             
             # Add well_id and date to groundwater_no_wellheight 
-            dict = {"well_id": row["well_id"],
-                    "date": row["date"]}
-            groundwater_no_wellheight.loc[len(groundwater_no_wellheight)] = pd.Series(dict)
+            # dict = {"well_id": row["well_id"],
+            #         "date": row["date"]}
+            # groundwater_no_wellheight.loc[len(groundwater_no_wellheight)] = pd.Series(dict)
 
         else:
-            # print(".....calculating....")
+            if row["well_id"] == ("KEF-XE3S" or "KFF-XE8S"):
+                print("CALCULATING water depth for %s on %s with %s well dimension entry" %
+                  (row["well_id"],row["timestamp"],well_dimension_filtered.iloc[0].effective_timestamp) )
             well_height = well_dimension_filtered.iloc[0].welltop_to_ground_cm
             row["ground_to_water_cm"] = row["welltop_to_water_cm"] - well_height
       
