@@ -59,6 +59,7 @@ groundwater_plot_filename = groundwater_plot_dir + 'groundwater_biweekly_2018-20
 # Fetch input (source data) files
 well_unique_id = pd.read_csv(well_unique_id_filename)
 well_dimension = pd.read_csv(well_dimension_filename)
+#well_dimension = pd.read_excel(well_dimension_filename)
 groundwater_data = pd.read_csv(groundwater_rawdata_filename)
 meter_offset = pd.read_csv(meter_offset_filename)
 
