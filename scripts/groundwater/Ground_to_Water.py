@@ -116,11 +116,14 @@ def validate_well_dimension(well_unique_id, well_dimension) -> bool:
     print('WARNING: Did not validate well dimension, function not yet defined.')
     return True
 
-def subcalculate_groundwater_level(row, well_dimension):
+def calculate_from_ground(row, well_dimension):
         
     # get well_dimension row(s) for the groundwater well_id
     well_dimension_filtered = well_dimension[
         well_dimension["well_id"] == row["well_id"]]
+    
+    well_dimension_filtered = well_dimension_filtered[
+        well_dimension_filtered["valid"] == True]
     
     # filter and sort well_dimension row(s) by matching groudwater date
     well_dimension_filtered = well_dimension_filtered[
@@ -131,12 +134,14 @@ def subcalculate_groundwater_level(row, well_dimension):
             (row["well_id"],row["timestamp"]))
         return None
     else:
-        if row["well_id"] == ("KEF-XE3S" or "KFF-XE8S"):
+        if row["well_id"] in ["KEF-XE3S", "KFF-XE8S"]:
             print("CALCULATING water depth for %s on %s with %s well dimension entry" %
-              (row["well_id"],row["timestamp"],well_dimension_filtered.iloc[0].effective_timestamp) )
+              (row["well_id"],row["timestamp"],well_dimension_filtered.iloc[-1].effective_timestamp) )
         
-        well_height = well_dimension_filtered.iloc[0].welltop_to_ground_cm
-        
+        if row["well_id"] in ["KW"]:
+            print("CALCULATING water depth for %s on %s with %s well dimension entry" %
+                  (row["well_id"],row["timestamp"],well_dimension_filtered.iloc[-1].effective_timestamp) )
+        well_height = well_dimension_filtered.iloc[-1].welltop_to_ground_cm
         ground_to_water_cm = row["welltop_to_water_cm"] - well_height
   
         # For each reading, add the appropriate meter offset (based on
@@ -145,13 +150,13 @@ def subcalculate_groundwater_level(row, well_dimension):
         # NOTE: For now, add 3cm offset for any meter except solinst or nm (no meter)
         # TODO: Examine range of meter_offset, did I consistently measure from 
         #       the top or bottom of the sensor?! Re-test the meters if possible.
-        if row["meter_id"] != ('nm' or 'solinst'):
+        if row["meter_id"] not in ['nm','solinst']:
             ground_to_water_cm = ground_to_water_cm + 3
         
         return ground_to_water_cm
 
     
-def calculate_groundwater_level(groundwater_data, well_dimension) -> pd.DataFrame():
+def get_groundwater_level(groundwater_data, well_dimension) -> pd.DataFrame():
     """
     For each well reading, determine ground_to_water_cm. 
 
@@ -169,10 +174,12 @@ def calculate_groundwater_level(groundwater_data, well_dimension) -> pd.DataFram
     
     groundwater_groups = groundwater_data.groupby(['well_id','timestamp'])
     groundwater_groups = groundwater_groups['welltop_to_water_cm'].mean().reset_index()
+
     groundwater_data = pd.merge(groundwater_groups, groundwater_data[[
-        'well_id','timestamp', 'water_binary','logger?',
-        'meter_id','soil moisture', 'notes' ]].drop_duplicates(), 
-         on=['well_id','timestamp'], how='left')
+             'well_id','timestamp', 'water_binary','logger?',
+             'meter_id','soil moisture', 'notes' ]].drop_duplicates(
+                 subset=['well_id','timestamp'], keep='first'), 
+              on=['well_id','timestamp'], how='left')
     
     # 1. For each well reading, subtract well_dimension.welltop_to_ground_cm 
     #    from groundwater_data.welltop_to_water_cm for the matching well_id to
@@ -185,7 +192,6 @@ def calculate_groundwater_level(groundwater_data, well_dimension) -> pd.DataFram
     #groundwater_data["timestamp"] = pd.Timestamp(groundwater_data["timestamp"])
     #groundwater_data["timestamp"] = pd.to_datetime(groundwater_data["timestamp"], format="%m/%d/%y %I:%M %p")
     groundwater_data["timestamp"] = pd.to_datetime(groundwater_data["timestamp"])
-
     #groundwater_data["date"] = [d.date() for d in groundwater_data["timestamp"]]
 
     
@@ -203,56 +209,15 @@ def calculate_groundwater_level(groundwater_data, well_dimension) -> pd.DataFram
         # NOTE: This might not be right!
         # TODO: Need to determine and consider dates of well replacement and 
         #       make sure this logic will work.
-    
-    
-    # for i, row in groundwater_data.iterrows():
-        
-    #     # get well_dimension row(s) for the groundwater well_id
-    #     well_dimension_filtered = well_dimension[
-    #         well_dimension["well_id"] == row["well_id"]]
-        
-    #     # filter and sort well_dimension row(s) by matching groudwater date
-    #     well_dimension_filtered = well_dimension_filtered[
-    #         well_dimension_filtered["effective_timestamp"] <= row["timestamp"]].sort_values(by="effective_timestamp")
-        
-    #     if well_dimension_filtered.empty:
-    #         print("WARNING: No well height for %s on %s" % 
-    #             (row["well_id"],row["timestamp"]))
-            
-    #         # Add well_id and date to groundwater_no_wellheight 
-    #         # dict = {"well_id": row["well_id"],
-    #         #         "date": row["date"]}
-    #         # groundwater_no_wellheight.loc[len(groundwater_no_wellheight)] = pd.Series(dict)
-
-    #     else:
-    #         if row["well_id"] == ("KEF-XE3S" or "KFF-XE8S"):
-    #             print("CALCULATING water depth for %s on %s with %s well dimension entry" %
-    #               (row["well_id"],row["timestamp"],well_dimension_filtered.iloc[0].effective_timestamp) )
-    #         well_height = well_dimension_filtered.iloc[0].welltop_to_ground_cm
-    #         row["ground_to_water_cm"] = row["welltop_to_water_cm"] - well_height
-      
-    #         # For each reading, add the appropriate meter offset (based on
-    #         #    gw_rawdata.meter_id) to adjust ground_to_water_cm.
-    #         #
-    #         # NOTE: For now, add 3cm offset for any meter except solinst or nm (no meter)
-    #         # TODO: Examine range of meter_offset, did I consistently measure from 
-    #         #       the top or bottom of the sensor?! Re-test the meters if possible.
-    #         if row["meter_id"] != ('nm' or 'solinst'):
-    #             row["ground_to_water_cm"] = row["ground_to_water_cm"] + 3
-                
-    #         # Add this column to new_groundwater_data
-    #         new_groundwater_data = pd.concat([new_groundwater_data, row])
+          
+    groundwater_data['ground_to_water_cm'] = groundwater_data.apply(lambda row: 
+        calculate_from_ground(row, well_dimension), axis=1)
         
     # 3. If water_binary is false (no water), estimate the ground_to_water
     #    as "greater than the" (total_well_length_cm - welltop_to_ground_cm)
     #    and set as ground_to_water_greater_than_cm.
     # NOTE: Skip for now
     # TODO: Add ground_to_water_greater_than_cm attribute to groundater_data
-    
-    #groundwater_data['ground_to_water_cm'] = new_groundwater_data['ground_to_water_cm']
-    
-    groundwater_data['ground_to_water_cm'] = groundwater_data.apply(lambda row: 
-        subcalculate_groundwater_level(row, well_dimension), axis=1)
     
     return groundwater_data
 
@@ -266,6 +231,8 @@ def save_groundwater(groundwater_data) -> None:
 
     Returns: None
     """
+    groundwater_data['ground_to_water_cm'] = groundwater_data['ground_to_water_cm'].astype('float').round(4)
+    groundwater_data = groundwater_data.sort_values(['well_id', 'timestamp'])
     groundwater_data[['well_id','timestamp','ground_to_water_cm']].to_csv(groundwater_fulldata_filename, index=False)
     
 # --- VALIDATE well_id's and well_dimension.welltop_to_ground ---
@@ -288,7 +255,7 @@ if (validate_well_id(well_unique_id, groundwater_data) and
 #    welltop_to_water_cm, water_binary, logger_binary, meter_id,
 #    soil_moisture, notes (but not the original three measurements).
 
-    groundwater_data = calculate_groundwater_level(groundwater_data, 
+    groundwater_data = get_groundwater_level(groundwater_data, 
                                                    well_dimension)
     # Re-order columns
     #groundwater_data.insert(3,'ground_to_water_cm', groundwater_data.pop('ground_to_water_cm'))
