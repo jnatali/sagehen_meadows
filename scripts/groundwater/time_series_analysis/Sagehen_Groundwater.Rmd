@@ -1,0 +1,180 @@
+---
+title: "ESPM 205 - Homework assignment 2"
+author: "Jennifer Natali, with help from chatgpt for learning R and dplyr"
+date: "2024 October 16 [extremely late]"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+### Instructions
+
+Work on the exercise below, due October 1st (before midnight) on bCourses. Please write **short answers (\<100 words)** in "your text here", as well as the R code you used to get there (in "your code here").
+
+### Exercise
+
+1)  Please upload a sample of the data (.csv file) you plan to analyze for your final project. You can (but do not need to) upload the whole dataset. However, the closer the resemblance of this data set to the one you will end up analyzing, the better. E.g., if your question is at the community level, then include several species; if you would like to compare a particular physical variable across different sites, then include several sites. The goal is for you to start getting familiar with your data and its level of complexity. In the code below, import your data set in R, and examine the following properties: (1) length and frequency of the time series (whether it is one, or multiple time series); (2) completeness of each time series; (3) basic descriptive statistics for each time series (at least mean, CV, ACF for each variable; plus anything else you would like to add). [6 points total]
+
+```{r code chunk 1, warning=FALSE}
+# Load libraries
+library(dplyr)
+library(astsa)
+library(lubridate)
+
+# Setup directories and filepaths
+home_dir='/Volumes/SANDISK_SSD_G40/GoogleDrive/GitHub/'
+repository_dir = paste(home_dir,'sagehen_meadows/', sep='')
+groundwater_filepath = paste(repository_dir,'data/field_observations/groundwater/biweekly_manual/groundwater_biweekly_FULL.csv', sep='')
+
+# Load groundwater data
+groundwater <- read.csv(groundwater_filepath)
+
+# summarize the full times series
+summary(groundwater)
+
+# length of full time series by date
+groundwater <- groundwater %>%
+  mutate(timestamp = as.POSIXct(timestamp, format = "%m/%d/%Y %H:%M"))
+
+groundwater <- groundwater %>% mutate(date = as.Date(timestamp))
+groundwater %>% summarize(
+  start_date = min(date, na.rm=TRUE),
+  stop_date = max(date, na.rm=TRUE),
+  timespan = difftime(stop_date, start_date, units="days")
+)
+
+# number of unique dates in the full time series
+groundwater %>% 
+  summarize(unique_dates_count = n_distinct(date))
+
+# length of full time series by week of the year
+# -- NOTE: some well readings are on consecutive days, may want to group them
+#          without altering the date; but doing this by week won't work!!
+#          (e.g. 11/18/19 and 11/19/19 are different isoweeks)
+
+# groundwater <- groundwater %>% mutate(week = isoweek(date))
+# groundwater_weekly_summary <- groundwater %>%
+#   group_by(week) %>%
+#   summarize(
+#     start_week = min(week),
+#     end_week = max(week),
+#     n_week = n()  # Number of entries in each week
+#   )
+# groundwater_weekly_summary
+
+# completeness of full time series in terms of entries with NA
+# ---NOTE: expect 153 NA entries due to NO WATER readings
+# ---TODO: create a ground_to_water_greater_than column for NO WATER readings
+#          to capture the depth of the well; this is more info than nothing.
+groundwater %>%
+  summarize(
+    na_sum = sum(is.na(ground_to_water_cm)),
+    na_percent = 100 * sum(is.na(ground_to_water_cm)) / n())
+
+# basic descriptive statistics across all groundwater readings: mean, CV, ACF
+groundwater %>%
+  summarize(
+    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
+    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
+    var_value = var(ground_to_water_cm, na.rm = TRUE),
+    cv_value = 100 * sd_value / mean_value
+  )
+
+groundwater_by_day <- groundwater %>%
+  group_by(date) %>%
+  summarise(
+    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
+    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
+    var_value = var(ground_to_water_cm, na.rm = TRUE)
+  )
+
+# basic descriptive statistics by groupings: mean, CV, ACF for each variable
+groundwater_by_well <- groundwater %>%
+  group_by(well_id) %>%
+  summarise(
+    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
+    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
+    var_value = var(ground_to_water_cm, na.rm = TRUE)
+  )
+groundwater_by_well
+
+groundwater_by_well_year <- groundwater %>%
+  mutate(year = year(timestamp)) %>%
+  group_by(well_id, year) %>%
+  summarise(
+    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
+    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
+    var_value = var(ground_to_water_cm, na.rm = TRUE),
+    .groups = "keep"
+  )
+groundwater_by_well_year
+
+# Trying to get acf, but not sure if this summarized data means anything
+acf(groundwater_by_day$mean_value)
+
+
+# TODO Next step summary statistics
+# ------wells in each meadow group: kiln, east, low
+# ------wells from each plant functional type: sedge, willow, mixed herbaceous, pine
+# ------wells from each hydrogeomorphic zone: riparian, terrace, fan
+
+# TODO: Next time series to consider
+# ------discharge (at one point)
+# ------daily precipitation (at one point)
+# ------sunlight, aka PAR (at one point)
+# ------max, mean daily temperature (at each meadow)
+
+```
+
+### 2) Plot the data [2 points].
+
+```{r code chunk 2, warning=FALSE}
+# Load libraries
+library(ggplot2)
+library(tidyr)
+
+# Plot (1): the mean annual groundwater level for all wells for each year
+ggplot(groundwater_by_well_year, aes(x = year, y = mean_value, group = well_id)) +
+  geom_point() +  # Optional: add points at each data point
+  labs(title = "Mean Groundwater Levels Over Time (for each well)",
+       x = "Year", y = "Mean Ground to Water (cm)") +
+  theme_minimal()
+
+# Plot (2): year-over-year daily time series of mean groundwater level 
+
+# ---Setup dataframe with new columns for year and day_of_year 
+groundwater_by_day <- groundwater_by_day %>%
+  mutate(
+    year = year(date),                # Extract the year from Date
+    day_of_year = yday(date)          # Extract the day of year (1-365/366)
+  )
+
+# ---Add NA values for days with no measurement (or mean_value)
+complete_groundwater_by_day <- groundwater_by_day %>%
+  group_by(year) %>%
+  complete(day_of_year = 
+           min(groundwater_by_day$day_of_year):max(groundwater_by_day$day_of_year), 
+           fill = list(mean_value = NA))  # Fill missing days with NA
+
+# ---Plot it!
+ggplot(complete_groundwater_by_day, aes(x = day_of_year, y = mean_value, color = factor(year), group = year)) +
+  geom_point() +
+  geom_smooth() +
+  theme_bw() +
+  labs(title = "Daily Time Series of Mean Daily Groundwater Level per Year",
+       x = "Day of Year",
+       y = "Mean Ground to Water (cm)",
+       color = "Year") +
+  scale_x_continuous(breaks = seq(min(groundwater_by_day$day_of_year), 
+                                  max(groundwater_by_day$day_of_year), by = 30)) +  # Customize x-axis (days of year)
+  theme_minimal()
+
+
+```
+
+### 3) What is your main research question? Do you have any working hypothesis? [2 points].
+
+Q1: How does meadow groundwater vary by season and climate as influenced by elevation, hydrogeomorphic zones, and evapotranspiration rates of plant functional types? I expect evapotranspiration to drive daily and seasonal groundwater levels with sensitivity to meteorology and day length. Q2: What controls plant functional type phenology? I hypothesize that peak productivity and senescence will correlate to groundwater levels as governed by meteorology but moderated by hydrogeomorphic zones and elevation. Q3: Does topography or subsurface character influence groundwater reliability? I expect that groundwater reliability will correlate to topographic convergence or subsurface boundaries (i.e. differing conductivity).
+
+### Any notes (optional)
+Thank you for patience and support. So excited to be digging into this data with renewed energy and focused guidance! Been dreaming of this day.
