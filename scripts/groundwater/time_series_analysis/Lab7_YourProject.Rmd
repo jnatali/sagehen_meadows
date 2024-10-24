@@ -29,14 +29,17 @@ Remember time needs to go over columns (use tidyr's 'pivot_wider' if necessary),
 Variates can be site- and year-specific (e.g., in the example you provided, you'd have 3 states), and you could ask (a) questions about whether trajectories show natural groupings among themselves (e.g. by year, or by site characteristics - you could do that using the Z matrix); and (b) questions about what are influencing the states (e.g. by including meteorological data as a covariate - even if the data is year specific, you could use the C matrix in a way that the 2018 meteorological data affects the 2018 state, 2019 to 2019, etc.). 
 
 ```{r code chunk 1}
-# Load response data, the biweekly groundwater measurements (and eventually the greenness values for vegetation PFTs)
+# Load response data, the biweekly groundwater measurements
+# ---TODO: Consider adding data from Kirchner 2006-2008 B+D xect
 
-# Make it close to evenly-spaced.
-# Suggestion: calculate averages at a common time-step (e.g. biweekly), or use shorter time steps (e.g. weekly) and adding NA's when you don't have data at a given site.
+# Make it evenly-spaced.
+# Suggestion: calculate averages at a common time-step (e.g. biweekly)
+# or use shorter time steps (e.g. weekly) and adding NA's when you don't 
+# have data at a given site.
 
-# Consider adding data from Kirchner 2006-2008 for B and D transect wells, how to extract comparable bi-weekly measurements?
 
 # Transform it, if needed (e.g., log-transform, z-score))
+# Why z-score?
 # Assume that don't need to transform it?
 
 # Format it as a matrix with time as columns (use tidyr's 'pivot_wider' if necessary)
@@ -51,16 +54,22 @@ Your text here (<100 words).
 Question 2
 What is (are) your covariate(s), aka driver(s), if any? Z-score them and make sure they have no missing data (MARSS does not allow NA's in covariate data). You can name them 'transformed_covar'. Remember time needs to go over columns (use tidyr's 'pivot_wider' if necessary), and you need a 'matrix' object--you can check that using the function 'class()' [1 point]
 ```{r code chunk 2}
+# Load covariate data
+# ---TODO: greenness values for vegetation PFTs
+
+# Potential Hydro Covariates:
+# --- Discharge (could this be a response variable as well?)
+# --- Previous winter snowpack (how express?)
+# --- Multi-year snowpack (know that groundwater at spring dated to be 30yo)
+# --- Topographic Wetness Index
+# --- Distance to Sagehen Creek or tributary stream channel, following topo
 
 # Potential Meteorological Covariates:
 # --- Temperature (at east only vs near each site; consider daily mean, max, cumulative)
 # --- Precip (total per day)
-# --- Previous winter's snowfall (how express?)
 # --- Relative Humidity (consider daily mean)
 # --- PAR (consider cumulative, daily mean, max)
-
-# So far, only downloaded climate data for 10/1/16 to 12/17/20
-# Kirchner data is 2007-2008 at least
+# ------ NOTE: So far, only downloaded climate data for 10/1/16 to 12/17/20
 
 ```
 Your text here (<100 words).
@@ -70,7 +79,23 @@ Your text here (<100 words).
 Question 3
 Is each observation suppposed to be modeled as a different state, or do you have 'replicate' observations, i.e. more than one observation being funneled into a state (via the Z matrix)? What are the dimensions of your Y's (observations x time steps) and X's (states x time steps)? Build the Z matrix you need, or specify it using a shortcut (e.g., Z = "identity"). [1 point]
 ```{r code chunk 3}
-# your code here
+# H1: Every well is its own state;
+# --- In this case, Z will be the identity matrix 
+# --- (how many wells? this'll define matrix dimensions)
+Z_1 = "identity"
+
+# H2: 3 (or 4) states = meadow sites: Kiln, East, Lo (and Up with an estimate of gw?)
+
+# H3: PFT
+
+# H4: HGMZ
+
+# H5: PFT x HGMZ
+
+# H6: HGMZ but clump Fan and Terrace
+# --- also consider dynamic factor analysis
+
+
 ```
 Your text here (<100 words).
 
@@ -87,7 +112,8 @@ If you are building custom matrices, remember that R and Q need to be symmetrica
 If you plan on comparing models, it is best practice to start with a simple model structure (e.g., Q = "diagonal and equal" instead of "unconstrained"), and make it progressively more complex. 
  [1 point]
 ```{r code chunk 4}
-# your code here
+
+### --- MODEL 1 ---
 ```
 Your text here (<100 words).
 

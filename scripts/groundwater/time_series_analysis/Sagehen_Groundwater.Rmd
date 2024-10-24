@@ -1,25 +1,32 @@
 ---
-title: "ESPM 205 - Homework assignment 2"
-author: "Jennifer Natali, with help from chatgpt for learning R and dplyr"
-date: "2024 October 16 [extremely late]"
+title: "Sagehen Groundwater Data Processing"
+author: "Jennifer Natali, with help from chatgpt for learning R, dplyr, stats"
+date: "2024 October 24"
 output:
   pdf_document: default
   html_document: default
 ---
 
-### Instructions
+### Load and Summarize Response Data
 
-Work on the exercise below, due October 1st (before midnight) on bCourses. Please write **short answers (\<100 words)** in "your text here", as well as the R code you used to get there (in "your code here").
+1. Upload data (.csv file)
+- groundwater level
+- TODO: plant greenness from phenopix
+- TODO: discharge?
 
-### Exercise
+2. Examine the following properties:
+- length and frequency of the time series
+- completeness of each time series
+- descriptive statistics
+  - basics: mean, CV, ACF for each variable
+  - normality: histogram, qqplot, skewness, kurtosis
 
-1)  Please upload a sample of the data (.csv file) you plan to analyze for your final project. You can (but do not need to) upload the whole dataset. However, the closer the resemblance of this data set to the one you will end up analyzing, the better. E.g., if your question is at the community level, then include several species; if you would like to compare a particular physical variable across different sites, then include several sites. The goal is for you to start getting familiar with your data and its level of complexity. In the code below, import your data set in R, and examine the following properties: (1) length and frequency of the time series (whether it is one, or multiple time series); (2) completeness of each time series; (3) basic descriptive statistics for each time series (at least mean, CV, ACF for each variable; plus anything else you would like to add). [6 points total]
-
-```{r code chunk 1}
+```{r code chunk 1, message=FALSE, warning=FALSE}
 # Load libraries
 library(dplyr)
 library(astsa)
 library(lubridate)
+library(moments) # for skewness and kurtosis testing
 
 # Setup directories and filepaths
 home_dir='/Volumes/SANDISK_SSD_G40/GoogleDrive/GitHub/'
@@ -46,6 +53,31 @@ groundwater <- groundwater %>% mutate(
 # summarize the full times series
 summary(groundwater)
 
+# use z-score? test if data is normally distributed
+
+# shapiro-wilk test; data is likely non-normal if p-value < 0.05
+shapiro.test(groundwater$ground_to_water_cm)
+# results: p << 0.05, data is non-normal
+
+# Q-Q plots; data is normal if falls on a straight line
+qqnorm(groundwater$ground_to_water_cm)
+qqline(groundwater$ground_to_water_cm)
+# results: mostly normal but some outliers
+
+# Histogram; check for bell-shaped curve
+hist(groundwater$ground_to_water_cm)
+
+# Skewness; test if near 0 (symmetric), >0 (positive skew), <0 (neg skew)
+skewness(groundwater$ground_to_water_cm, na.rm = TRUE)
+# result: 0.83; positive skewed, >0.5 so moderately skewed
+
+# Kurtosis; test for heavy tails (if ~3 normal, if >3 heavy tails + sharp peak, if <3 light tails, flat peak)
+kurtosis(groundwater$ground_to_water_cm, na.rm = TRUE)
+# result 4.5; heavy tail and sharp peak
+
+# YES, USE Z-SCORE!
+# ---TODO: Add ground_to_water_zscore column
+
 # summarize the span of full time series by date
 groundwater %>% summarize(
   start_date = min(date, na.rm=TRUE),
@@ -70,13 +102,25 @@ unique_observations <- groundwater %>%
   arrange(date) %>%
   mutate(day_diff = as.numeric(difftime(lead(date), date, units="days")))
 
-unique_observations
-#write.csv(unique_observations, observation_filepath)
-
 unique_observations %>% summarize(
   max_days = max(day_diff, na.rm=TRUE),
-  mean_days = mean(day_diff, na.rm=TRUE)
+  mean_days = mean(day_diff, na.rm=TRUE),
 )
+
+# evaluate how many observation dates are "close" and if they're in the same week
+close_threshold = 3 # consider observations "close" if <3 days apart
+same_week_count <- unique_observations %>%
+  mutate(next_isoweek = lead(isoweek)) %>%
+  filter(day_diff < close_threshold) %>%
+  summarise(
+    close_days_count = n(),
+    close_count = sum(isoweek == next_isoweek)
+  ) %>%
+  mutate(
+    percent_close = close_count / close_days_count * 100
+  )
+same_week_count
+
 
 # filter measurements, only before 11a
 am_time_limit <- 10
@@ -164,7 +208,7 @@ acf(groundwater_by_day$mean_value)
 
 ```
 
-### 2) Plot the data [2 points].
+### Plots
 
 ```{r code chunk 2, warning=FALSE}
 # Load libraries
@@ -210,9 +254,14 @@ ggplot(complete_groundwater_by_day, aes(x = day_of_year, y = mean_value, color =
 
 ```
 
-### 3) What is your main research question? Do you have any working hypothesis? [2 points].
+### Research Questions and Hypotheses
 
-Q1: How does meadow groundwater vary by season and climate as influenced by elevation, hydrogeomorphic zones, and evapotranspiration rates of plant functional types? I expect evapotranspiration to drive daily and seasonal groundwater levels with sensitivity to meteorology and day length. Q2: What controls plant functional type phenology? I hypothesize that peak productivity and senescence will correlate to groundwater levels as governed by meteorology but moderated by hydrogeomorphic zones and elevation. Q3: Does topography or subsurface character influence groundwater reliability? I expect that groundwater reliability will correlate to topographic convergence or subsurface boundaries (i.e. differing conductivity).
+1. How does meadow groundwater vary by season and climate as influenced by elevation, hydrogeomorphic zones, and evapotranspiration rates of plant functional types? 
+- Hypothesis: I expect evapotranspiration to drive daily and seasonal groundwater levels with sensitivity to meteorology and day length.
 
-### Any notes (optional)
-Thank you for patience and support. So excited to be digging into this data with renewed energy and focused guidance! Been dreaming of this day.
+2. What controls plant functional type phenology? 
+- Hypothesis: peak productivity and senescence will correlate to groundwater levels as governed by meteorology but moderated by hydrogeomorphic zones and elevation.
+
+3. Does discharge, topography or subsurface character influence groundwater reliability? 
+- Hypothesis: I expect that groundwater reliability will correlate to topographic convergence or subsurface boundaries (i.e. differing conductivity).
+
