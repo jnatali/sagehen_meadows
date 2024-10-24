@@ -1,0 +1,123 @@
+---
+title: "ESPM 205 - Lab 7 & Homework Assignment 4"
+author: "Jennifer Natali"
+date: "Your date"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+### Instructions
+In this lab and associated homework assignment, we will advance the final project. We will get the data ready, we will specify a model to fit your own data, we will fit the model, and we will interpret the results. This lab is meant to build on Homework Assignment 2 (HW2), and get you closer to the final model or set of models that you will be using for your project. 
+
+Most of you will be fitting MAR or MARSS models. If so, answer questions 1-5 below. If in our grading of HW2 we recommended that you use some method other than MAR on MARSS (e.g., ARIMA), please see question 6 first.
+
+Please submit the completed lab on bCourses as a knitted R Markdown (html or pdf) by next Tuesday, Oct 29th before midnight. This submission will be the 4th and last Homework Assignment (HW4).
+
+### Questions
+Question 1
+In your individual project, what is (are) your variate(s), also known as response(s)? 
+
+Create the object (or recover it from HW2), and name it 'dat'. If you have many variates, you do not need to analyze the whole dataset in this lab/HW4. However, the closer the resemblance of this data set to the one you will end up analyzing, the better. E.g., if your question is at the community level, then include several species; if you would like to compare a particular physical variable across different sites, then include several sites. 
+
+If you have multivariate responses, name rows appropriately so that you can keep track of each state. Do you need to further clean and/or transform these data for analysis (e.g., log-transform, z-score)? If so, do it below (and name this new object 'transformed_dat'). 
+Remember time needs to go over columns (use tidyr's 'pivot_wider' if necessary), and you need a 'matrix' object--you can check that using the function 'class()'  [1 point]
+
+### Feedback from Prof Ruhi
+
+# --- Hypotheses
+Variates can be site- and year-specific (e.g., in the example you provided, you'd have 3 states), and you could ask (a) questions about whether trajectories show natural groupings among themselves (e.g. by year, or by site characteristics - you could do that using the Z matrix); and (b) questions about what are influencing the states (e.g. by including meteorological data as a covariate - even if the data is year specific, you could use the C matrix in a way that the 2018 meteorological data affects the 2018 state, 2019 to 2019, etc.). 
+
+```{r code chunk 1}
+# Load response data, the biweekly groundwater measurements (and eventually the greenness values for vegetation PFTs)
+
+# Make it close to evenly-spaced.
+# Suggestion: calculate averages at a common time-step (e.g. biweekly), or use shorter time steps (e.g. weekly) and adding NA's when you don't have data at a given site.
+
+# Consider adding data from Kirchner 2006-2008 for B and D transect wells, how to extract comparable bi-weekly measurements?
+
+# Transform it, if needed (e.g., log-transform, z-score))
+# Assume that don't need to transform it?
+
+# Format it as a matrix with time as columns (use tidyr's 'pivot_wider' if necessary)
+
+# Is it a 'matrix' object? you can check that using the function 'class()' 
+
+```
+Your text here (<100 words).
+
+
+
+Question 2
+What is (are) your covariate(s), aka driver(s), if any? Z-score them and make sure they have no missing data (MARSS does not allow NA's in covariate data). You can name them 'transformed_covar'. Remember time needs to go over columns (use tidyr's 'pivot_wider' if necessary), and you need a 'matrix' object--you can check that using the function 'class()' [1 point]
+```{r code chunk 2}
+
+# Potential Meteorological Covariates:
+# --- Temperature (at east only vs near each site; consider daily mean, max, cumulative)
+# --- Precip (total per day)
+# --- Previous winter's snowfall (how express?)
+# --- Relative Humidity (consider daily mean)
+# --- PAR (consider cumulative, daily mean, max)
+
+# So far, only downloaded climate data for 10/1/16 to 12/17/20
+# Kirchner data is 2007-2008 at least
+
+```
+Your text here (<100 words).
+
+
+
+Question 3
+Is each observation suppposed to be modeled as a different state, or do you have 'replicate' observations, i.e. more than one observation being funneled into a state (via the Z matrix)? What are the dimensions of your Y's (observations x time steps) and X's (states x time steps)? Build the Z matrix you need, or specify it using a shortcut (e.g., Z = "identity"). [1 point]
+```{r code chunk 3}
+# your code here
+```
+Your text here (<100 words).
+
+
+
+Question 4
+Specify the rest of your MAR/MARSS parameters using a model list, like we have been doing so far: R (based on the number of observations), and U, B, C, Q (based on the number of states). 
+
+If you would like to fit MAR instead of MARSS, then set R to "zero".
+Remember what we learned over the past few weeks, e.g. if you want to focus on the B matrix (e.g. species interactions) then it is best to fix U (long-term trend) to zero, which you can do after demeaning the variate data. 
+
+If you are building custom matrices, remember that R and Q need to be symmetrical, B does not need to be. Also, R, Q, and B need to be square; all other matrices may be rectangular. If you have covariate data, assign it here as well to the model list ("c").
+
+If you plan on comparing models, it is best practice to start with a simple model structure (e.g., Q = "diagonal and equal" instead of "unconstrained"), and make it progressively more complex. 
+ [1 point]
+```{r code chunk 4}
+# your code here
+```
+Your text here (<100 words).
+
+
+
+Question 5
+Fit the model. If you get errors or warnings, first check that the model specification is right (e.g., number of dimensions of each matrix). If dimensions are right, but the model does not converge, increase number of iterations using the agument 'maxit'. If it still does not converge, check if the model you are fitting does not make sense given the data (e.g. perhaps you are fitting a stationary model to a non-stationary process), and re-specify the model accordingly, in step 5.
+
+If you are fitting MARSS and one of the variances goes to zero (Q or R), try fitting a MAR model instead.
+
+If errors persist, check the MARSS User Guide: https://cran.r-project.org/web/packages/MARSS/vignettes/UserGuide.pdf ("Appendix A - Warnings and errors", page 309). 
+
+Once it does work: bootstrap the model(s). What do you obtain? Is it what you expected?
+What are the next steps to complete analyses for your final project? [1 point]
+```{r code chunk 5}
+# your code here
+```
+Your text here (<100 words).
+
+
+Question 6 [ONLY FOR THOSE OF YOU WHO ARE NOT USING MAR/MARSS]
+Discuss with Albert/Robert and find an appropriate model to use. 
+Follow the steps 1-5 above by reading in your response and driver data (if any), transforming it (if necessary), and specifying a model (e.g, ARIMA, DFA, DLM) that gets at your question.
+Fit the model, if you can (if we have not seen this in class yet, let's troubleshoot together). 
+What did you learn? 
+What are the next steps to complete analyses for your final project? [5 points]
+```{r code chunk 6}
+# your code here
+```
+Your text here (<100 words).
+
+### Any notes (optional)
+If you need to add any additional text, please do so here (<100 words).

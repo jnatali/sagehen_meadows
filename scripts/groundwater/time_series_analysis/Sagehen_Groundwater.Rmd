@@ -15,7 +15,7 @@ Work on the exercise below, due October 1st (before midnight) on bCourses. Pleas
 
 1)  Please upload a sample of the data (.csv file) you plan to analyze for your final project. You can (but do not need to) upload the whole dataset. However, the closer the resemblance of this data set to the one you will end up analyzing, the better. E.g., if your question is at the community level, then include several species; if you would like to compare a particular physical variable across different sites, then include several sites. The goal is for you to start getting familiar with your data and its level of complexity. In the code below, import your data set in R, and examine the following properties: (1) length and frequency of the time series (whether it is one, or multiple time series); (2) completeness of each time series; (3) basic descriptive statistics for each time series (at least mean, CV, ACF for each variable; plus anything else you would like to add). [6 points total]
 
-```{r code chunk 1, warning=FALSE}
+```{r code chunk 1}
 # Load libraries
 library(dplyr)
 library(astsa)
@@ -25,47 +25,85 @@ library(lubridate)
 home_dir='/Volumes/SANDISK_SSD_G40/GoogleDrive/GitHub/'
 repository_dir = paste(home_dir,'sagehen_meadows/', sep='')
 groundwater_filepath = paste(repository_dir,'data/field_observations/groundwater/biweekly_manual/groundwater_biweekly_FULL.csv', sep='')
+observation_filepath = paste(repository_dir,'data/field_observations/groundwater/biweekly_manual/groundwater_biweekly_observation_spacing.csv', sep='')
 
 # Load groundwater data
 groundwater <- read.csv(groundwater_filepath)
 
+# Manage dates and times
+groundwater$timestamp <- ymd_hms(groundwater$timestamp)
+
+# Check timestamp formatting
+str(groundwater$timestamp)
+
+# Create columns for date and isoweek (starts on Monday)
+groundwater <- groundwater %>% mutate(
+  date = as.Date(timestamp), 
+  year = year(timestamp),
+  isoweek = isoweek(date),
+  day_of_year = yday(date))
+
 # summarize the full times series
 summary(groundwater)
 
-# length of full time series by date
-groundwater <- groundwater %>%
-  mutate(timestamp = as.POSIXct(timestamp, format = "%m/%d/%Y %H:%M"))
-
-groundwater <- groundwater %>% mutate(date = as.Date(timestamp))
+# summarize the span of full time series by date
 groundwater %>% summarize(
   start_date = min(date, na.rm=TRUE),
   stop_date = max(date, na.rm=TRUE),
-  timespan = difftime(stop_date, start_date, units="days")
+  timespan = difftime(stop_date, start_date, units="days"),
+  unique_dates_count = n_distinct(date)
 )
 
-# number of unique dates in the full time series
-groundwater %>% 
-  summarize(unique_dates_count = n_distinct(date))
+# summarize the weekly data
+groundwater_weekly_summary <- groundwater %>%
+  group_by(isoweek) %>%
+  summarize(
+      n_week = n()  # Number of entries in each week
+  )
+groundwater_weekly_summary
 
-# length of full time series by week of the year
-# -- NOTE: some well readings are on consecutive days, may want to group them
-#          without altering the date; but doing this by week won't work!!
-#          (e.g. 11/18/19 and 11/19/19 are different isoweeks)
+# summarize spacing of the full time series
+unique_observations <- groundwater %>%
+  select(-well_id, -ground_to_water_cm, -timestamp) %>%
+  distinct(date, .keep_all=TRUE) %>%
+  group_by(year) %>%
+  arrange(date) %>%
+  mutate(day_diff = as.numeric(difftime(lead(date), date, units="days")))
 
-# groundwater <- groundwater %>% mutate(week = isoweek(date))
-# groundwater_weekly_summary <- groundwater %>%
-#   group_by(week) %>%
-#   summarize(
-#     start_week = min(week),
-#     end_week = max(week),
-#     n_week = n()  # Number of entries in each week
-#   )
-# groundwater_weekly_summary
+unique_observations
+#write.csv(unique_observations, observation_filepath)
 
-# completeness of full time series in terms of entries with NA
-# ---NOTE: expect 153 NA entries due to NO WATER readings
+unique_observations %>% summarize(
+  max_days = max(day_diff, na.rm=TRUE),
+  mean_days = mean(day_diff, na.rm=TRUE)
+)
+
+# filter measurements, only before 11a
+am_time_limit <- 10
+groundwater_filter_by_time <- groundwater %>%
+  filter(hour(timestamp) < am_time_limit)
+
+# number of rows lost from this filter
+nrow(groundwater) - nrow(groundwater_filter_by_time)
+
+# filter for duplicate entries (same well, same week)
+groundwater_filter_duplicates <- groundwater_filter_by_time %>%
+  group_by(well_id, isoweek) %>%
+  distinct(well_id, isoweek, .keep_all = TRUE) %>%
+  ungroup()
+
+# compare and validate results
+summary(groundwater)
+summary(groundwater_filter_by_time)
+summary(groundwater_filter_duplicates)
+
+# test completeness of full time series 
 # ---TODO: create a ground_to_water_greater_than column for NO WATER readings
 #          to capture the depth of the well; this is more info than nothing.
+
+# completeness in terms of entries with NA
+# ---NOTE: expect 153 NA entries due to NO WATER readings
+
 groundwater %>%
   summarize(
     na_sum = sum(is.na(ground_to_water_cm)),
