@@ -14,3 +14,4 @@ data/station_instrumentation/climate/FieldStation_Raw/Sagehen Data from Dan/wy20
 scripts/.DS_Store
 scripts/groundwater/.DS_Store
 scripts/groundwater/time_series_analysis/.DS_Store
+data/field_observations/groundwater/.DS_Store

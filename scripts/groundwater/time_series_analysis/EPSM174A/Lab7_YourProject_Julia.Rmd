@@ -196,7 +196,7 @@ for (wellname in rownames(groundwater_variates)){
 }
 
 #Hypothesis 5: Every well is part of the same picture:
-Z_5 = matrix(rep(1, 19), nrow = 19, ncol = 1)
+Z_7 = matrix(rep(1, 19), nrow = 19, ncol = 1)
 
 #Hypothesis 6: 2 states: Kiln and East:
 Z_6 = matrix(NA, nrow = 0, ncol = 2)

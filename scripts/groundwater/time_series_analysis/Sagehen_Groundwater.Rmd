@@ -24,6 +24,7 @@ output:
 ```{r code chunk 1, message=FALSE, warning=FALSE}
 # Load libraries
 library(dplyr)
+library(tidyr)
 library(astsa)
 library(lubridate)
 library(moments) # for skewness and kurtosis testing
@@ -31,11 +32,19 @@ library(moments) # for skewness and kurtosis testing
 # Setup directories and filepaths
 home_dir='/Volumes/SANDISK_SSD_G40/GoogleDrive/GitHub/'
 repository_dir = paste(home_dir,'sagehen_meadows/', sep='')
-groundwater_filepath = paste(repository_dir,'data/field_observations/groundwater/biweekly_manual/groundwater_biweekly_FULL.csv', sep='')
-observation_filepath = paste(repository_dir,'data/field_observations/groundwater/biweekly_manual/groundwater_biweekly_observation_spacing.csv', sep='')
+groundwater_data_dir = 'data/field_observations/groundwater/biweekly_manual/'
+groundwater_filepath = paste(repository_dir, groundwater_data_dir, 
+                             'groundwater_biweekly_FULL.csv', sep='')
+groundwater_weekly_matrix_filepath = paste(repository_dir, groundwater_data_dir,
+                             'groundwater_weekly_matrix.csv',
+                             sep='')
 
 # Load groundwater data
 groundwater <- read.csv(groundwater_filepath)
+
+# ---TODO: Add "greater_than" data to increase completeness (for now)
+# ---TODO: Consider adding data from Kirchner 2006-2008 B+D xect
+# ---TODO: Get data from other (not my) transducers for 2018-2024?
 
 # Manage dates and times
 groundwater$timestamp <- ymd_hms(groundwater$timestamp)
@@ -52,8 +61,10 @@ groundwater <- groundwater %>% mutate(
 
 # summarize the full times series
 summary(groundwater)
+nrow_groundwater_orig <- nrow(groundwater)
 
-# use z-score? test if data is normally distributed
+# explore the distribution of the data
+# NOTE: does NOT need to be normally distributed for MAR/MARSS models
 
 # shapiro-wilk test; data is likely non-normal if p-value < 0.05
 shapiro.test(groundwater$ground_to_water_cm)
@@ -71,12 +82,10 @@ hist(groundwater$ground_to_water_cm)
 skewness(groundwater$ground_to_water_cm, na.rm = TRUE)
 # result: 0.83; positive skewed, >0.5 so moderately skewed
 
-# Kurtosis; test for heavy tails (if ~3 normal, if >3 heavy tails + sharp peak, if <3 light tails, flat peak)
+# Kurtosis; test for heavy tails 
+# (if ~3 normal, if >3 heavy tails + sharp peak, if <3 light tails, flat peak)
 kurtosis(groundwater$ground_to_water_cm, na.rm = TRUE)
 # result 4.5; heavy tail and sharp peak
-
-# YES, USE Z-SCORE!
-# ---TODO: Add ground_to_water_zscore column
 
 # summarize the span of full time series by date
 groundwater %>% summarize(
@@ -86,6 +95,49 @@ groundwater %>% summarize(
   unique_dates_count = n_distinct(date)
 )
 
+# basic descriptive statistics across all groundwater readings: mean, CV, ACF
+groundwater %>%
+  summarize(
+    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
+    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
+    var_value = var(ground_to_water_cm, na.rm = TRUE),
+    cv_value = 100 * sd_value / mean_value
+  )
+
+# basic descriptive statistics by groupings: mean, CV, ACF for each variable
+groundwater_summary_by_date <- groundwater %>%
+  group_by(date) %>%
+  summarise(
+    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
+    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
+    var_value = var(ground_to_water_cm, na.rm = TRUE)
+  )
+
+groundwater_summary_by_well <- groundwater %>%
+  group_by(well_id) %>%
+  summarise(
+    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
+    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
+    var_value = var(ground_to_water_cm, na.rm = TRUE)
+  )
+groundwater_summary_by_well
+
+groundwater_summary_by_well_year <- groundwater %>%
+  mutate(year = year(timestamp)) %>%
+  group_by(well_id, year) %>%
+  summarise(
+    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
+    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
+    var_value = var(ground_to_water_cm, na.rm = TRUE),
+    .groups = "keep"
+  )
+groundwater_summary_by_well_year
+
+# Trying to get acf, but not sure if this summarized data means anything
+acf(groundwater_summary_by_date$mean_value)
+
+
+## ORGANIZE BY AN EVEN TIMESTEP
 # summarize the weekly data
 groundwater_weekly_summary <- groundwater %>%
   group_by(isoweek) %>%
@@ -107,100 +159,133 @@ unique_observations %>% summarize(
   mean_days = mean(day_diff, na.rm=TRUE),
 )
 
-# evaluate how many observation dates are "close" and if they're in the same week
+# evaluate how many observation dates are "close" & if they're in the same week
 close_threshold = 3 # consider observations "close" if <3 days apart
 same_week_count <- unique_observations %>%
   mutate(next_isoweek = lead(isoweek)) %>%
   filter(day_diff < close_threshold) %>%
   summarise(
-    close_days_count = n(),
-    close_count = sum(isoweek == next_isoweek)
+    number_close_days = n(),
+    number_same_week = sum(isoweek == next_isoweek)
   ) %>%
   mutate(
-    percent_close = close_count / close_days_count * 100
+    percent_close = number_same_week / number_close_days * 100
   )
 same_week_count
 
-
-# filter measurements, only before 11a
+# filter measurements, only before AM threshold
 am_time_limit <- 10
 groundwater_filter_by_time <- groundwater %>%
-  filter(hour(timestamp) < am_time_limit)
+  filter(hour(timestamp) > am_time_limit)
 
-# number of rows lost from this filter
-nrow(groundwater) - nrow(groundwater_filter_by_time)
+# number of observations removed by time limit
+nrow(groundwater_filter_by_time)
 
-# filter for duplicate entries (same well, same week)
-groundwater_filter_duplicates <- groundwater_filter_by_time %>%
-  group_by(well_id, isoweek) %>%
-  distinct(well_id, isoweek, .keep_all = TRUE) %>%
-  ungroup()
+groundwater <- groundwater %>%
+  filter(hour(timestamp) <= am_time_limit)
 
-# compare and validate results
-summary(groundwater)
-summary(groundwater_filter_by_time)
-summary(groundwater_filter_duplicates)
+# # number of observations that'll be lost from 
+# # filtering for duplicate entries (same well, same week)
+# groundwater_filter_duplicates <- groundwater %>%
+#   group_by(well_id, year, isoweek) %>%
+#   filter(n() > 1) %>%
+#   ungroup()
+# nrow(groundwater_filter_duplicates)
+# 
+# # remove duplicate entries (same well, same week)
+# groundwater <- groundwater %>%
+#   group_by(well_id, year, isoweek) %>%
+#   distinct(well_id, year, isoweek, .keep_all = TRUE) %>%
+#   ungroup()
 
-# test completeness of full time series 
-# ---TODO: create a ground_to_water_greater_than column for NO WATER readings
-#          to capture the depth of the well; this is more info than nothing.
+# get full range of year_weeks
+year_range <- c(2018, 2019, 2021)
+isoweek_range <- min(groundwater$isoweek):max(groundwater$isoweek)
+year_week_range <- as.character(unlist(lapply(year_range, function(year) {
+  paste0(year, sprintf("%02d", isoweek_range))
+})))
 
-# completeness in terms of entries with NA
-# ---NOTE: expect 153 NA entries due to NO WATER readings
+# # HOLD OFF ON REMOVING TIMESTEPS
+# # remove first two timesteps (201820, 201821 have no entries)
+# year_week_range <- year_week_range[-c(1,2)]
+# # remove last 2 weeks of 2018 and 2019, first 2 weeks of 2019
+# indices_to_remove <- c(21:26, 49, 50)
+# year_week_range <- year_week_range[-indices_to_remove]
 
+length(year_week_range)
+
+# add new column with year and isoweek combined
+# (e.g. 201820 for year 2018, week 20)
+groundwater <- groundwater %>%
+  mutate(year_week = as.character(paste0(year, sprintf("%02d", isoweek))))
+
+# if multiple entries per well_id and year_week, average them
+# --- TODO: is averaging the best representation of the data?
+groundwater <- groundwater %>%
+  group_by(well_id, year_week) %>%
+  summarise(
+    ground_to_water_cm = mean(ground_to_water_cm, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# convert NaN to NA
+groundwater$ground_to_water_cm[is.nan(groundwater$ground_to_water_cm)] <- NA
+
+# compare original vs filtered entries (diff and percentage)
+nrow_groundwater_orig - nrow(groundwater)
+nrow(groundwater) / nrow_groundwater_orig * 100
+
+# completeness in terms of entries with NA (before filling in weeks)
 groundwater %>%
   summarize(
     na_sum = sum(is.na(ground_to_water_cm)),
     na_percent = 100 * sum(is.na(ground_to_water_cm)) / n())
 
-# basic descriptive statistics across all groundwater readings: mean, CV, ACF
-groundwater %>%
+# create a complete grid off all well_id and year_week values
+groundwater_full_grid <- expand_grid(
+  well_id = unique(groundwater$well_id),
+  year_week = year_week_range
+)
+
+# join the complete grid with groundwater
+groundwater_full_grid <- groundwater_full_grid %>%
+  left_join(groundwater, by = c("well_id", "year_week"))
+
+# check for duplicates
+duplicate_groundwater <- groundwater_full_grid %>%
+  group_by(well_id, year_week) %>%
   summarize(
-    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
-    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
-    var_value = var(ground_to_water_cm, na.rm = TRUE),
-    cv_value = 100 * sd_value / mean_value
+    count = n(),
+    .groups = "drop"
+  ) %>%
+  filter(count>1)
+
+# create new dataframe with timesteps as columns and one unique well_id per row
+groundwater_weekly_matrix <- groundwater_full_grid %>%
+  pivot_wider(
+    names_from = year_week,
+    values_from = ground_to_water_cm,
+    values_fill = NA
   )
 
-groundwater_by_day <- groundwater %>%
-  group_by(date) %>%
-  summarise(
-    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
-    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
-    var_value = var(ground_to_water_cm, na.rm = TRUE)
+# recheck completeness percentage
+groundwater_weekly_matrix %>%
+  summarize(
+    na_sum = sum(across(everything(), ~ is.na(.))),
+    na_percent = 100 * na_sum / (n() * ncol(.))
   )
 
-# basic descriptive statistics by groupings: mean, CV, ACF for each variable
-groundwater_by_well <- groundwater %>%
-  group_by(well_id) %>%
-  summarise(
-    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
-    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
-    var_value = var(ground_to_water_cm, na.rm = TRUE)
-  )
-groundwater_by_well
+# save groundwater data in timestep matrix form
+write.csv(groundwater_weekly_matrix, groundwater_weekly_matrix_filepath, row.names = FALSE)
 
-groundwater_by_well_year <- groundwater %>%
-  mutate(year = year(timestamp)) %>%
-  group_by(well_id, year) %>%
-  summarise(
-    mean_value = mean(ground_to_water_cm, na.rm = TRUE),
-    sd_value = sd(ground_to_water_cm, na.rm = TRUE),
-    var_value = var(ground_to_water_cm, na.rm = TRUE),
-    .groups = "keep"
-  )
-groundwater_by_well_year
-
-# Trying to get acf, but not sure if this summarized data means anything
-acf(groundwater_by_day$mean_value)
-
+# NOTE: 75.5% incomplete at weekly timestep with 2018-19 transducer data
 
 # TODO Next step summary statistics
 # ------wells in each meadow group: kiln, east, low
 # ------wells from each plant functional type: sedge, willow, mixed herbaceous, pine
 # ------wells from each hydrogeomorphic zone: riparian, terrace, fan
 
-# TODO: Next time series to consider
+# TODO: Next time series to validate and prepare for analysis
 # ------discharge (at one point)
 # ------daily precipitation (at one point)
 # ------sunlight, aka PAR (at one point)
@@ -210,13 +295,18 @@ acf(groundwater_by_day$mean_value)
 
 ### Plots
 
+1. Plot mean annual groundwater level for all wells for each year
+2. Plot year-over-year daily time series of mean groundwater level 
 ```{r code chunk 2, warning=FALSE}
 # Load libraries
 library(ggplot2)
 library(tidyr)
 
 # Plot (1): the mean annual groundwater level for all wells for each year
-ggplot(groundwater_by_well_year, aes(x = year, y = mean_value, group = well_id)) +
+ggplot(groundwater_summary_by_well_year, aes(
+  x = year,
+  y = mean_value,
+  group = well_id)) +
   geom_point() +  # Optional: add points at each data point
   labs(title = "Mean Groundwater Levels Over Time (for each well)",
        x = "Year", y = "Mean Ground to Water (cm)") +
@@ -225,21 +315,26 @@ ggplot(groundwater_by_well_year, aes(x = year, y = mean_value, group = well_id))
 # Plot (2): year-over-year daily time series of mean groundwater level 
 
 # ---Setup dataframe with new columns for year and day_of_year 
-groundwater_by_day <- groundwater_by_day %>%
+groundwater_summary_by_day <- groundwater_summary_by_date %>%
   mutate(
     year = year(date),                # Extract the year from Date
     day_of_year = yday(date)          # Extract the day of year (1-365/366)
   )
 
 # ---Add NA values for days with no measurement (or mean_value)
-complete_groundwater_by_day <- groundwater_by_day %>%
+complete_groundwater_summary_by_day <- groundwater_summary_by_day %>%
   group_by(year) %>%
   complete(day_of_year = 
-           min(groundwater_by_day$day_of_year):max(groundwater_by_day$day_of_year), 
+           min(groundwater_summary_by_day$day_of_year):
+             max(groundwater_summary_by_day$day_of_year), 
            fill = list(mean_value = NA))  # Fill missing days with NA
 
 # ---Plot it!
-ggplot(complete_groundwater_by_day, aes(x = day_of_year, y = mean_value, color = factor(year), group = year)) +
+ggplot(complete_groundwater_summary_by_day, aes(
+  x = day_of_year,
+  y = mean_value,
+  color = factor(year),
+  group = year)) +
   geom_point() +
   geom_smooth() +
   theme_bw() +
@@ -247,8 +342,9 @@ ggplot(complete_groundwater_by_day, aes(x = day_of_year, y = mean_value, color =
        x = "Day of Year",
        y = "Mean Ground to Water (cm)",
        color = "Year") +
-  scale_x_continuous(breaks = seq(min(groundwater_by_day$day_of_year), 
-                                  max(groundwater_by_day$day_of_year), by = 30)) +  # Customize x-axis (days of year)
+  scale_x_continuous(breaks = seq(min(groundwater_summary_by_day$day_of_year), 
+                                  max(groundwater_summary_by_day$day_of_year),
+                                  by = 30)) +  # Customize x-axis (days of year)
   theme_minimal()
 
 

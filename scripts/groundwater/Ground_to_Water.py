@@ -38,13 +38,19 @@ import pandas as pd
 import os
 from datetime import datetime
 import numpy as np
+from pathlib import Path
 
+# --- USE TRANSDUCER DATA? ---
+transducer_binary = True
 
 # --- INITIALIZE FILE VARIABLES ---
 
 # Setup directory (dir) structure and file names based on structure in github
 groundwater_data_dir = '../../data/field_observations/groundwater/biweekly_manual/'
 groundwater_plot_dir = '../../data/field_observations/groundwater/plots/biweekly_manual/'
+
+if transducer_binary:
+    transducer_data_dir = '../../data/field_observations/groundwater/subdaily_loggers/relative_to_ground/'
 
 # Input (source data) filenames
 well_unique_id_filename = groundwater_data_dir + '../well_unique_id.txt'
@@ -55,6 +61,7 @@ groundwater_rawdata_filename = groundwater_data_dir + 'groundwater_biweekly_RAW.
 # Output filenames
 groundwater_fulldata_filename = groundwater_data_dir + 'groundwater_biweekly_FULL.csv'
 groundwater_plot_filename = groundwater_plot_dir + 'groundwater_biweekly_2018-2021.pdf'
+
 
 # Fetch input (source data) files
 well_unique_id = pd.read_csv(well_unique_id_filename)
@@ -67,18 +74,69 @@ meter_offset = pd.read_csv(meter_offset_filename)
 # groundwater_no_wellheight = pd.DataFrame(columns=["well_id", "date"])
 
 # # --- FUNCTIONS ---
-# def SAMPLE_get_poly_area(x, y) -> float:
-#     """
-#     Calculate area of a polygon.
 
-#     Parameters:
-#     x (array of float): series of x coordinates
-#     y (array of float): series of y coordinates
 
-#     Returns:
-#     a_np (float): the area of polygon
-#     """
+def get_transducer_data() -> pd.DataFrame:
+    """
+    get groundwater levels from transducer files
+    they're oragnized in one directory, 
+    with one file per well per logging time period.
+
+    Parameters: none
     
+    Returns:
+    transducer_data (dataframe): new entries added from the transducer directory
+    """    
+    
+    target_time = pd.to_datetime('08:00').time()
+    all_transducer_data = pd.DataFrame()
+    transducer_data_path = Path(transducer_data_dir)
+   
+    # iterate through all .csv files in the tranducer directory
+    for transducer_filename in transducer_data_path.iterdir():
+
+        # check if valid file
+        if transducer_filename.is_file() and transducer_filename.suffix == '.csv':
+            
+            # open the next file
+            transducer_data = pd.read_csv(transducer_filename)
+            
+            # extract well_id from filename
+            # assumes format follows this pattern: 'gtw_compensated_cut_EEF-1_2018_0727_0824.csv'
+            filename_only = os.path.basename(transducer_filename)
+            well_id_parts = filename_only.split('_')
+            well_id = well_id_parts[3]
+            
+            print(filename_only)
+            # convert to datetime formats
+            transducer_data['timestamp'] = pd.to_datetime(transducer_data['Date'] + ' ' + transducer_data['Time'], format='mixed')
+            #transducer_data['timestamp'] = pd.to_datetime(transducer_data['Date'] + ' ' + transducer_data['Time'], format='%m/%d/%Y %I:%M:%S %p')
+
+            transducer_data['Time'] = pd.to_datetime(transducer_data['Time'], format='%I:%M:%S %p').dt.time
+            
+            # filter to only 8am timestamps
+            transducer_data = transducer_data[transducer_data['Time'] == target_time]
+            
+            # flip sign of ground_to_water and rename
+            # TODO: fix non-standard way of recording ground_to_water across observation types
+            transducer_data = transducer_data[['timestamp', 'ground_to_water_m']]
+            transducer_data['ground_to_water_cm'] = (-1) * transducer_data['ground_to_water_m']
+            transducer_data.drop(columns=['ground_to_water_m'], inplace=True)
+            
+            # reconstruct dataframe with bi-weekly groundwater columns and values
+            transducer_data['well_id'] = well_id
+            transducer_data['water_binary'] = True
+            transducer_data['logger?'] = True
+            transducer_data['meter_id'] = 'transducer'
+            transducer_data = transducer_data.reset_index(drop=True)
+            
+            # add to all_transducer_data
+            all_transducer_data = pd.concat([all_transducer_data, transducer_data], ignore_index=True)
+    
+    return all_transducer_data
+ 
+
+
 def validate_well_id(well_unique_id, groundwater_data) -> bool:
     """
     Check that all well_id's in gw_rawdata and well_dimension are
@@ -223,7 +281,7 @@ def get_groundwater_level(groundwater_data, well_dimension) -> pd.DataFrame():
 
 def save_groundwater(groundwater_data) -> None:
     """
-    Save a subset of groundwater_data to pre-defined csv (global var)
+    Save a subset of groundwater_data to pre-defined csv
 
     Parameters:
     groundwater_data (dataframe): groundwater well reading; each entry
@@ -235,7 +293,6 @@ def save_groundwater(groundwater_data) -> None:
     groundwater_data = groundwater_data.sort_values(['well_id', 'timestamp'])
     groundwater_data[['well_id','timestamp','ground_to_water_cm']].to_csv(groundwater_fulldata_filename, index=False)
     
-
 
 # --- VALIDATE well_id's and well_dimension.welltop_to_ground ---
 # 
@@ -258,10 +315,21 @@ if (validate_well_id(well_unique_id, groundwater_data) and
 #    soil_moisture, notes (but not the original three measurements).
 
     groundwater_data = get_groundwater_level(groundwater_data, 
-                                                   well_dimension)
+                                                   well_dimension)    
     # Re-order columns
     #groundwater_data.insert(3,'ground_to_water_cm', groundwater_data.pop('ground_to_water_cm'))
     save_groundwater(groundwater_data)
     
 else:
-    print('WARNING: Unable to manipulate or save groundwater data.')
+    print('WARNING: Unable to manipulate or save biweekly groundwater data.')
+    
+# --- ADD transducer data ---
+
+if transducer_binary:
+    transducer_data = get_transducer_data()
+    print(len(transducer_data))
+    print(len(groundwater_data))
+    groundwater_data = pd.concat([groundwater_data, transducer_data], ignore_index=True)
+    print(len(groundwater_data))
+    
+    save_groundwater(groundwater_data)
