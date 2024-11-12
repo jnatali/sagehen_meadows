@@ -280,30 +280,32 @@ If you plan on comparing models, it is best practice to start with a simple mode
 ```{r code chunk 4}
 
 ### --- MARSS MODEL PARAMETERS --- ###
+# NOTE: Simple
+R.2 <- 'zero' 
+U.2 <- 'equal' 
+B.2 <- 'identity' # no interaction among the x's in x
+C.2 <- 'zero' # no inputs
+Q.2 <- 'diagonal and equal' # process errors independent, but different variances
+A.2 <- 'zero' # ALERT: I don't know what this is!
+
 # NOTE: Defaults from MARSS User Guide, p 30-31
-R.1 <- 'diagonal and equal' # observations are iid
-U.1 <- 'unequal' # all different
-B.1 <- 'identity' # no interaction among the x's in x
-C.1 <- 'zero' # no inputs
-Q.1 <- 'diagonal and equal' # process errors independent, but different variances
-A.1 <- 'zero' # ALERT: I don't know what this is!
-
-# NOTE: Julia's params
-R.2 <- "zero" # Was not converging otherwise, but had less data
-U.2 <- "zero" # Assume no overall trend in data
-B.2 <- "identity" #Assume wells do not interact with oneanother, and no density dependence, since we zscored.
-Q.2 <- "diagonal and unequal"
-C.2 <- "unequal" #Let each state respond to covariates in a different way
-c.2  <- discharge_covariate
-A.2 <- "zero" # ALERT: I don't know what this is!
-
-# NOTE: Simpler?
-R.3 <- 'zero' 
-U.3 <- 'equal' 
+R.3 <- 'diagonal and equal' # observations are iid
+U.3 <- 'unequal' # all different
 B.3 <- 'identity' # no interaction among the x's in x
 C.3 <- 'zero' # no inputs
 Q.3 <- 'diagonal and equal' # process errors independent, but different variances
 A.3 <- 'zero' # ALERT: I don't know what this is!
+
+# NOTE: Julia's params, includes Q, but different data (includes 2021)
+R.4 <- "zero" # Was not converging otherwise, but had less data
+U.4 <- "zero" # Assume no overall trend in data
+B.4 <- "identity" #Assume wells do not interact with oneanother, and no density dependence, since we zscored.
+Q.4 <- "diagonal and unequal"
+C.4 <- "unequal" #Let each state respond to covariates in a different way
+c.4  <- discharge_covariate
+A.4 <- "zero" # ALERT: I don't know what this is!
+
+
 
 ```
 Your text here (<100 words).
@@ -329,14 +331,325 @@ dat <- apply(dat, 2, as.numeric)
 
 # FIT THE MODEL
 # # Simplest possible?
-# model.list = list(Z=Z_1)
-# model_1 <- MARSS(dat, model = model.list, control=list(maxit=10000))
+print("-------MODEL 1: Defaults, Z=Z_1-------")
+model.list = list(Z=Z_1)
+model_1 <- MARSS(dat, model = model.list, control=list(maxit=10000))
+
+# Success! abstol and log-log tests passed at 3302 iterations.
+# Alert: conv.test.slope.tol is 0.5.
+# Test with smaller values (<0.1) to ensure convergence.
 # 
-# # Better?
-# model.list = list(Z=Z_1,B=B.1,U=U.1,Q=Q.1,A=A.1,R=R.1,C=C.1)
+# MARSS fit is
+# Estimation method: kem 
+# Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+# Estimation converged in 3302 iterations. 
+# Log-likelihood: -3470.317 
+# AIC: 7266.634   AICc: 7343.56   
+#  
+#                  Estimate
+# R.diag            1.96076
+# U.X.Y1            0.04207
+# U.X.Y2           -0.00315
+# U.X.Y3            0.05586
+# U.X.Y4           -1.92728
+# U.X.Y5           -0.84026
+# U.X.Y6            0.14748
+# U.X.Y7            0.00830
+# U.X.Y8            0.15792
+# U.X.Y9            0.09657
+# U.X.Y10          -0.05308
+# U.X.Y11          -0.23964
+# U.X.Y12          -0.54562
+# U.X.Y13          -0.21989
+# U.X.Y14           0.00676
+# U.X.Y15          -0.00173
+# U.X.Y16          -0.31437
+# U.X.Y17           0.03194
+# U.X.Y18          -0.27219
+# U.X.Y19           0.29413
+# U.X.Y20           0.00000
+# U.X.Y21           0.05175
+# U.X.Y22          -0.03104
+# U.X.Y23          -0.10051
+# U.X.Y24          -0.35887
+# U.X.Y25          -0.32577
+# U.X.Y26          -0.04507
+# U.X.Y27           0.01298
+# U.X.Y28           0.23978
+# U.X.Y29           0.00496
+# U.X.Y30           0.51927
+# U.X.Y31           0.17384
+# U.X.Y32           0.25337
+# U.X.Y33           0.17336
+# U.X.Y34          -0.04138
+# U.X.Y35          -0.82940
+# U.X.Y36          -0.16466
+# U.X.Y37           0.00000
+# U.X.Y38          -0.11249
+# U.X.Y39           1.16001
+# U.X.Y40           0.23827
+# U.X.Y41          -1.13034
+# U.X.Y42           0.45112
+# U.X.Y43          -0.18629
+# U.X.Y44          -0.10223
+# U.X.Y45          -0.59954
+# U.X.Y46           0.74325
+# U.X.Y47          -0.12081
+# U.X.Y48          -0.75374
+# U.X.Y49          -0.10179
+# U.X.Y50          -0.04386
+# U.X.Y51          -0.56854
+# U.X.Y52          -0.33687
+# U.X.Y53          -0.50100
+# U.X.Y54          -0.00759
+# Q.(X.Y1,X.Y1)    86.94716
+# Q.(X.Y2,X.Y2)    25.21965
+# Q.(X.Y3,X.Y3)   301.02366
+# Q.(X.Y4,X.Y4)   245.16802
+# Q.(X.Y5,X.Y5)    93.36644
+# Q.(X.Y6,X.Y6)    30.64643
+# Q.(X.Y7,X.Y7)    50.84181
+# Q.(X.Y8,X.Y8)   158.65844
+# Q.(X.Y9,X.Y9)     5.82105
+# Q.(X.Y10,X.Y10)   4.63733
+# Q.(X.Y11,X.Y11)  15.69365
+# Q.(X.Y12,X.Y12)  39.18316
+# Q.(X.Y13,X.Y13) 380.03393
+# Q.(X.Y14,X.Y14) 286.37812
+# Q.(X.Y15,X.Y15)  50.20315
+# Q.(X.Y16,X.Y16)  15.93468
+# Q.(X.Y17,X.Y17) 490.95175
+# Q.(X.Y18,X.Y18) 368.05368
+# Q.(X.Y19,X.Y19) 118.55219
+# Q.(X.Y20,X.Y20)   0.05000
+# Q.(X.Y21,X.Y21) 176.95663
+# Q.(X.Y22,X.Y22)  18.15829
+# Q.(X.Y23,X.Y23)  52.34209
+# Q.(X.Y24,X.Y24)  22.03178
+# Q.(X.Y25,X.Y25) 832.53191
+# Q.(X.Y26,X.Y26)   0.00000
+# Q.(X.Y27,X.Y27) 173.33669
+# Q.(X.Y28,X.Y28) 218.66694
+# Q.(X.Y29,X.Y29)   0.13778
+# Q.(X.Y30,X.Y30)  26.36437
+# Q.(X.Y31,X.Y31) 618.55580
+# Q.(X.Y32,X.Y32) 222.74086
+# Q.(X.Y33,X.Y33)  23.17549
+# Q.(X.Y34,X.Y34)   2.37081
+# Q.(X.Y35,X.Y35) 456.24473
+# Q.(X.Y36,X.Y36) 363.89392
+# Q.(X.Y37,X.Y37)   0.05000
+# Q.(X.Y38,X.Y38) 236.83543
+# Q.(X.Y39,X.Y39)  72.08102
+# Q.(X.Y40,X.Y40)   3.19235
+# Q.(X.Y41,X.Y41)  41.45524
+# Q.(X.Y42,X.Y42)   1.23576
+# Q.(X.Y43,X.Y43) 210.16766
+# Q.(X.Y44,X.Y44) 758.70330
+# Q.(X.Y45,X.Y45) 107.02059
+# Q.(X.Y46,X.Y46) 222.32555
+# Q.(X.Y47,X.Y47) 662.43831
+# Q.(X.Y48,X.Y48) 213.14080
+# Q.(X.Y49,X.Y49)  20.94124
+# Q.(X.Y50,X.Y50)  35.12372
+# Q.(X.Y51,X.Y51) 661.40101
+# Q.(X.Y52,X.Y52) 177.27592
+# Q.(X.Y53,X.Y53) 242.46735
+# Q.(X.Y54,X.Y54)  74.02659
+# x0.X.Y1           4.63546
+# x0.X.Y2          17.57629
+# x0.X.Y3           8.82690
+# x0.X.Y4         147.31400
+# x0.X.Y5          47.60884
+# x0.X.Y6          15.12312
+# x0.X.Y7          11.50442
+# x0.X.Y8          -0.85829
+# x0.X.Y9          34.72833
+# x0.X.Y10         26.12676
+# x0.X.Y11         51.92071
+# x0.X.Y12         69.35106
+# x0.X.Y13         32.41280
+# x0.X.Y14          3.36730
+# x0.X.Y15         29.75520
+# x0.X.Y16         68.86688
+# x0.X.Y17         -1.20019
+# x0.X.Y18         20.19492
+# x0.X.Y19         43.44664
+# x0.X.Y20          0.00000
+# x0.X.Y21         10.05039
+# x0.X.Y22          5.28302
+# x0.X.Y23         38.76877
+# x0.X.Y24         39.68401
+# x0.X.Y25         36.54955
+# x0.X.Y26          6.72686
+# x0.X.Y27         20.63819
+# x0.X.Y28         -7.74600
+# x0.X.Y29         -6.68255
+# x0.X.Y30        -38.04857
+# x0.X.Y31         18.17649
+# x0.X.Y32         -2.98430
+# x0.X.Y33         43.29953
+# x0.X.Y34          2.89839
+# x0.X.Y35         69.58557
+# x0.X.Y36         33.91563
+# x0.X.Y37          0.00000
+# x0.X.Y38         20.09231
+# x0.X.Y39        -46.52479
+# x0.X.Y40         27.24765
+# x0.X.Y41         31.26125
+# x0.X.Y42         54.79589
+# x0.X.Y43         39.53771
+# x0.X.Y44         27.37343
+# x0.X.Y45         51.44943
+# x0.X.Y46          5.57369
+# x0.X.Y47          4.93871
+# x0.X.Y48         60.02162
+# x0.X.Y49         24.74695
+# x0.X.Y50         41.51106
+# x0.X.Y51         63.90684
+# x0.X.Y52         44.36740
+# x0.X.Y53         55.79819
+# x0.X.Y54         28.85730
+# Initial states (x0) defined at t=0
+# 
+# Standard errors have not been calculated. 
+# Use MARSSparamCIs to compute CIs and bias estimates.
+
+# 
+# Better?
+print("-------MODEL 2-------")
+# model.list = list(Z=Z_1,B=B.2,U=U.2,Q=Q.2,A=A.2,R=R.2,C=C.2)
 # model_2 <- MARSS(dat, model = model.list, control=list(maxit=10000))
 
-# # Is this simpler?
+#----model_2 returns----
+# Success! abstol and log-log tests passed at 2249 iterations.
+# Alert: conv.test.slope.tol is 0.5.
+# Test with smaller values (<0.1) to ensure convergence.
+# 
+# MARSS fit is
+# Estimation method: kem 
+# Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
+# Estimation converged in 2249 iterations. 
+# Log-likelihood: -3891.271 
+# AIC: 8002.543   AICc: 8035.19   
+#  
+#           Estimate
+# R.diag    24.39906
+# U.X.Y1     0.06298
+# U.X.Y2    -0.00369
+# U.X.Y3     0.03815
+# U.X.Y4    -1.94896
+# U.X.Y5    -0.81820
+# U.X.Y6     0.13817
+# U.X.Y7     0.00946
+# U.X.Y8     0.16998
+# U.X.Y9     0.09666
+# U.X.Y10   -0.06007
+# U.X.Y11   -0.24138
+# U.X.Y12   -0.54716
+# U.X.Y13   -0.23405
+# U.X.Y14    0.01238
+# U.X.Y15   -0.00127
+# U.X.Y16   -0.31249
+# U.X.Y17    0.01607
+# U.X.Y18   -0.29016
+# U.X.Y19    0.27336
+# U.X.Y20    0.00000
+# U.X.Y21    0.04841
+# U.X.Y22   -0.02991
+# U.X.Y23   -0.09617
+# U.X.Y24   -0.35345
+# U.X.Y25   -0.31124
+# U.X.Y26   -0.08708
+# U.X.Y27   -0.01191
+# U.X.Y28    0.30208
+# U.X.Y29   -0.00834
+# U.X.Y30    0.52544
+# U.X.Y31    0.16386
+# U.X.Y32    0.25863
+# U.X.Y33    0.17170
+# U.X.Y34   -0.04025
+# U.X.Y35   -0.82831
+# U.X.Y36   -0.15797
+# U.X.Y37    0.00000
+# U.X.Y38   -0.09045
+# U.X.Y39    1.12248
+# U.X.Y40    0.22583
+# U.X.Y41   -1.14002
+# U.X.Y42    0.46939
+# U.X.Y43   -0.18261
+# U.X.Y44   -0.06294
+# U.X.Y45   -0.59080
+# U.X.Y46    0.72946
+# U.X.Y47   -0.11226
+# U.X.Y48   -0.76321
+# U.X.Y49   -0.10159
+# U.X.Y50   -0.04168
+# U.X.Y51   -0.58374
+# U.X.Y52   -0.30331
+# U.X.Y53   -0.46304
+# U.X.Y54   -0.01722
+# Q.diag   151.69671
+# x0.X.Y1    4.43833
+# x0.X.Y2   17.90762
+# x0.X.Y3   10.93146
+# x0.X.Y4  149.86521
+# x0.X.Y5   47.42605
+# x0.X.Y6   16.30443
+# x0.X.Y7   11.81265
+# x0.X.Y8   -1.32623
+# x0.X.Y9   34.44097
+# x0.X.Y10  26.27929
+# x0.X.Y11  52.10602
+# x0.X.Y12  69.60079
+# x0.X.Y13  34.54130
+# x0.X.Y14   3.52284
+# x0.X.Y15  30.37104
+# x0.X.Y16  68.81732
+# x0.X.Y17   0.78821
+# x0.X.Y18  22.57056
+# x0.X.Y19  45.55063
+# x0.X.Y20   0.00000
+# x0.X.Y21  10.60495
+# x0.X.Y22   5.39133
+# x0.X.Y23  38.63047
+# x0.X.Y24  39.66649
+# x0.X.Y25  38.52418
+# x0.X.Y26   7.88281
+# x0.X.Y27  23.05094
+# x0.X.Y28  -9.61850
+# x0.X.Y29  -5.50142
+# x0.X.Y30 -38.01967
+# x0.X.Y31  19.34103
+# x0.X.Y32  -2.53222
+# x0.X.Y33  43.49586
+# x0.X.Y34   2.58090
+# x0.X.Y35  70.57920
+# x0.X.Y36  33.84377
+# x0.X.Y37   0.00000
+# x0.X.Y38  20.07393
+# x0.X.Y39 -43.20672
+# x0.X.Y40  27.43056
+# x0.X.Y41  31.92622
+# x0.X.Y42  53.53708
+# x0.X.Y43  39.47049
+# x0.X.Y44  29.44601
+# x0.X.Y45  52.10740
+# x0.X.Y46   6.79787
+# x0.X.Y47   6.14722
+# x0.X.Y48  61.10032
+# x0.X.Y49  24.88928
+# x0.X.Y50  41.59353
+# x0.X.Y51  66.59414
+# x0.X.Y52  44.30202
+# x0.X.Y53  55.11431
+# x0.X.Y54  30.14903
+# Initial states (x0) defined at t=0
+# 
+# Standard errors have not been calculated. 
+# Use MARSSparamCIs to compute CIs and bias estimates.
+
+print("-------MODEL 3-------")
 # model.list = list(Z=Z_1,B=B.3,U=U.3,Q=Q.3,A=A.3,R=R.3,C=C.3)
 # model_3 <- MARSS(dat, model = model.list, control=list(maxit=10000))
 

@@ -12,7 +12,7 @@ This code is under development and follows a functional programming paradigm.
 It leverages Pandas DataFrames and csv files with well-defined column names.
 
 Major Functions:
-TRANSLATES 
+ 
 
 Requires X data files:
 1. Unique well ids: 'well_unique_id.txt'
@@ -39,9 +39,11 @@ import os
 from datetime import datetime
 import numpy as np
 from pathlib import Path
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 
 # --- USE TRANSDUCER DATA? ---
-transducer_binary = True
+transducer_binary = False
 
 # --- INITIALIZE FILE VARIABLES ---
 
@@ -60,7 +62,7 @@ groundwater_rawdata_filename = groundwater_data_dir + 'groundwater_biweekly_RAW.
 
 # Output filenames
 groundwater_fulldata_filename = groundwater_data_dir + 'groundwater_biweekly_FULL.csv'
-groundwater_plot_filename = groundwater_plot_dir + 'groundwater_biweekly_2018-2021.pdf'
+groundwater_plot_filename = groundwater_plot_dir + 'groundwater_biweekly_2018-2024.pdf'
 
 
 # Fetch input (source data) files
@@ -292,7 +294,83 @@ def save_groundwater(groundwater_data) -> None:
     groundwater_data['ground_to_water_cm'] = groundwater_data['ground_to_water_cm'].astype('float').round(4)
     groundwater_data = groundwater_data.sort_values(['well_id', 'timestamp'])
     groundwater_data[['well_id','timestamp','ground_to_water_cm']].to_csv(groundwater_fulldata_filename, index=False)
+    return
+
+def plot_groundwater_per_well(groundwater_data) -> None:
+    """
+    Plot groundwater level for each well with each year plotted as a different color
+    Save as a single pdf
+
+    Parameters:
+    groundwater_data (dataframe): groundwater well reading; each entry
+                                  uniquely identified by well_id and timestamp
+
+    Returns: None (creates a pdf)
+    """
     
+    # Convert date to extra 'year' and 'isoweek'
+    groundwater_data['timestamp'] = pd.to_datetime(groundwater_data['timestamp'])
+    groundwater_data['year'] = groundwater_data['timestamp'].dt.year
+    groundwater_data['isoweek'] = groundwater_data['timestamp'].dt.isocalendar().week
+    
+    # Define isoweek range
+    isoweek_range = groundwater_data['isoweek'].unique()
+    
+    # Group by well_id, year and isoweek
+    well_ids = groundwater_data['well_id'].unique()
+    years = sorted(groundwater_data['year'].unique())  # Extract unique years in sorted order
+    plot_data = pd.MultiIndex.from_product([well_ids, years, isoweek_range], names=['well_id', 'year', 'isoweek'])
+    plot_data = pd.DataFrame(index=plot_data).reset_index()
+    
+    # Merge plot_data with original data to fill in missing weeks with NaN
+    groundwater_data = plot_data.merge(groundwater_data, on=['well_id', 'year', 'isoweek'], how='left')
+    
+    # Sort values
+    groundwater_data = groundwater_data.sort_values(by=['well_id', 'timestamp'])
+
+    
+    # Define color map for years    
+    # TODO P3: consider coding flexibility if more years?             
+    plot_colors = ['blue', 'green', 'orange', 'yellow']  # Define colors for each year
+    plot_color_map = dict(zip(years, plot_colors)) # Define dict for legend
+    
+    # Setup plots within a single PDF output
+    with PdfPages(groundwater_plot_filename) as pdf:
+        for well_id in well_ids:
+            plt.figure(figsize=(10, 6))
+        
+            # Filter data for the current well_id
+            well_data = groundwater_data[groundwater_data['well_id'] == well_id]
+        
+            # Plot data for each year in a different color
+            for year in years:
+                year_data = well_data[well_data['year'] == year]
+                plt.plot(
+                    year_data['isoweek'], 
+                    year_data['ground_to_water_cm'], 
+                    marker='o', linestyle='-',  # Use dots for data points
+                    markersize=4,
+                    color=plot_color_map[year], 
+                    label=str(year)
+                    )
+        
+            # plot layout
+            plt.gca().invert_yaxis() #Invert the y-axis so gw level is intuitive
+            plt.xticks(isoweek_range)
+            plt.grid(color='0.95', linestyle='-', linewidth=0.5)
+            plt.grid(True, which='both', axis='x')
+
+            # plot labeling
+            plt.title(f"Ground to Water Level for Well ID {well_id}")
+            plt.xlabel("Isoweek")
+            plt.ylabel("Ground to Water Level (cm)")
+            plt.legend(title="Year")
+        
+        
+            # Save the current plot to the PDF
+            pdf.savefig()
+            plt.close()
+    return
 
 # --- VALIDATE well_id's and well_dimension.welltop_to_ground ---
 # 
@@ -333,3 +411,5 @@ if transducer_binary:
     print(len(groundwater_data))
     
     save_groundwater(groundwater_data)
+
+plot_groundwater_per_well(groundwater_data)
