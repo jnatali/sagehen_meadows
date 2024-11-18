@@ -349,7 +349,7 @@ def plot_groundwater_per_well(groundwater_data) -> None:
                     year_data['isoweek'], 
                     year_data['ground_to_water_cm'], 
                     marker='o', linestyle='-',  # Use dots for data points
-                    markersize=4,
+                    markersize=5,
                     color=plot_color_map[year], 
                     label=str(year)
                     )
@@ -403,13 +403,13 @@ else:
     
 # --- ADD transducer data ---
 
+print('# OF UNIQUE WELLS: %s' % len(groundwater_data['well_id'].unique()))
 if transducer_binary:
     transducer_data = get_transducer_data()
-    print(len(transducer_data))
-    print(len(groundwater_data))
+    print('# of TRANSDUCER ENTRIES: %s' % len(transducer_data))
+    print('# of BI-WEEKLY ENTRIES: %s' % len(groundwater_data))
     groundwater_data = pd.concat([groundwater_data, transducer_data], ignore_index=True)
-    print(len(groundwater_data))
-    
+    print('# of BI-WEEKLY ENTRIES AFTER MERGE: %s' % len(groundwater_data))
     save_groundwater(groundwater_data)
 
 plot_groundwater_per_well(groundwater_data)
