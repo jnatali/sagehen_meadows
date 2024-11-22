@@ -58,7 +58,7 @@ class(dat)
 
 # TODO: Consider how covariates correlate with each other??
 
-### --- Load DISCHARGE from USGS ---
+### -- Load DISCHARGE from USGS --
 
 # Load NWIS data retrieval package for
 # USGS and EPA Hydro and Water Quality Data

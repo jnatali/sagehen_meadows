@@ -4,6 +4,10 @@
 # 
 # This script sets up and executes MARSS model(s) for groundwater level data.
 # 
+# This version supports:
+# - a 'timespan' parameter that can be either 'continuous' or 'each year'
+# - parallelized model runs
+# 
 # This code is under development and follows a functional programming paradigm.
 # 
 # Requires  data files:
@@ -17,13 +21,14 @@
 library(MARSS)
 library(lubridate)
 library(dplyr)
-
+library(foreach)
+library(doParallel)
 
 # ------ INITIALIZE GLOBAL VARIABLES ------
 #### Info about the data
 year_range <- c(2018, 2019, 2021, 2024)
 # time limit for filtering groundwater observations
-time_limit <- 12 # only include data prior to this time (i.e. noon)
+time_limit <- 12 # only include gw measurements prior to this time (i.e. noon)
 # completeness limit for % of entries NA values per row
 completeness_limit <- 0.88 # default, can be overridden by model params
 # NOTE: at 0.85 13 wells removed, 0.8800->8 wells, 0.90->5 wells, at 0.95->2
@@ -449,6 +454,39 @@ get_model_parameters <- function(start_number, end_number) {
   return(params)
 }
 
+#### PROCESS MODEL RESULTS
+# by: JNatali
+# on: 20 Nov 2024
+# purpose: reformat the model run summaries prior to saving
+# returns: merged_results dataframe with reformatted structure
+process_model_results <- function(model_result_dataframe,
+                                  model_param_dataframe,
+                                  model_ID, number_states){
+  
+  # ASSIGN model ID and date to the result dataframe
+  new_result_row <- data.frame(
+    ID = model_ID,
+    run_date = model_param_dataframe$run_date[i],
+    states = number_states,
+    completeness = model_param_dataframe$completeness[i],
+    stringsAsFactors = FALSE)
+  
+  # Merge with "glance" summary from model run
+  merged_results <- merge(new_result_row, 
+                          model_result_dataframe, # "glance" dataframe + run_minutes
+                          by = NULL)
+  # reorder columns
+  merged_results <- merged_results[, c("ID", "run_date", "run_minutes", 
+                                       "states", "completeness", 
+                                       "AIC", "AICc",
+                                       setdiff(names(merged_results), 
+                                               c("ID", "run_date", 
+                                                 "run_minutes", "states",
+                                                 "completeness", 
+                                                 "AIC", "AICc")))]
+  return(merged_results)
+}
+
 #### RUN A SINGLE MODEL
 # by: JNatali
 # on: 17 Nov 2024
@@ -459,6 +497,13 @@ run_single_model <- function(response_matrix, param_list, model_id){
 
   # set max iterations
   number_iterations <- 10000
+  
+  ## FINAL response_matrix prep prior to passing model
+  # strip header row and well_id column from response_matrix
+  colnames(response_matrix) <- NULL
+  response_matrix <- response_matrix[,-1]
+  # ensure it's all numeric
+  response_matrix <- apply(response_matrix, 2, as.numeric)
   
   # Track runtime
   start_time <- Sys.time()
@@ -503,67 +548,84 @@ run_single_model <- function(response_matrix, param_list, model_id){
 # returns: model_dataframe
 run_all_models <- function(response_matrix) {
   
+   ### SETUP PARALLELIZATION ###
+   # use all but two cores
+   num_cores <- parallel::detectCores() - 2 
+   # create and register the cluster
+   cluster <- makeCluster(num_cores)
+   registerDoParallel(cluster)
+   
    ### SETUP THE MODEL RUNS ###
-   # setup the results dataframe
-   results_dataframe <- data.frame() 
-  
+
    # get the params for the runs 
    model_param_dataframe <- get_model_parameters() # today's runs in the csv
    param_list_columns <- c("Z", "R", "U", "B", "Q", "C", "A")
    
    # LOOP through each row of the model IDs and params
-   for (i in 1:nrow(model_param_dataframe)) {
+   # use "foreach" to parallelize the model runs
+   results_dataframe <- foreach(i = 1:nrow(model_param_dataframe),
+                                .combine=rbind) %dopar% {
      
      # GET model parameters and name them appropriately
      row <- model_param_dataframe[i, param_list_columns, drop=FALSE]
      param_list <- as.list(row)
      names(param_list) <- param_list_columns
      
+     # GET the model ID for this model run row
+     model_ID = model_param_dataframe$ID[i]
+     
      ### PREP THE RESPONSE MATRIX (groundwater data) ###
-     # GET completeness param and filter matrix
+     ## GET completeness param and filter matrix
      model_response_matrix <- filter_incomplete_wells(response_matrix, 
                                                 model_param_dataframe$completeness[i])
-     
-     # remove header row and well_id column from response_matrix
-     colnames(model_response_matrix) <- NULL
-     model_response_matrix <- model_response_matrix[,-1]
+     # get and report # of states (i.e. groundwater wells)
      number_states <- nrow(model_response_matrix)
-     print(paste0('MODEL RUN ',i,'number of states: ',number_states))
-     # ensure it's all numeric
-     model_response_matrix <- apply(model_response_matrix, 2, as.numeric)
+
+     ## GET timespan param and filter matrix
+     timespan_param <- model_param_dataframe$timespan[i]
      
-     # RUN the model with the appropriate params,
-     #     it'll return the result and runtime as a dataframe
-     model_result_dataframe <- run_single_model(model_response_matrix, 
-                                                param_list, 
-                                                model_param_dataframe$ID[i])
-     
-     # ASSIGN model ID and date to the result dataframe
-     new_result_row <- data.frame(
-       ID = model_param_dataframe$ID[i],
-       run_date = model_param_dataframe$run_date[i],
-       states = number_states,
-       completeness = model_param_dataframe$completeness[i],
-       stringsAsFactors = FALSE)
-     
-     # Merge with "glance" summary from model run
-     merged_results <- merge(new_result_row, 
-                       model_result_dataframe, # "glance" dataframe + run_minutes
-                       by = NULL)
-     # reorder columns
-     merged_results <- merged_results[, c("ID", "run_date", "run_minutes", 
-                                          "states", "completeness", 
-                                          "AIC", "AICc",
-                                          setdiff(names(merged_results), 
-                                                  c("ID", "run_date", 
-                                                    "run_minutes", "states",
-                                                    "completeness", 
-                                                    "AIC", "AICc")))]
-     
-     results_dataframe <- rbind(results_dataframe, merged_results)
+     # If 'each year', run for each year in year_range (global variable)
+     # NOT parallelized (only outer loop is)
+     if (timespan_param == 'each year'){
+       all_year_results <- foreach(year=year_range) %do% {
+         # append year to model id (e.g. 2.2024)
+         model_ID_year = model_ID + (year * 0.0001)
+         
+         # filter model_response_matrix to only this iteration's year
+         year_response_matrix <- model_response_matrix %>%
+           select(matches(paste0("^", year)))
+         
+         # run the model for this year
+         year_result_dataframe <- run_single_model(year_response_matrix, 
+                                                    param_list, 
+                                                    model_ID_year)
+         # process results
+         year_results <- process_model_results(year_result_dataframe,
+                                                    model_param_dataframe,
+                                                    model_ID_year, number_states)
+       }
+       # combine inner loop 'year' results
+       formatted_results <- do.call(rbind, year_results)
+
+     } else {
+        # If 'continuous' (not 'year year'), run model as is, one time only.
+       model_result_dataframe <- run_single_model(model_response_matrix, 
+                                                  param_list, 
+                                                  model_ID)
+       # process results
+       formatted_results <- process_model_results(model_result_dataframe,
+                                                  model_param_dataframe,
+                                                  model_ID, number_states)
+ 
+     }
+     # return results, so they'll be added to results_dataframe
+     formatted_results
    }
    
-   # save all results in csv
+   ### STOP CLUSTER ###
+   stopCluster(cluster)
+   
+   ### SAVE ALL MODEL RUN RESULTS ###
    start_id <- min(results_dataframe$ID)
    end_id <- max(results_dataframe$ID)
    # identify model_id and date in filename
@@ -576,6 +638,7 @@ run_all_models <- function(response_matrix) {
                                   model_stats_filename,
                                   sep='')
    
+   # write to csv
    write.csv(results_dataframe,model_stats_filepath, row.names=FALSE)
    
    # return results

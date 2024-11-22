@@ -173,16 +173,16 @@ same_week_count <- unique_observations %>%
   )
 same_week_count
 
-# filter measurements, only before AM threshold
-am_time_limit <- 10
+# filter measurements, only before threshold
+time_limit <- 12
 groundwater_filter_by_time <- groundwater %>%
-  filter(hour(timestamp) > am_time_limit)
+  filter(hour(timestamp) > time_limit)
 
 # number of observations removed by time limit
 nrow(groundwater_filter_by_time)
 
 groundwater <- groundwater %>%
-  filter(hour(timestamp) <= am_time_limit)
+  filter(hour(timestamp) <= time_limit)
 
 # # number of observations that'll be lost from 
 # # filtering for duplicate entries (same well, same week)
@@ -199,7 +199,7 @@ groundwater <- groundwater %>%
 #   ungroup()
 
 # get full range of year_weeks
-year_range <- c(2018, 2019, 2021)
+year_range <- c(2018, 2019, 2021, 2024)
 isoweek_range <- min(groundwater$isoweek):max(groundwater$isoweek)
 year_week_range <- as.character(unlist(lapply(year_range, function(year) {
   paste0(year, sprintf("%02d", isoweek_range))
