@@ -1,6 +1,7 @@
 ﻿ID,run_date,hypothesis group,hypothesis specifics,timespan,completeness,timesteps,Z,R,U,B,Q,C,A
 ,11/25/24,"Compare the (5) Z parameterization per year. Do each of  the four years support the same best model (via AIC)? If not, why not? (identity, site, pft, hgmz, pftxhgmz)",,,,102,identity,,zero,identity,,zero,zero
 ,11/25/24,Model convergence test with groundwater wells as independent elements and no consideration of covariates,Best Q+R Parameter combo,continuous,0.88,102,identity,,zero,identity,diagonal and equal,zero,zero
+34,11/24/24,2018; all weeks (52),"Simplest params, debugging",each year,0.82,,identity,zero,unequal,identity,diagonal and unequal,zero,zero
 33,11/23/24,all years; all weeks (52),Simplest params,continuous,0.95,102,identity,zero,zero,identity,diagonal and equal,zero,zero
 32,11/21/24,2018; all weeks (52),Simplest params,continuous,0.95,102,identity,zero,zero,identity,diagonal and equal,zero,zero
 31,11/21/24,2019; all weeks (52),Simplest params,continuous,0.95,102,identity,zero,zero,identity,diagonal and equal,zero,zero

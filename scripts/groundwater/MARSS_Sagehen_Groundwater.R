@@ -4,6 +4,9 @@
 # 
 # This script sets up and executes MARSS model(s) for groundwater level data.
 # 
+# This version supports:
+# - a 'timespan' parameter that can be either 'continuous' or 'each year'
+# 
 # This code is under development and follows a functional programming paradigm.
 # 
 # Requires  data files:
@@ -17,20 +20,29 @@
 library(MARSS)
 library(lubridate)
 library(dplyr)
+library(tidyr)
 
 
 # ------ INITIALIZE GLOBAL VARIABLES ------
 #### Info about the data
-year_range <- c(2018, 2019, 2021, 2024)
+# TODO: set as model param
+#year_range <- c(2018, 2019, 2021, 2024)
+year_range <- c(2018)
+
 # time limit for filtering groundwater observations
-time_limit <- 12 # only include data prior to this time (i.e. noon)
+time_limit <- 12 # only include gw well measurements prior to this time (i.e. noon)
 # completeness limit for % of entries NA values per row
 completeness_limit <- 0.88 # default, can be overridden by model params
 # NOTE: at 0.85 13 wells removed, 0.8800->8 wells, 0.90->5 wells, at 0.95->2
 
 # flag (binary) to keep or trim the first two weeks
-# TODO: update code to trim first two weeks of EVERY YR (not just first year)
+# TODO: update code to trim first/last NA columns of the series
+# TODO: set as model param
 trim_first_two_weeks = FALSE
+
+# flag (binary) to fill gaps for entire year (vs. between weeks during summer)
+# TODO: set as model param
+fill_full_year_gaps = TRUE
 
 # today's date for running models from model parameter file listed for today
 today <- Sys.Date()
@@ -39,16 +51,19 @@ formatted_date <- format(today, "%Y_%m%d")
 # Setup directories and filepaths
 home_dir='/Volumes/SANDISK_SSD_G40/GoogleDrive/GitHub/'
 repository_name = 'sagehen_meadows'
-groundwater_data_dir = 'data/field_observations/groundwater/biweekly_manual/'
 repository_dir = paste(home_dir, repository_name, '/', sep='')
+
+groundwater_matrix_filename = 'groundwater_weekly_matrix.csv'
+groundwater_data_dir = 'data/field_observations/groundwater/biweekly_manual/'
+marss_script_dir = 'scripts/groundwater/MARSS/'
+marss_results_dir = paste(home_dir, repository_name, '/results/MARSS/', sep='')
 
 groundwater_rawdata_filepath = paste(repository_dir, groundwater_data_dir,
                                      'groundwater_biweekly_FULL.csv',
                                      sep='')
 groundwater_weekly_matrix_filepath = paste(repository_dir, groundwater_data_dir,
-                                           'groundwater_weekly_matrix.csv',
+                                           groundwater_matrix_filename,
                                            sep='')
-marss_script_dir = 'scripts/groundwater/MARSS/'
 model_parameter_filepath = paste(repository_dir, marss_script_dir,
                                  'MARSS_groundwater_parameters.csv',
                                  sep='')
@@ -89,7 +104,14 @@ prepare_groundwater_data <- function(){
   groundwater <- groundwater %>%
     filter(hour(timestamp) <= time_limit) # time_limit defined in global vars
   
-  isoweek_range <- min(groundwater$isoweek):max(groundwater$isoweek)
+  # get ranges of isoweeks (min to max) depending on flag (global variable)
+  if (fill_full_year_gaps == FALSE) {
+    isoweek_range <- min(groundwater$isoweek):max(groundwater$isoweek)
+  } else {
+    isoweek_range <- 1:52
+  }
+  
+  # setup column names, e.g. 202401 where the last two digits are the isoweek
   year_week_range <- as.character(unlist(lapply(year_range, function(year) {
     paste0(year, sprintf("%02d", isoweek_range))
   })))
@@ -184,12 +206,16 @@ load_response_data <- function(weekly_matrix) {
   
   # if no params pass, load response data: weekly groundwater measurements
   if (missing(weekly_matrix)) { 
-      weekly_matrix <- as.matrix(read.csv(groundwater_weekly_matrix_filepath),
-                                  header=TRUE)
-  } else {
-    weekly_matrix <- as.matrix(weekly_matrix)
-  }
-
+      weekly_matrix <- read.csv(groundwater_weekly_matrix_filepath,
+                                  header=TRUE, check.names=FALSE)
+      }
+  
+  # Remove any "X" prefix, if it's present
+  colnames(weekly_matrix) <- gsub("^X","",colnames(weekly_matrix))
+  
+  # Convert to a matrix
+  weekly_matrix <- as.matrix(weekly_matrix)
+  
   # Check matrix dimensions
   dim(weekly_matrix)
   
@@ -446,7 +472,42 @@ get_model_parameters <- function(start_number, end_number) {
       filter(run_date == filter_date)
   }
   
+  if (nrow(params) < 1) print("ALERT! No parameters")
+  
   return(params)
+}
+
+#### PROCESS MODEL RESULTS
+# by: JNatali
+# on: 20 Nov 2024
+# purpose: reformat the model run summaries prior to saving
+# returns: merged_results dataframe with reformatted structure
+process_model_results <- function(model_result_dataframe,
+                                  model_param_dataframe,
+                                  model_ID, number_states){
+  
+  # ASSIGN model ID and date to the result dataframe
+  new_result_row <- data.frame(
+    ID = model_ID,
+    run_date = model_param_dataframe$run_date,
+    states = number_states,
+    completeness = model_param_dataframe$completeness,
+    stringsAsFactors = FALSE)
+  
+  # Merge with "glance" summary from model run
+  merged_results <- merge(new_result_row, 
+                          model_result_dataframe, # "glance" dataframe + run_minutes
+                          by = NULL)
+  # reorder columns
+  merged_results <- merged_results[, c("ID", "run_date", "run_minutes", 
+                                       "states", "completeness", 
+                                       "AIC", "AICc",
+                                       setdiff(names(merged_results), 
+                                               c("ID", "run_date", 
+                                                 "run_minutes", "states",
+                                                 "completeness", 
+                                                 "AIC", "AICc")))]
+  return(merged_results)
 }
 
 #### RUN A SINGLE MODEL
@@ -460,36 +521,53 @@ run_single_model <- function(response_matrix, param_list, model_id){
   # set max iterations
   number_iterations <- 10000
   
+  # map well_id to row number
+  well_index_dataframe <- as.data.frame(response_matrix) %>%
+    mutate(row_index = row_number()) %>% #add row_index column
+    select(well_id, row_index) %>% # select only well_id and row_index
+    rename(term = well_id, estimate = row_index) #rename to match summary (below)
+  
+  ## FINAL response_matrix prep prior to passing model
+  # strip header row and well_id column from response_matrix
+  colnames(response_matrix) <- NULL
+  response_matrix <- response_matrix[,-1]
+  # ensure it's all numeric
+  response_matrix <- apply(response_matrix, 2, as.numeric)
+  
   # Track runtime
   start_time <- Sys.time()
   
   # Fit the model
-  model <- MARSS(response_matrix, model = param_list, control=list(maxit=number_iterations))
+  model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations))
   
   # Track runtime
   end_time <- Sys.time()
   execution_minutes <- as.numeric(difftime(end_time, start_time, units = "mins"))
   
-  # Save model summary as a csv 
+  # get model summary (for this model output csv)
   model_summary <- tidy(model)
-  # identify model_id and date in filename
+  
+  # append well_id info to summary
+  model_summary <- bind_rows(model_summary, well_index_dataframe)
+  
+  # generate model results stats (for all model run summary csv)
+  model_stats <- glance(model)
+  
+  ## SAVE this model_summary for this model run as csv
   model_summary_filename = paste(formatted_date,"_",model_id,
                                  "_summary.csv",sep='')
+  model_summary_filepath = paste(marss_results_dir, 
+                                 model_summary_filename,
+                                 sep='')
+  write.csv(model_summary,model_summary_filepath, row.names=FALSE)
+  
+  # Summarize summary and merge with model_stats for "all model run" report 
   
   # WARNING: will only work if Q is 'diagonal' in the param file
   if (any(model_summary$term == "Q.diag")) {
     Q_diag = model_summary$estimate[model_summary$term == "Q.diag"]
   } else Q_diag = "N/A"
   
-  # leverage directory names set at top of file
-  model_summary_filepath = paste(repository_dir, marss_script_dir,
-                                   model_summary_filename,
-                                   sep='')
-  
-  write.csv(model_summary,model_summary_filepath, row.names=FALSE)
-  
-  # generate model results stats
-  model_stats <- glance(model)
   # return for analysis of full set of model runs
   return(cbind(model_stats, run_minutes = execution_minutes, Q.diag = Q_diag))
   
@@ -519,48 +597,57 @@ run_all_models <- function(response_matrix) {
      param_list <- as.list(row)
      names(param_list) <- param_list_columns
      
+     # GET the model ID for this model run row
+     model_ID = model_param_dataframe$ID[i]
+     
      ### PREP THE RESPONSE MATRIX (groundwater data) ###
-     # GET completeness param and filter matrix
+     ## GET completeness param and filter matrix
      model_response_matrix <- filter_incomplete_wells(response_matrix, 
                                                 model_param_dataframe$completeness[i])
-     
-     # remove header row and well_id column from response_matrix
-     colnames(model_response_matrix) <- NULL
-     model_response_matrix <- model_response_matrix[,-1]
+     # get and report # of states (i.e. groundwater wells)
      number_states <- nrow(model_response_matrix)
-     print(paste0('MODEL RUN ',i,'number of states: ',number_states))
-     # ensure it's all numeric
-     model_response_matrix <- apply(model_response_matrix, 2, as.numeric)
+     print(paste('MODEL RUN ',i,'number of states: ',number_states, sep=' '))
      
-     # RUN the model with the appropriate params,
-     #     it'll return the result and runtime as a dataframe
-     model_result_dataframe <- run_single_model(model_response_matrix, 
-                                                param_list, 
-                                                model_param_dataframe$ID[i])
+     ## GET timespan param and filter matrix
+     timespan_param <- model_param_dataframe$timespan[i]
      
-     # ASSIGN model ID and date to the result dataframe
-     new_result_row <- data.frame(
-       ID = model_param_dataframe$ID[i],
-       run_date = model_param_dataframe$run_date[i],
-       states = number_states,
-       completeness = model_param_dataframe$completeness[i],
-       stringsAsFactors = FALSE)
-     
-     # Merge with "glance" summary from model run
-     merged_results <- merge(new_result_row, 
-                       model_result_dataframe, # "glance" dataframe + run_minutes
-                       by = NULL)
-     # reorder columns
-     merged_results <- merged_results[, c("ID", "run_date", "run_minutes", 
-                                          "states", "completeness", 
-                                          "AIC", "AICc",
-                                          setdiff(names(merged_results), 
-                                                  c("ID", "run_date", 
-                                                    "run_minutes", "states",
-                                                    "completeness", 
-                                                    "AIC", "AICc")))]
-     
-     results_dataframe <- rbind(results_dataframe, merged_results)
+     # If 'each year', run for each year in year_range (global variable)
+     if (timespan_param == 'each year'){
+       for (year in year_range) {
+         # append year to model id (e.g. 2.2024)
+         model_ID_year = model_ID + (year * 0.0001)
+         
+         # filter model_response_matrix to only this iteration's year
+         # the select fn keeps well_id and all columns with the year
+         year_response_matrix <- as.data.frame(model_response_matrix) %>%
+           select(well_id, matches(paste0("^", year)))
+         
+         year_response_matrix <- as.matrix(year_response_matrix)
+         
+         # run the model for this year
+         year_result_dataframe <- run_single_model(year_response_matrix, 
+                                                    param_list, 
+                                                    model_ID_year)
+         # process results
+         year_results <- process_model_results(year_result_dataframe,
+                                                    model_param_dataframe[i, , drop=FALSE],
+                                                    model_ID_year, number_states)
+         
+         # add to results_dataframe
+         results_dataframe <- rbind(results_dataframe, year_results) 
+       }
+     } else {
+        # If 'continuous' (not year-by-year), run model as is, one time only.
+       model_result_dataframe <- run_single_model(model_response_matrix, 
+                                                  param_list, 
+                                                  model_ID)
+       # process results
+       formatted_results <- process_model_results(model_result_dataframe,
+                                                  model_param_dataframe[i, , drop=FALSE],
+                                                  model_ID, number_states)
+       # add to results_dataframe
+       results_dataframe <- rbind(results_dataframe, formatted_results) 
+     }
    }
    
    # save all results in csv
@@ -572,10 +659,10 @@ run_all_models <- function(response_matrix) {
                                 "_stats.csv",sep='')
    
    # leverage directory names set at top of file
-   model_stats_filepath = paste(repository_dir, marss_script_dir,
-                                  model_stats_filename,
-                                  sep='')
-   
+   # model_stats_filepath = paste(repository_dir, marss_script_dir,
+   #                                model_stats_filename,
+   #                                sep='')
+   model_stats_filepath = paste(marss_results_dir, model_stats_filename,sep='')
    write.csv(results_dataframe,model_stats_filepath, row.names=FALSE)
    
    # return results
@@ -589,8 +676,13 @@ run_all_models <- function(response_matrix) {
 # returns:
 # NOT YET DEFINED
 
-# ------ MAIN PROCEDURAL SCRIPT ------
+                                                                                                                                                                                                                                                                                                                                                                          # ------ MAIN PROCEDURAL SCRIPT ------
 groundwater_data <- prepare_groundwater_data()
 response_matrix <- load_response_data(groundwater_data)
+
+#if no response data, loads from groundwater_weekly_matrix_filepath
+#response_matrix <- load_response_data()
+
 Z <- get_z_matrices(response_matrix)
 results_dataframe <- run_all_models(response_matrix)
+print("MODEL RUNS COMPLETE!!")

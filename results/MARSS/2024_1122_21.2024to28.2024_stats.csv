@@ -1,0 +1,9 @@
+ID,model description,run_date,run_minutes,states,completeness,AIC,AICc,% increase,% change,coef.det,sigma,df,logLik,convergence,errors,R,Q.diag,Q.offdiag,U.1,U,R,Q,Notes
+25.2024,2024 biweekly forced spacing,11/22/24,54.75,37,0.82,3307.817059,3338.862152,18.92,2.55,0.812233966,244.4350454,76,-1577.908529,10,1,"(0.001,1752)",59.4,38,0,zero,diagonal and unequal,equalvarcov,"R>1000 in Rows 41, 49"
+27.2024,2024 biweekly forced spacing,11/22/24,0.92,37,0.82,3371.134436,3443.83619,16.37,1.19,0.914104248,126.3275839,111,-1574.567218,0,0,N/A,"(0.23,438)",,"(0.06,7.5)",unequal,zero,diagonal and unequal,
+26.2024,2024 biweekly forced spacing,11/22/24,58.44,37,0.82,3419.982541,3492.684296,15.19,5.16,0.902739576,130.8659968,111,-1598.991271,10,1,"(0.0006,1429)","(0,1499)",,,zero,diagonal and unequal,diagonal and unequal,
+21.2024,2024 biweekly forced spacing,11/22/24,0.54,52,0.82,3647.88459,3705.057365,10.03,0.25,0.865521454,173.1354333,104,-1719.942295,0,0,,"(0.4, 1548.78)",,,zero,zero,diagonal and unequal,
+28.2024,2024 biweekly forced spacing,11/22/24,0.9,37,0.82,3685.11925,3715.27798,9.78,9.21,0.914104248,126.3275839,75,-1767.559625,0,0,55.45711538,55.4,,"(0.06,7.5)",unequal,zero,diagonal and equal,"U>3 in rows 27, 36, 24"
+23.2024,2024 biweekly forced spacing,11/22/24,0.23,52,0.82,4080.628056,4094.378056,0.58,0.51,0.864674388,176.4468552,54,-1986.314028,0,0,,188,,2.89,equal,zero,diagonal and equal,
+24.2024,2024 biweekly forced spacing,11/22/24,0.22,52,0.82,4102.25724,4115.47664,0.06,0.06,0.865544115,173.1033129,53,-1998.12862,0,0,,197.4,,,zero,zero,diagonal and equal,
+22.2024,2024 biweekly forced spacing,11/22/24,113.46,52,0.82,4104.316644,4118.066644,,,0.86550066,173.1609277,54,-1998.158322,10,1,0.031,197.4,,,zero,diagonal and equal,diagonal and equal,
