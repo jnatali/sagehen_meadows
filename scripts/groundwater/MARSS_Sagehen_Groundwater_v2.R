@@ -24,8 +24,8 @@ library(dplyr)
 
 # ------ INITIALIZE GLOBAL VARIABLES ------
 #### Info about the data
-year_range <- c(2018, 2019, 2021, 2024)
-#year_range <- c(2019, 2021, 2024)
+#year_range <- c(2018, 2019, 2021, 2024)
+year_range <- c(2024)
 
 # time limit for filtering groundwater observations
 time_limit <- 12 # only include data prior to this time (i.e. noon)
@@ -51,8 +51,11 @@ groundwater_rawdata_filepath = paste(repository_dir, groundwater_data_dir,
                                      'groundwater_biweekly_FULL.csv',
                                      sep='')
 groundwater_weekly_matrix_filepath = paste(repository_dir, groundwater_data_dir,
-                                           'groundwater_weekly_matrix.csv',
+                                           'groundwater_biweekly_matrix_2024.csv',
                                            sep='')
+# groundwater_weekly_matrix_filepath = paste(repository_dir, groundwater_data_dir,
+#                                            'groundwater_weekly_matrix.csv',
+#                                            sep='')
 marss_script_dir = 'scripts/groundwater/MARSS/'
 model_parameter_filepath = paste(repository_dir, marss_script_dir,
                                  'MARSS_groundwater_parameters.csv',
@@ -189,12 +192,16 @@ load_response_data <- function(weekly_matrix) {
   
   # if no params pass, load response data: weekly groundwater measurements
   if (missing(weekly_matrix)) { 
-      weekly_matrix <- as.matrix(read.csv(groundwater_weekly_matrix_filepath),
-                                  header=TRUE)
-  } else {
-    weekly_matrix <- as.matrix(weekly_matrix)
-  }
-
+      weekly_matrix <- read.csv(groundwater_weekly_matrix_filepath,
+                                  header=TRUE, check.names=FALSE)
+      }
+  
+  # Remove any "X" prefix, if it's present
+  colnames(weekly_matrix) <- gsub("^X","",colnames(weekly_matrix))
+  
+  # Convert to a matrix
+  weekly_matrix <- as.matrix(weekly_matrix)
+  
   # Check matrix dimensions
   dim(weekly_matrix)
   
@@ -509,7 +516,7 @@ run_single_model <- function(response_matrix, param_list, model_id){
   start_time <- Sys.time()
   
   # Fit the model
-  model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations, trace=1, safe=TRUE))
+  model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations))
   
   # Track runtime
   end_time <- Sys.time()
@@ -639,7 +646,9 @@ run_all_models <- function(response_matrix) {
 # NOT YET DEFINED
 
 # ------ MAIN PROCEDURAL SCRIPT ------
-groundwater_data <- prepare_groundwater_data()
-response_matrix <- load_response_data(groundwater_data)
+#groundwater_data <- prepare_groundwater_data()
+#response_matrix <- load_response_data(groundwater_data)
+response_matrix <- load_response_data()
 Z <- get_z_matrices(response_matrix)
 results_dataframe <- run_all_models(response_matrix)
+print("MODEL RUNS COMPLETE!!")
