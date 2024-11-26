@@ -26,8 +26,9 @@ library(tidyr)
 # ------ INITIALIZE GLOBAL VARIABLES ------
 #### Info about the data
 # TODO: set as model param
-#year_range <- c(2018, 2019, 2021, 2024)
-year_range <- c(2018)
+#year_range <- c(2019, 2021, 2024)
+year_range <- c(2018, 2019, 2021, 2024)
+#year_range <- c(2018)
 
 # time limit for filtering groundwater observations
 time_limit <- 12 # only include gw well measurements prior to this time (i.e. noon)
@@ -166,6 +167,60 @@ prepare_groundwater_data <- function(){
   write.csv(groundwater_weekly_matrix, groundwater_weekly_matrix_filepath, 
             row.names = FALSE)
   return(groundwater_weekly_matrix)
+}
+
+#### STACK GROUNDWATER DATA
+# by: JNatali
+# on: 24 Nov 2024
+# purpose: transforms the evenly-spaced groundwater_weekly_matrix 
+#          so it's stacked by year 
+#          with rows uniquely identified by well_id + year
+#          and columns are ordered isoweeks.
+# returns: groundwater_weekly_stacked_matrix, evenly-spaced weekly matrix of 
+#          groundwater measurements by well_id + year
+#          
+stack_groundwater_data <- function(groundwater_data){
+  
+  # RESTRUCTURE the groundwater dataframe
+  # restructure df to long format and extract year, week from YYYYww columns
+  groundwater_stack <- as.data.frame(groundwater_data) %>%
+    pivot_longer(cols = -well_id,
+                 names_to = 'yearweek',
+                 values_to = 'value') %>%
+    mutate(
+      year = substr(yearweek, 1, 4),
+      week = substr(yearweek, 5, 6)
+    ) %>%
+    select(-yearweek)
+  
+  # rename identifying column
+  groundwater_stack <- groundwater_stack %>%
+    mutate(
+      well_id = paste(well_id, year, sep='-')
+    ) %>%
+    select(-year)
+
+  # restructure to wide format with one row per well_id + year
+  groundwater_stack_matrix <- groundwater_stack %>%
+    pivot_wider(
+      names_from = week,
+      values_from = value
+    )
+  
+  ## REMOVE the first sequential NA columns
+  # identify all NA columns, exclude 'well_id' first column
+  na_cols <- sapply(groundwater_stack_matrix[, -1], function(col) all(is.na(col)))
+  # get index of first and last non-NA column
+  first_non_na <- which(!na_cols)[[1]]
+  # remove initial sequential columns, if any
+  if (!is.na(first_non_na)) {
+    groundwater_stack_matrix <- groundwater_stack_matrix[, c(1, (first_non_na+1):ncol(groundwater_stack_matrix))]
+  } 
+  na_cols <- sapply(groundwater_stack_matrix[, -1], function(col) all(is.na(col)))
+  last_non_na <- max(which(!na_cols))
+  # only keep columns to last_non_na  
+  groundwater_stack_matrix <- groundwater_stack_matrix[, 1:(last_non_na-1)]
+  return(groundwater_stack_matrix)
 }
 
 #### FILTER INCOMPLETE WELLS
@@ -363,7 +418,7 @@ load_covariate_data <- function() {
 # TODO: Use dynamic factor analysis to improve categorization of HGMZ / PFT
 #       address uncertainty about categorization; see MARSS User Guide Ch 10.
 
-get_z_matrices <- function(gw_data) {
+get_z_matrices_no_years <- function(gw_data) {
   
   ## MEADOW SITES ##
   # 3 meadow sites (Kiln, East, Lo); each is its own state, an independent dimension
@@ -382,6 +437,8 @@ get_z_matrices <- function(gw_data) {
     } else print("WARNING: Well Meadow Site is NOT E, K, or L")
     Z_site <- rbind(Z_site, row)
   }
+  rownames(Z_site) <- NULL
+  colnames(Z_site) <- NULL
   dim(Z_site)
   
   ## PLANT FUNCTIONAL TYPES ##
@@ -403,6 +460,8 @@ get_z_matrices <- function(gw_data) {
     } else print("WARNING: Well PFT is NOT E, W, H or F")
     Z_pft <- rbind(Z_pft, row)
   }
+  rownames(Z_pft) <- NULL
+  colnames(Z_pft) <- NULL
   dim(Z_pft)
   
   ## HYDROGEOMORPHIC ZONES ##
@@ -422,6 +481,8 @@ get_z_matrices <- function(gw_data) {
     } else print("WARNING: Well HGMZ is NOT R, T, or F")
     Z_hgmz <- rbind(Z_hgmz, row)
   }
+  rownames(Z_hgmz) <- NULL
+  colnames(Z_hgmz) <- NULL
   dim(Z_hgmz)
   
   ## STRATIFIED COMBO ##
@@ -444,6 +505,98 @@ get_z_matrices <- function(gw_data) {
   Z_matrix_list <- list(Z_site, Z_pft, Z_hgmz, Z_pftXhgmz)
   return(Z_matrix_list)
   
+}
+
+get_z_matrices <- function(gw_data) {
+
+  # --- loop thru well_ids to determine sub-categories
+  gw_names <- as.data.frame(gw_data) %>%
+    mutate (
+      meadows = substring(well_id, 1, 1),
+      pft = substring(well_id, 2, 2),
+      hgmz = substring(well_id, 3, 3),
+      year = sub(".*-(.*)-(\\d{4})$", "\\2", well_id) # 4 chars after 2nd dash
+    )
+  
+  meadows <- unique(gw_names$meadow)
+  pfts <- unique(gw_names$pft)
+  hgmzs <- unique(gw_names$hgmz)
+  years <- unique(gw_names$year) 
+  
+  ## MEADOW SITES ##
+  # 3 meadow sites (Kiln, East, Lo); each is its own state
+
+  # create a grid dataframe of all possible combos of meadow+year
+  site_combos <- expand.grid(meadow = meadows, year = years)
+    
+  column_names <- paste(site_combos$meadow, site_combos$year, sep = "+")
+  Z_site <- matrix(0, nrow = nrow(gw_names), ncol = length(column_names))
+  colnames(Z_site) <- column_names
+  
+  for (i in 1:nrow(gw_names)) {
+    meadow_year_combo <- paste(gw_names$meadow[i], gw_names$year[i], sep = "+")
+    Z_site[i, meadow_year_combo] <- 1
+  }
+  colnames(Z_site) <- NULL
+  
+  ## PLANT FUNCTIONAL TYPES ##
+  # PFT x 4 (sedge, willow, mixed herbaceous, pine)
+  
+  # create a grid dataframe of all possible combos of pft+year
+  site_combos <- expand.grid(pft = pfts, year = years)
+  
+  column_names <- paste(site_combos$pft, site_combos$year, sep = "+")
+  Z_pft <- matrix(0, nrow = nrow(gw_names), ncol = length(column_names))
+  colnames(Z_pft) <- column_names
+  
+  for (i in 1:nrow(gw_names)) {
+    pft_year_combo <- paste(gw_names$pft[i], gw_names$year[i], sep = "+")
+    Z_pft[i, pft_year_combo] <- 1
+  }
+  colnames(Z_pft) <- NULL
+  
+  
+  ## HYDROGEOMORPHIC ZONES ##
+  # HGMZ x 3 (riparian, terrace, fan)
+  
+  # create a grid dataframe of all possible combos of hgmz+year
+  site_combos <- expand.grid(hgmz = hgmzs, year = years)
+  
+  column_names <- paste(site_combos$hgmz, site_combos$year, sep = "+")
+  Z_hgmz <- matrix(0, nrow = nrow(gw_names), ncol = length(column_names))
+  colnames(Z_hgmz) <- column_names
+  
+  for (i in 1:nrow(gw_names)) {
+    hgmz_year_combo <- paste(gw_names$hgmz[i], gw_names$year[i], sep = "+")
+    Z_hgmz[i, hgmz_year_combo] <- 1
+  }
+  colnames(Z_hgmz) <- NULL
+  
+  
+  ## STRATIFIED COMBO ##
+  # PFT x HGMZ (3x4 = 12 combos)
+  
+  site_combos <- expand.grid(pft = pfts, hgmz = hgmzs, year = years)
+  column_names <- paste(site_combos$pft, site_combos$hgmz, site_combos$year, sep = "+")
+  Z_pftXhgmz <- matrix(0, nrow = nrow(gw_names), ncol = length(column_names))
+  colnames(Z_pftXhgmz) <- column_names
+  
+  # Fill the matrix with 1s based on pft, hgmz, and year from gw_names
+  for (i in 1:nrow(gw_names)) {
+    # Get the pft, hgmz, and year for the current row
+    pft_year_hgmz_combination <- paste(gw_names$pft[i], 
+                                       gw_names$hgmz[i], 
+                                       gw_names$year[i], 
+                                       sep = "+")
+    
+    # Set the corresponding cell in the matrix to 1
+    Z_pftXhgmz[i, pft_year_hgmz_combination] <- 1
+  }
+  colnames(Z_pftXhgmz) <- NULL
+  
+  ## CREATE LIST OF MATRICES AND RETURN
+  Z_matrix_list <- list(Z_site, Z_pft, Z_hgmz, Z_pftXhgmz)
+  return(Z_matrix_list)
 }
 
 #### SPECIFY MARSS PARAMS
@@ -519,7 +672,7 @@ process_model_results <- function(model_result_dataframe,
 run_single_model <- function(response_matrix, param_list, model_id){
 
   # set max iterations
-  number_iterations <- 10000
+  number_iterations <- 20000
   
   # map well_id to row number
   well_index_dataframe <- as.data.frame(response_matrix) %>%
@@ -539,6 +692,7 @@ run_single_model <- function(response_matrix, param_list, model_id){
   
   # Fit the model
   model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations))
+  #model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations), fit=FALSE)
   
   # Track runtime
   end_time <- Sys.time()
@@ -561,15 +715,27 @@ run_single_model <- function(response_matrix, param_list, model_id){
                                  sep='')
   write.csv(model_summary,model_summary_filepath, row.names=FALSE)
   
-  # Summarize summary and merge with model_stats for "all model run" report 
+  ## SUMMARIZE AND MERGE summary with stats for "all model run" report 
   
-  # WARNING: will only work if Q is 'diagonal' in the param file
+  # Gather summary terms
   if (any(model_summary$term == "Q.diag")) {
-    Q_diag = model_summary$estimate[model_summary$term == "Q.diag"]
-  } else Q_diag = "N/A"
+    model_stats$Q.diag = model_summary$estimate[model_summary$term == "Q.diag"]
+  } else model_stats$Q.diag = "N/A"
+  
+  if (any(model_summary$term == "Q.offdiag")) {
+    model_stats$Q.offdiag = model_summary$estimate[model_summary$term == "Q.offdiag"]
+  } else model_stats$Q.offdiag = "N/A"
+  
+  if (any(model_summary$term == "R.diag")) {
+    model_stats$R.diag = model_summary$estimate[model_summary$term == "R.diag"]
+  } else model_stats$R.diag = "N/A"
+  
+  if (any(model_summary$term == "U.1")) {
+    model_stats$U.1 = model_summary$estimate[model_summary$term == "U.1"]
+  } else model_stats$U.1 = "N/A"
   
   # return for analysis of full set of model runs
-  return(cbind(model_stats, run_minutes = execution_minutes, Q.diag = Q_diag))
+  return(cbind(model_stats, run_minutes = execution_minutes))
   
 }
 
@@ -585,12 +751,20 @@ run_all_models <- function(response_matrix) {
    # setup the results dataframe
    results_dataframe <- data.frame() 
   
-   # get the params for the runs 
+   # get the params for the MARSS model 
    model_param_dataframe <- get_model_parameters() # today's runs in the csv
    param_list_columns <- c("Z", "R", "U", "B", "Q", "C", "A")
    
    # LOOP through each row of the model IDs and params
    for (i in 1:nrow(model_param_dataframe)) {
+     
+     ## GET timespan param
+     timespan_param <- model_param_dataframe$timespan[i]
+     
+     # check if need to restructure response data
+     if (timespan_param == 'stacked') {
+       response_matrix <- stack_groundwater_data(response_matrix)
+     }
      
      # GET model parameters and name them appropriately
      row <- model_param_dataframe[i, param_list_columns, drop=FALSE]
@@ -604,16 +778,18 @@ run_all_models <- function(response_matrix) {
      ## GET completeness param and filter matrix
      model_response_matrix <- filter_incomplete_wells(response_matrix, 
                                                 model_param_dataframe$completeness[i])
+     
      # get and report # of states (i.e. groundwater wells)
      number_states <- nrow(model_response_matrix)
      print(paste('MODEL RUN ',i,'number of states: ',number_states, sep=' '))
      
-     ## GET timespan param and filter matrix
-     timespan_param <- model_param_dataframe$timespan[i]
-     
      # If 'each year', run for each year in year_range (global variable)
      if (timespan_param == 'each year'){
        for (year in year_range) {
+         
+         # print info for watching progress
+         print(paste('PROCESSING year',year))
+         
          # append year to model id (e.g. 2.2024)
          model_ID_year = model_ID + (year * 0.0001)
          
@@ -624,20 +800,33 @@ run_all_models <- function(response_matrix) {
          
          year_response_matrix <- as.matrix(year_response_matrix)
          
-         # run the model for this year
-         year_result_dataframe <- run_single_model(year_response_matrix, 
-                                                    param_list, 
-                                                    model_ID_year)
-         # process results
-         year_results <- process_model_results(year_result_dataframe,
+         ## SETUP a trycatch for errors so the model runs keep iterating
+         year_result_dataframe <- tryCatch({
+           
+           # run the model for this year
+          run_single_model(year_response_matrix, 
+                                                     param_list, 
+                                                     model_ID_year)
+         }, error = function(e) {
+           
+           # print message and return NULL
+           message(paste("ERROR at iteration", i, "in year", year, e$message))
+           return(NULL)
+         })
+         
+         if (!is.null(year_result_dataframe)) {
+         
+          # process results
+          year_results <- process_model_results(year_result_dataframe,
                                                     model_param_dataframe[i, , drop=FALSE],
                                                     model_ID_year, number_states)
          
-         # add to results_dataframe
-         results_dataframe <- rbind(results_dataframe, year_results) 
+          # add to results_dataframe
+          results_dataframe <- rbind(results_dataframe, year_results)
+         }
        }
-     } else {
-        # If 'continuous' (not year-by-year), run model as is, one time only.
+     } else if (timespan_param == 'continuous') {
+       # If 'continuous' (not year-by-year), run model as is, one time only.
        model_result_dataframe <- run_single_model(model_response_matrix, 
                                                   param_list, 
                                                   model_ID)
@@ -647,9 +836,50 @@ run_all_models <- function(response_matrix) {
                                                   model_ID, number_states)
        # add to results_dataframe
        results_dataframe <- rbind(results_dataframe, formatted_results) 
+     } else {
+       
+       # If 'stacked' (each well represented per year), check if Z=explore
+        if (model_param_dataframe$Z[i] == 'explore') {
+          
+          # iterator for printing info while processing
+          i=0
+          #z_list <- get_z_matrices_no_years(model_response_matrix)
+          z_list <- get_z_matrices(model_response_matrix)
+          
+          for (z_matrix in z_list){
+           
+            i=i+1
+            # print info for watching progress
+            print(paste('PROCESSING Z round',i))
+           
+            # replace 'explore' in param_list with this z
+            param_list$Z <- z_matrix
+           
+            # run model with z
+            model_result_dataframe <- run_single_model(model_response_matrix, 
+                                                      param_list, 
+                                                      model_ID)
+            # process results
+            formatted_results <- process_model_results(model_result_dataframe,
+                                                      model_param_dataframe[i, , drop=FALSE],
+                                                      model_ID, number_states)
+            # add to results_dataframe
+            results_dataframe <- rbind(results_dataframe, formatted_results) 
+          }
+        } else {
+          # run model with z
+          model_result_dataframe <- run_single_model(model_response_matrix, 
+                                                     param_list, 
+                                                     model_ID)
+          # process results
+          formatted_results <- process_model_results(model_result_dataframe,
+                                                     model_param_dataframe[i, , drop=FALSE],
+                                                     model_ID, number_states)
+          # add to results_dataframe
+          results_dataframe <- rbind(results_dataframe, formatted_results) 
+        }
      }
    }
-   
    # save all results in csv
    start_id <- min(results_dataframe$ID)
    end_id <- max(results_dataframe$ID)
@@ -676,13 +906,8 @@ run_all_models <- function(response_matrix) {
 # returns:
 # NOT YET DEFINED
 
-                                                                                                                                                                                                                                                                                                                                                                          # ------ MAIN PROCEDURAL SCRIPT ------
+# ------ MAIN PROCEDURAL SCRIPT ------
 groundwater_data <- prepare_groundwater_data()
 response_matrix <- load_response_data(groundwater_data)
-
-#if no response data, loads from groundwater_weekly_matrix_filepath
-#response_matrix <- load_response_data()
-
-Z <- get_z_matrices(response_matrix)
 results_dataframe <- run_all_models(response_matrix)
 print("MODEL RUNS COMPLETE!!")

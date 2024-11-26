@@ -38,6 +38,7 @@ groundwater_filepath = paste(repository_dir, groundwater_data_dir,
 groundwater_weekly_matrix_filepath = paste(repository_dir, groundwater_data_dir,
                              'groundwater_weekly_matrix.csv',
                              sep='')
+results_plot_dir = paste(repository_dir,'results/plots',sep='')
 
 # Load groundwater data
 groundwater <- read.csv(groundwater_filepath)
@@ -76,7 +77,11 @@ qqline(groundwater$ground_to_water_cm)
 # results: mostly normal but some outliers
 
 # Histogram; check for bell-shaped curve
+# save as .svg
+# hist_filename = 'histogram_groundwater_allyears.svg'
+# svg(paste(results_plot_dir,'/',hist_filename,sep=''))
 hist(groundwater$ground_to_water_cm)
+# dev.off()
 
 # Skewness; test if near 0 (symmetric), >0 (positive skew), <0 (neg skew)
 skewness(groundwater$ground_to_water_cm, na.rm = TRUE)
@@ -113,6 +118,7 @@ groundwater_summary_by_date <- groundwater %>%
     var_value = var(ground_to_water_cm, na.rm = TRUE)
   )
 
+# TODO: Add %NAs for all years
 groundwater_summary_by_well <- groundwater %>%
   group_by(well_id) %>%
   summarise(
@@ -122,6 +128,7 @@ groundwater_summary_by_well <- groundwater %>%
   )
 groundwater_summary_by_well
 
+# TODO: Add %NAs for each years
 groundwater_summary_by_well_year <- groundwater %>%
   mutate(year = year(timestamp)) %>%
   group_by(well_id, year) %>%
