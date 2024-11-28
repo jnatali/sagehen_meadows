@@ -26,8 +26,9 @@ library(tidyr)
 # ------ INITIALIZE GLOBAL VARIABLES ------
 #### Info about the data
 # TODO: set as model param
-#year_range <- c(2019, 2021, 2024)
-year_range <- c(2018, 2019, 2021, 2024)
+year_range <- c(2019,2021,2024)
+# seemed to be working with 2021 + 2024 only
+#year_range <- c(2018, 2019, 2021, 2024)
 #year_range <- c(2018)
 
 # time limit for filtering groundwater observations
@@ -690,9 +691,11 @@ run_single_model <- function(response_matrix, param_list, model_id){
   # Track runtime
   start_time <- Sys.time()
   
+  # Debug the model
+  model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations), fit=FALSE)
+  
   # Fit the model
   model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations))
-  #model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations), fit=FALSE)
   
   # Track runtime
   end_time <- Sys.time()
