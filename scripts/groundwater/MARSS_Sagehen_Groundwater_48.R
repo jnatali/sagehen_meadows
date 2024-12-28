@@ -41,13 +41,9 @@ year_range <- c(2019,2021,2024)
 
 # time limit for filtering groundwater observations
 time_limit <- 12 # only include gw well measurements prior to this time (i.e. noon)
-
 # completeness limit for % of entries NA values per row
 completeness_limit <- 0.88 # default, can be overridden by model params
 # NOTE: at 0.85 13 wells removed, 0.8800->8 wells, 0.90->5 wells, at 0.95->2
-
-# default max iterations
-number_iterations <- 10000
 
 # flag (binary) to keep or trim the first two weeks
 # TODO: update code to trim first/last NA columns of the series
@@ -706,6 +702,9 @@ process_model_results <- function(model_result_dataframe,
 # returns: model_result, a dataframe with model summary stats (from glance()) 
 #                         and model runtime
 run_single_model <- function(response_matrix, param_list, model_id){
+
+  # set max iterations
+  number_iterations <- 100000
   
   # map well_id to row number
   well_index_dataframe <- as.data.frame(response_matrix) %>%
@@ -724,7 +723,7 @@ run_single_model <- function(response_matrix, param_list, model_id){
   start_time <- Sys.time()
   
   # Debug the model
-  #model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations), fit=FALSE)
+  model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations), fit=FALSE)
   
   # Fit the model
   model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations))
@@ -741,9 +740,6 @@ run_single_model <- function(response_matrix, param_list, model_id){
   
   # generate model results stats (for all model run summary csv)
   model_stats <- glance(model)
-  
-  # append AIC info to summary
-  model_summary <- bind_rows(model_summary, model_stats$AIC)
   
   ## REPORT AND SAVE this model_summary for this model run as csv
   model_summary_filename = paste(formatted_date,"_",model_id,
@@ -799,15 +795,12 @@ run_all_models <- function(response_matrix) {
      ## GET "timespan" param, can be = 'stacked', 'continuous' or 'each year'
      timespan_param <- model_param_dataframe$timespan[i]
      
-     ## SET "number_iterations" for maxit param
-     number_iterations <<- model_param_dataframe$maxit[i]
-     
      # check if need to restructure response data
      if (timespan_param == 'stacked') {
        response_matrix <- stack_groundwater_data(response_matrix)
      }
      
-     # GET MARSS model parameters and name them appropriately
+     # GET model parameters and name them appropriately
      row <- model_param_dataframe[i, param_list_columns, drop=FALSE]
      param_list <- as.list(row)
      names(param_list) <- param_list_columns
