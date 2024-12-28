@@ -2,15 +2,23 @@
 # Author: Jennifer Natali, jennifer.natali@berkeley.edu
 # Date Created: Sunday 17 November 2024
 # 
-# This script sets up and executes MARSS model(s) for groundwater level data.
+# This script sets up and executes MARSS model(s) for weekly groundwater data.
 # 
 # This version supports:
-# - a 'timespan' parameter that can be either 'continuous' or 'each year'
+# - a 'timespan' parameter that can be:
+#         'continuous' where weekly observations continue from one year to next
+#         'each year' where only one year of observations is represented and run
+#         'stacked' one yr of observations per well, but well_id includes yr
+# - a 'Z' parameter which can be:
+#         'identity' as accepted by MARSS
+#         'grouped' which creates a list of Z matrices to test specific
+#                     hypotheses; depends on value of 'timespan'
 # 
 # This code is under development and follows a functional programming paradigm.
 # 
 # Requires  data files:
 # 1. RAW groundwater data (in cm) for all years: 'groundwater_biweekly_RAW.csv'
+# 2. A model parameterization file: 'MARSS_groundwater_parameters.csv'
 # 
 # TODOs documented in github repo issue tracking.
 
@@ -44,11 +52,15 @@ trim_first_two_weeks = FALSE
 
 # flag (binary) to fill gaps for entire year (vs. between weeks during summer)
 # TODO: set as model param
-fill_full_year_gaps = TRUE
+fill_full_year_gaps = FALSE
 
 # today's date for running models from model parameter file listed for today
 today <- Sys.Date()
 formatted_date <- format(today, "%Y_%m%d")
+
+# initialize a Z_grouping_id_list global variable
+# for assigning a relevant model_id with grouped Z matrix
+Z_grouping_id_list <- NULL
 
 # Setup directories and filepaths
 home_dir='/Volumes/SANDISK_SSD_G40/GoogleDrive/GitHub/'
@@ -409,15 +421,11 @@ load_covariate_data <- function() {
 # by: JNatali
 # on: 17 Nov 2024
 # purpose: sets up Z matrices for the model runs, 
-#          returns them as a list of matrices
+#          returns them as a list of matrices;
+#          does NOT setup a year-based Z matrix
 # returns: z_matrix_list, a list of matrices
-
-# TODO: Consider other Z matrices:
-#           SITE x PFT x HGMZ combo
-#           well distance from Sagehen Creek (well across a transect)
-
-# TODO: Use dynamic factor analysis to improve categorization of HGMZ / PFT
-#       address uncertainty about categorization; see MARSS User Guide Ch 10.
+#
+# TODO: Refactor so that only one get_z_matrices function
 
 get_z_matrices_no_years <- function(gw_data) {
   
@@ -502,11 +510,31 @@ get_z_matrices_no_years <- function(gw_data) {
   }
   dim(Z_pftXhgmz)
   
+  # Set z_grouping_id_list
+  Z_grouping_id_list <<- c('site', 'pft', 'hgmz', 'pftXhgmz')
+  
   ## CREATE LIST OF MATRICES AND RETURN
   Z_matrix_list <- list(Z_site, Z_pft, Z_hgmz, Z_pftXhgmz)
   return(Z_matrix_list)
   
 }
+
+#### BUILD Z MATRICES
+# by: JNatali
+# on: 25 Nov 2024 (after the previous function)
+# purpose: sets up Z matrices for the model runs, 
+#          returns them as a list of matrices
+#          with consideration of the year as part of the well name, e.g. -2018
+# returns: z_matrix_list, a list of matrices
+
+# TODO: Refactor so that only one get_z_matrices function
+# 
+# TODO: Consider other Z matrices:
+#           SITE x PFT x HGMZ combo
+#           well distance from Sagehen Creek (well across a transect)
+
+# TODO: Use dynamic factor analysis to improve categorization of HGMZ / PFT
+#       address uncertainty about categorization; see MARSS User Guide Ch 10.
 
 get_z_matrices <- function(gw_data) {
 
@@ -595,7 +623,10 @@ get_z_matrices <- function(gw_data) {
   }
   colnames(Z_pftXhgmz) <- NULL
   
-  ## CREATE LIST OF MATRICES AND RETURN
+  # Set z_grouping_id_list
+  Z_grouping_id_list <<- c('site', 'pft', 'hgmz', 'pftXhgmz')
+  
+  ### CREATE LIST OF MATRICES AND RETURN
   Z_matrix_list <- list(Z_site, Z_pft, Z_hgmz, Z_pftXhgmz)
   return(Z_matrix_list)
 }
@@ -638,13 +669,13 @@ get_model_parameters <- function(start_number, end_number) {
 # returns: merged_results dataframe with reformatted structure
 process_model_results <- function(model_result_dataframe,
                                   model_param_dataframe,
-                                  model_ID, number_states){
+                                  model_ID, number_obs){
   
   # ASSIGN model ID and date to the result dataframe
   new_result_row <- data.frame(
     ID = model_ID,
     run_date = model_param_dataframe$run_date,
-    states = number_states,
+    observations = number_obs,
     completeness = model_param_dataframe$completeness,
     stringsAsFactors = FALSE)
   
@@ -654,11 +685,11 @@ process_model_results <- function(model_result_dataframe,
                           by = NULL)
   # reorder columns
   merged_results <- merged_results[, c("ID", "run_date", "run_minutes", 
-                                       "states", "completeness", 
+                                       "observations", "completeness", 
                                        "AIC", "AICc",
                                        setdiff(names(merged_results), 
                                                c("ID", "run_date", 
-                                                 "run_minutes", "states",
+                                                 "run_minutes", "observations",
                                                  "completeness", 
                                                  "AIC", "AICc")))]
   return(merged_results)
@@ -667,13 +698,13 @@ process_model_results <- function(model_result_dataframe,
 #### RUN A SINGLE MODEL
 # by: JNatali
 # on: 17 Nov 2024
-# purpose: run a single models and track runtime
+# purpose: run a single model and track runtime
 # returns: model_result, a dataframe with model summary stats (from glance()) 
 #                         and model runtime
 run_single_model <- function(response_matrix, param_list, model_id){
 
   # set max iterations
-  number_iterations <- 20000
+  number_iterations <- 100000
   
   # map well_id to row number
   well_index_dataframe <- as.data.frame(response_matrix) %>%
@@ -710,7 +741,7 @@ run_single_model <- function(response_matrix, param_list, model_id){
   # generate model results stats (for all model run summary csv)
   model_stats <- glance(model)
   
-  ## SAVE this model_summary for this model run as csv
+  ## REPORT AND SAVE this model_summary for this model run as csv
   model_summary_filename = paste(formatted_date,"_",model_id,
                                  "_summary.csv",sep='')
   model_summary_filepath = paste(marss_results_dir, 
@@ -761,7 +792,7 @@ run_all_models <- function(response_matrix) {
    # LOOP through each row of the model IDs and params
    for (i in 1:nrow(model_param_dataframe)) {
      
-     ## GET timespan param
+     ## GET "timespan" param, can be = 'stacked', 'continuous' or 'each year'
      timespan_param <- model_param_dataframe$timespan[i]
      
      # check if need to restructure response data
@@ -783,8 +814,8 @@ run_all_models <- function(response_matrix) {
                                                 model_param_dataframe$completeness[i])
      
      # get and report # of states (i.e. groundwater wells)
-     number_states <- nrow(model_response_matrix)
-     print(paste('MODEL RUN ',i,'number of states: ',number_states, sep=' '))
+     number_obs <- nrow(model_response_matrix)
+     print(paste('MODEL RUN ',i,'number of observations: ', number_obs, sep=' '))
      
      # If 'each year', run for each year in year_range (global variable)
      if (timespan_param == 'each year'){
@@ -822,7 +853,7 @@ run_all_models <- function(response_matrix) {
           # process results
           year_results <- process_model_results(year_result_dataframe,
                                                     model_param_dataframe[i, , drop=FALSE],
-                                                    model_ID_year, number_states)
+                                                    model_ID_year, number_obs)
          
           # add to results_dataframe
           results_dataframe <- rbind(results_dataframe, year_results)
@@ -836,26 +867,41 @@ run_all_models <- function(response_matrix) {
        # process results
        formatted_results <- process_model_results(model_result_dataframe,
                                                   model_param_dataframe[i, , drop=FALSE],
-                                                  model_ID, number_states)
+                                                  model_ID, number_obs)
        # add to results_dataframe
        results_dataframe <- rbind(results_dataframe, formatted_results) 
-     } else {
+     
+       } else {
        
-       # If 'stacked' (each well represented per year), check if Z=explore
-        if (model_param_dataframe$Z[i] == 'explore') {
+       # If 'stacked' (each well represented per year), check if Z=grouped
+        if (model_param_dataframe$Z[i] == 'grouped') {
           
           # iterator for printing info while processing
           i=0
           #z_list <- get_z_matrices_no_years(model_response_matrix)
           z_list <- get_z_matrices(model_response_matrix)
           
+          # save original model_ID for reference within the z_list loop
+          original_model_ID <- model_ID
+          
           for (z_matrix in z_list){
            
             i=i+1
+            
+            # JN 2024_1226
+            # update model_ID based on Z_grouping_id_list (a global var)
+            # assign the ith item from Z_grouping_id_list
+            if (!is.null(Z_grouping_id_list) &&
+                i <= length(Z_grouping_id_list)) {
+                    Z_id <- Z_grouping_id_list[i]
+                    model_ID <- paste0(original_model_ID,"_",Z_id)
+            }
+            
             # print info for watching progress
-            print(paste('PROCESSING Z round',i))
-           
-            # replace 'explore' in param_list with this z
+            print(paste('PROCESSING Z round',i,'for model_ID',
+                        model_ID,sep=' '))
+          
+            # replace 'grouped' in param_list with this z
             param_list$Z <- z_matrix
            
             # run model with z
@@ -865,7 +911,7 @@ run_all_models <- function(response_matrix) {
             # process results
             formatted_results <- process_model_results(model_result_dataframe,
                                                       model_param_dataframe[i, , drop=FALSE],
-                                                      model_ID, number_states)
+                                                      model_ID, number_obs)
             # add to results_dataframe
             results_dataframe <- rbind(results_dataframe, formatted_results) 
           }
@@ -877,7 +923,7 @@ run_all_models <- function(response_matrix) {
           # process results
           formatted_results <- process_model_results(model_result_dataframe,
                                                      model_param_dataframe[i, , drop=FALSE],
-                                                     model_ID, number_states)
+                                                     model_ID, number_obs)
           # add to results_dataframe
           results_dataframe <- rbind(results_dataframe, formatted_results) 
         }
