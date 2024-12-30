@@ -743,7 +743,8 @@ run_single_model <- function(response_matrix, param_list, model_id){
   model_stats <- glance(model)
   
   # append AIC info to summary
-  model_summary <- bind_rows(model_summary, model_stats$AIC)
+  AIC_row <- data.frame(term="AIC", estimate = model_stats$AIC)
+  model_summary <- bind_rows(AIC_row, model_summary)
   
   ## REPORT AND SAVE this model_summary for this model run as csv
   model_summary_filename = paste(formatted_date,"_",model_id,
@@ -800,7 +801,9 @@ run_all_models <- function(response_matrix) {
      timespan_param <- model_param_dataframe$timespan[i]
      
      ## SET "number_iterations" for maxit param
-     number_iterations <<- model_param_dataframe$maxit[i]
+     if (!is.na(model_param_dataframe$maxit[i])) {
+      number_iterations <<- model_param_dataframe$maxit[i]
+     }
      
      # check if need to restructure response data
      if (timespan_param == 'stacked') {

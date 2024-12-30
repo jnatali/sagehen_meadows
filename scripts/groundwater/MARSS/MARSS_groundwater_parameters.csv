@@ -1,6 +1,7 @@
 ﻿ID,run_date,hypothesis group,hypothesis specifics,timespan,completeness,maxit,Z,R,U,B,Q,C,A,Results
-50,12/29/24,"all years (2019-2024), weekly with gaps filled; underconstrained with 2018 data","Compare U, Q, R across years, sites, pfts, hgmz and pft x hgmz",stacked,0.85,300000,grouped,diagonal and equal,unequal,identity,diagonal and unequal,zero,zero,
-49,12/28/24,"all years (2019-2024), weekly with gaps filled; underconstrained with 2018 data","Compare U, Q, R across years, sites, pfts, hgmz and pft x hgmz",stacked,0.88,200000,grouped,diagonal and equal,unequal,identity,diagonal and unequal,zero,zero,
+51,12/29/24,quick test of model csv summary and stats,quick test,each year,0.88,,identity,zero,zero,identity,diagonal and equal,zero,zero,
+50,12/28/24,"all years (2019-2024), weekly with gaps filled; underconstrained with 2018 data","Compare U, Q, R across years, sites, pfts, hgmz and pft x hgmz",stacked,0.85,300000,grouped,diagonal and equal,unequal,identity,diagonal and unequal,zero,zero,
+49,12/29/24,"all years (2019-2024), weekly with gaps filled; underconstrained with 2018 data","Compare U, Q, R across years, sites, pfts, hgmz and pft x hgmz",stacked,0.88,200000,grouped,diagonal and equal,unequal,identity,diagonal and unequal,zero,zero,
 48,12/27/24,"all years (2019-2024), weekly with gaps filled; underconstrained with 2018 data","Compare U, Q, R across years, sites, pfts, hgmz and pft x hgmz",stacked,0.9,100000,grouped,diagonal and equal,unequal,identity,diagonal and unequal,zero,zero,pftxhgmz failed
 47,12/26/24,"all years (2019-2024), weekly with gaps filled; underconstrained with 2018 data","Test simplest U, Q, R combo",stacked,0.9,100000,grouped,diagonal and equal,zero,identity,diagonal and unequal,zero,zero,pftxhgmz failed
 46,11/26/24,"all years, weekly with gaps filled","Test simplest U, Q, R combo",stacked,0.88,,grouped,diagonal and unequal,zero,identity,diagonal and equal,zero,zero,
