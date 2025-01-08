@@ -192,7 +192,7 @@ prepare_groundwater_data <- function(){
 # purpose: transforms the evenly-spaced groundwater_weekly_matrix 
 #          so it's stacked by year 
 #          with rows uniquely identified by well_id + year
-#          and columns are ordered isoweeks.
+#          and columns ordered by isoweeks.
 # returns: groundwater_weekly_stacked_matrix, evenly-spaced weekly matrix of 
 #          groundwater measurements by well_id + year
 #          
@@ -545,16 +545,45 @@ get_z_matrices <- function(gw_data) {
   # --- loop thru well_ids to determine sub-categories
   gw_names <- as.data.frame(gw_data) %>%
     mutate (
-      meadows = substring(well_id, 1, 1),
+      well = sub("-\\d{4}$", "", well_id), # pattern match, exclude year at end
+      meadow = substring(well_id, 1, 1), #JN 01/07/2025 changed variable name from meadows to meadow
       pft = substring(well_id, 2, 2),
       hgmz = substring(well_id, 3, 3),
       year = sub(".*-(.*)-(\\d{4})$", "\\2", well_id) # 4 chars after 2nd dash
     )
   
+  wells <- unique(gw_names$well) 
   meadows <- unique(gw_names$meadow)
   pfts <- unique(gw_names$pft)
   hgmzs <- unique(gw_names$hgmz)
-  years <- unique(gw_names$year) 
+  years <- unique(gw_names$year) #TODO: why is this only 2024?
+  
+  ## PANMICTIC ##
+  # All wells treated the same, grouped by year only
+  column_names <- years # a character
+  Z_pan <- matrix(0, nrow = nrow(gw_names), ncol = length(column_names))
+  colnames(Z_pan) <- column_names 
+  
+  for (i in 1:nrow(gw_names)) {
+    Z_pan[i, gw_names$year[i]] <- 1
+  }
+  colnames(Z_pan) <- NULL
+  
+  # # TODO: Get Z='identity' working; for now it's throwing a MARSSinits error
+  # ## IDENTITY ##
+  # # Identity for each year
+  # 
+  # # create a grid dataframe of all possible combos of well+year
+  # site_combos <- expand.grid(well = wells, year = years)
+  # column_names <- paste(site_combos$well, site_combos$year, sep = "+")
+  # Z_identity <- matrix(0, nrow = nrow(gw_names), ncol = length(column_names))
+  # colnames(Z_identity) <- column_names
+  # 
+  # for (i in 1:nrow(gw_names)) {
+  #   well_year_combo <- paste(gw_names$well[i], gw_names$year[i], sep = "+")
+  #   Z_identity[i, well_year_combo] <- 1
+  # }
+  # colnames(Z_identity) <- NULL
   
   ## MEADOW SITES ##
   # 3 meadow sites (Kiln, East, Lo); each is its own state
@@ -628,10 +657,13 @@ get_z_matrices <- function(gw_data) {
   colnames(Z_pftXhgmz) <- NULL
   
   # Set z_grouping_id_list
-  Z_grouping_id_list <<- c('site', 'pft', 'hgmz', 'pftXhgmz')
+  # Z_grouping_id_list <<- c('pan','identity','site', 'pft', 'hgmz', 'pftXhgmz')
+  Z_grouping_id_list <<- c('pan','site', 'pft', 'hgmz', 'pftXhgmz')
   
   ### CREATE LIST OF MATRICES AND RETURN
-  Z_matrix_list <- list(Z_site, Z_pft, Z_hgmz, Z_pftXhgmz)
+  #Z_matrix_list <- list(Z_pan, Z_identity, Z_site, Z_pft, Z_hgmz, Z_pftXhgmz)
+  Z_matrix_list <- list(Z_pan, Z_site, Z_pft, Z_hgmz, Z_pftXhgmz)
+  
   return(Z_matrix_list)
 }
 
