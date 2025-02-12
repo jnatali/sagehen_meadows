@@ -1,4 +1,4 @@
-## Sagehen Groundwater Data
+## Sagehen Subdaily Groundwater Data
 
 ### Sub-Daily Loggers in Shallow wells
 
@@ -42,7 +42,5 @@ As we processed the data, we recorded tasks and instructions in this [google doc
 
 **IMPORTANT NOTE**: Please do NOT overwrite the original files in the Solinst_Levelogger_ folders. If you change the file, please save in a different directory with a distinct file name. Please use git tools (such as the [github desktop app](https://desktop.github.com/), and see [help docs](https://docs.github.com/en/desktop) if needed) to sync files, upload with notes so we can track versions.
 
-#### Notebook scripts
-
---TODO: Update this section with quick overview of scripts in R (not .ipynb notebooks)--
-Running all cells in the (which one?) .ipynb notebook will read every csv in the /data folder and cut the data using the rate of change. For each csv file, the script will plot and output how many rows were cut off of each end of the data (useful for validation). Can view plots in notebook and all are saved to plot folder. To run this script on new data, be sure to have the same directory setup.
+## Sagehen Subdaily Groundwater Scripts
+See [README](https://github.com/jnatali/sagehen_meadows/blob/main/scripts/groundwater/README.md) in the scripts directory
