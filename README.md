@@ -5,7 +5,11 @@ Directory Description
 scripts for phenopix data processing of phenocam imagery in meadows (in R + python)
 
 #### groundwater
-scripts for groundwater data processing of manual and logger measurements in meadows (in matlab, so far)
+scripts for groundwater data processing and analysis; needs organization. 
+
+includes:
+- processing manual and logger measurements in meadows (in matlab and python)
+- MARSS time series analysis for manual weekly measurements (in R)
 
 ## data
 
