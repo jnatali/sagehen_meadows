@@ -14,13 +14,15 @@ Requires data files:
     1. RAW logger data as .csv files in subdaily_dir with strict 
         naming convention and formatting
     2. cut_times_file = groundwater_logger_times.csv (based on field notes)
-
+    3. barometric pressure data as .csv
 
 TODO: 
 * 2021_0624 FIX cut times for 1-2 wells, see cut_times_file for notes
-* 2021_0628 FIX save_fig flag and plot_water_level(), throwing a "view limit minimum" valueError
+* 2021_0628 FIX save_fig flag and plot_water_level(), 
+    throwing a "view limit minimum" valueError
 * Look at barometric compensation script, why are 6 files empty?
-* Look at several files with zero overlapping manual readings (note: if +/- 30 mins, capture 5 more valid files)
+* Look at several files with zero overlapping manual readings 
+    (note: if +/- 30 mins, capture 5 more valid files)
 * EWR-1 2018-10-01 count: 0, KET-1 2019-09-04 count: 0, KWR-1 2018-10-01 count: 0
 """
 # import libraries
@@ -31,6 +33,7 @@ import os
 import datetime
 import re # regexpression library to extract well id from filenames
 import math
+import statistics
 import logging
 import pprint
 #from glob import glob
@@ -82,7 +85,7 @@ for handler in logging.root.handlers[:]:
 logging.basicConfig(filename="logs/subdaily_processing_log.txt", 
                         level=log_level, 
                         format='%(asctime)s - %(message)s')
-logging.info("Logging ON for subdaily_processing_RawToGround.py")
+logging.info("----------\n\nLogging ON for subdaily_processing_RawToGround.py")
 
 ### DEFINE FUNCTIONS 
 
@@ -125,6 +128,7 @@ def plot_water_level(logger,water_level_column_name,well_id):
 #        tick.label.set_fontsize(10)
 
     fig.suptitle('Groundwater Level at Well '+ well_id, size=12)
+    
     if save_fig: 
         ax1.set_xticklabels(ax1.get_xticks(), rotation=90)
         plot_file = gw_data_dir +'plots/gw_level_' + well_id + '.eps'
@@ -216,6 +220,11 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
     Returns:
         None, displays the plot.
     """
+    # Define time for extracting subdaily measurement 
+    #  i.e time that represents equivalent of manual readings
+    manual_reading_start_time = 6
+    manual_reading_stop_time = 10
+    
     # Extract unique well_ids from both datasets
     well_ids = set(subdaily_df['well_id']) if plot_subdaily_only else set(subdaily_df['well_id']).union(set(manual_df['well_id']))
     
@@ -238,12 +247,25 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
         well_manual['Isoweek'] = well_manual['DateTime'].dt.isocalendar().week
 
         # Filter only May-November (Isoweeks ~18 to ~47)
-        well_subdaily = well_subdaily[(well_subdaily['Isoweek'] >= 18) & (well_subdaily['Isoweek'] <= 47)]
-        well_manual = well_manual[(well_manual['Isoweek'] >= 18) & (well_manual['Isoweek'] <= 47)]
+        well_subdaily = well_subdaily[(well_subdaily['Isoweek'] >= 18)
+                                      & (well_subdaily['Isoweek'] <= 47)]
+        well_manual = well_manual[(well_manual['Isoweek'] >= 18)
+                                  & (well_manual['Isoweek'] <= 47)]
+        
+        # Filter subdaily wells to appropriate AM reading times
+        well_subdaily = well_subdaily[(well_subdaily['DateTime'].dt.hour >= manual_reading_start_time)
+                                  & (well_subdaily['DateTime'].dt.hour < manual_reading_stop_time)]
 
         # Average subdaily data per isoweek
-        well_subdaily = well_subdaily.groupby(['Year', 'Isoweek'], as_index=False)['ground_to_water_cm'].mean()
+        # JN 03/04/2025 updated to plot each deployment independently
+        well_subdaily_avg = well_subdaily.groupby(['Year', 'Isoweek'], as_index=False)['ground_to_water_cm'].mean()
+        # Group by well_id, deployment, Year, and Isoweek, then compute mean
+        #well_subdaily = well_subdaily.groupby(['deployment','Isoweek'], 
+        #                                      as_index=False)['ground_to_water_cm'].mean()
         
+        # Merge to restore 'Deployment'
+        well_subdaily = well_subdaily_avg.merge(well_subdaily[['Year', 'Isoweek', 'deployment']].drop_duplicates(), 
+                                        on=['Year', 'Isoweek'], how='left')
         # Identify years where data is present for this well
         available_years = sorted(set(well_subdaily['Year']).union(set(well_manual['Year'])))
         
@@ -253,32 +275,36 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
 
         # Get unique x-axis values in order (avoids unnecessary gaps)
         unique_x_labels = sorted(set(well_subdaily['Year-Isoweek']).union(set(well_manual['Year-Isoweek'])))
-
-        # Create mapping of categorical x-axis values
         x_ticks = {label: i for i, label in enumerate(unique_x_labels)}
-        
+
         # Map the categorical labels to integer positions
         well_subdaily['x_pos'] = well_subdaily['Year-Isoweek'].map(x_ticks)
         well_manual['x_pos'] = well_manual['Year-Isoweek'].map(x_ticks)
 
         # Ensure data is sorted by x-axis position
-        well_subdaily = well_subdaily.sort_values(by='x_pos')
+        well_subdaily = well_subdaily.sort_values(by=['deployment','x_pos'])
         well_manual = well_manual.sort_values(by='x_pos')
 
         # Plot
         plt.figure(figsize=(12, 5))
 
         # Scatter plot for subdaily data (ENSURES circular markers)
-        plt.scatter(
-            well_subdaily['x_pos'], well_subdaily['ground_to_water_cm'], 
-            marker='o', s=50, color='blue', label='Logger Data', zorder=3
-        )
+        # plt.scatter(
+        #     well_subdaily['x_pos'], well_subdaily['ground_to_water_cm'], 
+        #     marker='o', s=50, color='blue', label='Logger Data', zorder=3
+        # )
+        # # Line plot to connect subdaily points (ENSURES correct sorting)
+        # plt.plot(
+        #     well_subdaily['x_pos'], well_subdaily['ground_to_water_cm'], 
+        #     linestyle='-', color='blue', alpha=0.7)
+        
+        # Plot each subdaily deployment separately within the well
+        for deployment, dep_data in well_subdaily.groupby('deployment'):
+            plt.scatter(dep_data['x_pos'], dep_data['ground_to_water_cm'], 
+                marker='o', s=50, color='blue', label=None, zorder=3)
 
-        # Line plot to connect subdaily points (ENSURES correct sorting)
-        plt.plot(
-            well_subdaily['x_pos'], well_subdaily['ground_to_water_cm'], 
-            linestyle='-', color='blue', alpha=0.7
-        )
+            plt.plot(dep_data['x_pos'], dep_data['ground_to_water_cm'], 
+                     linestyle='-', color='blue', alpha=0.7, label=None)
 
         # Scatter plot for manual data (ENSURES circular markers)
         plt.scatter(
@@ -305,6 +331,82 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
 
         plt.tight_layout()
         plt.show()
+
+def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df):
+    """
+    Plots subdaily groundwater level (in cm) for each well_id and deployment,
+    overlaying biweekly manual measurements if they are within 10 minutes.
+
+    Parameters:
+        subdaily_df (DataFrame): Logger data with columns ['well_id', 'deployment', 'DateTime', 'ground_to_water_m'].
+        biweek_df (DataFrame): Manual measurement data with columns ['well_id', 'DateTime', 'ground_to_water_cm'].
+
+    Returns:
+    None, displays the plots.
+    """
+    # Convert groundwater depth from meters to cm
+    subdaily_df['ground_to_water_cm'] = subdaily_df['ground_to_water_m'] * 100  
+    
+    # Convert DateTime columns to pandas datetime format
+    subdaily_df['DateTime'] = pd.to_datetime(subdaily_df['DateTime'])
+    biweek_df['DateTime'] = pd.to_datetime(biweek_df['DateTime'])
+    
+    # Iterate through unique (well_id, deployment) combinations
+    for (well_id, deployment), well_subdaily in subdaily_df.groupby(
+                                                    ['well_id', 'deployment']):
+        #if debug_gtw: logging.debug(f"Plotting {well_id} {deployment}")
+        
+        # Filter manual data for the current well
+        well_biweek = biweek_df[biweek_df['well_id'] == well_id].copy()
+    
+        # ERROR HANDLING: Check if have biweekly measurements for deployment    
+        if well_biweek.empty:
+            logging.info(f"PLOTTING MANUAL BI-WEEKLY GW: {well_id} "
+                         + f"{deployment} has no manual biweekly records")
+            continue # Skip loop iteration for this deployment
+    
+        # Merge biweekly data with subdaily data, 
+        # keep only biweekly points within ±10 minutes
+        well_biweek['closest_subdaily'] = well_biweek['DateTime'].apply(
+            lambda x: (well_subdaily['DateTime'] - x).abs().min() 
+              if not well_subdaily.empty else pd.Timedelta('1D'))
+        
+        well_biweek = well_biweek[well_biweek['closest_subdaily'] 
+                                  <= pd.Timedelta(minutes=10)]
+    
+        # Sort subdaily data by DateTime
+        well_subdaily = well_subdaily.sort_values(by='DateTime')
+        
+        # Plot
+        plt.figure(figsize=(12, 5))
+    
+        # Subdaily groundwater levels (blue)
+        plt.plot(well_subdaily['DateTime'], 
+                 well_subdaily['ground_to_water_cm'], 
+                 linestyle='-', marker='o', markersize=2, 
+                 color='blue', label='Logger (10-min intervals)')
+    
+        # Biweekly groundwater levels (red) for overlapping times
+        if not well_biweek.empty:
+            plt.scatter(well_biweek['DateTime'], 
+                        well_biweek['ground_to_water_cm'], 
+                        color='red', s=50, 
+                        label='Biweekly Manual Measurement', zorder=3)
+    
+        # Formatting
+        plt.xlabel("DateTime")
+        plt.ylabel("Groundwater Level (cm)")
+        plt.title("Subdaily Groundwater Levels for" 
+                  + f" Well {well_id} (Deployment {deployment})")
+        plt.legend()
+        plt.grid(True)
+    
+        # Reverse the y-axis so positive values appear below zero
+        plt.gca().invert_yaxis()
+    
+        plt.tight_layout()
+        plt.show()
+
         
 ## Cut or trim logger data at front/back end of data
 ## to account for when logger not in the well.
@@ -333,7 +435,7 @@ def cut_logger_data():
     for f in os.listdir(subdaily_dir):
         if f.endswith('.csv'):
         
-            if debug_cut: print(f)
+            if debug_cut: logging.debug(f)
             
             # get well_id based on filename
             well_id = re.split('_20',f)[0]
@@ -356,7 +458,7 @@ def cut_logger_data():
             
             ## ERROR HANDLING if no time limits found for this well deployment in field notes
             if well_time_df.empty: 
-                print(f'WARNING: No time limits for {well_id}:' 
+                logging.info(f'WARNING: No time limits for {well_id}:' 
                       + 'check if well name is correct. Exiting cut process.')
                 break
             
@@ -371,7 +473,7 @@ def cut_logger_data():
             ## ERROR HANDLING: only continue if one matching entry of start/stop times
             if well_time_df.shape[0] != 1:
                 warning_str = 'WARNING: More/less than one row in well_time_df for ' + well_id + ', not clear which one to use. Check date range in logger csv. Exiting cut process. '
-                print(warning_str)
+                logging.info(warning_str)
                 # break
             
             
@@ -386,7 +488,7 @@ def cut_logger_data():
             ## Calculate temperature rate of change
             # temp change threshold that controls cutoff points
             change_threshold = well_time_df['temp_threshold'].iloc[0]
-            if debug_cut: print(str(change_threshold))
+            if debug_cut: logging.debug(str(change_threshold))
             log_df['Rate of Change'] = np.append(np.abs((log_df['TEMPERATURE'].iloc[:-1].values - log_df['TEMPERATURE'].iloc[1:].values)/(10)), 0.0001)
 
             # Split data in half
@@ -397,10 +499,10 @@ def cut_logger_data():
             try:
                 index = first.loc[(first['Rate of Change'] >= change_threshold), :].index[-1]
                 first_cut = first.iloc[index:]
-                if debug_cut: print('cutoff front end.')
+                if debug_cut: logging.debug('cutoff front end.')
             except IndexError as err:
                 first_cut = first
-                if debug_cut: print('Nothing to cut off front end.')
+                if debug_cut: logging.debug('Nothing to cut off front end.')
             
     
             # In second half, cut out all data after the first point that has a rate of change greater than the change threshold
@@ -408,10 +510,10 @@ def cut_logger_data():
                 index = second.loc[(second['Rate of Change'] >= change_threshold), :].index[0]
                 #second_cut = second.loc[(second.index < index)]
                 second_cut = second.loc[(second.index <= index)]
-                if debug_cut: print('Cutoff backend.')
+                if debug_cut: logging.debug('Cutoff backend.')
             except IndexError as err:
                 second_cut = second
-                if debug_cut: print('Nothing to cut off back end.')
+                if debug_cut: logging.debug('Nothing to cut off back end.')
         
             # Snip both halfs back together
             log_df = pd.concat((first_cut, second_cut), axis=0)
@@ -456,23 +558,29 @@ def get_baro_dataframe_solinst():
     """Consolidate all barometer CSV files into one dataframe, then convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units."""
     all_baro_data = pd.DataFrame()
     
-    for f in os.listdir(baro_data_dir):
+    for f in os.listdir(solinst_baro_data_dir):
         if f.endswith('.csv'):
-            if debug_baro: print(f)
+            if debug_baro: 
+                logging.debug(f"Fetching baro data from {f}")
             ## TODO: consider adding barometer well_id to dataframe
-            new_baro = pd.read_csv(baro_data_dir + f, header=10, encoding='ISO-8859-1')
+            new_baro = pd.read_csv(solinst_baro_data_dir + f, header=10, encoding='ISO-8859-1')
             
             if debug_baro: 
-                print(str(len(new_baro)))
+                logging.debug(f"Length of bara dataframe: {str(len(new_baro))}")
                 test_b = new_baro
-                test_b['DateTime'] = pd.to_datetime(test_b['Date'] + ' ' + test_b['Time'])
-                str_b_range = 'min/max of new baro file time:' + str(min(test_b['DateTime'])) + ' to ' + str(max(test_b['DateTime']))
-                print(str_b_range)
                 
-            all_baro_data = all_baro_data.append(new_baro,sort=True)
+                # format DateTime using explicit 12-hour format with AM/PM
+                test_b['DateTime'] = pd.to_datetime(
+                    test_b['Date'] + ' ' + test_b['Time'],
+                    format='%m/%d/%Y %I:%M:%S %p')
+                str_b_range = 'min/max of new baro file time:' + str(min(test_b['DateTime'])) + ' to ' + str(max(test_b['DateTime']))
+                logging.debug(str_b_range)
+                
+            all_baro_data = pd.concat([all_baro_data, new_baro],
+                                      ignore_index=True, sort=True)
             
             if debug_baro: 
-                print(str(len(all_baro_data))+ '\n\n')
+                logging.debug(str(len(all_baro_data))+ '\n')
 
     return all_baro_data
 
@@ -480,7 +588,6 @@ def get_baro_dataframe_solinst():
 ## Convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units
 def get_baro_dataframe():
     """Consolidate all barometer CSV files into one dataframe, then convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units."""
-    all_baro_data = pd.DataFrame()
     
     new_baro = pd.read_csv(station_baro_file)
     new_baro['DateTime'] = pd.to_datetime(new_baro['Time'])
@@ -568,10 +675,13 @@ def compensate_baro(baro_df, gw_df):
 
 
 
-def calculate_toGround_offsets(merged_df):
-    
-    # Dictionary of offsets per well_id and deployment
-    offsets = {}
+def calculate_sensor_level(merged_df):
+    """
+    Determines the depth of the sensor relative to the ground surface
+    based on the manual gw measurement and water pressure head from the sensor
+    """
+    # Dictionary of sensor_levels per well_id and deployment
+    sensor_levels = {}
     
     # Dictionary of errors 
     #  (based on "drift" between multiple manual measurements 
@@ -595,7 +705,7 @@ def calculate_toGround_offsets(merged_df):
                 subdaily_group['DateTime_biweek']).idxmin()]
 
         # Store all offsets for drift error calculation
-        offset_list = []
+        sensor_level_list = []
         
         for i, row in closest_measurements.iterrows():
             manual_time = row['DateTime_biweek']
@@ -607,16 +717,21 @@ def calculate_toGround_offsets(merged_df):
             
             # If there's an exact match, use it directly!
             if not exact_match.empty:
-                estimated_sensor_m = exact_match['compensated_LEVEL_m'].values[0]
+                pressure_head = exact_match['compensated_LEVEL_m'].values[0]
             
             else:
                 # Find the closest two logger records before and after
+                # JN 2025/02/28 changed tail(1) to tail(2), same for head()
                 before = subdaily_group[subdaily_group['DateTime_subdaily'] <= 
-                                        manual_time].tail(1)
+                                        manual_time].tail(2)
                 after = subdaily_group[subdaily_group['DateTime_subdaily'] > 
-                                       manual_time].head(1)
+                                       manual_time].head(2)
                 
                 if not before.empty and not after.empty:
+                    if len(before) > 1: 
+                        before = before.loc[[before['time_diff'].abs().idxmin()]]
+                    if len(after) > 1:
+                        after = after.loc[[after['time_diff'].abs().idxmin()]]
                     # Interpolate compensated_LEVEL_m at manual measurement time
                     t1 = before['DateTime_subdaily'].values[0]
                     t2 = after['DateTime_subdaily'].values[0]
@@ -624,28 +739,28 @@ def calculate_toGround_offsets(merged_df):
                     v2 = after['compensated_LEVEL_m'].values[0]
                 
                     # Linear interpolation
-                    estimated_sensor_m = v1 + (
+                    pressure_head = v1 + (
                         manual_time - t1) / (t2 - t1) * (v2 - v1)
                 
                 elif not before.empty and len(before) > 1:
-                    logging.debug("CASE not before.empty for {well} and {deploy}")
+                    logging.debug(f"CASE not before.empty for {well} and {deploy}")
                     # Use rate of change to extrapolate
                     before_sorted = before.sort_values('DateTime_subdaily')
-                    t1, t2 = before_sorted['DateTime'].iloc[-2:].values
+                    t1, t2 = before_sorted['DateTime_subdaily'].iloc[-2:].values
                     v1, v2 = before_sorted['compensated_LEVEL_m'].iloc[-2:].values
                     time_diff = (t2 - t1) / np.timedelta64(1, 'm')  # Convert to minutes
                     rate = (v2 - v1) / time_diff  # Rate of change per minute
-                    estimated_sensor_m = v2 + rate * (manual_time - t2)
+                    pressure_head = v2 + rate * ((manual_time - t2).total_seconds()/60)
 
                 elif not after.empty and len(after) > 1:
-                    logging.debug("CASE not after.empty for {well} and {deploy}")
+                    logging.debug(f"CASE not after.empty for {well} and {deploy}")
                     # Use rate of change from two after readings
                     after_sorted = after.sort_values('DateTime_subdaily')
                     t1, t2 = after_sorted['DateTime_subdaily'].iloc[:2].values
                     v1, v2 = after_sorted['compensated_LEVEL_m'].iloc[:2].values
                     time_diff = (t2 - t1) / np.timedelta64(1, 'm')  # Convert to minutes
                     rate = (v2 - v1) / time_diff  # Rate of change per minute
-                    estimated_sensor_m = v1 - rate * (t1 - manual_time)
+                    pressure_head = v1 - rate * ((t1 - manual_time).total_seconds()/60)
 
                 # New case: Manual measurement occurs after the last subdaily record
                 # TODO: see if there's a second before
@@ -663,7 +778,7 @@ def calculate_toGround_offsets(merged_df):
                     
                         # Extrapolate forward
                         time_diff = (manual_time - t2).total_seconds() / 60  # Convert to minutes
-                        estimated_sensor_m = v2 + rate * time_diff
+                        pressure_head = v2 + rate * time_diff
 
                 else:
                     # Skip if we don't have enough data
@@ -675,32 +790,34 @@ def calculate_toGround_offsets(merged_df):
                         logging.debug(f"Skipping ahead, no exact manual entry for {well} and {deploy}")
                     continue
                 
-            # Compute offset
-            # TODO 2025/02/25: flip the subdaily data
-            offset = manual_groundwater_m - estimated_sensor_m
-            #offset = (-1 * manual_groundwater_m) + estimated_sensor_m
+            # TODO: Compute the sensor level
+            this_sensor_level = pressure_head + manual_groundwater_m
 
-            offset_list.append(offset)
+            sensor_level_list.append(this_sensor_level)
             
-            if offset_list:
-                # Store the earliest offset for the deployment
-                offsets[(well, deploy)] = offset_list[0]
+            if sensor_level_list:
+                # Store the average of all sensor levels
+                avg_sensor_level = statistics.mean(sensor_level_list)
+                sensor_levels[(well, deploy)] = avg_sensor_level
                 
-                if len(offset_list) > 1:
-                    # Compute drift error as max difference in offsets
-                    drift_errors[(well, deploy)] = max(offset_list) - min(offset_list)
+                if len(sensor_level_list) > 1:
+                    # Compute drift error as standard error of the mean
+                    drift_errors[(well, deploy)] = (
+                        statistics.stdev(sensor_level_list) / 
+                        math.sqrt(len(sensor_level_list)))
                 
     # Log information about offsets
-    logging.debug("Final offset dictionary:\n" + pprint.pformat(offsets, 
-                                                               indent=4))
-    logging.debug("Drift error dictionary:\n" + pprint.pformat(drift_errors,
-                                                               indent=4))
+    logging.debug(f"Sensor level dictionary has {len(sensor_levels)}" 
+                  + "elements:\n" + 
+                  pprint.pformat(sensor_levels, indent=4))
+    logging.debug(f"Drift error dictionary has {len(drift_errors)}"
+                  + "elements:\n" + pprint.pformat(drift_errors, indent=4))
 
-    for (well, deploy), offset in offsets.items():
-        if isinstance(offset, float) and math.isnan(offset):
+    for (well, deploy), this_sensor_level in sensor_levels.items():
+        if isinstance(this_sensor_level, float) and math.isnan(this_sensor_level):
             logging.info(f"Offset is NaN for {well} and {deploy}")
     
-    return offsets
+    return sensor_levels
 
 ## Convert baro-compensated water level from sensor 
 ## so that it's relative to the ground surface
@@ -734,8 +851,13 @@ def convert_relativeToGround(subdaily_df):
     )
     
     # Assign deployment number per well by detecting time_diff > 10 min
-    subdaily_df['deployment'] =well_group_df['time_diff'].transform(lambda x: (
+    subdaily_df['deployment'] = well_group_df['time_diff'].transform(lambda x: (
             x != measurement_frequency_interval).cumsum())
+    
+    # Log number of deployments
+    unique_deployments = subdaily_df[['well_id', 'deployment']].drop_duplicates()
+    logging.info("ALERT: Number of deployments in convert_relativeToGround is:"
+                 + f" {len(unique_deployments)}\n")
     
     # Drop helper column
     subdaily_df = subdaily_df.drop(columns=['time_diff'])
@@ -761,52 +883,112 @@ def convert_relativeToGround(subdaily_df):
 
     # Remove and log where ground_to_water_cm for a deployment is nan
     deploy_group = merged_df.groupby(['well_id', 'deployment'])
-    nan_group = deploy_group['ground_to_water_cm'].transform(
-        lambda x: x.isna().all())
     
-    # Log where NaNs removed
-    nan_deployments = merged_df.loc[nan_group,['well_id',
+    # Remove any deployment where all NaNs for the deployment
+    nan_group_all = deploy_group['ground_to_water_cm'].transform(
+         lambda x: x.isna().all())
+    
+    nan_deployments = merged_df.loc[nan_group_all,['well_id',
                                                'deployment']].drop_duplicates()
     
-    logging.info(
-        f"WARNING: {len(nan_deployments)} of {len(deploy_group)} deployments "
-        + "removed: ground_to_water_cm = NaN")
-    
     for _, row in nan_deployments.iterrows():
-        logging.info(f"Assume well was dry for deployment {row['well_id']} and {row['deployment']}")
+        logging.info("WARNING: Assume well was dry for *full* deployment.\n" 
+                     + f"Removing {row['well_id']} and {row['deployment']}"
+                     + "from subdaily dataframe.\n")
     
-    # Remove NaNs, assume it occurs because well was dry
-    # TODO: is there a way to salvage this data with well depth lookup?
-    merged_df = merged_df[~nan_group]
+    # Remove NaN deployments from subdaily_df
+    # with an inner join (tags subdaily_df rows that match nan_deployment)
+    subdaily_df = subdaily_df.merge(nan_deployments, on=['well_id', 
+                                                         'deployment'], 
+                                    how='left', 
+                                    indicator=True)
+
+    # Keep only rows that do NOT match the NaN deployments
+    # by filtering out rows with _merge, created by innerjoin with indicator=T
+    subdaily_df = subdaily_df[subdaily_df['_merge'] == 'left_only'].drop(columns=['_merge'])
+    
+    # Identify rows to drop from merged_df
+    nan_rows = merged_df[merged_df['ground_to_water_cm'].isna()]
+    # Count total rows to be removed
+    num_dropped_rows = len(nan_rows)
+    # Get unique well_id + deployment groups affected
+    affected_deployments = nan_rows[['well_id', 'deployment']].drop_duplicates()
+
+    # Log the results
+    logging.info(f"Removing {num_dropped_rows} rows where 'ground_to_water_cm' is NaN.")
+    logging.info(f"Affected well_id + deployment groups:\n{affected_deployments.to_string(index=False)}")
+
+    # Drop NaN rows from merged_df
+    merged_df = merged_df.dropna(subset=['ground_to_water_cm'])
+    
+    # # JN 2025/02/28 replaced the following lines with isna().any()
+    # # nan_group = deploy_group['ground_to_water_cm'].transform(
+    # #     lambda x: x.isna().all())
+    # nan_group_any = deploy_group['ground_to_water_cm'].transform(
+    #     lambda x: x.isna().any())
+    
+    # nan_measurements = merged_df.loc[nan_group_any,['well_id',
+    #                                            'deployment']].drop_duplicates()
+    # # Log where NaNs removed   
+    # logging.info(
+    #     f"WARNING: {len(nan_measurements)} of {len(deploy_group)} deployments "
+    #     + f"removed from merged dataframe.\n"
+    #     + f"Ground_to_water_cm = NaN for *some* of \n {nan_measurements}\n\n")
+    
+    # Remove NaNs, assume it occurs because well was dry during measurement
+    #merged_df = merged_df[~nan_group_any]
     
     # Validate results 
+    # if (debug_gtw):
+    #         # Check if at least 2 rows of manual measurements per well_id and deployment
+    #         row_counts = merged_df.groupby(['well_id', 'deployment']).size()
+    #         groups_with_less_than_two = row_counts[row_counts < 2].index
+    #         rows_with_less_than_two = merged_df[merged_df.set_index(
+    #             ['well_id', 'deployment']).index.isin(
+    #                 groups_with_less_than_two)]
+    #         logging.debug("Deployments with <2 manual measurements:\n %s" %
+    #               rows_with_less_than_two[['well_id','deployment',
+    #                                        'DateTime_subdaily',
+    #                                        'DateTime_biweek']])
+
+    # Validate results
     if (debug_gtw):
-            # Check if at least 2 rows per well_id and deployment
-            row_counts = merged_df.groupby(['well_id', 'deployment']).size()
-            groups_with_less_than_two = row_counts[row_counts < 2].index
-            rows_with_less_than_two = merged_df[merged_df.set_index(
-                ['well_id', 'deployment']).index.isin(
-                    groups_with_less_than_two)]
-            logging.debug("Deployments with <2 manual measurements:\n %s" %
-                  rows_with_less_than_two[['well_id','deployment',
-                                           'DateTime_subdaily',
-                                           'DateTime_biweek']])
+        # Identify deployments with only one unique 'DateTime_biweek'
+        single_biweek_deployments = (
+            merged_df.groupby(['well_id', 'deployment'])['DateTime_biweek']
+            .nunique()
+            .reset_index()
+        )
+        
+        # Filter to deployments with exactly one unique 'DateTime_biweek'
+        single_biweek_deployments = single_biweek_deployments[single_biweek_deployments['DateTime_biweek'] == 1]
+        
+        # Merge to get relevant details
+        single_biweek_details = merged_df.merge(single_biweek_deployments[['well_id', 'deployment']], 
+                                                on=['well_id', 'deployment'])
+        
+        # Log the affected deployments
+        if not single_biweek_details.empty:
+            logging.info("Deployments with only ONE unique manual measurement:\n" + 
+                         single_biweek_details[['well_id', 'deployment']].drop_duplicates().to_string(index=False))
+        else:
+            logging.info("No deployments found where 'DateTime_biweek' has only one unique value.")
+        
 
     # Convert 'ground_to_water_cm' to meters
     merged_df = merged_df.copy()
     merged_df['ground_to_water_m'] = merged_df['ground_to_water_cm'] / 100    
 
-    # Calculate offsets in meters
-    offsets_m = calculate_toGround_offsets(merged_df)
-    #subdaily_df = calculate_subdaily_toGround(subdaily_df, merged_df)
+    # Calculate sensor level below the ground surface (in meters)
+    sensor_levels_m = calculate_sensor_level(merged_df)
     
     # Apply manual measurement offsets to subdaily_df
-    def apply_manual_offset(row):
+    def calculate_subdaily_water_level(row):
         key = (row['well_id'], row['deployment'])
-        return row['compensated_LEVEL_m'] + offsets_m.get(key, np.nan)
+        return sensor_levels_m.get(key, np.nan) - row['compensated_LEVEL_m']
     
     subdaily_df['ground_to_water_m'] = subdaily_df.apply(
-                                        apply_manual_offset, axis=1)
+                                        calculate_subdaily_water_level, axis=1)
 
     # Finished processing all logger files
     # Now save singular file of all logger data
@@ -823,7 +1005,7 @@ def convert_relativeToGround(subdaily_df):
     # Plot to validate if debugging
     if debug_gtw:
         plot_weekly_groundwater_data_by_well(subdaily_df, biweek_df)
-        
+        plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df)
     return subdaily_df
 
 
@@ -842,7 +1024,7 @@ else:
 
 ## 2. Compensate logger water level (m) based on barometer data (kPa)
 if process_baro: 
-    waterLevel_df = compensate_baro(convert_baro(get_baro_dataframe()), 
+    waterLevel_df = compensate_baro(convert_baro_solinst(get_baro_dataframe_solinst()), 
                                     waterLevel_df)
 
 ## 3. Convert water level from 'relative to sensor' to 
