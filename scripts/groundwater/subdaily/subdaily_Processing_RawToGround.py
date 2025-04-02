@@ -28,7 +28,9 @@ TODO:
 # import libraries
 import pandas as pd
 import numpy as np
+import json
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import os
 import datetime
 import re # regexpression library to extract well id from filenames
@@ -40,18 +42,19 @@ import pprint
 
 ### SETUP FLAGS 
 ##  for processing, logging, debugging and data validation
-process_cut = True
+process_cut = False
 process_baro = True
 
 save_fig = False #not working yet, throwing error
 
-debug_cut = True
-debug_baro = False
+debug_cut = False
+debug_baro = True
 debug_gtw = True
 
 ### GLOBAL VARIABLES
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
-density_factor = 1/gravity_sagehen
+density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
+baro_standard_elevation = 1933.7
 
 ### SETUP DIRECTORY + FILE NAMES
 project_dir = '/VOLUMES/SANDISK_SSD_G40/GoogleDrive/GitHub/sagehen_meadows/'
@@ -59,7 +62,6 @@ gw_data_dir = project_dir + 'data/field_observations/groundwater/'
 
 # As of 03/12/2025, Solinst_levelogger_all contains 2018, 2019, 2021 data
 subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_all/'
-#subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_2021/'
 cut_dir = gw_data_dir + 'subdaily_loggers/WORKING/cut/'
 solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/RAW/baro_data/'
 station_baro_data_dir = project_dir + 'data/station_instrumentation/climate/Dendra/'
@@ -70,9 +72,10 @@ os.makedirs("logs",exist_ok=True)
 
 cut_times_file = gw_data_dir + 'subdaily_loggers/groundwater_logger_times.csv'
 cut_data_file = cut_dir+'cut_all_wells.csv'
-station_baro_file = station_baro_data_dir + 'Dendra_baro_2018_0701_2019_1201.csv'
+station_baro_file = station_baro_data_dir + 'Dendra_Sagehen_2007_2024.csv'
 gw_biweekly_file = 'biweekly_manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
 subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_full.csv'
+well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
 
 # Configure and test logging to write to a file
 log_level=logging.INFO  # Can log different levels: INFO, DEBUG or ERROR
@@ -103,6 +106,36 @@ def filter_subset_dataframe(df, well, deploy):
         (df['well_id'] == well) &
         (df['deployment'] >= deploy)]
     return subset_df
+
+def remove_outliers(df, column_name, multiplier=1.5):
+    """
+    Remove outliers based on IQR method.
+    
+    Parameters:
+    df : pandas DataFrame
+        The dataframe containing the data.
+    column_name : str
+        The column in which to identify outliers.
+    multiplier : float, optional
+        The factor to multiply the IQR by (default is 1.5).
+    
+    Returns:
+    pandas DataFrame
+        DataFrame with outliers removed.
+    """
+    # Calculate the IQR
+    Q1 = df[column_name].quantile(0.25)
+    Q3 = df[column_name].quantile(0.75)
+    IQR = Q3 - Q1
+    
+    # Calculate bounds
+    lower_bound = Q1 - multiplier * IQR
+    upper_bound = Q3 + multiplier * IQR
+    
+    # Remove outliers
+    df_cleaned = df[(df[column_name] >= lower_bound) & (df[column_name] <= upper_bound)]
+    
+    return df_cleaned
 
 ## Consolidate all logger csv files into one dataframe    
 def get_logger_dataframe():
@@ -187,14 +220,14 @@ def plot_water_temp_compare(before_df, manual_df, after_df, water_level_column_n
     ax1.set_ylabel('Water Level', size=12)
     ax2.set_ylabel('Temperature', size=12)
 
-    ax1.plot(before_df['DT'], before_df[water_level_column_name], color="b", label="Cut due to date")
-    ax2.plot(before_df['DT'], before_df['TEMPERATURE'], color="b", label="Cut due to date")
+    ax1.plot(before_df['DT'], before_df[water_level_column_name], color="b", linewidth=0.6, label="Cut due to date")
+    ax2.plot(before_df['DT'], before_df['TEMPERATURE'], color="b", linewidth=0.6, label="Cut due to date")
     
-    ax1.plot(manual_df['DT'], manual_df[water_level_column_name], color="g", label="Cut due to Temp change")
-    ax2.plot(manual_df['DT'], manual_df['TEMPERATURE'], color="g", label="Cut due to Temp change")
+    ax1.plot(manual_df['DT'], manual_df[water_level_column_name], color="g", linewidth=0.6, label="Cut due to Temp change")
+    ax2.plot(manual_df['DT'], manual_df['TEMPERATURE'], color="g", linewidth=0.6, label="Cut due to Temp change")
     
-    ax1.plot(after_df['DT'], after_df[water_level_column_name], color="r", label="Remaining data")
-    ax2.plot(after_df['DT'], after_df['TEMPERATURE'], color="r", label="Remaining data")
+    ax1.plot(after_df['DT'], after_df[water_level_column_name], color="r", linewidth=0.6, label="Remaining data")
+    ax2.plot(after_df['DT'], after_df['TEMPERATURE'], color="r", linewidth=0.6, label="Remaining data")
 
     # Throwing error --> AttributeError: 'YTick' object has no attribute 'label'
     # for tick in ax1.yaxis.get_major_ticks():
@@ -387,8 +420,8 @@ def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df):
         # Subdaily groundwater levels (blue)
         plt.plot(well_subdaily['DateTime'], 
                  well_subdaily['ground_to_water_cm'], 
-                 linestyle='-', marker='o', markersize=1.5, 
-                 color='blue', linewidth=0.5, label='Logger (10-min intervals)')
+                 linestyle='-', marker='o', markersize=0.6, 
+                 color='blue', linewidth=0.4, label='Logger (10-min intervals)')
     
         # Biweekly groundwater levels (red) for overlapping times
         if not well_biweek.empty:
@@ -401,7 +434,9 @@ def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df):
         plt.xlabel("DateTime")
         plt.ylabel("Groundwater Level (cm)")
         plt.title("Subdaily Groundwater Levels for" 
-                  + f" Well {well_id} (Deployment {deployment})")
+                  + f" Well {well_id} (Deployment {deployment} from"
+                  + f" {min(well_subdaily['DateTime'])} to "
+                  + f"{max(well_subdaily['DateTime'])})")
         plt.legend()
         plt.grid(True)
     
@@ -410,6 +445,62 @@ def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df):
     
         plt.tight_layout()
         plt.show()
+
+def plot_baro_compare(df1, df2):
+    """
+    Plots and compares barometric data from two dataframes.
+    Each year's data is plotted in a separate subplot.
+    Only years where both dataframes have data are included.
+    
+    Parameters:
+    df1, df2: pandas DataFrame
+        DataFrames contain 'DateTime' and 'baro_LEVEL_kPa' columns.
+    """
+    df3 = normalize_baro(df1, df2)
+    years_df3 = set(df3['DateTime'].dt.year)
+
+    # Extract years present in initial datasets
+    years_df1 = set(df1['DateTime'].dt.year)
+    years_df2 = set(df2['DateTime'].dt.year)
+    common_years = sorted(years_df1.intersection(years_df2))
+    
+    if not common_years:
+        print("No common years with data between the two datasets.")
+        return
+    
+    fig, axes = plt.subplots(len(common_years), 1, 
+                             figsize=(10, 5 * len(common_years)), sharex=True)
+    if len(common_years) == 1:
+        axes = [axes]  # Ensure axes is iterable
+    
+    for ax, year in zip(axes, common_years):
+        # Filter data for the given year
+        df1_year = df1[df1['DateTime'].dt.year == year].copy()
+        df2_year = df2[df2['DateTime'].dt.year == year].copy()
+        df3_year = df3[df3['DateTime'].dt.year == year].copy()
+
+        # Convert DateTime to day of the year
+        df1_year['DayOfYear'] = df1_year['DateTime'].dt.dayofyear
+        df2_year['DayOfYear'] = df2_year['DateTime'].dt.dayofyear
+        df3_year['DayOfYear'] = df3_year['DateTime'].dt.dayofyear
+
+        
+        # Plot data with smaller lines and markers
+        ax.plot(df1_year['DayOfYear'], df1_year['baro_Pressure_kPa'], label='Solinst', linestyle='-', linewidth=0.9)
+        ax.plot(df2_year['DayOfYear'], df2_year['baro_Pressure_kPa'], label='Dendra', linestyle='-',  linewidth=0.7)
+        ax.plot(df3_year['DayOfYear'], df3_year['baro_Pressure_kPa'], label='Offset Correction', linestyle='--', linewidth=0.5)
+
+        # Formatting
+        ax.set_title(f'Barometric Pressure Comparison for {year}')
+        ax.set_ylabel('Barometric Pressure (kPa)')
+        ax.legend()
+        ax.grid(True)
+    
+    plt.xlabel('Day of Year')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+    return
 
         
 ## Cut or trim logger data at front/back end of data
@@ -463,7 +554,7 @@ def cut_logger_data():
             #log_df['DT'] = pd.to_datetime(log_df['Date'] + ' ' + log_df['Time'])
             
             # save original version for comparison plot later
-            orig_deployment_df = deployment_df.rename(columns={'LEVEL': 'raw_LEVEL_m'})  
+            orig_deployment_df = deployment_df.rename(columns={'LEVEL': 'raw_Level_m'})  
             
             ## Calculate difference between raw datetime and field notes start_time and end_time
             #  and select matching deployments, first by well_id
@@ -511,6 +602,7 @@ def cut_logger_data():
                                 "in cut_logger_data(). Which one to use?"
                                 " Check date range in logger csv. Exiting.")
                 logging.info(warning_str)
+                logging.debug(well_time_df)
                 break
             
             ## Select logger data rows within start/end times from field notes
@@ -524,7 +616,7 @@ def cut_logger_data():
             deployment_df = deployment_df[(deployment_df['DT'] >= start_time) & (deployment_df['DT'] <= end_time)]
             
             # take snapshot of dataframe to plot and validate later
-            manual_deployment_df = deployment_df.rename(columns={'LEVEL': 'raw_LEVEL_m'})
+            manual_deployment_df = deployment_df.rename(columns={'LEVEL': 'raw_Level_m'})
             
             ## Calculate temperature rate of change
             # temp change threshold that controls cutoff points
@@ -561,7 +653,7 @@ def cut_logger_data():
         
             # Snip both halfs back together
             deployment_df = pd.concat((first_cut, second_cut), axis=0)
-            deployment_df.rename(columns={'LEVEL': 'raw_LEVEL_m'}, inplace=True)
+            deployment_df.rename(columns={'LEVEL': 'raw_Level_m'}, inplace=True)
             
             # track cut info for each well
             track_df = pd.DataFrame(
@@ -594,9 +686,9 @@ def cut_logger_data():
     
     return cut_logger_df
     
-## Consolidate all barometer CSV files into one dataframe
-## Convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units
-def get_baro_dataframe_solinst():
+## Consolidate all solinst barometer CSV files into one dataframe
+## Rename columns with units and filter based on start/end time of gw data
+def get_baro_solinst(start_time, end_time):
     """Consolidate all barometer CSV files into one dataframe, then convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units."""
     all_baro_data = pd.DataFrame()
     
@@ -604,74 +696,168 @@ def get_baro_dataframe_solinst():
         if f.endswith('.csv'):
             if debug_baro: 
                 logging.debug(f"Fetching baro data from {f}")
-            ## TODO: consider adding barometer well_id to dataframe
+            
+            ## Get data from csv and format date
             new_baro = pd.read_csv(solinst_baro_data_dir + f, header=10, encoding='ISO-8859-1')
+            new_baro['DateTime'] = pd.to_datetime(
+                new_baro['Date'] + ' ' + new_baro['Time'],
+                format='%m/%d/%Y %I:%M:%S %p')
+            
+            # Extract well_id from filename using regex and add column
+            match = re.search(r'Baro_([A-Za-z0-9-]{4,8})_', f)
+            well_id = match.group(1) if match else None  # Extract matched group
+            
+            # Find elevation for the well_id from geojson file
+            with open(well_elevation_file, "r") as well_file:
+                    geojson_data = json.load(well_file)
+            
+            # Extract elevation for the well_id
+            elevation_m = None
+            for feature in geojson_data["features"]:
+                props = feature["properties"]
+                if props.get("Name") == well_id:
+                    elevation_m = props.get("elevation_m")
+                    break
+            
+            if debug_baro and elevation_m == None:
+                print(f"No elevation found for well_id {well_id}")
+            
+            # Assign the elevation to the DataFrame
+            new_baro['elevation_m'] = elevation_m
+            
+            # Cleanup data so column names clear, not carrying unneeded data
+            new_baro.drop(['Date', 'Time', 'ms'], axis=1, inplace=True)
+            new_baro.rename(columns={'LEVEL': 'baro_Pressure_kPa', 
+                                     'TEMPERATURE': 'baro_Temp_C'}, 
+                            inplace=True)
             
             if debug_baro: 
                 logging.debug(f"Length of bara dataframe: {str(len(new_baro))}")
-                test_b = new_baro
-                
-                # format DateTime using explicit 12-hour format with AM/PM
-                test_b['DateTime'] = pd.to_datetime(
-                    test_b['Date'] + ' ' + test_b['Time'],
-                    format='%m/%d/%Y %I:%M:%S %p')
-                str_b_range = 'min/max of new baro file time:' + str(min(test_b['DateTime'])) + ' to ' + str(max(test_b['DateTime']))
+                str_b_range = 'min/max of new baro file time:' + str(min(new_baro['DateTime'])) + ' to ' + str(max(new_baro['DateTime']))
                 logging.debug(str_b_range)
                 
             all_baro_data = pd.concat([all_baro_data, new_baro],
                                       ignore_index=True, sort=True)
-            
-            if debug_baro: 
-                logging.debug(str(len(all_baro_data))+ '\n')
-
+    
+    # Filter baro data so only store those relevant to gw data
+    all_baro_data = all_baro_data[(all_baro_data['DateTime'] >= start_time) 
+                                  & (all_baro_data['DateTime'] <= end_time)]
+    
+    if debug_baro: 
+        logging.debug(str(len(all_baro_data))+ '\n')
+        
     return all_baro_data
 
-## Consolidate all barometer CSV files into one dataframe
-## Convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units
-def get_baro_dataframe():
+## Retrieve baro data from Dendra field station 
+## Convert pressure reading from mb to kPa
+def get_baro_dendra(start_time, end_time):
     """Consolidate all barometer CSV files into one dataframe, then convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units."""
     
+    # Get needed data from the csv
     new_baro = pd.read_csv(station_baro_file)
-    new_baro['DateTime'] = pd.to_datetime(new_baro['Time'])
+    new_baro = new_baro[['time', 'barometric-pressure-avg-mb']]
+    
+    # Filter for start and end times
+    new_baro['DateTime'] = pd.to_datetime(new_baro['time'])
+    new_baro = new_baro[(new_baro['DateTime'] >= start_time) & (new_baro['DateTime'] <= end_time)]
     
     if debug_baro: 
         print(str(len(new_baro)))
         str_b_range = 'min/max of new baro file time:' + str(min(new_baro['DateTime'])) + ' to ' + str(max(new_baro['DateTime']))
         print(str_b_range)
         
-    new_baro.drop(['Barometric Pressure Avg (mb)'], axis=1, inplace=True)
-    new_baro.rename(columns={'Barometric Pressure Avg (kPa)': 'baro_LEVEL_kPa'}, inplace=True)
-    #column_order = ['DateTime', 'baro_LEVEL_kPa']
-    #new_baro = new_baro.reindex(columns=column_order)
+    # Convert measurement from mb to kPa
+    new_baro['baro_Pressure_kPa'] = new_baro['barometric-pressure-avg-mb']*0.1
+    new_baro.drop(['barometric-pressure-avg-mb'], axis=1, inplace=True)
+    
+    column_order = ['DateTime', 'baro_Pressure_kPa']
+    new_baro = new_baro.reindex(columns=column_order)
 
     return new_baro
 
-## Takes barometric pressure reading from the raw Solinst barologger
-## and converts it from kPa of pressure to meters (m) of pressure
-def convert_baro(baro_df):
-    """Takes water level reading from the Dendra data, 
-    converts it from kPa of pressure to meters (m) above the sensor."""
+def normalize_baro(df1, df2):
+    """
+    Computes the mean offset correction for barometric pressure data in df2 
+    based on df1 and returns df2 with corrected values.
+
+    Parameters:
+        df1, df2: pandas DataFrame
+        DataFrames containing 'DateTime' and 'baro_Pressure_kPa' columns.
+
+    Returns:
+        df2_offset: pandas DataFrame
+    """
+
+    # initialize df2_offset
+    df2_offset = df2.copy()
+
+    years_df1 = set(df1['DateTime'].dt.year)
+    years_df2 = set(df2['DateTime'].dt.year)
+    common_years = sorted(years_df1.intersection(years_df2))
+
+    if not common_years:
+        print("No common years with data between the two datasets.")
+        return df2_offset
+
+    for year in common_years:
+        df1_year = df1[df1['DateTime'].dt.year == year].copy()
+        df2_year = df2[df2['DateTime'].dt.year == year].copy()
+        
+        # Remove outliers for the year
+        df1_year = remove_outliers(df1_year, 'baro_Pressure_kPa')
+        df2_year = remove_outliers(df2_year, 'baro_Pressure_kPa')
     
-    baro_df['baro_LEVEL_m'] = baro_df['baro_LEVEL_kPa'] * density_factor    
-   
-#    if debug_baro: 
-#        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
-#        print(str_b_range)
+        df1_year['DayOfYear'] = df1_year['DateTime'].dt.dayofyear
+        df2_year['DayOfYear'] = df2_year['DateTime'].dt.dayofyear
     
-    # cleanup baro data so column names clear, not carrying unneeded data
-#    baro_df.drop(['Date', 'Time', 'ms'], axis=1, inplace=True)
-#    baro_df.rename(columns={'LEVEL': 'baro_LEVEL_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
+        merged = df1_year[['DayOfYear', 'baro_Pressure_kPa']].merge(
+            df2_year[['DayOfYear', 'baro_Pressure_kPa']], 
+            on='DayOfYear', 
+            suffixes=('_df1', '_df2')
+            )
     
-    return baro_df
+        if not merged.empty:
+            mean_offset = (merged['baro_Pressure_kPa_df1'] - 
+                           merged['baro_Pressure_kPa_df2']).mean()
+        else:
+            mean_offset = 0  # No common data points
+        
+        # Select rows where the 'DateTime' column matches the current year
+        mask = df2_offset['DateTime'].dt.year == year
+
+        # Apply the offset only to those rows
+        df2_offset.loc[mask, 'baro_Pressure_kPa'] = ( 
+            df2_offset.loc[mask, 'baro_Pressure_kPa'] + mean_offset)
+
+    return df2_offset
+
 
 ## Takes barometric pressure reading from the raw Solinst barologger
 ## and converts it from kPa of pressure to meters (m) of pressure
-def convert_baro_solinst(baro_df):
-    """Takes water level reading from the raw Solinst levelogger data, converts it from kPa of pressure to meters (m) above the sensor."""
+# def convert_baro(baro_df):
+#     """Takes water level reading from the Dendra data, 
+#     converts it from kPa of pressure to meters (m) above the sensor."""
     
-    #baro_df['baro_LEVEL_m'] = baro_df['LEVEL'] * 0.101972
-    baro_df['baro_LEVEL_m'] = baro_df['LEVEL'] * density_factor 
-    baro_df['DateTime'] = pd.to_datetime(baro_df['Date'] + ' ' + baro_df['Time'])
+#     baro_df['baro_LEVEL_m'] = baro_df['baro_LEVEL_kPa'] * density_factor    
+   
+# #    if debug_baro: 
+# #        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
+# #        print(str_b_range)
+    
+#     # cleanup baro data so column names clear, not carrying unneeded data
+# #    baro_df.drop(['Date', 'Time', 'ms'], axis=1, inplace=True)
+# #    baro_df.rename(columns={'LEVEL': 'baro_LEVEL_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
+    
+#     return baro_df
+
+## Converts barometric pressure reading
+## from kPa of pressure to meters (m) of pressure head
+def convert_baro(baro_df):
+    """Takes water level reading from the raw Solinst levelogger data, 
+    converts it from kPa of pressure to meters (m) above the sensor."""
+    
+    baro_df['baro_Level_m'] = baro_df['LEVEL'] * density_factor 
+    #baro_df['DateTime'] = pd.to_datetime(baro_df['Date'] + ' ' + baro_df['Time'])
     
 #    if debug_baro: 
 #        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
@@ -679,41 +865,104 @@ def convert_baro_solinst(baro_df):
     
     # cleanup baro data so column names clear, not carrying unneeded data
     baro_df.drop(['Date', 'Time', 'ms'], axis=1, inplace=True)
-    baro_df.rename(columns={'LEVEL': 'baro_LEVEL_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
+    baro_df.rename(columns={'LEVEL': 'baro_Pressure_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
+    
+    return baro_df
+
+def adjust_baro_elevation(baro_df, to_elevation=baro_standard_elevation, from_elevation=None):
+    """
+    Adjusts barometric pressure readings in baro_df to a standard elevation using the barometric formula.
+    
+    Parameters:
+    baro_df : pandas DataFrame
+        DataFrame containing:
+        - 'baro_Level_kPa' (barometric pressure in kPa)
+        - 'DateTime' (timestamp of the reading)
+        - 'baro_Temp_C' (air temperature in Celsius)
+        - 'elevation_m' (current elevation of the reading in meters)
+    to_elevation : float, optional
+        The target elevation to adjust pressure readings to. Default is baro_standard_elevation.
+    from_elevation : float, optional
+        The source elevation. If None, it uses 'elevation_m' from the DataFrame.
+    
+    Returns:
+    pandas DataFrame
+        The input DataFrame with 'baro_Level_kPa' adjusted and 'elevation_m' set to to_elevation.
+    """
+    import numpy as np
+    
+    # Physical constants
+    R = 8.3144598  # Universal gas constant (J/(mol*K))
+    M = 0.0289644  # Molar mass of Earth's air (kg/mol)
+    L = 0.0065  # Standard temperature lapse rate (K/m)
+    
+    # Ensure from_elevation is set
+    if from_elevation is None:
+        from_elevation = baro_df['elevation_m']
+    
+    # Convert temperature to Kelvin
+    T1_K = baro_df['baro_Temp_C'] + 273.15
+    
+    # Compute pressure adjustment using the barometric formula
+    exponent = (gravity_sagehen * M) / (R * L)
+    baro_df['baro_Pressure_kPa'] = baro_df['baro_Pressure_kPa'] * (
+        (1 - L * (to_elevation - from_elevation) / T1_K) ** exponent
+    )
+    
+    # Update elevation column
+    baro_df['elevation_m'] = to_elevation
     
     return baro_df
 
 ## Removes the barometric pressure (in meters) from the sensor water level
 #  Assumes baro_df and gw_df are ('datetime64[ns]') type
-def compensate_baro(baro_df, gw_df):
+def compensate_baro(gw_df):
     """
     Removes the barometric pressure (in meters)
     from the sensor water level.
     """
     
-    # merge baro and gw dataframes, only keeping relevant rows
-    merge_df = baro_df.merge(gw_df, how='inner',on='DateTime')
+    ## Get the barometric data for the date ranges of the gw_df
     
-#    if debug_baro: 
-#        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
-#        str_g_range = 'min/max of gw time:' + str(min(gw_df['DateTime'])) + ' to ' + str(max(gw_df['DateTime']))
-#        print(str_b_range)
-#        print(str_g_range)
-#        print('lost gw records after merge with baro: ' + str(len(gw_df) - len(merge_df)))
+    # Get date ranges of gw_df
+    start_time = min(gw_df['DateTime'])
+    end_time = max(gw_df['DateTime'])
     
-    # subtract baro data from gw data
-    merge_df['compensated_LEVEL_m'] = merge_df['raw_LEVEL_m'] - merge_df['baro_LEVEL_m']
+    # Get the baro data
+    baro_df_solinst = get_baro_solinst(start_time, end_time)
+    baro_df_dendra = get_baro_dendra(start_time, end_time)
     
-    # cleanup column names + order so human readable and save as csv
-    #merge_df.drop(['baro_LEVEL_kPa', 'baro_Temp_C'], axis=1, inplace=True)
-    merge_df.drop(['baro_LEVEL_kPa'], axis=1, inplace=True)
-    column_order = ['well_id', 'DateTime', 'raw_LEVEL_m',
-                    'baro_LEVEL_m', 'compensated_LEVEL_m', 'Temp_c']
-    merge_df = merge_df.reindex(columns=column_order)
-    merge_df.to_csv(compensated_dir+'compensated_all_wells.csv', 
-                    encoding='ISO-8859-1', index=False)
+    # Adjust solinst baro data for elevation; base on weather station location
+    baro_df_solinst = adjust_baro_elevation(baro_df_solinst,
+                                                baro_standard_elevation)
+        
+    # If needed, plot and compare the baro data sources
+    if debug_baro:
+        plot_baro_compare(baro_df_solinst, baro_df_dendra)
+    
+    # Normalize the data based on both sources using an offset
+    baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
+    
+    if debug_baro: 
+       str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
+       str_g_range = 'min/max of gw time:' + str(min(gw_df['DateTime'])) + ' to ' + str(max(gw_df['DateTime']))
+       print(str_b_range)
+       print(str_g_range)
+       #print('lost gw records after merge with baro: ' + str(len(gw_df) - len(merge_df)))
+    
+    # # subtract baro data from gw data
+    # merge_df['compensated_Level_m'] = merge_df['raw_Level_m'] - merge_df['baro_Level_m']
+    
+    # # cleanup column names + order so human readable and save as csv
+    # #merge_df.drop(['baro_LEVEL_kPa', 'baro_Temp_C'], axis=1, inplace=True)
+    # merge_df.drop(['baro_Pressure_kPa'], axis=1, inplace=True)
+    # column_order = ['well_id', 'DateTime', 'raw_Level_m',
+    #                 'baro_Level_m', 'compensated_Level_m', 'Temp_c']
+    # merge_df = merge_df.reindex(columns=column_order)
+    # merge_df.to_csv(compensated_dir+'compensated_all_wells.csv', 
+    #                 encoding='ISO-8859-1', index=False)
 
-    return merge_df
+    return baro_df
 
 
 
@@ -759,7 +1008,7 @@ def calculate_sensor_level(merged_df):
             
             # If there's an exact match, use it directly!
             if not exact_match.empty:
-                pressure_head = exact_match['compensated_LEVEL_m'].values[0]
+                pressure_head = exact_match['compensated_Level_m'].values[0]
             
             else:
                 # Find the closest two logger records before and after
@@ -777,8 +1026,8 @@ def calculate_sensor_level(merged_df):
                     # Interpolate compensated_LEVEL_m at manual measurement time
                     t1 = before['DateTime_subdaily'].values[0]
                     t2 = after['DateTime_subdaily'].values[0]
-                    v1 = before['compensated_LEVEL_m'].values[0]
-                    v2 = after['compensated_LEVEL_m'].values[0]
+                    v1 = before['compensated_Level_m'].values[0]
+                    v2 = after['compensated_Level_m'].values[0]
                 
                     # Linear interpolation
                     pressure_head = v1 + (
@@ -789,7 +1038,7 @@ def calculate_sensor_level(merged_df):
                     # Use rate of change to extrapolate
                     before_sorted = before.sort_values('DateTime_subdaily')
                     t1, t2 = before_sorted['DateTime_subdaily'].iloc[-2:].values
-                    v1, v2 = before_sorted['compensated_LEVEL_m'].iloc[-2:].values
+                    v1, v2 = before_sorted['compensated_Level_m'].iloc[-2:].values
                     time_diff = (t2 - t1) / np.timedelta64(1, 'm')  # Convert to minutes
                     rate = (v2 - v1) / time_diff  # Rate of change per minute
                     pressure_head = v2 + rate * ((manual_time - t2).total_seconds()/60)
@@ -799,7 +1048,7 @@ def calculate_sensor_level(merged_df):
                     # Use rate of change from two after readings
                     after_sorted = after.sort_values('DateTime_subdaily')
                     t1, t2 = after_sorted['DateTime_subdaily'].iloc[:2].values
-                    v1, v2 = after_sorted['compensated_LEVEL_m'].iloc[:2].values
+                    v1, v2 = after_sorted['compensated_Level_m'].iloc[:2].values
                     time_diff = (t2 - t1) / np.timedelta64(1, 'm')  # Convert to minutes
                     rate = (v2 - v1) / time_diff  # Rate of change per minute
                     pressure_head = v1 - rate * ((t1 - manual_time).total_seconds()/60)
@@ -814,7 +1063,7 @@ def calculate_sensor_level(merged_df):
                     if len(before) > 1:
                         before_sorted = before.sort_values('DateTime_subdaily')
                         t1, t2 = before_sorted['DateTime_subdaily'].iloc[-2:].values
-                        v1, v2 = before_sorted['compensated_LEVEL_m'].iloc[-2:].values
+                        v1, v2 = before_sorted['compensated_Level_m'].iloc[-2:].values
                         time_diff = (t2 - t1) / np.timedelta64(1, 'm')  # Convert to minutes
                         rate = (v2 - v1) / time_diff  # Rate of change per minute
                     
@@ -1027,7 +1276,7 @@ def convert_relativeToGround(subdaily_df):
     # Apply manual measurement offsets to subdaily_df
     def calculate_subdaily_water_level(row):
         key = (row['well_id'], row['deployment'])
-        return sensor_levels_m.get(key, np.nan) - row['compensated_LEVEL_m']
+        return sensor_levels_m.get(key, np.nan) - row['compensated_Level_m']
     
     subdaily_df['ground_to_water_m'] = subdaily_df.apply(
                                         calculate_subdaily_water_level, axis=1)
@@ -1037,8 +1286,8 @@ def convert_relativeToGround(subdaily_df):
     
     # Re-order columns
     column_order = ['well_id', 'DateTime', 'deployment', 'ground_to_water_m', 
-                    'raw_LEVEL_m', 'baro_LEVEL_m', 
-                    'compensated_LEVEL_m', 'Temp_c']
+                    'raw_Level_m', 'baro_Level_m', 
+                    'compensated_Level_m', 'Temp_c']
     subdaily_df = subdaily_df.reindex(columns=column_order)  
     
     # Save
@@ -1066,8 +1315,7 @@ else:
 
 ## 2. Compensate logger water level (m) based on barometer data (kPa)
 if process_baro: 
-    waterLevel_df = compensate_baro(convert_baro_solinst(get_baro_dataframe_solinst()), 
-                                    waterLevel_df)
+    waterLevel_df = compensate_baro(waterLevel_df)
 
 ## 3. Convert water level from 'relative to sensor' to 
 ###    'relative to ground surface elevation' (in meters)
