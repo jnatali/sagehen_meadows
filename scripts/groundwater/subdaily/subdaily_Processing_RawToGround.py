@@ -26,9 +26,9 @@ TODO:
 * EWR-1 2018-10-01 count: 0, KET-1 2019-09-04 count: 0, KWR-1 2018-10-01 count: 0
 """
 # import libraries
-import pandas as pd
 import numpy as np
-import json
+import pandas as pd
+import geopandas as gpd # to handle geojson file
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import os
@@ -144,6 +144,26 @@ def get_logger_dataframe():
         log_df = pd.concat([pd.read_csv(f, header=11, encoding='ISO-8859-1')])
     log_df['DT'] = pd.to_datetime(log_df['Date'] + ' ' + log_df['Time'])
     return log_df
+
+def get_well_elevations(gw_df):
+    """
+    Adds new column for elevation of the well (in meters) based on geojson data
+    
+    Parameters:
+    gw_df : pandas dataframe
+        groundwater reading data from sensor
+
+    Returns:
+        gw_df: pandas dataframe
+        groundwater reading data with a new column, 'elevation_m'
+    """
+    # Load well elevation data from GeoJSON
+    well_elevations = gpd.read_file(well_elevation_file)[['Name', 'elevation_m']]
+    well_elevations = well_elevations.rename(columns={'Name': 'well_id'})
+    # Merge elevation data into groundwater dataframe
+    gw_df = gw_df.merge(well_elevations, on='well_id', how='left')
+    
+    return gw_df
 
 ## Plot subdaily logger dataframe
 #  Assume dataframe has DT column converted to datetime
@@ -692,6 +712,13 @@ def get_baro_solinst(start_time, end_time):
     """Consolidate all barometer CSV files into one dataframe, then convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units."""
     all_baro_data = pd.DataFrame()
     
+    # Get elevations for well_ids from geojson file
+    well_elevations = gpd.read_file(well_elevation_file)[['Name', 'elevation_m']]
+    well_elevations = well_elevations.rename(columns={'Name': 'well_id'})
+    
+    # Set index for fast lookups in the for loop
+    well_elevations = well_elevations.set_index('well_id')
+
     for f in os.listdir(solinst_baro_data_dir):
         if f.endswith('.csv'):
             if debug_baro: 
@@ -707,20 +734,13 @@ def get_baro_solinst(start_time, end_time):
             match = re.search(r'Baro_([A-Za-z0-9-]{4,8})_', f)
             well_id = match.group(1) if match else None  # Extract matched group
             
-            # Find elevation for the well_id from geojson file
-            with open(well_elevation_file, "r") as well_file:
-                    geojson_data = json.load(well_file)
-            
-            # Extract elevation for the well_id
-            elevation_m = None
-            for feature in geojson_data["features"]:
-                props = feature["properties"]
-                if props.get("Name") == well_id:
-                    elevation_m = props.get("elevation_m")
-                    break
-            
+            if well_id in well_elevations.index:
+                elevation_m = well_elevations.at[well_id, 'elevation_m'] 
+            else:
+                elevation_m = None
+
             if debug_baro and elevation_m == None:
-                print(f"No elevation found for well_id {well_id}")
+                logging.debug(f"No elevation found for well_id {well_id}")
             
             # Assign the elevation to the DataFrame
             new_baro['elevation_m'] = elevation_m
@@ -755,7 +775,8 @@ def get_baro_dendra(start_time, end_time):
     
     # Get needed data from the csv
     new_baro = pd.read_csv(station_baro_file)
-    new_baro = new_baro[['time', 'barometric-pressure-avg-mb']]
+    new_baro = new_baro[['time', 'barometric-pressure-avg-mb', 'air-temp-avg-degc']]
+    new_baro = new_baro.rename(columns={'air-temp-avg-degc': 'baro_Temp_C'})
     
     # Filter for start and end times
     new_baro['DateTime'] = pd.to_datetime(new_baro['time'])
@@ -770,7 +791,7 @@ def get_baro_dendra(start_time, end_time):
     new_baro['baro_Pressure_kPa'] = new_baro['barometric-pressure-avg-mb']*0.1
     new_baro.drop(['barometric-pressure-avg-mb'], axis=1, inplace=True)
     
-    column_order = ['DateTime', 'baro_Pressure_kPa']
+    column_order = ['DateTime', 'baro_Pressure_kPa', 'baro_Temp_C']
     new_baro = new_baro.reindex(columns=column_order)
 
     return new_baro
@@ -791,6 +812,7 @@ def normalize_baro(df1, df2):
     # initialize df2_offset
     df2_offset = df2.copy()
 
+    # determine and apply unique offset for each year
     years_df1 = set(df1['DateTime'].dt.year)
     years_df2 = set(df2['DateTime'].dt.year)
     common_years = sorted(years_df1.intersection(years_df2))
@@ -810,8 +832,8 @@ def normalize_baro(df1, df2):
         df1_year['DayOfYear'] = df1_year['DateTime'].dt.dayofyear
         df2_year['DayOfYear'] = df2_year['DateTime'].dt.dayofyear
     
-        merged = df1_year[['DayOfYear', 'baro_Pressure_kPa']].merge(
-            df2_year[['DayOfYear', 'baro_Pressure_kPa']], 
+        merged = df1_year[['DayOfYear', 'baro_Pressure_kPa', 'baro_Temp_C']].merge(
+            df2_year[['DayOfYear', 'baro_Pressure_kPa', 'baro_Temp_C']], 
             on='DayOfYear', 
             suffixes=('_df1', '_df2')
             )
@@ -852,31 +874,72 @@ def normalize_baro(df1, df2):
 
 ## Converts barometric pressure reading
 ## from kPa of pressure to meters (m) of pressure head
-def convert_baro(baro_df):
+def convert_baro_kPa_meters(baro_df):
     """Takes water level reading from the raw Solinst levelogger data, 
     converts it from kPa of pressure to meters (m) above the sensor."""
     
-    baro_df['baro_Level_m'] = baro_df['LEVEL'] * density_factor 
-    #baro_df['DateTime'] = pd.to_datetime(baro_df['Date'] + ' ' + baro_df['Time'])
-    
-#    if debug_baro: 
-#        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
-#        print(str_b_range)
+    baro_df['baro_Level_m'] = baro_df['baro_Pressure_kPa'] * density_factor 
     
     # cleanup baro data so column names clear, not carrying unneeded data
-    baro_df.drop(['Date', 'Time', 'ms'], axis=1, inplace=True)
-    baro_df.rename(columns={'LEVEL': 'baro_Pressure_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
+    #baro_df.rename(columns={'LEVEL': 'baro_Pressure_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
     
     return baro_df
 
-def adjust_baro_elevation(baro_df, to_elevation=baro_standard_elevation, from_elevation=None):
+# def adjust_pressure_elevation(baro_df, to_elevation=baro_standard_elevation, from_elevation=None):
+#     """
+#     Adjusts barometric pressure readings in baro_df to a standard elevation using the barometric formula.
+    
+#     Parameters:
+#     baro_df : pandas DataFrame
+#         DataFrame containing:
+#         - 'baro_Level_kPa' (barometric pressure in kPa)
+#         - 'DateTime' (timestamp of the reading)
+#         - 'baro_Temp_C' (air temperature in Celsius)
+#         - 'elevation_m' (current elevation of the reading in meters)
+#     to_elevation : float, optional
+#         The target elevation to adjust pressure readings to. Default is baro_standard_elevation.
+#     from_elevation : float, optional
+#         The source elevation. If None, it uses 'elevation_m' from the DataFrame.
+    
+#     Returns:
+#     pandas DataFrame
+#         The input DataFrame with 'baro_Level_kPa' adjusted and 'elevation_m' set to to_elevation.
+#     """
+#     import numpy as np
+    
+#     # Physical constants
+#     R = 8.3144598  # Universal gas constant (J/(mol*K))
+#     M = 0.0289644  # Molar mass of Earth's air (kg/mol)
+#     L = 0.0065  # Standard temperature lapse rate (K/m)
+    
+#     # Ensure from_elevation is set
+#     if from_elevation is None:
+#         from_elevation = baro_df['elevation_m']
+    
+#     # Convert temperature to Kelvin
+#     T1_K = baro_df['baro_Temp_C'] + 273.15
+    
+#     # Compute pressure adjustment using the barometric formula
+#     exponent = (gravity_sagehen * M) / (R * L)
+#     baro_df['baro_Pressure_kPa'] = baro_df['baro_Pressure_kPa'] * (
+#         (1 - L * (to_elevation - from_elevation) / T1_K) ** exponent
+#     )
+    
+#     # Update elevation column
+#     baro_df['elevation_m'] = to_elevation
+    
+#     return baro_df
+
+
+def adjust_pressure_elevation(df, to_elevation=baro_standard_elevation, from_elevation=None):
     """
-    Adjusts barometric pressure readings in baro_df to a standard elevation using the barometric formula.
+    Adjusts barometric pressure readings in df based on elevation change.
+    Uses the barometric formula.
     
     Parameters:
-    baro_df : pandas DataFrame
+    df : pandas DataFrame
         DataFrame containing:
-        - 'baro_Level_kPa' (barometric pressure in kPa)
+        - 'baro_Pressure_kPa' (barometric pressure in kPa)
         - 'DateTime' (timestamp of the reading)
         - 'baro_Temp_C' (air temperature in Celsius)
         - 'elevation_m' (current elevation of the reading in meters)
@@ -898,71 +961,85 @@ def adjust_baro_elevation(baro_df, to_elevation=baro_standard_elevation, from_el
     
     # Ensure from_elevation is set
     if from_elevation is None:
-        from_elevation = baro_df['elevation_m']
+        from_elevation = df['elevation_m']
     
     # Convert temperature to Kelvin
-    T1_K = baro_df['baro_Temp_C'] + 273.15
+    df['baro_Temp_K'] = df['baro_Temp_C'] + 273.15
     
     # Compute pressure adjustment using the barometric formula
     exponent = (gravity_sagehen * M) / (R * L)
-    baro_df['baro_Pressure_kPa'] = baro_df['baro_Pressure_kPa'] * (
-        (1 - L * (to_elevation - from_elevation) / T1_K) ** exponent
+    df['baro_Pressure_kPa'] = df['baro_Pressure_kPa'] * (
+        (1 - L * (to_elevation - from_elevation) 
+         / df['baro_Temp_K']) ** exponent
     )
     
     # Update elevation column
-    baro_df['elevation_m'] = to_elevation
+    df['elevation_m'] = to_elevation
     
-    return baro_df
+    return df
 
-## Removes the barometric pressure (in meters) from the sensor water level
-#  Assumes baro_df and gw_df are ('datetime64[ns]') type
+
+
+
 def compensate_baro(gw_df):
     """
-    Removes the barometric pressure (in meters)
-    from the sensor water level.
+    Compensates groundwater sensor readings by removing barometric pressure.
+    Removes the barometric pressure (in meters) from the sensor water level.
+    
+    Parameters:
+        gw_df : pandas DataFrame
+        Contains groundwater level readings with 'well_id', 'DateTime', and 'raw_LEVEL_m'.
+    
+    Returns:
+        pandas DataFrame
+        The groundwater data with corrected water level (in meters)
+
+    
     """
     
-    ## Get the barometric data for the date ranges of the gw_df
+    ## 1. Get the barometric data for the date ranges of the gw_df
     
     # Get date ranges of gw_df
     start_time = min(gw_df['DateTime'])
     end_time = max(gw_df['DateTime'])
     
-    # Get the baro data
+    # Get barometric data for the given date range
     baro_df_solinst = get_baro_solinst(start_time, end_time)
     baro_df_dendra = get_baro_dendra(start_time, end_time)
     
     # Adjust solinst baro data for elevation; base on weather station location
-    baro_df_solinst = adjust_baro_elevation(baro_df_solinst,
-                                                baro_standard_elevation)
+    baro_df_solinst = adjust_pressure_elevation(baro_df_solinst,
+                                                baro_standard_elevation, None)
         
-    # If needed, plot and compare the baro data sources
+    # If helpful, plot and compare the baro data sources
     if debug_baro:
         plot_baro_compare(baro_df_solinst, baro_df_dendra)
     
-    # Normalize the data based on both sources using an offset
+    # Normalize the baro data based on both sources using an offset
     baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
     
-    if debug_baro: 
-       str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
-       str_g_range = 'min/max of gw time:' + str(min(gw_df['DateTime'])) + ' to ' + str(max(gw_df['DateTime']))
-       print(str_b_range)
-       print(str_g_range)
-       #print('lost gw records after merge with baro: ' + str(len(gw_df) - len(merge_df)))
+    ## 2. Offset the baro pressure (convered to m) from the gw level
     
-    # # subtract baro data from gw data
-    # merge_df['compensated_Level_m'] = merge_df['raw_Level_m'] - merge_df['baro_Level_m']
+    # 2a. Adjust baro pressure for the well elevation
     
-    # # cleanup column names + order so human readable and save as csv
-    # #merge_df.drop(['baro_LEVEL_kPa', 'baro_Temp_C'], axis=1, inplace=True)
-    # merge_df.drop(['baro_Pressure_kPa'], axis=1, inplace=True)
-    # column_order = ['well_id', 'DateTime', 'raw_Level_m',
-    #                 'baro_Level_m', 'compensated_Level_m', 'Temp_c']
-    # merge_df = merge_df.reindex(columns=column_order)
-    # merge_df.to_csv(compensated_dir+'compensated_all_wells.csv', 
-    #                 encoding='ISO-8859-1', index=False)
+    # # Distinguish baro elevation from gw well elevation
+    # baro_df = baro_df.rename(columns={"elevation_m": "baro_elevation_m"})
+    
+    # Merge baro and gw data
+    gw_df = gw_df.merge(baro_df, on="DateTime", how="left")  # Merge baro data
+    
+    # Adjust pressure based on elevation difference
+    gw_df = adjust_pressure_elevation(gw_df, gw_df['elevation_m'], baro_standard_elevation)
+    
+    # 2b. Convert baro pressure to meters
+    baro_m = convert_baro_kPa_meters(gw_df)
+    gw_df['compensated_Level_m'] = gw_df["raw_LEVEL_m"] - baro_m["baro_Level_m"]
+    
+    # Remove the baro level from gw level
+    
+    # Return the gw data with compensated water level
 
-    return baro_df
+    return gw_df
 
 
 
@@ -1313,11 +1390,14 @@ else:
     waterLevel_df = pd.read_csv(cut_data_file)
     waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
 
-## 2. Compensate logger water level (m) based on barometer data (kPa)
+## 2. Get elevation data for each well
+waterLevel_df = get_well_elevations(waterLevel_df)
+
+## 3. Compensate logger water level (m) based on barometer data (kPa)
 if process_baro: 
     waterLevel_df = compensate_baro(waterLevel_df)
 
-## 3. Convert water level from 'relative to sensor' to 
+## 4. Convert water level from 'relative to sensor' to 
 ###    'relative to ground surface elevation' (in meters)
 waterLevel_df = convert_relativeToGround(waterLevel_df)
 
