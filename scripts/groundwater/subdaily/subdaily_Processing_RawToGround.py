@@ -31,6 +31,8 @@ import pandas as pd
 import geopandas as gpd # to handle geojson file
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.colors as mcolors
+import matplotlib.patches as patches
 import os
 import datetime
 import re # regexpression library to extract well id from filenames
@@ -43,12 +45,12 @@ import pprint
 ### SETUP FLAGS 
 ##  for processing, logging, debugging and data validation
 process_cut = False
-process_baro = True
+process_baro = True #not working with false yet
 
 save_fig = False #not working yet, throwing error
 
 debug_cut = False
-debug_baro = True
+debug_baro = False
 debug_gtw = True
 
 ### GLOBAL VARIABLES
@@ -64,7 +66,7 @@ gw_data_dir = project_dir + 'data/field_observations/groundwater/'
 subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_all/'
 cut_dir = gw_data_dir + 'subdaily_loggers/WORKING/cut/'
 solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/RAW/baro_data/'
-station_baro_data_dir = project_dir + 'data/station_instrumentation/climate/Dendra/'
+station_dendra_data_dir = project_dir + 'data/station_instrumentation/climate/Dendra/'
 compensated_dir = gw_data_dir + 'subdaily_loggers/WORKING/baro_compensated/'
 gtw_logger_dir = gw_data_dir + 'subdaily_loggers/WORKING/relative_to_ground/'
 os.makedirs(gtw_logger_dir,exist_ok=True)
@@ -72,7 +74,8 @@ os.makedirs("logs",exist_ok=True)
 
 cut_times_file = gw_data_dir + 'subdaily_loggers/groundwater_logger_times.csv'
 cut_data_file = cut_dir+'cut_all_wells.csv'
-station_baro_file = station_baro_data_dir + 'Dendra_Sagehen_2007_2024.csv'
+station_dendra_file = station_dendra_data_dir + 'Dendra_Sagehen_2007_2024.csv'
+#station_baro_file = station_dendra_data_dir + 'Dendra_Sagehen_2007_2024.csv'
 gw_biweekly_file = 'biweekly_manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
 subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_full.csv'
 well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
@@ -169,17 +172,11 @@ def get_well_elevations(gw_df):
 #  Assume dataframe has DT column converted to datetime
 def plot_water_level(logger,water_level_column_name,well_id):
     fig, ax1 = plt.subplots(figsize=(10, 5), nrows=1, sharex=True)
-    ax1.plot(logger['DT'], logger[water_level_column_name])
+    ax1.plot(logger['DateTime'], logger[water_level_column_name])
     ax1.set_ylabel('Water Level', size=12)
-    #ax2.plot(logger['DT'], logger['TEMPERATURE'])
-    #ax2.set_ylabel('Temperature', size=12)
 
     for tick in ax1.yaxis.get_major_ticks():
         tick.label.set_fontsize(9)
-#    for tick in ax2.yaxis.get_major_ticks():
-#        tick.label.set_fontsize(10)
-#    for tick in ax2.xaxis.get_major_ticks():
-#        tick.label.set_fontsize(10)
 
     fig.suptitle('Groundwater Level at Well '+ well_id, size=12)
     
@@ -189,7 +186,6 @@ def plot_water_level(logger,water_level_column_name,well_id):
         plt.savefig(plot_file, format='eps')
     plt.show()
     
-
 ## Plot subdaily logger dataframe
 #  Assume dataframe has DT column converted to datetime
 def plot_water_temp(logger,water_level_column_name,well_id):
@@ -389,14 +385,18 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
         plt.tight_layout()
         plt.show()
 
-def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df):
+def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df, 
+                                            plot_rain=False):
     """
     Plots subdaily groundwater level (in cm) for each well_id and deployment,
     overlaying biweekly manual measurements if they are within 10 minutes.
 
     Parameters:
-        subdaily_df (DataFrame): Logger data with columns ['well_id', 'deployment', 'DateTime', 'ground_to_water_m'].
-        biweek_df (DataFrame): Manual measurement data with columns ['well_id', 'DateTime', 'ground_to_water_cm'].
+        subdaily_df (DataFrame): Logger data with columns 
+                ['well_id', 'deployment', 'DateTime', 'ground_to_water_m'].
+        biweek_df (DataFrame): Manual measurement data with columns 
+            ['well_id', 'DateTime', 'ground_to_water_cm'].
+        plot_rain: a binary, should the function plot rainfall? Y or N?
 
     Returns:
     None, displays the plots.
@@ -407,6 +407,11 @@ def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df):
     # Convert DateTime columns to pandas datetime format
     subdaily_df['DateTime'] = pd.to_datetime(subdaily_df['DateTime'])
     biweek_df['DateTime'] = pd.to_datetime(biweek_df['DateTime'])
+    
+    # Load rainfall if needed
+    if plot_rain:
+        rain_df = get_rainfall_dendra()
+        rain_df['DateTime'] = pd.to_datetime(rain_df['DateTime'])
     
     # Iterate through unique (well_id, deployment) combinations
     for (well_id, deployment), well_subdaily in subdaily_df.groupby(
@@ -434,37 +439,88 @@ def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df):
         # Sort subdaily data by DateTime
         well_subdaily = well_subdaily.sort_values(by='DateTime')
         
-        # Plot
-        plt.figure(figsize=(12, 5))
+        # Setup plot
+        fig, ax1 = plt.subplots(figsize=(12, 5))
     
-        # Subdaily groundwater levels (blue)
-        plt.plot(well_subdaily['DateTime'], 
+        # Plot subdaily groundwater levels (black)
+        ax1.plot(well_subdaily['DateTime'], 
                  well_subdaily['ground_to_water_cm'], 
                  linestyle='-', marker='o', markersize=0.6, 
-                 color='blue', linewidth=0.4, label='Logger (10-min intervals)')
+                 color='black', linewidth=0.4, label='Logger (10-min intervals)')
     
         # Biweekly groundwater levels (red) for overlapping times
         if not well_biweek.empty:
-            plt.scatter(well_biweek['DateTime'], 
+            ax1.scatter(well_biweek['DateTime'], 
                         well_biweek['ground_to_water_cm'], 
-                        color='red', s=50, 
+                        color='red', s=30, 
                         label='Biweekly Manual Measurement', zorder=3)
     
         # Formatting
-        plt.xlabel("DateTime")
-        plt.ylabel("Groundwater Level (cm)")
-        plt.title("Subdaily Groundwater Levels for" 
-                  + f" Well {well_id} (Deployment {deployment} from"
-                  + f" {min(well_subdaily['DateTime'])} to "
-                  + f"{max(well_subdaily['DateTime'])})")
-        plt.legend()
-        plt.grid(True)
+        ax1.set_xlabel("DateTime")
+        ax1.set_ylabel("Groundwater Level (cm)")
+        ax1.invert_yaxis()
+        ax1.grid(True)
+        plot_title = "Subdaily Groundwater Levels"
+        
+        
     
-        # Reverse the y-axis so positive values appear below zero
-        plt.gca().invert_yaxis()
-    
+        # Plot rainfall
+        if plot_rain:
+            ax2 = ax1.twinx()
+            rain_window = rain_df[
+                (rain_df['DateTime'] >= well_subdaily['DateTime'].min()) &
+                (rain_df['DateTime'] <= well_subdaily['DateTime'].max())]
+            ax2.bar(rain_window['DateTime'], rain_window['rainfall_mm'],
+                    width=0.005, color='blue', alpha=0.5, label='Rainfall (mm)')
+            ax2.set_ylabel("Rainfall (mm)", color='blue')
+            plot_title += " and Rainfall"
+
+        plot_title += (f" for Well {well_id} (Deployment {deployment} from"
+                      f" {min(well_subdaily['DateTime'])} to "
+                      f"{max(well_subdaily['DateTime'])})")
+                      
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels() if plot_rain else ([], [])
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
+
+        plt.title(plot_title)
         plt.tight_layout()
         plt.show()
+
+def plot_dataframes(df1, df2, column_name, title, timespan=None):
+    """
+    Plots the given column from two DataFrames against their DateTime column.
+
+    Parameters:
+    df1 (pd.DataFrame): First dataframe with 'DateTime' column and target column.
+    df2 (pd.DataFrame): Second dataframe with 'DateTime' column and target column.
+    column_name (str): Name of the column to plot on the y-axis.
+    title (str): Preface for the title to describe df1 vs df2
+    timespan (tuple): Optional (start_date, end_date) to limit x-axis range.
+                      Accepts strings or datetime-like objects.
+    """
+    # Ensure DateTime is sorted
+    df1.sort_values('DateTime', inplace=True)
+    df2.sort_values('DateTime', inplace=True)
+    
+    # Filter by timespan if provided
+    if timespan is not None:
+        start, end = pd.to_datetime(timespan[0]), pd.to_datetime(timespan[1])
+        df1 = df1[(df1['DateTime'] >= start) & (df1['DateTime'] <= end)]
+        df2 = df2[(df2['DateTime'] >= start) & (df2['DateTime'] <= end)]
+
+    # Plotting
+    plt.figure(figsize=(12, 6))
+    plt.plot(df1['DateTime'], df1[column_name], label='DataFrame 1', linestyle='-', linewidth=0.6)
+    plt.plot(df2['DateTime'], df2[column_name], label='DataFrame 2', linestyle='--', linewidth=0.6)
+    
+    plt.xlabel('DateTime')
+    plt.ylabel(column_name)
+    plt.title(f'{title}: {column_name} Over Time')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
 
 def plot_baro_compare(df1, df2):
     """
@@ -477,7 +533,6 @@ def plot_baro_compare(df1, df2):
         DataFrames contain 'DateTime' and 'baro_LEVEL_kPa' columns.
     """
     df3 = normalize_baro(df1, df2)
-    years_df3 = set(df3['DateTime'].dt.year)
 
     # Extract years present in initial datasets
     years_df1 = set(df1['DateTime'].dt.year)
@@ -522,7 +577,118 @@ def plot_baro_compare(df1, df2):
     plt.show()
     return
 
-        
+def plot_timeseries_gridmap(df):
+    # Add DOY and year columns
+    df['DayOfYear'] = df['DateTime'].dt.dayofyear
+    df['Year'] = df['DateTime'].dt.year
+    df['month'] = df['DateTime'].dt.month
+
+    # Extract site and category info
+    df['site'] = df['well_id'].str[0].replace({'E': 'East', 'K': 'Kiln', 'L': 'Lower'})
+    df['plant'] = df['well_id'].str[1]
+    df['zone'] = df['well_id'].str[2]
+    df['category'] = df['plant'] + df['zone']
+
+    categories = sorted(df['category'].unique())
+    sites = ['East', 'Kiln', 'Lower']
+
+    # Get range of DOYs
+    min_doy = df['DayOfYear'].min()
+    max_doy = df['DayOfYear'].max()
+
+    # Count number of years for each site/category/DOY
+    counts = df.drop_duplicates(subset=['well_id', 'DayOfYear', 'Year'])
+    summary = counts.groupby(['site', 'category', 'DayOfYear'])['Year'].nunique().reset_index()
+    summary = summary.rename(columns={'Year': 'year_count'})
+
+    # Create color map
+    cmap = plt.cm.magma_r # to reverse, use _r
+    norm = mcolors.Normalize(vmin=0, vmax=summary['year_count'].max())
+    
+    # Get months in data and sort them
+    months_in_data = sorted(df['month'].unique())
+
+    # Map month numbers to month initials
+    month_labels = {
+        1: 'J', 2: 'F', 3: 'M', 4: 'A', 5: 'M', 6: 'J', 7: 'J', 8: 'A', 9: 'S', 10: 'O', 11: 'N', 12: 'D'
+    }
+    dynamic_month_labels = [month_labels[month] for month in months_in_data]
+
+    # Mapping DOY to grid position: (row for month, column for day-in-month)
+    day_to_grid = {}
+    for month in months_in_data:
+        for day in range(1, 32):
+            try:
+                doy = pd.Timestamp(f'2021-{month:02d}-{day:02d}').dayofyear
+                if min_doy <= doy <= max_doy:
+                    day_to_grid[doy] = (months_in_data.index(month), day - 1)
+            except ValueError:
+                continue
+
+    # Start plotting
+    fig, axes = plt.subplots(nrows=len(categories), ncols=len(sites), figsize=(15, 12), sharex=True, sharey=True)
+
+    square_size = 1.0
+    spacing = 0.2
+
+    for i, cat in enumerate(categories):
+        for j, site in enumerate(sites):
+            ax = axes[i, j] if len(categories) > 1 else axes[j]
+            ax.set_xlim(0, 32)
+            ax.set_ylim(0, len(months_in_data))  # Dynamic number of rows based on months
+            ax.set_xticks([])
+            ax.set_yticks([])
+            ax.set_aspect('equal')
+            ax.set_facecolor('white')
+            
+            # Set gray border around each grid
+            for spine in ax.spines.values():
+                spine.set_edgecolor('gray')
+
+            subset = summary[(summary['site'] == site) & (summary['category'] == cat)]
+            doy_to_count = dict(zip(subset['DayOfYear'], subset['year_count']))
+
+            for doy, (row, col) in day_to_grid.items():
+                count = doy_to_count.get(doy, 0)
+                color = cmap(norm(count))
+                x = col * (square_size + spacing)
+                y = len(months_in_data) - row - 1  # Flip to have May on top
+
+                rect = patches.Rectangle((x, y), square_size, square_size,
+                                         facecolor=color, edgecolor='white', 
+                                         linewidth=0.4)
+                ax.add_patch(rect)
+
+            if j == 0:
+                ax.set_ylabel(cat, rotation=0, labelpad=25, va='center', 
+                              fontsize=12)
+            if i == 0:
+                ax.set_title(site, fontsize=12)
+
+            # Add dynamic month labels on the left side of each row
+            if j == 0 and i == 0:  # Only add once for the first site and first category
+                for idx, label in enumerate(dynamic_month_labels):
+                    # move the month labels
+                    ax.text(-1, len(months_in_data) - idx - 0.5, label, 
+                            ha='center', va='center', fontsize=9, 
+                            color='gray')
+
+    # Add colorbar
+    max_years = summary['year_count'].max()
+
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, ax=axes.ravel().tolist(), orientation='horizontal', 
+                        fraction=0.05, pad=0.02, shrink=0.4)
+    cbar.set_label('Years with data')
+    # Show only integer ticks on the colorbar
+    cbar.set_ticks(range(0, max_years + 1))
+
+    fig.suptitle("Groundwater Well Data Overlap by DOY and Category", fontsize=14)
+    plt.tight_layout(rect=[0, 0.15, 1, 0.96])
+    plt.show()
+
+
 ## Cut or trim logger data at front/back end of data
 ## to account for when logger not in the well.
 ## 
@@ -564,15 +730,7 @@ def cut_logger_data():
             
             # add well_id to dataframe
             deployment_df.insert(0, 'well_id', well_id)
-                
-            # append temp_df to log_df
-            # if log_df is None: 
-            #     log_df = temp_df
-            # else: 
-            #     log_df = pd.concat([log_df, temp_df], ignore_index = True)
-            
-            #log_df['DT'] = pd.to_datetime(log_df['Date'] + ' ' + log_df['Time'])
-            
+    
             # save original version for comparison plot later
             orig_deployment_df = deployment_df.rename(columns={'LEVEL': 'raw_Level_m'})  
             
@@ -586,11 +744,7 @@ def cut_logger_data():
                 logging.info(f'ALERT: No time limits for {well_id}:' 
                       + 'check if well name is correct. Exiting cut process.')
                 break
-            
-            # Select timing row from the range of times in the deployment logger file
-            # min_DT = log_df['DT'].min()
-            # max_DT = log_df['DT'].max()
-            
+                       
             # Strip timing of deployment from the filename
             # Extract YYYY, MMDD_min, MMDD_max using regex
             match = re.search(r"_(\d{4})_(\d{4})_(\d{4})\.csv", f)
@@ -611,10 +765,6 @@ def cut_logger_data():
                 ((well_time_df['end'] >= (end_time - time_delta)) & 
                 (well_time_df['end'] <= (end_time + time_delta)))
             ]
-            
-            # time_mask = ((well_time_df['start'] >= (min_DT - buffer)) & 
-            #              (well_time_df['end'] <= (max_DT + buffer)))
-            # well_time_df = well_time_df.loc[time_mask]
 
             ## ERROR HANDLING: only continue if one matching entry of start/stop times
             if well_time_df.shape[0] != 1:
@@ -692,7 +842,7 @@ def cut_logger_data():
             if debug_cut: plot_water_temp_compare(orig_deployment_df, manual_deployment_df, deployment_df,'raw_LEVEL_m',well_id)
             
             # save individual csv file with cut times
-            deployment_df.to_csv(cut_dir+'cut_'+f, encoding='ISO-8859-1')
+            deployment_df.to_csv(cut_dir+'cut_'+f, encoding='ISO-8859-1', index=False)
             
             # cut_logger_df = cut_logger_df.append(log_df)
             cut_logger_df = pd.concat([cut_logger_df, deployment_df])
@@ -702,7 +852,7 @@ def cut_logger_data():
     cut_logger_df.rename(columns={'DT': 'DateTime', 'TEMPERATURE': 'Temp_c'}, inplace=True)
     cut_logger_df.to_csv(cut_data_file, index=False)
     #cut_count_df.to_csv(cut_dir+'cut_count_'+str(change_threshold)+'.csv')
-    cut_count_df.to_csv(cut_dir+'cut_count.csv')
+    cut_count_df.to_csv(cut_dir+'cut_count.csv', index=False)
     
     return cut_logger_df
     
@@ -768,13 +918,30 @@ def get_baro_solinst(start_time, end_time):
         
     return all_baro_data
 
+def get_rainfall_dendra(start_time, end_time):
+    """Retrieve 10-min frequency rainfall data from Dendra CSV files
+       for requested dates"""       
+    # Get needed data from the csv
+    rainfall = pd.read_csv(station_dendra_file)
+    rainfall = rainfall[['time', 'precipitation-geonor-mm-mm']]
+    rainfall = rainfall.rename(columns={'precipitation-geonor-mm-mm': 'rainfall_mm'})
+    
+    # Filter for start and end times
+    rainfall['DateTime'] = pd.to_datetime(rainfall['time'])
+    rainfall = rainfall[(rainfall['DateTime'] >= start_time) & (rainfall['DateTime'] <= end_time)]
+        
+    column_order = ['DateTime', 'rainfall_mm']
+    rainfall = rainfall.reindex(columns=column_order)
+
+    return rainfall
+
 ## Retrieve baro data from Dendra field station 
 ## Convert pressure reading from mb to kPa
 def get_baro_dendra(start_time, end_time):
     """Consolidate all barometer CSV files into one dataframe, then convert LEVEL (kPa) to LEVEL (m); add a column for LEVEL (m); rename columns with units."""
     
     # Get needed data from the csv
-    new_baro = pd.read_csv(station_baro_file)
+    new_baro = pd.read_csv(station_dendra_file)
     new_baro = new_baro[['time', 'barometric-pressure-avg-mb', 'air-temp-avg-degc']]
     new_baro = new_baro.rename(columns={'air-temp-avg-degc': 'baro_Temp_C'})
     
@@ -799,7 +966,11 @@ def get_baro_dendra(start_time, end_time):
 def normalize_baro(df1, df2):
     """
     Computes the mean offset correction for barometric pressure data in df2 
-    based on df1 and returns df2 with corrected values.
+    based on df1. 
+    
+    Also adjusts time interval between readings from 10 to 5 minuts.
+    
+    Returns df2 with corrected values.
 
     Parameters:
         df1, df2: pandas DataFrame
@@ -822,19 +993,32 @@ def normalize_baro(df1, df2):
         return df2_offset
 
     for year in common_years:
-        df1_year = df1[df1['DateTime'].dt.year == year].copy()
-        df2_year = df2[df2['DateTime'].dt.year == year].copy()
+        df1_year_raw = df1[df1['DateTime'].dt.year == year].copy()
+        df2_year_raw = df2[df2['DateTime'].dt.year == year].copy()
         
         # Remove outliers for the year
-        df1_year = remove_outliers(df1_year, 'baro_Pressure_kPa')
-        df2_year = remove_outliers(df2_year, 'baro_Pressure_kPa')
-    
-        df1_year['DayOfYear'] = df1_year['DateTime'].dt.dayofyear
-        df2_year['DayOfYear'] = df2_year['DateTime'].dt.dayofyear
-    
-        merged = df1_year[['DayOfYear', 'baro_Pressure_kPa', 'baro_Temp_C']].merge(
-            df2_year[['DayOfYear', 'baro_Pressure_kPa', 'baro_Temp_C']], 
-            on='DayOfYear', 
+        # - need multiplier of 5 based on plots for 2018-2024
+        df1_year = remove_outliers(df1_year_raw, 'baro_Pressure_kPa', 5.0)
+        df2_year = remove_outliers(df2_year_raw, 'baro_Pressure_kPa', 5.0)
+        
+        if debug_baro:
+            # Compare plots before/after outlier removal
+            plot_dataframes(df1_year_raw, df1_year, 'baro_Pressure_kPa', 
+                            'Solinst Baro raw vs clean')
+            plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+                        'Dendra Baro raw vs clean')
+            if (year==2021): 
+                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+                            'Dendra Baro raw vs clean',
+                            ('2021-11-15', '2021-11-16'))
+            if (year==2024): 
+                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+                            'Dendra Baro raw vs clean',
+                            ('2024-08-16', '2024-08-18'))
+            
+        merged = df1_year[['DateTime','baro_Pressure_kPa', 'baro_Temp_C']].merge(
+            df2_year[['DateTime', 'baro_Pressure_kPa', 'baro_Temp_C']], 
+            on='DateTime', 
             suffixes=('_df1', '_df2')
             )
     
@@ -850,86 +1034,27 @@ def normalize_baro(df1, df2):
         # Apply the offset only to those rows
         df2_offset.loc[mask, 'baro_Pressure_kPa'] = ( 
             df2_offset.loc[mask, 'baro_Pressure_kPa'] + mean_offset)
+        
+    # Sort values and ensure DateTime is a proper index
+    df2_offset = df2_offset.sort_values('DateTime').set_index('DateTime')
+        
+    # Resample to 5-minute intervals to match the finest gw_df interval
+    df2_offset = df2_offset.resample("5min").interpolate(method="linear").reset_index()
 
+    # Reset index and return the offset data with increased interval
     return df2_offset
 
 
-## Takes barometric pressure reading from the raw Solinst barologger
-## and converts it from kPa of pressure to meters (m) of pressure
-# def convert_baro(baro_df):
-#     """Takes water level reading from the Dendra data, 
-#     converts it from kPa of pressure to meters (m) above the sensor."""
-    
-#     baro_df['baro_LEVEL_m'] = baro_df['baro_LEVEL_kPa'] * density_factor    
-   
-# #    if debug_baro: 
-# #        str_b_range = 'min/max of baro time:' + str(min(baro_df['DateTime'])) + ' to ' + str(max(baro_df['DateTime']))
-# #        print(str_b_range)
-    
-#     # cleanup baro data so column names clear, not carrying unneeded data
-# #    baro_df.drop(['Date', 'Time', 'ms'], axis=1, inplace=True)
-# #    baro_df.rename(columns={'LEVEL': 'baro_LEVEL_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
-    
-#     return baro_df
-
 ## Converts barometric pressure reading
 ## from kPa of pressure to meters (m) of pressure head
-def convert_baro_kPa_meters(baro_df):
-    """Takes water level reading from the raw Solinst levelogger data, 
-    converts it from kPa of pressure to meters (m) above the sensor."""
-    
-    baro_df['baro_Level_m'] = baro_df['baro_Pressure_kPa'] * density_factor 
-    
-    # cleanup baro data so column names clear, not carrying unneeded data
-    #baro_df.rename(columns={'LEVEL': 'baro_Pressure_kPa', 'TEMPERATURE': 'baro_Temp_C'}, inplace=True)
-    
-    return baro_df
-
-# def adjust_pressure_elevation(baro_df, to_elevation=baro_standard_elevation, from_elevation=None):
-#     """
-#     Adjusts barometric pressure readings in baro_df to a standard elevation using the barometric formula.
-    
-#     Parameters:
-#     baro_df : pandas DataFrame
-#         DataFrame containing:
-#         - 'baro_Level_kPa' (barometric pressure in kPa)
-#         - 'DateTime' (timestamp of the reading)
-#         - 'baro_Temp_C' (air temperature in Celsius)
-#         - 'elevation_m' (current elevation of the reading in meters)
-#     to_elevation : float, optional
-#         The target elevation to adjust pressure readings to. Default is baro_standard_elevation.
-#     from_elevation : float, optional
-#         The source elevation. If None, it uses 'elevation_m' from the DataFrame.
-    
-#     Returns:
-#     pandas DataFrame
-#         The input DataFrame with 'baro_Level_kPa' adjusted and 'elevation_m' set to to_elevation.
-#     """
-#     import numpy as np
-    
-#     # Physical constants
-#     R = 8.3144598  # Universal gas constant (J/(mol*K))
-#     M = 0.0289644  # Molar mass of Earth's air (kg/mol)
-#     L = 0.0065  # Standard temperature lapse rate (K/m)
-    
-#     # Ensure from_elevation is set
-#     if from_elevation is None:
-#         from_elevation = baro_df['elevation_m']
-    
-#     # Convert temperature to Kelvin
-#     T1_K = baro_df['baro_Temp_C'] + 273.15
-    
-#     # Compute pressure adjustment using the barometric formula
-#     exponent = (gravity_sagehen * M) / (R * L)
-#     baro_df['baro_Pressure_kPa'] = baro_df['baro_Pressure_kPa'] * (
-#         (1 - L * (to_elevation - from_elevation) / T1_K) ** exponent
-#     )
-    
-#     # Update elevation column
-#     baro_df['elevation_m'] = to_elevation
-    
-#     return baro_df
-
+def convert_baro_kPa_meters(pressure_kPa):
+    """
+    Converts kPa of pressure to meters (m).
+    Param is a pandas Series
+    Returns a pandas Series
+    """
+    return pressure_kPa * density_factor 
+      
 
 def adjust_pressure_elevation(df, to_elevation=baro_standard_elevation, from_elevation=None):
     """
@@ -952,7 +1077,6 @@ def adjust_pressure_elevation(df, to_elevation=baro_standard_elevation, from_ele
     pandas DataFrame
         The input DataFrame with 'baro_Level_kPa' adjusted and 'elevation_m' set to to_elevation.
     """
-    import numpy as np
     
     # Physical constants
     R = 8.3144598  # Universal gas constant (J/(mol*K))
@@ -977,8 +1101,6 @@ def adjust_pressure_elevation(df, to_elevation=baro_standard_elevation, from_ele
     df['elevation_m'] = to_elevation
     
     return df
-
-
 
 
 def compensate_baro(gw_df):
@@ -1007,41 +1129,41 @@ def compensate_baro(gw_df):
     baro_df_solinst = get_baro_solinst(start_time, end_time)
     baro_df_dendra = get_baro_dendra(start_time, end_time)
     
-    # Adjust solinst baro data for elevation; base on weather station location
+    # Standardize solinst baro data for elevation; set to weather station elev
     baro_df_solinst = adjust_pressure_elevation(baro_df_solinst,
                                                 baro_standard_elevation, None)
         
     # If helpful, plot and compare the baro data sources
-    if debug_baro:
-        plot_baro_compare(baro_df_solinst, baro_df_dendra)
+    # if debug_baro:
+    #     plot_baro_compare(baro_df_solinst, baro_df_dendra)
     
     # Normalize the baro data based on both sources using an offset
     baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
     
+    # # If helpful, plot and compare the baro data sources
+    # if debug_baro:
+    #     plot_baro_compare(baro_df_solinst, baro_df_dendra)
+    
     ## 2. Offset the baro pressure (convered to m) from the gw level
     
     # 2a. Adjust baro pressure for the well elevation
-    
-    # # Distinguish baro elevation from gw well elevation
-    # baro_df = baro_df.rename(columns={"elevation_m": "baro_elevation_m"})
-    
+       
     # Merge baro and gw data
     gw_df = gw_df.merge(baro_df, on="DateTime", how="left")  # Merge baro data
     
     # Adjust pressure based on elevation difference
     gw_df = adjust_pressure_elevation(gw_df, gw_df['elevation_m'], baro_standard_elevation)
     
-    # 2b. Convert baro pressure to meters
-    baro_m = convert_baro_kPa_meters(gw_df)
-    gw_df['compensated_Level_m'] = gw_df["raw_LEVEL_m"] - baro_m["baro_Level_m"]
+    # 2b. Convert baro pressure to meters and compensate the raw groundwater level reading
+    gw_df['baro_Level_m'] = convert_baro_kPa_meters(gw_df['baro_Pressure_kPa']) #TODO: why does this return NaNs when gw_df has none when passing in?
     
-    # Remove the baro level from gw level
+    # Compensate by subtracting air pressure from the raw groundwater reading
+    gw_df['compensated_Level_m'] = gw_df["raw_Level_m"] - gw_df["baro_Level_m"] 
+    
+    # TODO: Remove the baro level from gw level
     
     # Return the gw data with compensated water level
-
     return gw_df
-
-
 
 def calculate_sensor_level(merged_df):
     """
@@ -1176,10 +1298,10 @@ def calculate_sensor_level(merged_df):
                 
     # Log information about offsets
     logging.debug(f"Sensor level dictionary has {len(sensor_levels)}" 
-                  + "elements:\n" + 
+                  + " elements:\n" + 
                   pprint.pformat(sensor_levels, indent=4))
     logging.debug(f"Drift error dictionary has {len(drift_errors)}"
-                  + "elements:\n" + pprint.pformat(drift_errors, indent=4))
+                  + " elements:\n" + pprint.pformat(drift_errors, indent=4))
 
     for (well, deploy), this_sensor_level in sensor_levels.items():
         if isinstance(this_sensor_level, float) and math.isnan(this_sensor_level):
@@ -1188,9 +1310,7 @@ def calculate_sensor_level(merged_df):
     return sensor_levels
 
 ## Convert baro-compensated water level from sensor 
-## so that it's relative to the ground surface
-## not the sensor level
-## Use gw_df argument
+## so that it's relative to the ground surface, not the sensor level
 def convert_relativeToGround(subdaily_df):
     """
     With groundwater dataframe as argument, 
@@ -1202,9 +1322,10 @@ def convert_relativeToGround(subdaily_df):
     measurement_frequency_interval=10
     
     # Import manual groundwater data + setup for analysis
-    biweek_df = pd.read_csv(gw_data_dir + gw_biweekly_file)
+    biweek_df = pd.read_csv(gw_data_dir + gw_biweekly_file, index_col=0)
     biweek_df['DateTime'] = biweek_df['timestamp'].astype('datetime64[ns]')
     biweek_df = biweek_df.drop(columns=['timestamp'])
+    biweek_df.reset_index(inplace=True)
     
     # Sort and group dataframes
     subdaily_df = subdaily_df.sort_values(by=['well_id', 'DateTime'])
@@ -1273,14 +1394,16 @@ def convert_relativeToGround(subdaily_df):
 
     # Keep only rows that do NOT match the NaN deployments
     # by filtering out rows with _merge, created by innerjoin with indicator=T
-    subdaily_df = subdaily_df[subdaily_df['_merge'] == 'left_only'].drop(columns=['_merge'])
+    subdaily_df = subdaily_df[subdaily_df['_merge'] == 'left_only'].drop(
+                                                            columns=['_merge'])
     
     # Identify rows to drop from merged_df
     nan_rows = merged_df[merged_df['ground_to_water_cm'].isna()]
     # Count total rows to be removed
     num_dropped_rows = len(nan_rows)
     # Get unique well_id + deployment groups affected
-    affected_deployments = nan_rows[['well_id', 'deployment']].drop_duplicates()
+    affected_deployments = nan_rows[['well_id', 
+                                     'deployment']].drop_duplicates()
 
     # Log the results
     logging.info(f"Removing {num_dropped_rows} rows where 'ground_to_water_cm' is NaN.")
@@ -1289,36 +1412,6 @@ def convert_relativeToGround(subdaily_df):
     # Drop NaN rows from merged_df
     merged_df = merged_df.dropna(subset=['ground_to_water_cm'])
     
-    # # JN 2025/02/28 replaced the following lines with isna().any()
-    # # nan_group = deploy_group['ground_to_water_cm'].transform(
-    # #     lambda x: x.isna().all())
-    # nan_group_any = deploy_group['ground_to_water_cm'].transform(
-    #     lambda x: x.isna().any())
-    
-    # nan_measurements = merged_df.loc[nan_group_any,['well_id',
-    #                                            'deployment']].drop_duplicates()
-    # # Log where NaNs removed   
-    # logging.info(
-    #     f"WARNING: {len(nan_measurements)} of {len(deploy_group)} deployments "
-    #     + f"removed from merged dataframe.\n"
-    #     + f"Ground_to_water_cm = NaN for *some* of \n {nan_measurements}\n\n")
-    
-    # Remove NaNs, assume it occurs because well was dry during measurement
-    #merged_df = merged_df[~nan_group_any]
-    
-    # Validate results 
-    # if (debug_gtw):
-    #         # Check if at least 2 rows of manual measurements per well_id and deployment
-    #         row_counts = merged_df.groupby(['well_id', 'deployment']).size()
-    #         groups_with_less_than_two = row_counts[row_counts < 2].index
-    #         rows_with_less_than_two = merged_df[merged_df.set_index(
-    #             ['well_id', 'deployment']).index.isin(
-    #                 groups_with_less_than_two)]
-    #         logging.debug("Deployments with <2 manual measurements:\n %s" %
-    #               rows_with_less_than_two[['well_id','deployment',
-    #                                        'DateTime_subdaily',
-    #                                        'DateTime_biweek']])
-
     # Validate results
     if (debug_gtw):
         # Identify deployments with only one unique 'DateTime_biweek'
@@ -1332,13 +1425,15 @@ def convert_relativeToGround(subdaily_df):
         single_biweek_deployments = single_biweek_deployments[single_biweek_deployments['DateTime_biweek'] == 1]
         
         # Merge to get relevant details
-        single_biweek_details = merged_df.merge(single_biweek_deployments[['well_id', 'deployment']], 
-                                                on=['well_id', 'deployment'])
+        single_biweek_details = merged_df.merge(
+            single_biweek_deployments[['well_id', 'deployment']], 
+                                        on=['well_id', 'deployment'])
         
         # Log the affected deployments
         if not single_biweek_details.empty:
-            logging.info("Deployments with only ONE unique manual measurement:\n" + 
-                         single_biweek_details[['well_id', 'deployment']].drop_duplicates().to_string(index=False))
+            logging.info("Deployments with only ONE unique manual measure:\n" + 
+                single_biweek_details[['well_id', 
+                'deployment']].drop_duplicates().to_string(index=False))
         else:
             logging.info("No deployments found where 'DateTime_biweek' has only one unique value.")
         
@@ -1368,7 +1463,8 @@ def convert_relativeToGround(subdaily_df):
     subdaily_df = subdaily_df.reindex(columns=column_order)  
     
     # Save
-    subdaily_df.to_csv(gw_data_dir + subdaily_full_file, encoding='ISO-8859-1', index=False)
+    subdaily_df.to_csv(gw_data_dir + subdaily_full_file, 
+                       encoding='ISO-8859-1', index=False)
     
     # Plot to validate if debugging
     if debug_gtw:
@@ -1387,7 +1483,7 @@ def convert_relativeToGround(subdaily_df):
 if process_cut:
     waterLevel_df = cut_logger_data()
 else: 
-    waterLevel_df = pd.read_csv(cut_data_file)
+    waterLevel_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
     waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
 
 ## 2. Get elevation data for each well
@@ -1400,6 +1496,9 @@ if process_baro:
 ## 4. Convert water level from 'relative to sensor' to 
 ###    'relative to ground surface elevation' (in meters)
 waterLevel_df = convert_relativeToGround(waterLevel_df)
+
+## 5. Plot a visualization of the groundwater time series
+plot_timeseries_gridmap(waterLevel_df)
 
 print(waterLevel_df)
     
