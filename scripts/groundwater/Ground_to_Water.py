@@ -8,13 +8,13 @@ Created on Thu Oct  3 12:45:42 2024
 This module processes groundwater well readings to determine the groundwater
 level relative to the ground surface.
 
-This code is under development and follows a functional programming paradigm.
-It leverages Pandas DataFrames and csv files with well-defined column names.
+This code is under development and follows basic procedural programming,
+leverages Pandas DataFrames and csv files with well-defined column names.
 
 Major Functions:
  
 
-Requires X data files:
+Requires 4 data files:
 1. Unique well ids: 'well_unique_id.txt'
 2. Well Dimensions: 'well_dimensions.csv'
 3. RAW groundwater data (in cm) for all years: 'groundwater_biweekly_RAW.csv'

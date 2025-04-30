@@ -85,7 +85,8 @@ hist(groundwater$ground_to_water_cm)
 
 # Skewness; test if near 0 (symmetric), >0 (positive skew), <0 (neg skew)
 skewness(groundwater$ground_to_water_cm, na.rm = TRUE)
-# result: 0.83; positive skewed, >0.5 so moderately skewed
+# result 04/2025: 0.925; positive skewed, >0.5 so moderately skewed
+# result 11/2024: 0.83; positive skewed, >0.5 so moderately skewed
 
 # Kurtosis; test for heavy tails 
 # (if ~3 normal, if >3 heavy tails + sharp peak, if <3 light tails, flat peak)
@@ -108,6 +109,7 @@ groundwater %>%
     var_value = var(ground_to_water_cm, na.rm = TRUE),
     cv_value = 100 * sd_value / mean_value
   )
+
 
 # basic descriptive statistics by groupings: mean, CV, ACF for each variable
 groundwater_summary_by_date <- groundwater %>%

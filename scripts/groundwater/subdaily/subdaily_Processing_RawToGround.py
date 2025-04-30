@@ -35,12 +35,12 @@ import matplotlib.colors as mcolors
 import matplotlib.patches as patches
 import os
 import datetime
+from datetime import time
 import re # regexpression library to extract well id from filenames
 import math
 import statistics
 import logging
 import pprint
-#from glob import glob
 
 ### SETUP FLAGS 
 ##  for processing, logging, debugging and data validation
@@ -76,8 +76,9 @@ cut_times_file = gw_data_dir + 'subdaily_loggers/groundwater_logger_times.csv'
 cut_data_file = cut_dir+'cut_all_wells.csv'
 station_dendra_file = station_dendra_data_dir + 'Dendra_Sagehen_2007_2024.csv'
 #station_baro_file = station_dendra_data_dir + 'Dendra_Sagehen_2007_2024.csv'
-gw_biweekly_file = 'biweekly_manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
-subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_full.csv'
+gw_biweekly_file = gw_data_dir + 'biweekly_manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
+gw_daily_file = gw_data_dir + 'groundwater_daily_FULL_COMBINED.csv' # manual + logger data
+subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_FULL.csv'
 well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
 
 # Configure and test logging to write to a file
@@ -1322,7 +1323,7 @@ def convert_relativeToGround(subdaily_df):
     measurement_frequency_interval=10
     
     # Import manual groundwater data + setup for analysis
-    biweek_df = pd.read_csv(gw_data_dir + gw_biweekly_file, index_col=0)
+    biweek_df = pd.read_csv(gw_biweekly_file, index_col=0)
     biweek_df['DateTime'] = biweek_df['timestamp'].astype('datetime64[ns]')
     biweek_df = biweek_df.drop(columns=['timestamp'])
     biweek_df.reset_index(inplace=True)
@@ -1453,24 +1454,65 @@ def convert_relativeToGround(subdaily_df):
     subdaily_df['ground_to_water_m'] = subdaily_df.apply(
                                         calculate_subdaily_water_level, axis=1)
 
-    # Finished processing all logger files
-    # Now save singular file of all logger data
+    # Plot to validate
+    if debug_gtw:
+        plot_weekly_groundwater_data_by_well(subdaily_df, biweek_df)
+        plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df)
+    return subdaily_df
     
+    ## SAVE subdaily logger data in single file
     # Re-order columns
     column_order = ['well_id', 'DateTime', 'deployment', 'ground_to_water_m', 
                     'raw_Level_m', 'baro_Level_m', 
                     'compensated_Level_m', 'Temp_c']
     subdaily_df = subdaily_df.reindex(columns=column_order)  
     
-    # Save
+    # Save subdaily data
     subdaily_df.to_csv(gw_data_dir + subdaily_full_file, 
                        encoding='ISO-8859-1', index=False)
     
-    # Plot to validate if debugging
+    # COMBINE manual and subdaily logger data in single file
+    # Filter subdaily_df, only select rows between 7a to 10a
+    subdaily_df['DateTime'] = pd.to_datetime(subdaily_df['DateTime'])
+    subdaily_df['date'] = subdaily_df['DateTime'].dt.date
+    subdaily_df['time'] = subdaily_df['DateTime'].dt.time
+   
+    mask = subdaily_df['time'].between(time(7, 0), time(10, 0))
+    subdaily_am_df = subdaily_df[mask].copy()
+    
+    # Target the measurement closest to 8am
+    subdaily_am_df['target_time'] = pd.to_datetime(
+            subdaily_am_df['date'].astype(str) + ' 08:00')
+    subdaily_am_df['time_diff'] = (subdaily_am_df['DateTime'] - subdaily_am_df['target_time']).abs()
+    
+    subdaily_am_df = subdaily_am_df.sort_values(['well_id', 'date', 'time_diff', 'DateTime'])
+    subdaily_8am_df = subdaily_am_df.groupby(['well_id', 'date']).first().reset_index()
+
+    # Convert to cm and prepare data for merge
+    subdaily_8am_df['ground_to_water_cm'] = subdaily_8am_df['ground_to_water_m'] * 100
+    subdaily_8am_df = subdaily_8am_df.drop(columns='ground_to_water_m')
+    subdaily_8am_df = subdaily_8am_df.rename(columns={'DateTime': 'timestamp'})
+    biweek_df = biweek_df.rename(columns={'DateTime': 'timestamp'})
+    
+    # Append and save
+    daily_df = pd.concat([biweek_df, subdaily_8am_df], ignore_index=True)
+    daily_df = daily_df[['well_id', 'timestamp', 'ground_to_water_cm']]
+    daily_df = daily_df.sort_values(['well_id', 'timestamp'])
+    daily_df.to_csv(gw_daily_file, index=False)
+
+    # Validated combined dataset
     if debug_gtw:
-        plot_weekly_groundwater_data_by_well(subdaily_df, biweek_df)
-        plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df)
-    return subdaily_df
+        #Compare count of original versus combined dataset
+        print(f"biweek_df rows: {len(biweek_df)}, "
+              f"daily_df rows: {len(daily_df)}" 
+              f" ({(len(daily_df) - len(biweek_df)) / len(biweek_df) * 100:.1f}% change)")
+        missing_count = daily_df['ground_to_water_cm'].isna().sum()
+        total_count = len(daily_df)
+        missing_percent = (missing_count / total_count) * 100
+        print(f"Missing ground_to_water_cm values in daily_df: {missing_count}"
+              f"( {missing_percent:.1f}%)")
+
+
 
 
 ### EXECUTE FUNCTIONS TO PROCESS LOGGER DATA
@@ -1495,10 +1537,13 @@ if process_baro:
 
 ## 4. Convert water level from 'relative to sensor' to 
 ###    'relative to ground surface elevation' (in meters)
+###   Also save combined manual and sensor-based gw readings as .csv
 waterLevel_df = convert_relativeToGround(waterLevel_df)
 
-## 5. Plot a visualization of the groundwater time series
+## 5. Plot a visualization of the subdaily groundwater time series
 plot_timeseries_gridmap(waterLevel_df)
+
+
 
 print(waterLevel_df)
     

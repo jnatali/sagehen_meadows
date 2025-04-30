@@ -14,7 +14,7 @@
 #         'grouped' which creates a list of Z matrices to test specific
 #                     hypotheses; depends on value of 'timespan'
 # 
-# This code is under development and follows a functional programming paradigm.
+# This code is under development and follows a procedural programming paradigm.
 # 
 # Requires  data files:
 # 1. RAW groundwater data (in cm) for all years: 'groundwater_biweekly_RAW.csv'
@@ -91,7 +91,9 @@ model_parameter_filepath = paste(repository_dir, marss_script_dir,
 #### PREPARE GROUNDWATER DATA
 # by: JNatali
 # on: 18 Nov 2024
-# purpose: opens RAW groundwater data, manipulates into matrix form, saves it.
+# purpose: opens biweekly groundwater data 
+#          (manually measured then transformed relative to ground), 
+#          manipulates into matrix form, saves it.
 # returns: groundwater_weekly_matrix, evenly-spaced weekly matrix of groundwater
 #          well readings for all years.
 #          
@@ -998,7 +1000,7 @@ run_all_models <- function(response_matrix) {
 # NOT YET DEFINED
 
 # ------ MAIN PROCEDURAL SCRIPT ------
-groundwater_data <- prepare_groundwater_data()
+groundwater_data <- prepare_groundwater_data() # creates matrix from groundwater_biweekly_full.csv
 response_matrix <- load_response_data(groundwater_data)
 results_dataframe <- run_all_models(response_matrix)
 print("MODEL RUNS COMPLETE!!")
