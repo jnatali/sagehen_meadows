@@ -1,25 +1,35 @@
 # Sagehen Groundwater Scripts
 
 ## Sagehen Bi-Weekly Groundwater Scripts
+### Ground_to_Water.py
+In this directory, Ground_to_Water.py processes groundwater well readings to determine the groundwater
+level relative to the ground surface. 
+
+Requires 4 data files:
+1. Unique well ids: 'well_unique_id.txt'
+2. Well Dimensions: 'well_dimensions.csv'
+3. RAW groundwater data (in cm) for all years: 'groundwater_biweekly_RAW.csv'
+4. Well meter offsets (in cm): 'well_meter_offsets.csv'
+
+Outputs resulting processed groundwater data to:
+'data/field_observations/groundwater/plots/biweekly_manual/groundwater_biweekly_FULL.csv'
 
 ## Sagehen Sub-Daily Groundwater Scripts
-In subdaily directory, scripts to process RAW groundwater logger data.
+### subdaily_Processing_RawToGround.py
+In subdaily directory, script to process RAW groundwater logger data is subdaily_Processing_RawToGround.py.
 
-### .py Scripts
-
-#### subdaily_Processing_RawToGround.py
-Takes RAW subdaily logger data and compensates for barometric pressure
+It takes RAW subdaily logger data and compensates for barometric pressure
 Once compensated, translates water level above the pressure sensor to water level below ground
 Uses manual readings to generate the needed offset, 
     then applies to all subdaily readings for the appropriate time period.
 
-Saves output as: groundwater_subdaily_full.csv in the data/groundwater/subdaily folder.
-
-Requires data files:  
+Requires data files:
     1. RAW logger data as .csv files in subdaily_dir with strict 
-        naming convention and formatting  
-    2. cut_times_file = groundwater_logger_times.csv (based on field notes)  
-    3. barometric pressure data for the full time series that you want to process  
+        naming convention and formatting
+    2. cut_times_file = groundwater_logger_times.csv (based on field notes)
+    3. barometric pressure data as .csv
+
+Outputs results to groundwater_subdaily_full.csv in the data/groundwater/subdaily/
 
 ### .ipynb notebooks
 These are older versions of code that've been wrapped into the subdaily_Processing_RawToGround.py script
