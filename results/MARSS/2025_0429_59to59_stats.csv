@@ -1,0 +1,2 @@
+"ID","run_date","run_minutes","observations","completeness","AIC","AICc","coef.det","sigma","df","logLik","convergence","errors","Q.diag","Q.offdiag","R.diag","U.1"
+59,2025-04-29,70.8740452686946,180,0.9,13540.13260228,13583.8222574524,0.89441426781244,139.733793180928,181,-6589.06630113998,0,0,84.5198459617524,"N/A","N/A","N/A"
