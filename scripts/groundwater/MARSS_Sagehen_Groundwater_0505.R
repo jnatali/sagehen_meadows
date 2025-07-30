@@ -768,16 +768,15 @@ run_single_model <- function(response_matrix, param_list, model_id){
   execution_minutes <- as.numeric(difftime(end_time, start_time, units = "mins"))
  
   #model_summary <- tidy(model)
-  # 0505 UPDATE NOW: Skip MARSSparamCIs() 
-  model_summary <- tidy(model, method = "none")
+  # 0505 UPDATE Run 62: Skip MARSSparamCIs() 
+  #model_summary <- tidy(model, method = "none")
   
-  # 0505 UPDATE NEXT: Call MARSSparamCIs() with fewer bootstraps and in parallel
-  #model_CIs <- MARSSparamCIs(model, method = "parametric", nboot = 100, parallel = TRUE)
+  # 0505 UPDATE Run 63: Call MARSSparamCIs() with fewer bootstraps and in parallel
+  model_CIs <- MARSSparamCIs(model, method = "parametric", nboot = 100, parallel = TRUE)
   
-  # 0505 UPDATE NEXT: Use the above step to get model summary (for this model output csv)
-  #model_summary <- tidy(model_CIs)
-  #model_summary <- tidy(model)
-  
+  # 0505 UPDATE Run 63: Use the above step to get model summary (for this model output csv)
+  model_summary <- tidy(model_CIs)
+
   # append well_id info to summary
   model_summary <- bind_rows(model_summary, well_index_dataframe)
   

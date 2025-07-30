@@ -51,7 +51,7 @@ save_fig = False #not working yet, throwing error
 
 debug_cut = False
 debug_baro = False
-debug_gtw = True
+debug_gtw = False
 
 ### GLOBAL VARIABLES
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
