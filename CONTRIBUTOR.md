@@ -43,12 +43,12 @@ git checkout <issue#-name-of-your-branch>
 - Use your preferred editor and save your changes locally.
 
 #### 5. Commit your changes and push to github #### 
-- Commit and push often! It's a backup of your work.
+- Commit and push often! It's a backup of your work. No matter what happens to your computer, your edits will be uploaded to github.
 - Commit any chunk of work that you wouldn't want to lose.
 - Commit at the end of each work session.
 - Your commit description should help you differentiate your commits. I tend to have a list of short sentences. Each starts with verb then offers a brief (i.e. 1-3 word) reason for the change: "Added function to..., Fixed loop in...."
 
-On Github Desktop, go to the **"Changes"** tab on the left, write a short summary of your commit with a description for details, then click **"Commit"** to <issue#-name-of-your-branch>. Then click **"Push origin"** at the top bar to upload your changes to github. Now it should be safe, no matter what happens to your computer!
+On Github Desktop, go to the **"Changes"** tab on the left, write a short summary of your commit with a description for details, then click **"Commit"** to <issue#-name-of-your-branch>. Then click **"Push origin"** at the top bar to upload your changes to github. 
 
 OR with command line:
 ```
