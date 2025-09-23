@@ -5,7 +5,7 @@ Please follow these steps when working on your assigned issue.
 
 Key Points
 - Work in your branch, it's your safe space to make changes with confidence
-- Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not paying attention.
+- Commit your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not paying attention.
 - Write short, clear commit messages.
 - Don't push directly to main. We'll do this when the work is complete or needs to be shared. If you try to push to main, your request should be blocked.
 
