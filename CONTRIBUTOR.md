@@ -3,11 +3,16 @@
 Welcome! This repository uses a **branch-based workflow** to keep our `main` branch stable.  
 Please follow these steps when working on your assigned issue.
 
+Tools Needed
+- You can use Github Desktop to manage this workflow, it's easy to learn and has everything you need. See https://desktop.github.com/download/
+- Alternatively, you can use git via the command line in a terminal window. That's more advanced, but can be quick and powerful. You can invest in installing and learning this if you want. I provide commands below, but can't offer much help beyond that.
+
 Key Points
 - Work in your branch, it's your safe space to make changes with confidence
 - Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not paying attention.
 - Write short, clear commit messages.
 - Don't push directly to main. We'll do this when the work is complete or needs to be shared. If you try to push to main, your request should be blocked.
+
 
 ### Workflow Steps
 #### 1. *First time only:* Clone the repository ####  
@@ -26,9 +31,7 @@ On Github Desktop, check that you're in the `main` branch, then click **"Fetch O
 
 OR with command line:
 ```
-git checkout main
-git pull origin main
-git fetch origin
+git pull
 ```
 
 #### 3. Switch to your assigned branch ####
@@ -52,9 +55,13 @@ On Github Desktop, go to the **"Changes"** tab on the left, write a short summar
 
 OR with command line:
 ```
-git add .
+git status
+```
+confirm the branch (should be your issue's branch) and what has changed
+```
+git add <filenames or directories that relate to this commit>
 git commit -m "Short description of what you changed"
-git push origin <issue#-name-of-your-branch>
+git push
 ```
 
 #### 6. Open a **Pull Request** to merge `your issue's branch` into `main` ####
