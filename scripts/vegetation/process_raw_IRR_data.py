@@ -8,24 +8,24 @@ import pandas as pd
 RAW_DATA_DIR = "/run/media/smittlek/KINGSTON/Research_Jen/canopy_temp_RAW_2025_0919_update-20250920T050912Z-1-001/canopy_temp_RAW_2025_0919_update"
 #PROCESSED_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
 PROCESSED_DATA_DIR = "/run/media/smittlek/KINGSTON/Research_Jen"
-PROCESSED_FILENAME = 'processed_canopy_temp (Copy).xlsx'
+PROCESSED_FILENAME = 'processed_canopy_WORKING_202527_09_2117_CSV.csv'
 
 def main():
     """
     Main function to run the data processing workflow.
     """
     # Create the full path for the output file
-    proceses_file_path = os.path.join(PROCESSED_DATA_DIR, PROCESSED_FILENAME)
+    processed_file_path = os.path.join(PROCESSED_DATA_DIR, PROCESSED_FILENAME)
 
     print("--- Starting IRR Data Processing ---")
 
     # 1. Load any existing processed data into a dataframe
-    print(f"Checking for existing data at: {proceses_file_path}")
+    print(f"Checking for existing data at: {processed_file_path}")
     processed_dates = set()
     existing_df = pd.DataFrame() # Start with an empty DataFrame
     
-    if os.path.exists(proceses_file_path):
-        existing_df = pd.read_csv(proceses_file_path)
+    if os.path.exists(processed_file_path):
+        existing_df = pd.read_csv(processed_file_path)
         print(f"Loaded {len(existing_df)} existing records.")
     else:
         # If no file exists, start with an empty DataFrame
@@ -97,11 +97,11 @@ def main():
         # 7. Save the updated dataframe back to the CSV file
         # Use index=False to avoid writing an extra column for the row numbers
         os.makedirs(PROCESSED_DATA_DIR, exist_ok=True) # Ensure directory exists
-        updated_df.to_excel(proceses_file_path, index=False)
+        updated_df.to_excel(processed_file_path, index=False)
         
         print(f"\nSuccessfully added {len(new_data_df)} new records.")
         print(f"Total records are now {len(updated_df)}.")
-        print(f"Updated data saved to: {proceses_file_path}")
+        print(f"Updated data saved to: {processed_file_path}")
     
     print("--- Processing Complete ---")
 
