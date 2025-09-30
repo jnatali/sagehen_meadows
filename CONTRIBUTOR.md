@@ -35,7 +35,7 @@ git pull
 ```
 
 #### 3. Switch to your assigned branch ####
-On Github Desktop, click the **"Current Branch"** dropdown and select `your issue's` branch, e.g. `19-canopy-temp`  
+On Github Desktop, click the **"Current Branch"** dropdown and select `your issue's` branch. If you don't have a branch, create one. Use a meaningful name that relates to the github issue  you're working on, i.e. use the pattern <#-brief_descriptive_phrase>, e.g. `19-canopy-temp`.
 
 OR with command line:  
 ```
