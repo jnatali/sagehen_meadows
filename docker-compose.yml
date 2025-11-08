@@ -1,0 +1,15 @@
+services:
+  phenopix:
+    build: .
+    container_name: phenopix
+    environment:
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=/root/.Xauthority
+    volumes:
+      - ./data:/app/data # Mount local "images" dir to /app/images inside container
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 Socket for display
+      - ${HOME}/.Xauthority:/root/.Xauthority:ro
+    network_mode: "host" # host networking to simplify X11 access
+    working_dir: /app
+    tty: true
+
