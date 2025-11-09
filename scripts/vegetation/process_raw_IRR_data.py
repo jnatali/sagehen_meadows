@@ -5,11 +5,9 @@ from datetime import datetime
 
 # --- Configuration ---
 # Define the relative paths from the script's location in 'scripts/'
-#RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
-RAW_DATA_DIR = r"D:\Research_Jen\canopy_temp_RAW_2025_1108_final-20251108T221628Z-1-001\canopy_temp_RAW_2025_1108_final"
-#PROCESSED_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
-#PROCESSED_DATA_DIR = r"D:\Research_Jen"
-#PROCESSED_FILENAME = r"processed_canopy_temp (Copy).xlsx"
+RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
+#RAW_DATA_DIR = os.path.join('data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
+
 
 # --- Define SOURCE file (where you read existing data FROM) ---
 SOURCE_EXCEL_DIR = r"D:\Research_Jen\Working"
