@@ -10,24 +10,35 @@ RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetatio
 
 
 # --- Define SOURCE file (where you read existing data FROM) ---
-SOURCE_EXCEL_DIR = r"D:\Research_Jen\Working"
-SOURCE_EXCEL_FILENAME = r"processed_canopy_WORKING_20252709_2117_CSV.csv" # The original Excel file
+SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+#SOURCE_EXCEL_FILENAME = r"processed_canopy_WORKING_20252709_2117_CSV.csv" # The original Excel file
+
+
+# 3. Base name of the files to search for
+SOURCE_FILE_PATTERN = "WORKING_*.csv"
+
+OUTPUT_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+OUTPUT_FILENAME = "WORKING.csv" # The name for the new output file
+
 
 # --- Define OUTPUT file (where you save the new data TO) ---
-today_date_str = datetime.now().strftime('%Y-%d-%m_%H%M')
-OUTPUT_DIR = r"D:\Research_Jen\Working" # A new folder for the output
-OUTPUT_FILENAME = r"WORKING.csv" # The name for the new output file
-
-#Sets date time format to match the raw data file
-DATE_FORMAT_STRING = '%m/%d/%Y %H:%M'
+# --- CHANGE 1: Fixed date format for correct sorting ---
+# Your old format '%Y-%d-%m' (Year-Day-Month) will not sort correctly.
+# This format '%Y-%m-%d' (Year-Month-Day) will.
+today_date_str = datetime.now().strftime('%Y-%m-%d_%H%M')
 
 # 2. Split the original filename from its extension
 # This turns "working.csv" into "working" and ".csv"
 base_name, extension = os.path.splitext(OUTPUT_FILENAME)
 
 # 3. Create the new filename
-# This becomes "WORKING_yyyy-dd-mm hhmm.csv"
+# This becomes "WORKING_yyyy-mm-dd_hhmm.csv"
 dated_filename = f"{base_name}_{today_date_str}{extension}"
+
+
+#Sets date time format to match the raw data file
+DATE_FORMAT_STRING = '%m/%d/%Y %H:%M'
+
 
 FINAL_COLUMNS = [
     'Time', 
@@ -40,25 +51,53 @@ FINAL_COLUMNS = [
     'Notes:'
 ]
 
+# --- CHANGE 2: Helper function to get the date string from a filename ---
+def get_date_from_filename(file_path):
+    """
+    Extracts the 'YYYY-MM-DD_HHMM' string from a filename 
+    like 'WORKING_YYYY-MM-DD_HHMM.csv' for sorting.
+    """
+    try:
+        base_name = os.path.basename(file_path)
+        name_without_ext = os.path.splitext(base_name)[0]
+        # Splits 'WORKING_2025-11-09_1530' into ['WORKING', '2025-11-09_1530']
+        # and returns the date part.
+        return name_without_ext.split('_', 1)[1]
+    except:
+        # If the file is not named correctly (e.g., 'WORKING.csv'),
+        # return an empty string so it's not chosen as the max.
+        print(f"Warning: Filename '{file_path}' does not match expected pattern. Exiting.")
+        exit(0)
+
 """
 Main function to run the data processing workflow.
 """
-# Create the full path for the output file
-source_file_path = os.path.join(SOURCE_EXCEL_DIR, SOURCE_EXCEL_FILENAME)
+
+# Create the full path for the NEW output file
 output_file_path = os.path.join(OUTPUT_DIR, dated_filename)
 
 print("--- Starting IRR Data Processing ---")
 
-# 1. Load any existing processed data into a dataframe
-print(f"Checking for existing data at: {source_file_path}")
+# 1. Find and Load any existing processed data
+print(f"Searching for most recent source file in: {SOURCE_DIR}")
+search_pattern = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
+list_of_files = glob.glob(search_pattern)
+
+
 #Initialises a set. A set is a list without repeating elements
 processed_dates = set()
 existing_df = pd.DataFrame() # Start with an empty DataFrame
 
-if os.path.exists(source_file_path):
+if list_of_files:
+    # Compares the date string in the name
+    source_file_path = max(list_of_files, key=get_date_from_filename)
+    
+    print(f"Loading most recent source file (by name): {os.path.basename(source_file_path)}")
+    
     existing_df = pd.read_csv(source_file_path)
     #Removes spaces to help with merging data frames
     existing_df.columns = existing_df.columns.str.strip()
+    
     if 'Time' in existing_df.columns:
         # Create a set of unique dates for efficient lookup
         existing_df['Time'] = pd.to_datetime(existing_df['Time'], format=DATE_FORMAT_STRING)
@@ -69,14 +108,18 @@ if os.path.exists(source_file_path):
         exit(0)
 #If no file exists at the directory, exit (modify directory before trying again)
 else:
-    print("No existing data file found. Try again.")
+    # This is the change you requested
+    print(f"Error: No existing source files found matching '{search_pattern}'. Exiting program.")
     exit(0)
+
+# --- END OF RE-WRITTEN SECTION ---
+
 
 # 2. Find all raw data files
 #Points to RAW_DATA_DIR directory with file names Data Log.. * is a wildcard for any character
-search_pattern = os.path.join(RAW_DATA_DIR, 'Data Log*.txt') 
+search_pattern_raw = os.path.join(RAW_DATA_DIR, 'Data Log*.txt') # Changed variable name to avoid conflict
 #glob.glob finds all files matching the search pattern and returns them as a list named all_raw_files
-all_raw_files = glob.glob(search_pattern)
+all_raw_files = glob.glob(search_pattern_raw)
 
 #If .txt files are not found in directory, exit
 if not all_raw_files:
