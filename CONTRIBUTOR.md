@@ -4,7 +4,7 @@ Welcome! This repository uses a **branch-based workflow** to keep our `main` bra
 Please follow these steps when working on your assigned issue.
 
 Tools Needed
-- You can use Github Desktop to manage this workflow, it's easy to learn and has everything you need. See https://desktop.github.com/download/
+- You can use [Github Desktop](https://github.com/apps/desktop) to manage this workflow, it's easy to learn and has everything you need. See https://desktop.github.com/download/
 - Alternatively, you can use git via the command line in a terminal window. That's more advanced, but can be quick and powerful. You can invest in installing and learning this if you want. I provide commands below, but can't offer much help beyond that.
 
 Key Points
@@ -74,5 +74,13 @@ The request will need to be reviewed before it's integrated into `main`
 - Add a short description of what you did.
 - Click **"Create pull request"**
 
+## More Git Resources
+- [Basic Git Guide](https://github.com/git-guides), says it's "everything you need to know"
+- [GitHub Documentation](https://docs.github.com/en) includes a "Get Started" guide. You'll mainly need to work with repositories, branches, commits and pull requests, but at a very simple level.
+- [Intro to Github online course](https://github.com/skills/introduction-to-github)
+- [90-min GitHub Fundamentals Workshop](https://dlab-berkeley.github.io/dlab-workshops/workshop/git-fundamentals/) from UCB's D-Lab
 
+### Using Git with Visual Studio
+- [Visual Studio site on github integration](https://visualstudio.microsoft.com/vs/github/)
+- [Working with GitHub in VS Code tutorial](https://code.visualstudio.com/docs/sourcecontrol/github)
 
