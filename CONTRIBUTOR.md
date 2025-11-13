@@ -65,7 +65,7 @@ git push
 ```
 
 #### 6. Open a **Pull Request** to merge `your issue's branch` into `main` ####
-Do this once the work in your branch is fully operational and ready to integrate into the stable code base
+Do this once the work in your branch is fully operational (i.e. it's complete) and ready to integrate into the stable code base. 
 The request will need to be reviewed before it's integrated into `main` 
 
 - Go to the github repository at https://github.com/jnatali/sagehen_meadows
