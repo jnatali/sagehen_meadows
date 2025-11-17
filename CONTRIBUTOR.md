@@ -4,7 +4,7 @@ Welcome! This repository uses a **branch-based workflow** to keep our `main` bra
 Please follow these steps when working on your assigned issue.
 
 Tools Needed
-- You can use [Github Desktop](https://github.com/apps/desktop) to manage this workflow, it's easy to learn and has everything you need. See https://desktop.github.com/download/
+- You can use [Github Desktop](https://github.com/apps/desktop) application to manage this workflow, it's easy to learn and has everything you need. See https://desktop.github.com/download/
 - Alternatively, you can use git via the command line in a terminal window. That's more advanced, but can be quick and powerful. You can invest in installing and learning this if you want. I provide commands below, but can't offer much help beyond that.
 
 Key Points
