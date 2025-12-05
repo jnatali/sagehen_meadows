@@ -79,36 +79,49 @@ data_corrected <- data %>%
   #left_join() to combine 2 dataframes based on common column
   left_join(WAI, by = "Well_ID") %>% 
   mutate(
+    `Leaf Area Index [LAI]` = as.numeric(`Leaf Area Index [LAI]`),
+    WAI = as.numeric(WAI),
     #corrected == TRUE only if willow and date before leafoff_date; WAI exists
-    corrected = is_willow & Date < as.Date(willow_noleaf_date) & !is.na(WAI),
+    correctWillow = is_willow & Date < as.Date(willow_noleaf_date) & !is.na(WAI),
     #if corrected == TRUE, do the subtraction
-    LAI_noWAI = if_else(corrected, `Leaf Area Index [LAI]` - WAI, `Leaf Area Index [LAI]`)
-  )
-View(data_corrected)
+    LAI.rmWAI = if_else(correctWillow, `Leaf Area Index [LAI]` - WAI, `Leaf Area Index [LAI]`),
+    LAI.halfWAI = if_else(correctWillow, `Leaf Area Index [LAI]` - (0.5*WAI), `Leaf Area Index [LAI]`),
+    correctLastWillow = is_willow & Date == as.Date(willow_noleaf_date) & !is.na(WAI),
+    LAI.rmWAI = if_else(correctLastWillow, 0, LAI.rmWAI),
+    LAI.halfWAI = if_else(correctLastWillow, 0, LAI.halfWAI),
+    LAI.rmWAI   = round(LAI.rmWAI, 2),
+    LAI.halfWAI = round(LAI.halfWAI, 2),
+    `Leaf Area Index [LAI]` =  round(`Leaf Area Index [LAI]`, 2)
+  ) 
 
+View(data_corrected)
+head(data_corrected)
 data_corrected <- rename(data_corrected,c('well_id'='Well_ID',
                                           'datetime'='Date and Time',
-                                          'LAI'='Leaf Area Index [LAI]',
+                                          'LAI.sensor'='Leaf Area Index [LAI]',
                                           'abovePAR'='Average Above PAR',
                                           'belowPAR'='Average Below PAR',
-                                          'T'='Tau [T]',
-                                          'Fb'='Beam Fraction [Fb]',
-                                          'X'='Leaf Distribution [X]'))
+                                          'T'=`Tau [Τ]`,
+                                          'Fb'=`Beam Fraction [Fb]`,
+                                          'X'=`Leaf Distribution [Χ]`))
 
 LAI_Corrected <- data_corrected %>%
   select(
     well_id,
     datetime,
-    LAI,
-    LAI_noWAI,
+    LAI.sensor,
+    LAI.rmWAI,
+    LAI.halfWAI,
     WAI,
+    correctWillow,
+    correctLastWillow,
     abovePAR,
     belowPAR,
     T,
     Fb,
-    X,
-    corrected
+    X
   )
+
 View(LAI_Corrected)
 
-write_csv(LAI_Corrected, LAI_corrected_file, append=TRUE)
+write_csv(LAI_Corrected, LAI_corrected_file, append=FALSE)
