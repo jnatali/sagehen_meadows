@@ -1,8 +1,10 @@
 ## Git Workflow for Contributors
 
-Welcome! This repository is a place where we store all our data, scripts and output. Github has version control tools to help us keep our files safe and manage a project with multiple contributors. It uses a **branch-based workflow** to keep our `main` branch stable.
+Welcome! This repository is a place where we store all our data, scripts and output. Github has version control tools to help us keep our files safe and manage a project with multiple contributors. 
 
-Please follow these steps when working on your assigned issue.
+This repository uses a **branch-based workflow** to keep our `main` branch stable.
+
+Please follow these steps when working on your assigned "issue" or task. You can find all issues on the  menu above, and eash one should have an assigned branch. 
 
 Tools Needed
 - You can use [Github Desktop](https://github.com/apps/desktop) application to manage this workflow, it's easy to learn and has everything you need. Download it here --> https://desktop.github.com/download/
