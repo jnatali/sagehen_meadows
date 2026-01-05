@@ -5,8 +5,14 @@ import glob
 from datetime import datetime
 
 # --- Configuration ---
-SOURCE_DIR = r"D:\Research_Jen\Working"
-OUTPUT_DIR = r"D:\Research_Jen\Working"
+# These paths are relative to the script's location (assuming script is in 'scripts/')
+RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
+SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+SOURCE_FILE_PATTERN = "WORKING_*.csv"
+
+OUTPUT_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+OUTPUT_FILENAME = "WORKING.csv" 
+OUTPUT_GRAPH_DIR = os.path.join('..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
 
 EMISSIVITY = {
     'plant': 0.97,
@@ -15,7 +21,8 @@ EMISSIVITY = {
     'bare ground': 0.95
 }
 
-# function to get the date string from a filename 
+# --- Functions ---
+
 def get_date_from_filename(file_path):
     """
     Extracts the 'YYYY-MM-DD_HHMM' string from a filename 
@@ -24,27 +31,30 @@ def get_date_from_filename(file_path):
     try:
         base_name = os.path.basename(file_path)
         name_without_ext = os.path.splitext(base_name)[0]
-        # Returns the part after the first underscore
+        # Returns the part after the first underscore (e.g., 2023-05-01_1200)
         return name_without_ext.split('_', 1)[1]
-    except:
-        print(f"Warning: Filename '{file_path}' does not match expected pattern. Exiting.")
-        exit(0)
+    except Exception:
+        print(f"Warning: Filename '{file_path}' does not match expected pattern. Skipping.")
+        return "0000-00-00_0000"
 
-# Find the latest file 
-list_of_files = glob.glob(os.path.join(SOURCE_DIR, "WORKING_*.csv"))
+# --- Main Processing ---
+
+# 1. Find the latest file using the pattern defined in config
+list_of_files = glob.glob(os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN))
+
 if not list_of_files:
-    print("No working files found. Exiting.")
+    print(f"No files matching {SOURCE_FILE_PATTERN} found in {SOURCE_DIR}. Exiting.")
     exit(0)
 
 latest_file = max(list_of_files, key=get_date_from_filename)
 print(f"Processing latest file: {os.path.basename(latest_file)}")
 df_original = pd.read_csv(latest_file)
 
-# Saves date and target_type in specicific formats to prevent code failure
+# 2. Data Preparation
 df_original['Date'] = pd.to_datetime(df_original['Time']).dt.date
 df_original['target_type_lower'] = df_original['target_type'].str.lower().str.strip()
 
-# Average data for each unique well/Date/target_type combo
+# 3. Calculate Averages for Energy Correction
 grouped_averages = df_original.groupby(['well_id', 'Date', 'target_type_lower'], as_index=False).agg({
     'Target': 'mean',
     'percent_cover': 'mean'
@@ -53,16 +63,13 @@ grouped_averages = df_original.groupby(['well_id', 'Date', 'target_type_lower'],
 grouped_averages['f'] = grouped_averages['percent_cover'] / 100.0
 grouped_averages['Temp_K'] = grouped_averages['Target'] + 273.15
 
-#Calculate energy for each row
 def get_energy(row):
-    #get emissivity from dictionary, default to .95 if item doesn't match any list item
     e = EMISSIVITY.get(row['target_type_lower'], 0.95)
     return e * row['f'] * (row['Temp_K']**4)
 
-#get energy for each row in grouped_averages df
 grouped_averages['energy_contrib'] = grouped_averages.apply(get_energy, axis=1)
 
-# Sum non-plant energy components per well/day
+# 4. Sum non-plant energy components (Noise)
 other_cats = ['thatch', 'bare-thatch', 'bare ground']
 noise_lookup = (
     grouped_averages[grouped_averages['target_type_lower'].isin(other_cats)]
@@ -72,10 +79,9 @@ noise_lookup = (
     .rename(columns={'energy_contrib': 'sum_noise'})
 )
 
-# Apply Correction to Original Dataframe
+# 5. Apply Correction
 df_original = pd.merge(df_original, noise_lookup, on=['well_id', 'Date'], how='left')
 df_original['sum_noise'] = df_original['sum_noise'].fillna(0)
-
 
 def solve_tc(row):
     if row['target_type_lower'] != 'plant':
@@ -85,11 +91,9 @@ def solve_tc(row):
     f_p = row['percent_cover'] / 100.0
     ts_k_4 = (row['Target'] + 273.15)**4
     
-    # Mathematical implementation of Equation (9)
     numerator = ts_k_4 - row['sum_noise']
     denominator = e_p * f_p
     
-    # Safety check: Prevent square root of negative numbers
     if numerator > 0 and denominator > 0:
         tc_k = (numerator / denominator)**0.25
         return tc_k - 273.15
@@ -98,11 +102,15 @@ def solve_tc(row):
 df_original['corrected_Tc'] = df_original.apply(solve_tc, axis=1)
 df_original['Tc_Difference'] = df_original['Target'] - df_original['corrected_Tc']
 
-# 5. Save the final file
+# 6. Save the final file
+# Create output directory if it doesn't exist
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
+
 timestamp = datetime.now().strftime('%Y-%m-%d_%H%M')
 final_output = os.path.join(OUTPUT_DIR, f"TC_CORRECTED_{timestamp}.csv")
 
-# Clean up temporary processing columns but keep all original columns
+# Clean up temporary columns and save
 cols_to_drop = ['Date', 'target_type_lower', 'sum_noise']
 df_original.drop(columns=cols_to_drop).to_csv(final_output, index=False)
 
