@@ -5,26 +5,15 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 
 # --- Configuration ---
-# Define the relative paths from the script's location in 'scripts/'
-#RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
-RAW_DATA_DIR = r"D:\Research_Jen\canopy_temp_RAW_2025_1108_final-20251108T221628Z-1-001\canopy_temp_RAW_2025_1108_final"
-#PROCESSED_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
-#PROCESSED_DATA_DIR = r"D:\Research_Jen"
-#PROCESSED_FILENAME = r"processed_canopy_temp (Copy).xlsx"
 
 # --- Define SOURCE file (where you read existing data FROM) ---
-SOURCE_DIR = r"D:\Research_Jen\Working"
-#SOURCE_EXCEL_FILENAME = r"processed_canopy_WORKING_20252709_2117_CSV.csv" # The original Excel file
+SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
 
 # 3. Base name of the files to search for
 SOURCE_FILE_PATTERN = "TC_CORRECTED_*.csv"
 
-# --- Define OUTPUT file (where you save the new data TO) ---
-OUTPUT_DIR = r"D:\Research_Jen\Working\CleanGraph" # A new folder for the outputa
-
-# Ensure the output directory exists to prevent "No such file or directory" error
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+# --- Define OUTPUT file (where you save the new graphs TO) ---
+OUTPUT_DIR = os.path.join('..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
 
 # Saved current date/time in (Year-Month-Day_Hour_Minute) format.
 today_date_str = datetime.now().strftime('%Y-%m-%d_%H%M')
@@ -158,4 +147,5 @@ if list_of_files:
     print(f"All plots saved as .eps to {OUTPUT_DIR}")
 else:
     print(f"Error: No existing source files found matching '{search_pattern}'. Exiting program.")
+
     exit(0)
