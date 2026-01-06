@@ -8,10 +8,10 @@ from datetime import datetime
 # These paths are relative to the script's location (assuming script is in 'scripts/')
 RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
 SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
-SOURCE_FILE_PATTERN = "WORKING_*.csv"
+SOURCE_FILE_PATTERN = "TC_CORRECTED_*.csv"
 
 OUTPUT_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
-OUTPUT_FILENAME = "WORKING.csv" 
+OUTPUT_FILENAME = "TC_CORRECTED_.csv" 
 OUTPUT_GRAPH_DIR = os.path.join('..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
 
 EMISSIVITY = {
@@ -115,3 +115,4 @@ cols_to_drop = ['Date', 'target_type_lower', 'sum_noise']
 df_original.drop(columns=cols_to_drop).to_csv(final_output, index=False)
 
 print(f"Success! Corrected file saved as: {final_output}")
+
