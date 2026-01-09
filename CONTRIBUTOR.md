@@ -1,14 +1,17 @@
 ## Git Workflow for Contributors
 
-Welcome! This repository uses a **branch-based workflow** to keep our `main` branch stable.  
-Please follow these steps when working on your assigned issue.
+Welcome! This repository is a place where we store all our data, scripts and output. Github has version control tools to help us keep our files safe and manage a project with multiple contributors. 
+
+This repository uses a **branch-based workflow** to keep our `main` branch stable.
+
+Please follow these steps when working on your assigned "issue" or task. You can find all issues on the  menu above, and eash one should have an assigned branch. 
 
 Tools Needed
-- You can use [Github Desktop](https://github.com/apps/desktop) application to manage this workflow, it's easy to learn and has everything you need. See https://desktop.github.com/download/
+- You can use [Github Desktop](https://github.com/apps/desktop) application to manage this workflow, it's easy to learn and has everything you need. Download it here --> https://desktop.github.com/download/
 - Alternatively, you can use git via the command line in a terminal window. That's more advanced, but can be quick and powerful. You can invest in installing and learning this if you want. I provide commands below, but can't offer much help beyond that.
 
 Key Points
-- Work in your branch, it's your safe space to make changes with confidence
+- Work in *your issue's branch*. It's your safe space to make changes with confidence. If you're not sure what branch to use, please ask. I don't mind, I want your code and results to be backed up.
 - Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not paying attention.
 - Write short, clear commit messages.
 - Don't push directly to main. We'll do this when the work is complete or needs to be shared. If you try to push to `main`, your request should be blocked.
