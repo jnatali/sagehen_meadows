@@ -1,0 +1,7 @@
+"well_id","LAI.sensor","is_east","is_kiln","position"
+"EHR-1",1.16625,TRUE,FALSE,"Riparian"
+"EHT-XA5S",1.00625,TRUE,FALSE,"Terrace"
+"EHT-XC5S",0.3075,TRUE,FALSE,"Terrace"
+"KHF-1",0.7425,FALSE,TRUE,"Fan"
+"KHR-1",2.095,FALSE,TRUE,"Riparian"
+"KHT-XE5S",0.8075,FALSE,TRUE,"Terrace"
