@@ -1,3 +1,20 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+PROCESS RAW INFRARED RADIOMETER FIELD DATA SCRIPT
+Created on 10 December 2025
+@author: kara-leah smittle, jennifer natali
+
+Takes a single csv file of all canopy temperature observations,
+and corrects the calculated temperature based on the measured
+patch characteristics and emissivity.
+
+For details on how the data and processing steps for this script
+were defined, see github issue:
+    https://github.com/jnatali/sagehen_meadows/issues/19
+
+"""
+
 import pandas as pd
 import numpy as np
 import os
@@ -14,12 +31,15 @@ OUTPUT_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation'
 OUTPUT_FILENAME = "TC_CORRECTED_.csv" 
 OUTPUT_GRAPH_DIR = os.path.join('..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
 
+# Sources of emissivity estimates from Hillel p 312 and Mira et al 2007
 EMISSIVITY = {
-    'plant': 0.97,
-    'thatch': 0.95,
+    'plant': 0.97, # Jones, 2004, p. 114 says 0.92-0.96; higher if full canopy
+                   # Campbell and Norman, 1998, p. 230 says 0.98-0.99 if full
+    'thatch': 0.95, # dry leaves
     'bare-thatch': 0.95,
-    'bare ground': 0.95
+    'bare ground': 0.95 # for dry soil, might be 0.96 if moist
 }
+
 
 # --- Functions ---
 

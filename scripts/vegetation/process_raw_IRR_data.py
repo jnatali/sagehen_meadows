@@ -1,3 +1,22 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+PROCESS RAW INFRARED RADIOMETER FIELD DATA SCRIPT
+Created on 10 October 2025
+@author: kara-leah smittle, jennifer natali
+
+Takes RAW .txt data files from Apogee IRR instrument,
+as collected in the field, to build a single csv file
+of all observations. This allows data entry from field notes
+to associate each observation with a groundwater well_id
+and patch type, based on the timestamp of the data entry.
+
+For details on how the data and processing steps for this script
+were defined, see github issue:
+    https://github.com/jnatali/sagehen_meadows/issues/19
+
+"""
+
 import os
 import glob
 import pandas as pd

@@ -14,25 +14,32 @@ Time,Target,Sensor Body,source_file,well_id,target_type,percent_cover,Notes:
 7/9/25 17:03,22.2609,22.0678,Data Log(39).txt,,,,
 7/9/25 17:03,22.2768,22.074,Data Log(39).txt,,,,
 7/9/25 17:03,22.2784,22.0703,Data Log(39).txt,,,,
-7/11/25 12:12,25.6712,33.3011,Data Log(38).txt,Patch 1 m of well w/o bare ground,plant,100,
-7/11/25 12:12,25.7209,33.295,Data Log(38).txt,Patch 1 m of well w/o bare ground,plant,100,
-7/11/25 12:12,25.7241,33.3061,Data Log(38).txt,Patch 1 m of well w/o bare ground,plant,100,
-7/11/25 12:12,25.9132,33.31,Data Log(38).txt,Patch 1 m of well w/o bare ground,plant,100,
-7/11/25 12:12,26.2523,33.3162,Data Log(38).txt,Patch 1 m of well w/o bare ground,plant,100,
-7/11/25 12:25,48.6433,33.1299,Data Log(37).txt,EWR-1,bare ground,0,
-7/11/25 12:25,48.7055,33.1308,Data Log(37).txt,EWR-1,bare ground,0,
-7/11/25 12:32,22.9749,33.085,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:32,23.0105,33.0811,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:32,23.1169,33.0942,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:32,23.1715,33.1016,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:32,23.1805,33.0589,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:32,23.2402,33.0613,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:32,23.6338,33.1192,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:34,22.8639,32.9502,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:34,23.0372,32.9339,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:34,23.0548,32.9365,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:34,23.0805,32.9403,Data Log(37).txt,EWR-1 ,plant,100,
-7/11/25 12:35,23.0049,32.9308,Data Log(37).txt,EWR-1 ,plant,100,
+7/11/25 12:03,53.3129,33.9177,field notes,EHR-1,bare ground,3,
+7/11/25 12:04,-42.2447,34.0238,field notes,EHR-1,sky,,
+7/11/25 12:12,25.6712,33.3011,Data Log(38).txt,EHR-1,plant,97,Patch 1 m south of well w/o bare ground
+7/11/25 12:12,25.7209,33.295,Data Log(38).txt,EHR-1,plant,97,Patch 1 m south of well w/o bare ground
+7/11/25 12:12,25.7241,33.3061,Data Log(38).txt,EHR-1,plant,97,Patch 1 m south of well w/o bare ground
+7/11/25 12:12,25.9132,33.31,Data Log(38).txt,EHR-1,plant,97,Patch 1 m south of well w/o bare ground
+7/11/25 12:12,26.2523,33.3162,Data Log(38).txt,EHR-1,plant,97,Patch 1 m south of well w/o bare ground
+7/11/25 12:21,29.1376,32.8536,field notes,EER-1,plant,99,
+7/11/25 12:21,29.2958,32.8549,field notes,EER-1,plant,99,
+7/11/25 12:21,29.2314,32.8562,field notes,EER-1,plant,99,
+7/11/25 12:21,29.1161,32.8572,field notes,EER-1,plant,99,
+7/11/25 12:21,29.0673,32.8576,field notes,EER-1,plant,99,
+7/11/25 12:25,48.6433,33.1299,Data Log(37).txt,EER-1,bare ground,1,
+7/11/25 12:25,48.7055,33.1308,Data Log(37).txt,EER-1,bare ground,1,
+7/11/25 12:32,22.9749,33.085,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:32,23.0105,33.0811,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:32,23.1169,33.0942,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:32,23.1715,33.1016,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:32,23.1805,33.0589,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:32,23.2402,33.0613,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:32,23.6338,33.1192,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:34,22.8639,32.9502,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:34,23.0372,32.9339,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:34,23.0548,32.9365,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:34,23.0805,32.9403,Data Log(37).txt,EWR-1,plant,100,
+7/11/25 12:35,23.0049,32.9308,Data Log(37).txt,EWR-1,plant,100,
 7/11/25 12:43,25.9969,32.9759,Data Log(36).txt,EWT-2,plant,100,
 7/11/25 12:43,26.1074,32.9685,Data Log(36).txt,EWT-2,plant,100,
 7/11/25 12:43,26.2339,32.9763,Data Log(36).txt,EWT-2,plant,100,
@@ -90,9 +97,9 @@ Time,Target,Sensor Body,source_file,well_id,target_type,percent_cover,Notes:
 7/11/25 15:11,58.9274,31.9155,Data Log(26).txt,KHF-1,bare ground,4,
 7/11/25 15:17,26.7995,32.3141,Data Log(25).txt,KWR-1,plant,100,
 7/11/25 15:17,27.0742,32.3168,Data Log(25).txt,KWR-1,plant,100,
-7/11/25 15:22,31.5378,32.7902,Data Log(25).txt,KER-1,plant,88,
-7/11/25 15:22,31.8436,32.7365,Data Log(25).txt,KER-1,plant,88,
-7/11/25 15:23,31.5754,32.7932,Data Log(25).txt,KER-1,plant,88,
+7/11/25 15:22,31.5378,32.7902,Data Log(25).txt,KER-2,plant,100,
+7/11/25 15:22,31.8436,32.7365,Data Log(25).txt,KER-2,plant,100,
+7/11/25 15:23,31.5754,32.7932,Data Log(25).txt,KER-2,plant,100,
 7/29/25 10:19,17.7768,20.611,Data Log(24).txt,EWR-1,plant,100,
 7/29/25 10:19,17.7922,20.6024,Data Log(24).txt,EWR-1,plant,100,
 7/29/25 10:19,17.9344,20.5912,Data Log(24).txt,EWR-1,plant,100,
@@ -149,8 +156,8 @@ Time,Target,Sensor Body,source_file,well_id,target_type,percent_cover,Notes:
 7/29/25 11:43,56.3466,29.9073,Data Log(14).txt,EHR-1,thatch,1,
 7/29/25 11:43,59.7166,29.7852,Data Log(14).txt,EHR-1,bare ground,3,
 7/29/25 11:44,57.571,29.9791,Data Log(14).txt,EHR-1,thatch,1,
-7/29/25 12:12,19.4962,30.0412,Data Log(13).txt,KWR-1,plant,100,
-7/29/25 12:12,19.9102,30.09,Data Log(13).txt,KWR-1,plant,100,
+7/29/25 12:12,19.4962,30.0412,Data Log(13).txt,KWR-1,plant,100,oddly low point in 2025 time series for KWR-1 but matches audio and similar to KWT-2; no notes on sun/shade
+7/29/25 12:12,19.9102,30.09,Data Log(13).txt,KWR-1,plant,100,oddly low point in 2025 time series for KWR-1 but matches audio and similar to KWT-2; no notes on sun/shade
 7/29/25 12:28,21.8922,29.8232,Data Log(11).txt,KWT-2,plant,100,
 7/29/25 12:28,22.0074,29.8016,Data Log(11).txt,KWT-2,plant,100,
 7/29/25 12:28,22.8079,29.7746,Data Log(11).txt,KWT-2,plant,100,
@@ -194,11 +201,11 @@ Time,Target,Sensor Body,source_file,well_id,target_type,percent_cover,Notes:
 7/29/25 13:45,39.9053,33.65,Data Log(2).txt,KEF-1,thatch,3,
 7/29/25 13:45,41.968,33.6258,Data Log(2).txt,KEF-1,thatch,3,
 7/29/25 13:45,44.1277,33.6103,Data Log(2).txt,KEF-1,thatch,3,
-7/29/25 13:49,40.1224,33.8859,Data Log(1).txt,KEF-1,thatch,3,
-7/29/25 13:49,40.577,33.8572,Data Log(1).txt,KEF-1,thatch,3,
-7/29/25 13:50,65.6538,33.9895,Data Log(1).txt,KEF-1,bare ground,4," ""Rust on Potentilla"" 6:50"
-7/29/25 13:50,69.3866,34.0157,Data Log(1).txt,KEF-1,bare ground,4," ""Rust on Potentilla"" 6:51"
-7/29/25 13:51,71.0048,34.0605,Data Log(1).txt,KEF-1,bare ground,4," ""Rust on Potentilla"" 6:52"
+7/29/25 13:49,40.1224,33.8859,Data Log(1).txt,KHF-1,plant,96," ""Rust on Potentilla; veg drying out and crunchy"" 6:50"
+7/29/25 13:49,40.577,33.8572,Data Log(1).txt,KHF-1,plant,96,
+7/29/25 13:50,65.6538,33.9895,Data Log(1).txt,KHF-1,bare ground,4,
+7/29/25 13:50,69.3866,34.0157,Data Log(1).txt,KHF-1,bare ground,4,
+7/29/25 13:51,71.0048,34.0605,Data Log(1).txt,KHF-1,bare ground,4,
 7/29/25 13:59,32.4941,34.3373,Data Log.txt,KER-2,plant,97,
 7/29/25 13:59,33.1806,34.3445,Data Log.txt,KER-2,plant,97,
 7/29/25 14:00,33.1887,34.2958,Data Log.txt,KER-2,plant,97,
@@ -495,8 +502,8 @@ Time,Target,Sensor Body,source_file,well_id,target_type,percent_cover,Notes:
 9/21/25 10:30,20.7312,22.0173,Data Log(58).txt,EER-1,plant,98,
 9/21/25 10:30,25.1189,22.132,Data Log(58).txt,EER-1,thatch,2,
 9/21/25 10:31,22.0256,22.1624,Data Log(58).txt,EER-1,thatch,2,
-9/21/25 10:36,15.0042,22.5905,Data Log(57).txt,EWR-1,,,pg 86: plant Temp 22.59
-9/21/25 10:36,15.073,22.5612,Data Log(57).txt,EWR-1,,,pg 86: plant Temp 22.56
+9/21/25 10:36,15.0042,22.5905,Data Log(57).txt,EWR-1,plant,100,pg 86: plant Temp 22.59
+9/21/25 10:36,15.073,22.5612,Data Log(57).txt,EWR-1,plant,100,pg 86: plant Temp 22.56
 9/21/25 10:44,21.2206,22.1746,Data Log(55).txt,EWT-2,plant,100,
 9/21/25 10:44,22.4391,22.1672,Data Log(55).txt,EWT-2,plant,100,
 9/21/25 10:48,21.766,22.2011,Data Log(54).txt,EET-1,plant,98,
