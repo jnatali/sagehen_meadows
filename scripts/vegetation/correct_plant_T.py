@@ -7,7 +7,8 @@ Created on 10 December 2025
 
 Takes a single csv file of all canopy temperature observations,
 and corrects the calculated temperature based on the measured
-patch characteristics and emissivity.
+patch characteristics and associated emissivity (citations noted 
+                                                 in code, for now).
 
 For details on how the data and processing steps for this script
 were defined, see github issue:
