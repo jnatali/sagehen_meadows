@@ -3,7 +3,8 @@ This directory contains canopy temperature readings from July to October 2025.
 
 Canopy temperatures were recorded with an Apogee sensor around wells in two meadows, representing three hydrogeomorphic zones (HGMZ) and three plant functional types (PFT).
 
-Files in the RAW folder are files uploaded directly from the Apogee senesor.  
+Files in the RAW folder are files uploaded directly from the Apogee senesor. 
+
 For groundwater well naming conventions, see the key below. 
 
 #### Abbreviations used in our data model
