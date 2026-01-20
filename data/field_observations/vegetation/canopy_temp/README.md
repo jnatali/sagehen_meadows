@@ -1,8 +1,9 @@
 ### Sagehen Canopy Temperature
 This directory contains canopy temperature readings from July to October 2025. 
 
-Canopy temperatures were recorded around wells in two meadows, representing three hydrogeomorphic zones (HGMZ) and three plant functional types (PFT).
+Canopy temperatures were recorded with an Apogee sensor around wells in two meadows, representing three hydrogeomorphic zones (HGMZ) and three plant functional types (PFT).
 
+Files in the RAW folder are files uploaded directly from the Apogee senesor.  
 For groundwater well naming conventions, see the key below. 
 
 #### Abbreviations used in our data model
@@ -41,8 +42,8 @@ For groundwater well naming conventions, see the key below.
 * Notes; notes from field book or recording
 
 ##### Additional Columns for TC_CORRECTED CSV
-*corrected_Tc; plant temperature corrected for emissivity and other plant_type in the field of view
-*Tc_Difference; difference of Target temperature and corrected_temperature
+* corrected_Tc; plant temperature corrected for emissivity and other plant_type in the field of view
+* Tc_Difference; difference of Target temperature and corrected_temperature
   
 
 
