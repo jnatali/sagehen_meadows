@@ -34,7 +34,19 @@ To create the timeseries of greenness values for each vegetation type, call the 
 # TODO: template this for each site/camera
 path_to_image_dir <- "data/phenocam/images/2018/sageeast1"
 path_to_roi <- "data/phenocam/phenopix/2018/sageeast1/ROI"
-path_to_vi <- "data/phenocam/phenopix/2018/sageeast1/VI"
+path_to_vi <- "data/phenocam/phenopix/2018/sageeast1/VI/"
+log_file <- "data/phenocam/phenopix/2018/sageeast1"
 date_code = "yyyy_mm_dd_HHMM"
-extractVIs(path_to_image_dir, path_to_roi, path_to_vi,date.code=date_code)
+extractVIs(path_to_image_dir, path_to_roi, path_to_vi, date.code=date_code, log.file=log_file)
+```
+
+If running a custom `extractVIs()` defined in `src/extractVIs.R` do the following before running the above:
+
+```
+# may need these loaded explicitly if running custom extractVIs function from local source
+library(phenopix)
+library(raster)
+library(parallel)
+library(doParallel)
+source("src/extractVIs.R")
 ```

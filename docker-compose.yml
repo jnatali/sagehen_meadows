@@ -7,6 +7,7 @@ services:
       - XAUTHORITY=/root/.Xauthority
     volumes:
       - ./data:/app/data # Mount local "images" dir to /app/images inside container
+      - ./src:/app/src # Mount src dir for any code overrides
       - /tmp/.X11-unix:/tmp/.X11-unix # Share X11 Socket for display
       - ${HOME}/.Xauthority:/root/.Xauthority:ro
     network_mode: "host" # host networking to simplify X11 access
