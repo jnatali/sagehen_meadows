@@ -86,4 +86,11 @@ The request will need to be reviewed before it's integrated into `main`
 ### Using Git with Visual Studio
 - [Visual Studio site on github integration](https://visualstudio.microsoft.com/vs/github/)
 - [Working with GitHub in VS Code tutorial](https://code.visualstudio.com/docs/sourcecontrol/github)
+- 
+## Coding Guidelines
 
+### Python: Use PEP 8 Style Guide
+[PEP 8](https://peps.python.org/pep-0008/) supports consistent, readable code. Please follow this standard.
+
+### R: Use Tidyverse Style Guide
+[Tidyverse Style Guide](https://style.tidyverse.org/) supports consistent, readable code. Please follow this standard.
