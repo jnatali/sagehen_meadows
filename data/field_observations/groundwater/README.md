@@ -72,6 +72,12 @@ Variables in this file include:
 
 ###### in subdaily loggers
 
+###### in slug_tests
+Field notes from 2024 slug tests in 'slug_tests_2024_fieldnotes.xlsx'
+
+Field notes entered from the following sources:
+- East wells on 07/12/2024 from 2015-25 Orange Vol 3 p42, 44-45
+- Kiln wells on 07/13/2024 from 2015-25 Orange Vol 3 p43, 48-49
 
 
 ###### in archive
