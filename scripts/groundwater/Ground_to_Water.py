@@ -5,19 +5,26 @@ Created on Thu Oct  3 12:45:42 2024
 
 ##########  GROUNDWATER FIELD DATA PROCESSING SCRIPT  ##########  
 
-This module processes groundwater well readings to determine the groundwater
-level relative to the ground surface.
+This module processes manual groundwater well readings from a water level
+meter to determine the groundwater level relative to the ground surface,
+based on measurements of the distance between the welltop to the ground.
 
 This code is under development and follows basic procedural programming,
 leverages Pandas DataFrames and csv files with well-defined column names.
 
 Major Functions:
- 
+- VALIDATES well_id's, manual field data file has match in unique_id list
+- VALIDATES welltop_to_ground measurement exists for each well
+- DETERMINES groundwater level
+- SAVES groundwater level calcs in groundwater_biweekly_FULL.csv
+- ADDS a daily? 8am transducer reading if flagged (transducer_binary=True)
+- PLOTS groundwater levels
 
 Requires 4 data files:
 1. Unique well ids: 'well_unique_id.txt'
 2. Well Dimensions: 'well_dimensions.csv'
-3. RAW groundwater data (in cm) for all years: 'groundwater_biweekly_RAW.csv'
+3. RAW manual groundwater data (in cm) for all years: 
+                                                'groundwater_biweekly_RAW.csv'
 4. Well meter offsets (in cm): 'well_meter_offsets.csv'
 
 TODOs documented in github repo issue tracking.
@@ -42,7 +49,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-# --- USE TRANSDUCER DATA? ---
+# --- USE PRESSURE TRANSDUCER DATA? ---
 transducer_binary = False
 
 # --- INITIALIZE FILE VARIABLES ---
