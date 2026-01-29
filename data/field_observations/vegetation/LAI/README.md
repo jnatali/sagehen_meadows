@@ -1,4 +1,4 @@
-### Sagehen Canopy Temperature
+### Sagehen LAI TO BE UPDATED --> WENDY, this is a template from Canopy Temperature, some things will apply to LAI and some things NOT. Also see the FIELD_METHODS.md in this folder. You don't need to repeat that info.
 This directory contains canopy temperature readings from July to October 2025. 
 
 Canopy temperatures were recorded with an Apogee sensor around wells in two meadows, representing three hydrogeomorphic zones (HGMZ) and three plant functional types (PFT).
