@@ -1,5 +1,5 @@
-﻿well_id,well_former_id
-EEF-2,EET-2
-EHF-XA5S,EHT-XA5S
-EWF-1,EWT-1
-KWF-2,KWT-1
+﻿well_id,well_field_id,rename_reason,rename_date
+EEF-2,EET-2,HGMZ observations and classification changed,5/25/25
+EHF-XA5S,EHT-XA5S,HGMZ observations and classification changed,5/25/25
+EWF-1,EWT-1,HGMZ observations and classification changed,5/25/25
+KWF-2,KWT-1,HGMZ observations and classification changed,5/25/25
