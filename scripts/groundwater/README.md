@@ -31,6 +31,13 @@ Requires data files:
 
 Outputs results to groundwater_subdaily_full.csv in the data/groundwater/subdaily/
 
+## MARSS Analysis Scripts
+### MARSS_Sagehen_Groundwater.R
+To run MARSS model, the 'MARSS/MARSS_Sagehen_Groundwater.R' script creates a weekly groundwater dataset from the manual weekly groundwater measurements and the subdaily groundwater logger measurements. It uses parameters in the 'MARSS/MARSS_groundwater_parameters.csv' to define model run parameters.
+
+TODO: Need clarity on which version of the .R script is the most recent. Due to performance issues, had tried parallelization in _vParallel.R version, but it seems that _0505.R version is the most up-to-date script. @jnatali needs to verify!
+
+## Archived Scripts
 ### .ipynb notebooks
 These are older versions of code that've been wrapped into the subdaily_Processing_RawToGround.py script
 
