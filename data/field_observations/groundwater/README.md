@@ -1,6 +1,6 @@
 ### Sagehen Groundwater Data
 
-This directory contains groundwater level measurements in Sagehen Basin during the growing season, May to Nov in 2018-2024.
+This directory contains groundwater level measurements in Sagehen Basin during the growing season, May to Nov in 2018-2025.
 
 Groundwater levels were sampled from three meadows (identified as *meadow_id*). 
 
@@ -10,7 +10,12 @@ Shallow groundwater wells were installed in each combination of HGMZs and PFTs. 
 
 Georeferenced well locations are defined in the *data/instrumentation/Sagehen_Wells_Natali_3941.geojson* file.
 
-For groundwater well naming conventions, see the key below. All uniquely named wells are listed in *Wells_Unique_Id.txt*. 
+For groundwater well naming conventions, see the key below. All uniquely named wells are listed in *Wells_Unique_Id.txt*. The first three letters of the well_id identify the well's:
+1. meadow site name
+2. plant functional type
+3. hygrogeomorphic zone
+
+In 2025, hydrogeomorphic zones for some wells were renamed. The field_well_id remained the same. Naming corrections are applied programmatically via scripts/groundwater/well_utils.py. Raw data files and physical wells at Sagehen retain the original well_ids, which are populated in the column "field_well_id" following correction.
 
 #### Abbreviations used in our data model
 
@@ -27,11 +32,10 @@ For groundwater well naming conventions, see the key below. All uniquely named w
 * T = terrace
 
 ##### PFT
-
 * E = sedge
 * H = mixed herbaceous
 * W = willow
-* F = mixed pine forest
+* F = lodgepole pine forest
 
 #### Files and Data Model
 
@@ -48,7 +52,9 @@ For groundwater well naming conventions, see the key below. All uniquely named w
 
 *well_dimensions.csv*  contains measurements of the total_well_length in cm (from top to subsurface depth) and welltop_to_ground in cm from the top of the well to the ground surface. For   each well, multiple measurements may have been made so that an average can be used to calculate groundwater depth from the *average ground surface level*. The ground surface around each well was not level or smooth.
 
-*well_unique_id.txt* is a master list of unique well identifiers for all wells measured in Sagehen basin. Suffixes of E, K, and L indicate a location in East, Kiln or Lower meadows. The second and third letter indicate the plant functional type and hydrogeomorphic process zone, respectively. Wells include those installed and measured by Allen-Diaz in the 1980s. These are indicated by the -X suffix. Otherwise, wells were installed by Jen Natali following a stratified sampling method according to hydrogeomorphic zone and plant functional type. 
+*well_unique_id.txt* is a master list of unique well identifiers for all wells measured in Sagehen basin. These unique_id list includes the FIELD based well ids (uncorrected). Suffixes of E, K, and L indicate a location in East, Kiln or Lower meadows. The second and third letter indicate the plant functional type and hydrogeomorphic process zone, respectively. Wells include those installed and measured by Allen-Diaz in the 1980s. These are indicated by the -X suffix. Otherwise, wells were installed by Jen Natali following a stratified sampling method according to hydrogeomorphic zone and plant functional type. 
+
+*well_renamed_id.csv* includes corrections to the hydrogeomoprhic zone for at least four wells, reason for the correction and date of correction.
 
 *well_characteristics.csv* contains info about each well, such as elevation.
 
@@ -83,7 +89,7 @@ Field notes entered from the following sources:
 
 ###### in archive
 
-*Wells_Missing_Data.xlsx* is an archived administrative file to help track needed data (well dimensions) to process all groundwater levels. Working file is in Google Drive as [well_missing_data sheet](https://docs.google.com/spreadsheets/d/1VWjpe0lL2xAhl1Ogh15oLD59Xz053aVFRRPRLHZuETo/edit?gid=1784805402#gid=1784805402).
+*Wells_Missing_Data.xlsx* is an archived administrative file to help track needed data (e.g. well dimensions) to process all groundwater levels. Working file is in Google Drive as [well_missing_data sheet](https://docs.google.com/spreadsheets/d/1VWjpe0lL2xAhl1Ogh15oLD59Xz053aVFRRPRLHZuETo/edit?gid=1784805402#gid=1784805402).
 
 
 
