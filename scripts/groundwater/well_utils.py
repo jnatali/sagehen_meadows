@@ -30,13 +30,13 @@ from pathlib import Path
 
 ## -- INITIALIZE FILE VARIABLES --
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 DATA_DIR = PROJECT_ROOT / "data"
-RAW_DIR = DATA_DIR / "raw"
+GW_DIR = DATA_DIR / "field_observations/groundwater/raw"
 
-VALID_WELL_ID_PATH = RAW_DIR / "Wells_Unique_Id.txt"
-CORRECTIONS_PATH = META_DIR / "well_id_corrections.csv"
+VALID_WELL_ID_PATH = GW_DIR / "well_unique_id.txt"
+CORRECTIONS_PATH = GW_DIR / "well_id_corrections.csv"
 
 # --- FUNCTIONS ---
 
@@ -45,7 +45,6 @@ def load_valid_well_ids(path):
     """
     Load list of valid, physical well IDs.
     """
-    path = Path(path)
     return set(path.read_text().splitlines())
 
 
@@ -58,10 +57,14 @@ def load_well_id_corrections(path):
 
 
 ## Validation
-def validate_well_ids(df, id_col, valid_ids):
+def validate_well_ids(df, id_col):
     """
     Assert that all well IDs in df[id_col] are in valid_ids.
+    Checks the name of the FIELD well_ids,
+    NOT the renamed, recategorized well ids used in analysis.
     """
+    valid_ids = load_valid_well_ids(VALID_WELL_ID_PATH)
+    
     invalid = set(df[id_col].unique()) - valid_ids
     if invalid:
         raise ValueError(
@@ -71,28 +74,34 @@ def validate_well_ids(df, id_col, valid_ids):
 ## Renaming / Correction
 def apply_well_id_corrections(
     df,
-    corrections_df,
-    id_col="well_id",
-    new_col="analysis_well_id",
+    original_id_col="well_field_id",
+    new_col="well_id"
 ):
     """
     Add a corrected well ID column using a lookup table.
-    Original ID is preserved.
+    Original ID is preserved as field_well_id
     """
+    
+    # get corrections datafram from load_well_id_corrections(path)
+    corrections_df = load_well_id_corrections(CORRECTIONS_PATH)
+    
+    # map corrections
     corrections = (
         corrections_df
-        .set_index("original_well_id")["analysis_well_id"]
+        .set_index("original_well_id")["well_field_id"]
     )
 
+    # return new data frame with orginal id and new id
     df = df.copy()
-    df[new_col] = df[id_col].map(corrections).fillna(df[id_col])
+    df[new_col] = df[original_id_col].map(corrections).fillna(
+                                                       df[original_id_col])
 
     return df
 
 ## Categorization of site, HGMZ, and PFT
 def get_well_categories(
     df,
-    id_col="analysis_well_id",
+    id_col="well_id",
 ):
     """
     Parse meadow, hydrogeomorphic zone, and PFT
@@ -100,10 +109,34 @@ def get_well_categories(
     """
     df = df.copy()
 
-    df["meadow_id"] = df[id_col].str[0]
-    df["hydrogeomorphic_zone"] = df[id_col].str[1]
-    df["plant_functional_type"] = df[id_col].str[2]
+    meadow_code = df[id_col].str[0]
+    plant_code = df[id_col].str[1]
+    zone_code = df[id_col].str[2]
+   
+    df["meadow_id"] = {"E": "East", "K": "Kiln", "L": "Lower", "U": "Upper"}.get(meadow_code, meadow_code)
+    df["plant_type"] = {"E": "Sedge", "W": "Willow", "H": "Mixed Herbaceous", "F": "Lodgepole Pine"}.get(plant_code, plant_code)
+    df["hydrogeo_zone"] = {"R": "Riparian", "T": "Terrace", "F": "Fan"}.get(zone_code, zone_code)
 
     return df
 
+def process_well_ids(
+    df,
+    id_col="well_id",
+):
+    """
+    End-to-end well ID handling:
+      1. validate physical IDs
+      2. apply corrections
+      3. parse attributes
+    """
+    validate_well_ids(df, id_col=id_col)
+
+    df = apply_well_id_corrections(
+        df,
+        id_col=id_col,
+    )
+
+    df = get_well_categories(df)
+
+    return df
 
