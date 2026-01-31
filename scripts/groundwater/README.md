@@ -6,13 +6,13 @@ In this directory, Ground_to_Water.py processes groundwater well readings to det
 level relative to the ground surface. 
 
 Requires 4 data files:
-1. Unique well ids: 'well_unique_id.txt'
-2. Well Dimensions: 'well_dimensions.csv'
-3. RAW groundwater data (in cm) for all years: 'groundwater_biweekly_RAW.csv'
-4. Well meter offsets (in cm): 'well_meter_offsets.csv'
+1. Unique well ids: `well_unique_id.txt`
+2. Well Dimensions: `well_dimensions.csv`
+3. RAW groundwater data (in cm) for all years: `groundwater_biweekly_RAW.csv`
+4. Well meter offsets (in cm): `well_meter_offsets.csv`
 
 Outputs resulting processed groundwater data to:
-'data/field_observations/groundwater/plots/biweekly_manual/groundwater_biweekly_FULL.csv'
+`data/field_observations/groundwater/plots/biweekly_manual/groundwater_biweekly_FULL.csv`
 
 ## Sagehen Sub-Daily Groundwater Scripts
 ### subdaily_Processing_RawToGround.py
@@ -23,13 +23,13 @@ Once compensated, translates water level above the pressure sensor to water leve
 Uses manual readings to generate the needed offset, 
     then applies to all subdaily readings for the appropriate time period.
 
-Requires data files:
+Requires data files:  
     1. RAW logger data as .csv files in subdaily_dir with strict 
-        naming convention and formatting
-    2. cut_times_file = groundwater_logger_times.csv (based on field notes)
-    3. barometric pressure data as .csv
-
-Outputs results to groundwater_subdaily_full.csv in the data/groundwater/subdaily/
+        naming convention and formatting  
+    2. cut_times_file = `groundwater_logger_times.csv` (based on field notes)  
+    3. barometric pressure data as .csv  
+  
+Outputs results to `groundwater_subdaily_full.csv` in `data/groundwater/subdaily/` 
 
 ## MARSS Analysis Scripts
 ### MARSS_Sagehen_Groundwater.R
