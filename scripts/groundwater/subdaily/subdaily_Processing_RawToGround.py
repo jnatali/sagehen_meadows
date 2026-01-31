@@ -62,7 +62,6 @@ baro_standard_elevation = 1933.7
 project_dir = '/VOLUMES/SANDISK_SSD_G40/GoogleDrive/GitHub/sagehen_meadows/'
 gw_data_dir = project_dir + 'data/field_observations/groundwater/'
 
-# As of 03/12/2025, Solinst_levelogger_all contains 2018, 2019, 2021 data
 subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_all/'
 cut_dir = gw_data_dir + 'subdaily_loggers/WORKING/cut/'
 solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/RAW/baro_data/'

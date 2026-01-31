@@ -1,39 +1,29 @@
 ﻿Priority,Date,Issue,Resolution
 1,11/16/24,ALL: Need to customize meter offset or keep as -3 cm for all?,
 1,11/16/24,ALL: Use logger data to fill gaps?,
-C,11/16/24,"ALL URGENT: For 08/24/2018, check that when welltop_to_water=0 or NaN (no water) has meter id = nw",all seems ok now
 1,11/16/24,KHF-1 URGENT: missing readings betw 07/26-10/05 in 2019,need logger data to fill gaps!
 1,11/16/24,KHT-XE5S URGENT:  missing readings between 07/26-09/05 and 09/05-10/21 in 2019.,need logger data to fill gaps; otherwise CHANGED in GW_biweekly_RAW by adding 09/21/2019 NW reading 
 1,11/16/24,"LHT-1, LET-1, LWT-1: missing reading on 11/09/2024",need logger data to fill gap
-2,11/17/24,"DON'T ADD LOGGER DATA YET, PROBLEMATIC: Logger data ~flatlined in 2019, don't see any 2021 readings, only one well has oabvious 2018 readings (KHT-XE5S). For flat transducer data, see EWT-1, KHF-1 and KWT-1 in 2019. KHT-XE5S in 2018.",
 2,11/16/24,B transect wells: need logger data from 2018-2019. Where is it? Who contact?,
 2,11/16/24,"SPARSE DATA WELLS: Consider removing EFR-XB2S (8), EFT-XC4S (4 in 2024 only), EHT-XC6S (2 in 2024 only), KFT-XD3S (8), KHF-XE7S (0 b/c no welltop measurement), KHR-XD2N good only in 2018, ",
+2,11/16/24,KEF-1 variation seems odd on plots in 2018-2021. Good candidate to test if readings smoother with custom meter offset?,"Try custom meter offset, see if KEF-1 plot improves."
+2,11/17/24,"DON'T ADD LOGGER DATA YET, PROBLEMATIC: Logger data ~flatlined in 2019, don't see any 2021 readings, only one well has obvious 2018 readings (KHT-XE5S). For flat transducer data, see EWT-1, KHF-1 and KWT-1 in 2019. KHT-XE5S in 2018.",
 2,,EFF.XB7S VALIDATE: Why spike on 07/26 in 2019,
-C,11/16/24,"EFF-XA2S VALIDATE: hit floor or missing multiple readings? 07/27-10/01/2018, 08/06-09/21/2019","seems legit, well went dry often in 2024 as well"
-C,11/16/24,EFF-XA2S VALIDATE: high reading W23 in 2021,CHANGED in GW_biweekly_RAW; A3S and A2S readings were flipped for that day
-C,11/16/24,A3S and A2S first two readings in  2021 seem odd,"CONFIRMED better to change 0606 2021 reading in GW_biweekly_RAW, A2S should have 4.7' readings and A3S should have 3.45' readings"
 2,,KFF.XD6S VALIDATE: any late readings after 008/20 in 2019?,
 2,,KFR.XE1S VALIDATE: kinda odd drop on 10/01/2018,
 2,,KHT.CE6S VALIDATE: Any late readings after 10/05 in 2018 or 2019,
 2,,KHT.XD6N VALIDATE: any late readings after 09/21/2018,
 2,,KWR.1 VALIDATE: why rise betw 09/16-10/01,
 2,,LWT.1 VALIDATE: Reading for 08.06 in 2019,
-C,11/16/24,"EER-1 CONSIDER: sharp rise, rainfall after 09/06/2019?","OK; yes, sig rainfall just before 09/10"
 3,11/16/24,"EER-1 CONSIDER: small uptick between 07/17 to 07/27 in 2018, rainfall?",
-C,11/16/24,EER-1 TWO READINGS on week 38,OK; valid; filter out later readings (>12 pm)
-3,,"EHR.1 CONSISTENT: sharp rise, rainfall after 09/06/2019?",
-C,11/16/24,"KEF-1 CONSIDER: seems wild,","leave it;  small difference between readings, looks jagged due to error"
-3,,KEF.1 CONSIDER: Why rise betw 07/27-08/10 in 2018?,
-3,,KER.XD5N URGENT: Why no readings for 2018?,
-2,11/16/24,KEF-1 variation seems odd on plots in 2018-2021. Good candidate to test if readings smoother with custom meter offset?,"Try custom meter offset, see if KEF-1 plot improves."
-3,11/16/24,"EWT-1 on 06/02/2019: reading looks legitimate (welltop - reading), notes say water at soil surface (but doesn't say PONDED). But reading is >25 cm above surface, could it be under pressure?",assume water is under pressure?
+3,11/16/24,"EWT-1 on 06/02/2019: reading looks legitimate (welltop - reading), notes say water at soil surface (but doesn't say PONDED).  Reading is >25 cm above surface, could it be under pressure?",assume water is under pressure?
 3,11/16/24,"KHF-1 on 06/20/2021: oddly low reading on plot, but checks out in field notebook (4.44 ft = 135.3312 cm). It is the day before I augered a new well, suggesting that the water level was getting low, a signal that I needed to auger the well deeper","adjusted well_dimensions, probably kept the old well for the reading on 06/20/2021. It's still low but not ridiculous."
 3,11/16/24,EFF-XA2S: oddball increase in water level on 06/20/2021 is unexplained but seems legit based on field notebook entry (4.25 ft = 129.54 cm),leave it
 3,11/16/24,KHF-1 on 06/17/2019 calculated as -17 cm (above the ground); checks out in field notebook. Says soil is saturated.,leave it; assume positive pressure?
+3,,"EHR.1 CONSISTENT: sharp rise, rainfall after 09/06/2019?",
+3,,KEF.1 CONSIDER: Why rise betw 07/27-08/10 in 2018?,
+3,,KER.XD5N URGENT: Why no readings for 2018?,
 4,,KHR.XE2N NOTE: Could not find well in 2019.,
-C,11/16/24,"KER-1 odd drop on 06/20/2021 (week 24) looks legit; field book says ""near bottom"" and then not the following reading. ","CHANGED in GW_biweekly_RA for 0704 2021 from 3.84, 3.84, 3.85 to 4.84x2, 4.85. No rain in 2021. Probably misread the meter."
-C,11/16/24,"EFT-XC3S on weeks 30 and 38 in 2024: two readings seem too high, but check out via audio recording.",
-C,11/16/24,"EER-1 on week 38 in 2021: two readings on 09/24/2021 are valid, the lower reading is ~5:30PM","leave it in raw data, it's valid; filter out later readings (>12pm)  prior to analysis"
 100,,EEF.1 URGENT: missing reading 08/06-09/21 in 2019?,"ok, readings exist, as dots indicate."
 100,,EEF.XA2N URGENT: validate oddball low point on 10/05 in 2019,"ok, checks out in data file and field book"
 100,,EHF.XA3S URGENT:  missing readings 10/01-11/18/2018 08/20-09/21/2019,"ok, confirmed in field book; missed readings in 2018 and 2019; no EAST readings on 10/14/2018; in 2019 assumed no water"
@@ -43,13 +33,23 @@ C,11/16/24,"EER-1 on week 38 in 2021: two readings on 09/24/2021 are valid, the 
 100,,KFR.XE2S URGENT: odd spikes on 07/01 and 08/10 in 2018,"ok, 07/01/18 thru 08/10/18 matches field book"
 100,,KHF.1 URGENT: Validate positive reading on 06/18/2019,ok; confirmed in field book; notes say SSS = soil saturated at surface
 100,,KWT.1 URGENT:  Validate low readings after 07/17 in 2018; was it floored?,"ok, readings indicate it was floored"
-C,,EWT.1 URGENT: odd rise on 07/06/2019,CHANGED in GW_biweekly_RAW; water level misread from field book
-C,,"KEF-XE3S URGENT: No entries for any dates, how to calculate","CHANGED in GW_biweekly_RAW, add aboveground readings as negative; will that work?"
-C,,KEF.1 URGENT: Validate oddly low reading on 06/18/2019.,"CHANGED in GW_biweekly_RAW; field book entry matches, but note says ""flow at surface""; assume misreading of ruler at 64.5, 65.5, 65; shifted to 54.5, 55.5, 55."
+C,11/16/24,"ALL URGENT: For 08/24/2018, check that when welltop_to_water=0 or NaN (no water) has meter id = nw",all seems ok now
+C,11/16/24,"EFF-XA2S VALIDATE: hit floor or missing multiple readings? 07/27-10/01/2018, 08/06-09/21/2019","seems legit, well went dry often in 2024 as well"
+C,11/16/24,EFF-XA2S VALIDATE: high reading W23 in 2021,CHANGED in GW_biweekly_RAW; A3S and A2S readings were flipped for that day
+C,11/16/24,A3S and A2S first two readings in  2021 seem odd,"CONFIRMED better to change 0606 2021 reading in GW_biweekly_RAW, A2S should have 4.7' readings and A3S should have 3.45' readings"
+C,11/16/24,"EER-1 CONSIDER: sharp rise, rainfall after 09/06/2019?","OK; yes, sig rainfall just before 09/10"
+C,11/16/24,EER-1 TWO READINGS on week 38,OK; valid; filter out later readings (>12 pm)
+C,11/16/24,"KEF-1 CONSIDER: seems wild,","leave it;  small difference between readings, looks jagged due to error"
+C,11/16/24,"KER-1 odd drop on 06/20/2021 (week 24) looks legit; field book says ""near bottom"" and then not the following reading. ","CHANGED in GW_biweekly_RA for 0704 2021 from 3.84, 3.84, 3.85 to 4.84x2, 4.85. No rain in 2021. Probably misread the meter."
+C,11/16/24,"EFT-XC3S on weeks 30 and 38 in 2024: two readings seem too high, but check out via audio recording.",
+C,11/16/24,"EER-1 on week 38 in 2021: two readings on 09/24/2021 are valid, the lower reading is ~5:30PM","leave it in raw data, it's valid; filter out later readings (>12pm)  prior to analysis"
 C,11/16/24,"EHR-XB2N error on 09/20/2021 entry, off by 1 ft on Solinst reading into field notebook.",CHANGED in GW_biweekly_RA from 3.24' reading to 2.24' reading.
 C,11/16/24,KFR-XE2S oddly high reading on W40; says soil is saturated so adjusted WL = 0,CHANGED in GW_biweekly_RA from reading entered in field notebook to welltop to ground (cm) depth
 C,11/16/24,"KFR-XE2S had oddly low reading on 08/06/2021, the notebook WL numbers are 2.3, 2.4, 2.4 (so missing a decimal digit). ","CHANGED in GW_biweekly_RA to fix the error, entered as 2.03, 2.04, 2.04 ft"
 C,11/16/24,KHT-XE5S on 07/20/2021: reading seems to be 20 cm off. Notebook WL numbers are 3.27 ft. Well may have been installed on that day? Filling?,"REMOVED in GW_biweekly_RA, assume that it's not a good reading."
+C,,EWT.1 URGENT: odd rise on 07/06/2019,CHANGED in GW_biweekly_RAW; water level misread from field book
+C,,"KEF-XE3S URGENT: No entries for any dates, how to calculate","CHANGED in GW_biweekly_RAW, add aboveground readings as negative; will that work?"
+C,,KEF.1 URGENT: Validate oddly low reading on 06/18/2019.,"CHANGED in GW_biweekly_RAW; field book entry matches, but note says ""flow at surface""; assume misreading of ruler at 64.5, 65.5, 65; shifted to 54.5, 55.5, 55."
 ,,,
 C,11/16/24,KHT-XE6S on 07/20/2021: reading seems to be 20 cm off.  Well may have been installed on that day? Filling?,"REMOVED in GW_biweekly_RA, assume that it's not a good reading."
 3,11/16/24,"KWF-1 on 09/21/2021 looks slightly high. Checked field notebook, looks ok.",leave it
