@@ -21,13 +21,19 @@ Major Functions:
 - PLOTS groundwater levels
 
 Requires 4 data files:
-1. Unique well ids: 'well_unique_id.txt'
+1. Unique well ids: 'well_unique_id.txt' -- TODO: REMOVE, see well_utils 
 2. Well Dimensions: 'well_dimensions.csv'
 3. RAW manual groundwater data (in cm) for all years: 
                                                 'groundwater_biweekly_RAW.csv'
 4. Well meter offsets (in cm): 'well_meter_offsets.csv'
 
 TODOs documented in github repo issue tracking.
+
+RECENT UPDATES:
+    01/30/2026 JN added import from well_utils 
+                to leverage process_well_ids() function;
+                tested on 2025 data. Looks good. 
+                Still need to use on 2018-24 data to rename wells.
 
 """
 
@@ -48,6 +54,8 @@ import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+from well_utils import process_well_ids
+
 
 # --- USE PRESSURE TRANSDUCER DATA? ---
 transducer_binary = False
@@ -55,27 +63,37 @@ transducer_binary = False
 # --- INITIALIZE FILE VARIABLES ---
 
 # Setup directory (dir) structure and file names based on structure in github
-groundwater_data_dir = '../../data/field_observations/groundwater/biweekly_manual/'
-groundwater_plot_dir = '../../data/field_observations/groundwater/plots/biweekly_manual/'
+
+# ## Directories and input filenames for 2018-2024 data
+## JN 01/30/2026 NOTE: Have not yet run 2018-24 data with well renaming
+# groundwater_data_dir = '../../data/field_observations/groundwater/biweekly_manual/'
+# groundwater_plot_dir = '../../data/field_observations/groundwater/plots/biweekly_manual/'
+# groundwater_rawdata_filename = groundwater_data_dir + 'groundwater_biweekly_RAW.csv'
+
+# # Output filenames for 2018-2024 data
+# groundwater_fulldata_filename = groundwater_data_dir + 'groundwater_biweekly_FULL.csv'
+# groundwater_plot_filename = groundwater_plot_dir + 'groundwater_biweekly_2018-2024.pdf'
+
+# Directories and input filenames for 2025 data
+groundwater_data_dir = '../../data/field_observations/groundwater/manual/'
+groundwater_plot_dir = '../../results/plots/groundwater/manual/'
+groundwater_rawdata_filename = groundwater_data_dir + 'groundwater_manual_2025_RAW.csv'
+
+# Output filenames for 2025 data
+groundwater_fulldata_filename = groundwater_data_dir + 'groundwater_manual_2025_FULL.csv'
+groundwater_plot_filename = groundwater_plot_dir + 'groundwater_manual_2025.pdf'
 
 if transducer_binary:
     transducer_data_dir = '../../data/field_observations/groundwater/subdaily_loggers/relative_to_ground/'
 
-# Input (source data) filenames
+# Validation/Correction filenames
 well_unique_id_filename = groundwater_data_dir + '../well_unique_id.txt'
 well_dimension_filename = groundwater_data_dir + '../well_dimensions.csv'
 meter_offset_filename = groundwater_data_dir + '../well_meter_offsets.csv'
-groundwater_rawdata_filename = groundwater_data_dir + 'groundwater_biweekly_RAW.csv'
-
-# Output filenames
-groundwater_fulldata_filename = groundwater_data_dir + 'groundwater_biweekly_FULL.csv'
-groundwater_plot_filename = groundwater_plot_dir + 'groundwater_biweekly_2018-2024.pdf'
-
 
 # Fetch input (source data) files
 well_unique_id = pd.read_csv(well_unique_id_filename)
 well_dimension = pd.read_csv(well_dimension_filename)
-#well_dimension = pd.read_excel(well_dimension_filename)
 groundwater_data = pd.read_csv(groundwater_rawdata_filename)
 meter_offset = pd.read_csv(meter_offset_filename)
 
@@ -387,10 +405,10 @@ def plot_groundwater_per_well(groundwater_data) -> None:
 # 2. Check that every well_id in gw_rawdata has a matching welltop_to_ground;
 #    if not, print in a WARNING and save well_id and date in a CSV.
 
-if (validate_well_id(well_unique_id, groundwater_data) and
-    validate_well_dimension(well_unique_id, well_dimension)):
-    
-#   print('OK to calculate! Well ID and Dimensions Validated.')
+if validate_well_dimension(well_unique_id, well_dimension):
+    groundwater_data = process_well_ids(groundwater_data)
+    well_dimension = process_well_ids(well_dimension)
+    print('Processed well_ids')
        
 # --- DETERMINE welltop_to_ground_cm ---
 #
@@ -414,9 +432,9 @@ print('# OF UNIQUE WELLS: %s' % len(groundwater_data['well_id'].unique()))
 if transducer_binary:
     transducer_data = get_transducer_data()
     print('# of TRANSDUCER ENTRIES: %s' % len(transducer_data))
-    print('# of BI-WEEKLY ENTRIES: %s' % len(groundwater_data))
+    print('# of ENTRIES: %s' % len(groundwater_data))
     groundwater_data = pd.concat([groundwater_data, transducer_data], ignore_index=True)
-    print('# of BI-WEEKLY ENTRIES AFTER MERGE: %s' % len(groundwater_data))
+    print('# of ENTRIES AFTER MERGE: %s' % len(groundwater_data))
     save_groundwater(groundwater_data)
 
 plot_groundwater_per_well(groundwater_data)

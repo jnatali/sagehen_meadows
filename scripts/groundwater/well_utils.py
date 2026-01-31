@@ -33,10 +33,10 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 DATA_DIR = PROJECT_ROOT / "data"
-GW_DIR = DATA_DIR / "field_observations/groundwater/raw"
+GW_DIR = DATA_DIR / "field_observations/groundwater"
 
 VALID_WELL_ID_PATH = GW_DIR / "well_unique_id.txt"
-CORRECTIONS_PATH = GW_DIR / "well_id_corrections.csv"
+CORRECTIONS_PATH = GW_DIR / "well_renamed_id.csv"
 
 # --- FUNCTIONS ---
 
@@ -73,9 +73,7 @@ def validate_well_ids(df, id_col):
 
 ## Renaming / Correction
 def apply_well_id_corrections(
-    df,
-    original_id_col="well_field_id",
-    new_col="well_id"
+    df
 ):
     """
     Add a corrected well ID column using a lookup table.
@@ -88,13 +86,13 @@ def apply_well_id_corrections(
     # map corrections
     corrections = (
         corrections_df
-        .set_index("original_well_id")["well_field_id"]
+        .set_index("well_field_id")["well_id"]
     )
 
     # return new data frame with orginal id and new id
     df = df.copy()
-    df[new_col] = df[original_id_col].map(corrections).fillna(
-                                                       df[original_id_col])
+    df["field_well_id"] = df["well_id"] 
+    df["well_id"] = df["well_id"].map(corrections).fillna(df["well_id"])
 
     return df
 
@@ -105,17 +103,37 @@ def get_well_categories(
 ):
     """
     Parse meadow, hydrogeomorphic zone, and PFT
-    from a well ID string.
+    from a well_id string.
     """
     df = df.copy()
 
     meadow_code = df[id_col].str[0]
     plant_code = df[id_col].str[1]
     zone_code = df[id_col].str[2]
+    
+    meadow_map = {
+    "E": "East",
+    "K": "Kiln",
+    "L": "Lower",
+    "U": "Upper",
+    }
+
+    zone_map = {
+    "R": "Riparian",
+    "T": "Terrace",
+    "F": "Fan",
+    }
+
+    plant_map = {
+    "E": "Sedge",
+    "W": "Willow",
+    "H": "Mixed Herbaceous",
+    "F": "Lodgepole Pine",
+    }
    
-    df["meadow_id"] = {"E": "East", "K": "Kiln", "L": "Lower", "U": "Upper"}.get(meadow_code, meadow_code)
-    df["plant_type"] = {"E": "Sedge", "W": "Willow", "H": "Mixed Herbaceous", "F": "Lodgepole Pine"}.get(plant_code, plant_code)
-    df["hydrogeo_zone"] = {"R": "Riparian", "T": "Terrace", "F": "Fan"}.get(zone_code, zone_code)
+    df["meadow_id"] = meadow_code.map(meadow_map).fillna(meadow_code)
+    df["plant_type"] = plant_code.map(plant_map).fillna(plant_code)
+    df["hydrogeo_zone"] = zone_code.map(zone_map).fillna(zone_code)
 
     return df
 
@@ -124,18 +142,13 @@ def process_well_ids(
     id_col="well_id",
 ):
     """
-    End-to-end well ID handling:
+    End-to-end well ID processing:
       1. validate physical IDs
       2. apply corrections
-      3. parse attributes
+      3. assign categories
     """
     validate_well_ids(df, id_col=id_col)
-
-    df = apply_well_id_corrections(
-        df,
-        id_col=id_col,
-    )
-
+    df = apply_well_id_corrections(df)
     df = get_well_categories(df)
 
     return df
