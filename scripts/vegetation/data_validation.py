@@ -144,13 +144,13 @@ if list_of_files:
         labels = [l.get_label() for l in lines]
         ax1.legend(lines, labels, loc='upper left')
 
-        plt.title(f"All Wells Combined: Plant T, Thatch T, and Cover %")
+        plt.title(f"KHF-1 and EHT-XA5A: Plant T, Thatch T, and Cover %")
 
         # Format the X-Axis dates nicely
         plt.gcf().autofmt_xdate() # Auto-rotates dates to fit better
 
         # -- SAVE AS EPS --
-        plot_filename = "Data validation for KF-1 and EHT-XA5A.eps"
+        plot_filename = "Data validation for KHF-1 and EHT-XA5A.eps"
         save_path = os.path.join(OUTPUT_DIR, plot_filename)
         plt.savefig(save_path, format='eps', bbox_inches='tight')
         plt.close()
