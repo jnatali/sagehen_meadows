@@ -760,7 +760,7 @@ def cut_logger_data():
             #  and select matching deployments, first by well_id
             #  this result may have timing for several deployments
             well_time_df = log_time_df[log_time_df['well_id'] == well_id]
-            
+               
             ## ERROR HANDLING if no time limits found for this well deployment in field notes
             if well_time_df.empty: 
                 logging.info(f'ALERT: No time limits for {well_id}:' 
@@ -791,8 +791,10 @@ def cut_logger_data():
             ## ERROR HANDLING: only continue if one matching entry of start/stop times
             if well_time_df.shape[0] != 1:
                 warning_str = (f"WARNING: more/less than one row for {well_id} "
-                                "in cut_logger_data(). Which one to use?"
-                                " Check date range in logger csv. Exiting.")
+                                "in cut_logger_data() after filtering start/end"
+                                "times. If in debug mode, dataframe printed in"
+                                "next line. If >1 entry, which one"
+                                "to use? Check datestamped logger .csv. EXIT.")
                 logging.info(warning_str)
                 logging.debug(well_time_df)
                 break
@@ -1040,7 +1042,10 @@ def normalize_baro(df1, df2):
             if (year==2025):
                 plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
                         'Dendra Baro raw vs clean',
-                        ('2025-08-20', '2024-09-30'))
+                        ('2025-08-27', '2025-08-29'))
+                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+                        'Dendra Baro raw vs clean',
+                        ('2025-09-23', '2025-09-24'))
                 
         merged = df1_year[['DateTime','baro_Pressure_kPa', 'baro_Temp_C']].merge(
             df2_year[['DateTime', 'baro_Pressure_kPa', 'baro_Temp_C']], 
@@ -1165,6 +1170,8 @@ def compensate_baro(gw_df):
     
     # Normalize the baro data based on both sources using an offset
     baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
+    # Quick hack to make 2025 work
+    #baro_df = normalize_baro(baro_df_dendra, baro_df_solinst)
     
     # # If helpful, plot and compare the baro data sources after normalized
     if debug_baro:

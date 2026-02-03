@@ -1,478 +1,2107 @@
-2026-01-31 13:18:37,211 - ----------
+2026-02-02 19:31:17,007 - ----------
 
 Logging ON for subdaily_processing_RawToGround.py
-2026-01-31 13:18:37,218 - EER-1_2025_0525_1031.csv
-2026-01-31 13:18:37,892 - 0.1
-2026-01-31 13:18:37,893 - Nothing to cut off front end.
-2026-01-31 13:18:37,893 - Cutoff backend.
-2026-01-31 13:18:38,145 - EET-1_2025_0525_1031.csv
-2026-01-31 13:18:38,812 - 0.5
-2026-01-31 13:18:38,813 - Nothing to cut off front end.
-2026-01-31 13:18:38,814 - Cutoff backend.
-2026-01-31 13:18:39,057 - EET-2_2025_0525_1031.csv
-2026-01-31 13:18:39,726 - 0.5
-2026-01-31 13:18:39,727 - Nothing to cut off front end.
-2026-01-31 13:18:39,727 - Cutoff backend.
-2026-01-31 13:18:39,969 - EHR-1_2025_0525_1031.csv
-2026-01-31 13:18:40,629 - 0.01
-2026-01-31 13:18:40,629 - cutoff front end.
-2026-01-31 13:18:40,630 - Cutoff backend.
-2026-01-31 13:18:40,973 - EHT-XA5S_2025_0525_1031.csv
-2026-01-31 13:18:41,635 - 0.1
-2026-01-31 13:18:41,635 - Nothing to cut off front end.
-2026-01-31 13:18:41,636 - Cutoff backend.
-2026-01-31 13:18:41,886 - EWR-1_2025_0525_1031.csv
-2026-01-31 13:18:42,550 - 0.1
-2026-01-31 13:18:42,550 - Nothing to cut off front end.
-2026-01-31 13:18:42,551 - Cutoff backend.
-2026-01-31 13:18:42,809 - EWT-1_2025_0526_1031.csv
-2026-01-31 13:18:43,473 - 0.5
-2026-01-31 13:18:43,474 - Nothing to cut off front end.
-2026-01-31 13:18:43,474 - Cutoff backend.
-2026-01-31 13:18:43,719 - EWT-2_2025_0624_1105.csv
-2026-01-31 13:18:44,265 - WARNING: more/less than one row for EWT-2 in cut_logger_data(). Which one to use? Check date range in logger csv. Exiting.
-2026-01-31 13:18:44,265 - Empty DataFrame
+2026-02-02 19:31:17,014 - EER-1_2025_0525_1031.csv
+2026-02-02 19:31:17,695 - 0.1
+2026-02-02 19:31:17,696 - Nothing to cut off front end.
+2026-02-02 19:31:17,696 - Cutoff backend.
+2026-02-02 19:31:17,947 - EET-1_2025_0525_1031.csv
+2026-02-02 19:31:18,615 - 0.5
+2026-02-02 19:31:18,616 - Nothing to cut off front end.
+2026-02-02 19:31:18,617 - Cutoff backend.
+2026-02-02 19:31:18,858 - EET-2_2025_0525_1031.csv
+2026-02-02 19:31:19,528 - 0.5
+2026-02-02 19:31:19,529 - Nothing to cut off front end.
+2026-02-02 19:31:19,529 - Cutoff backend.
+2026-02-02 19:31:19,773 - EHR-1_2025_0525_1031.csv
+2026-02-02 19:31:20,430 - 0.01
+2026-02-02 19:31:20,431 - cutoff front end.
+2026-02-02 19:31:20,432 - Cutoff backend.
+2026-02-02 19:31:20,786 - EHT-XA5S_2025_0525_1031.csv
+2026-02-02 19:31:21,448 - 0.1
+2026-02-02 19:31:21,449 - Nothing to cut off front end.
+2026-02-02 19:31:21,450 - Cutoff backend.
+2026-02-02 19:31:21,691 - EWR-1_2025_0525_1031.csv
+2026-02-02 19:31:22,360 - 0.1
+2026-02-02 19:31:22,360 - Nothing to cut off front end.
+2026-02-02 19:31:22,361 - Cutoff backend.
+2026-02-02 19:31:22,614 - EWT-1_2025_0526_1031.csv
+2026-02-02 19:31:23,276 - 0.5
+2026-02-02 19:31:23,277 - Nothing to cut off front end.
+2026-02-02 19:31:23,277 - Cutoff backend.
+2026-02-02 19:31:23,517 - EWT-2_2025_0624_1031.csv
+2026-02-02 19:31:24,056 - 0.5
+2026-02-02 19:31:24,057 - cutoff front end.
+2026-02-02 19:31:24,057 - Cutoff backend.
+2026-02-02 19:31:24,436 - KEF-1_2025_0526_1101.csv
+2026-02-02 19:31:25,117 - 0.5
+2026-02-02 19:31:25,118 - Nothing to cut off front end.
+2026-02-02 19:31:25,118 - Nothing to cut off back end.
+2026-02-02 19:31:25,364 - KER-1_2025_0526_1101.csv
+2026-02-02 19:31:26,047 - 0.5
+2026-02-02 19:31:26,047 - cutoff front end.
+2026-02-02 19:31:26,048 - Cutoff backend.
+2026-02-02 19:31:26,276 - KER-2_2025_0624_1101.csv
+2026-02-02 19:31:26,836 - 0.5
+2026-02-02 19:31:26,836 - Nothing to cut off front end.
+2026-02-02 19:31:26,837 - Nothing to cut off back end.
+2026-02-02 19:31:27,122 - KET-1_2025_0526_1101.csv
+2026-02-02 19:31:27,804 - 0.5
+2026-02-02 19:31:27,804 - Nothing to cut off front end.
+2026-02-02 19:31:27,805 - Nothing to cut off back end.
+2026-02-02 19:31:28,055 - KHF-1_2025_0526_0624.csv
+2026-02-02 19:31:28,202 - 0.5
+2026-02-02 19:31:28,202 - Nothing to cut off front end.
+2026-02-02 19:31:28,203 - Nothing to cut off back end.
+2026-02-02 19:31:28,488 - KHF-1_2025_0624_1101.csv
+2026-02-02 19:31:29,052 - 0.5
+2026-02-02 19:31:29,053 - cutoff front end.
+2026-02-02 19:31:29,053 - Nothing to cut off back end.
+2026-02-02 19:31:29,389 - KHR-1_2025_0526_0624.csv
+2026-02-02 19:31:29,537 - 0.5
+2026-02-02 19:31:29,537 - Nothing to cut off front end.
+2026-02-02 19:31:29,538 - Cutoff backend.
+2026-02-02 19:31:29,719 - KHR-1_2025_0624_1101.csv
+2026-02-02 19:31:30,277 - 0.5
+2026-02-02 19:31:30,278 - cutoff front end.
+2026-02-02 19:31:30,278 - Nothing to cut off back end.
+2026-02-02 19:31:30,611 - KHT-XE5S_2025_0526_1101.csv
+2026-02-02 19:31:31,299 - 0.5
+2026-02-02 19:31:31,300 - Nothing to cut off front end.
+2026-02-02 19:31:31,300 - Nothing to cut off back end.
+2026-02-02 19:31:31,550 - KWR-1_2025_0526_1105.csv
+2026-02-02 19:31:32,228 - WARNING: more/less than one row for KWR-1 in cut_logger_data() after filtering start/endtimes. If in debug mode, dataframe printed innext line. If >1 entry, which oneto use? Check datestamped logger .csv. EXIT.
+2026-02-02 19:31:32,228 - Empty DataFrame
 Columns: [logger_no, serial_no, well_id, start, end, temp_threshold, notes, Unnamed: 7, Unnamed: 8, Unnamed: 9]
 Index: []
-2026-01-31 13:18:44,520 - GDAL_DATA found in environment.
-2026-01-31 13:18:44,521 - PROJ_DATA found in environment.
-2026-01-31 13:18:44,522 - GDAL_DATA found in environment.
-2026-01-31 13:18:44,523 - PROJ_DATA found in environment.
-2026-01-31 13:18:44,523 - Got coordinate system
-2026-01-31 13:18:44,523 - Got coordinate system
-2026-01-31 13:18:44,523 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
-2026-01-31 13:18:44,523 - OLC_FASTSETNEXTBYINDEX: 1
-2026-01-31 13:18:44,523 - OLC_FASTFEATURECOUNT: 1
-2026-01-31 13:18:44,523 - Next index: 0
-2026-01-31 13:18:44,523 - Next index: 1
-2026-01-31 13:18:44,524 - Next index: 2
-2026-01-31 13:18:44,524 - Next index: 3
-2026-01-31 13:18:44,524 - Next index: 4
-2026-01-31 13:18:44,524 - Next index: 5
-2026-01-31 13:18:44,524 - Next index: 6
-2026-01-31 13:18:44,524 - Next index: 7
-2026-01-31 13:18:44,524 - Next index: 8
-2026-01-31 13:18:44,524 - Next index: 9
-2026-01-31 13:18:44,524 - Next index: 10
-2026-01-31 13:18:44,524 - Next index: 11
-2026-01-31 13:18:44,524 - Next index: 12
-2026-01-31 13:18:44,524 - Next index: 13
-2026-01-31 13:18:44,524 - Next index: 14
-2026-01-31 13:18:44,525 - Next index: 15
-2026-01-31 13:18:44,525 - Next index: 16
-2026-01-31 13:18:44,525 - Next index: 17
-2026-01-31 13:18:44,525 - Next index: 18
-2026-01-31 13:18:44,525 - Next index: 19
-2026-01-31 13:18:44,525 - Next index: 20
-2026-01-31 13:18:44,525 - Next index: 21
-2026-01-31 13:18:44,525 - Next index: 22
-2026-01-31 13:18:44,525 - Next index: 23
-2026-01-31 13:18:44,525 - Next index: 24
-2026-01-31 13:18:44,525 - Next index: 25
-2026-01-31 13:18:44,525 - Next index: 26
-2026-01-31 13:18:44,526 - Next index: 27
-2026-01-31 13:18:44,526 - Next index: 28
-2026-01-31 13:18:44,526 - Next index: 29
-2026-01-31 13:18:44,526 - Next index: 30
-2026-01-31 13:18:44,526 - Next index: 31
-2026-01-31 13:18:44,526 - Next index: 32
-2026-01-31 13:18:44,526 - Next index: 33
-2026-01-31 13:18:44,526 - Next index: 34
-2026-01-31 13:18:44,526 - Next index: 35
-2026-01-31 13:18:44,526 - Next index: 36
-2026-01-31 13:18:44,526 - Next index: 37
-2026-01-31 13:18:44,526 - Next index: 38
-2026-01-31 13:18:44,527 - Next index: 39
-2026-01-31 13:18:44,527 - Next index: 40
-2026-01-31 13:18:44,527 - Next index: 41
-2026-01-31 13:18:44,527 - Next index: 42
-2026-01-31 13:18:44,527 - Next index: 43
-2026-01-31 13:18:44,527 - Next index: 44
-2026-01-31 13:18:44,527 - Next index: 45
-2026-01-31 13:18:44,527 - Next index: 46
-2026-01-31 13:18:44,527 - Next index: 47
-2026-01-31 13:18:44,527 - Next index: 48
-2026-01-31 13:18:44,527 - Next index: 49
-2026-01-31 13:18:44,527 - Next index: 50
-2026-01-31 13:18:44,527 - Next index: 51
-2026-01-31 13:18:44,528 - Next index: 52
-2026-01-31 13:18:44,528 - Next index: 53
-2026-01-31 13:18:44,528 - Next index: 54
-2026-01-31 13:18:44,528 - Next index: 55
-2026-01-31 13:18:44,528 - Next index: 56
-2026-01-31 13:18:44,528 - Next index: 57
-2026-01-31 13:18:44,528 - Next index: 58
-2026-01-31 13:18:44,530 - Flushed buffer
-2026-01-31 13:18:44,530 - Stopped session
-2026-01-31 13:18:44,829 - GDAL_DATA found in environment.
-2026-01-31 13:18:44,829 - PROJ_DATA found in environment.
-2026-01-31 13:18:44,830 - GDAL_DATA found in environment.
-2026-01-31 13:18:44,830 - PROJ_DATA found in environment.
-2026-01-31 13:18:44,830 - Got coordinate system
-2026-01-31 13:18:44,830 - Got coordinate system
-2026-01-31 13:18:44,830 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
-2026-01-31 13:18:44,830 - OLC_FASTSETNEXTBYINDEX: 1
-2026-01-31 13:18:44,830 - OLC_FASTFEATURECOUNT: 1
-2026-01-31 13:18:44,830 - Next index: 0
-2026-01-31 13:18:44,830 - Next index: 1
-2026-01-31 13:18:44,831 - Next index: 2
-2026-01-31 13:18:44,831 - Next index: 3
-2026-01-31 13:18:44,831 - Next index: 4
-2026-01-31 13:18:44,831 - Next index: 5
-2026-01-31 13:18:44,831 - Next index: 6
-2026-01-31 13:18:44,831 - Next index: 7
-2026-01-31 13:18:44,831 - Next index: 8
-2026-01-31 13:18:44,831 - Next index: 9
-2026-01-31 13:18:44,831 - Next index: 10
-2026-01-31 13:18:44,831 - Next index: 11
-2026-01-31 13:18:44,832 - Next index: 12
-2026-01-31 13:18:44,832 - Next index: 13
-2026-01-31 13:18:44,832 - Next index: 14
-2026-01-31 13:18:44,832 - Next index: 15
-2026-01-31 13:18:44,832 - Next index: 16
-2026-01-31 13:18:44,832 - Next index: 17
-2026-01-31 13:18:44,832 - Next index: 18
-2026-01-31 13:18:44,832 - Next index: 19
-2026-01-31 13:18:44,832 - Next index: 20
-2026-01-31 13:18:44,832 - Next index: 21
-2026-01-31 13:18:44,832 - Next index: 22
-2026-01-31 13:18:44,832 - Next index: 23
-2026-01-31 13:18:44,832 - Next index: 24
-2026-01-31 13:18:44,832 - Next index: 25
-2026-01-31 13:18:44,832 - Next index: 26
-2026-01-31 13:18:44,833 - Next index: 27
-2026-01-31 13:18:44,833 - Next index: 28
-2026-01-31 13:18:44,833 - Next index: 29
-2026-01-31 13:18:44,833 - Next index: 30
-2026-01-31 13:18:44,833 - Next index: 31
-2026-01-31 13:18:44,833 - Next index: 32
-2026-01-31 13:18:44,833 - Next index: 33
-2026-01-31 13:18:44,833 - Next index: 34
-2026-01-31 13:18:44,833 - Next index: 35
-2026-01-31 13:18:44,833 - Next index: 36
-2026-01-31 13:18:44,833 - Next index: 37
-2026-01-31 13:18:44,833 - Next index: 38
-2026-01-31 13:18:44,833 - Next index: 39
-2026-01-31 13:18:44,833 - Next index: 40
-2026-01-31 13:18:44,833 - Next index: 41
-2026-01-31 13:18:44,833 - Next index: 42
-2026-01-31 13:18:44,834 - Next index: 43
-2026-01-31 13:18:44,834 - Next index: 44
-2026-01-31 13:18:44,834 - Next index: 45
-2026-01-31 13:18:44,834 - Next index: 46
-2026-01-31 13:18:44,834 - Next index: 47
-2026-01-31 13:18:44,834 - Next index: 48
-2026-01-31 13:18:44,834 - Next index: 49
-2026-01-31 13:18:44,834 - Next index: 50
-2026-01-31 13:18:44,834 - Next index: 51
-2026-01-31 13:18:44,834 - Next index: 52
-2026-01-31 13:18:44,834 - Next index: 53
-2026-01-31 13:18:44,834 - Next index: 54
-2026-01-31 13:18:44,834 - Next index: 55
-2026-01-31 13:18:44,834 - Next index: 56
-2026-01-31 13:18:44,834 - Next index: 57
-2026-01-31 13:18:44,835 - Next index: 58
-2026-01-31 13:18:44,836 - Flushed buffer
-2026-01-31 13:18:44,836 - Stopped session
-2026-01-31 13:18:44,837 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
-2026-01-31 13:18:44,880 - Length of bara dataframe: 24359
-2026-01-31 13:18:44,895 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
-2026-01-31 13:18:44,895 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
-2026-01-31 13:18:44,903 - No elevation found for well_id EHF-XA3S
-2026-01-31 13:18:44,903 - Length of bara dataframe: 4018
-2026-01-31 13:18:44,905 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
-2026-01-31 13:18:44,907 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
-2026-01-31 13:18:44,909 - Length of bara dataframe: 289
-2026-01-31 13:18:44,909 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
-2026-01-31 13:18:44,910 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
-2026-01-31 13:18:44,919 - Length of bara dataframe: 4498
-2026-01-31 13:18:44,922 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
-2026-01-31 13:18:44,922 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
-2026-01-31 13:18:44,925 - Length of bara dataframe: 1119
-2026-01-31 13:18:44,926 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
-2026-01-31 13:18:44,926 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
-2026-01-31 13:18:44,967 - Length of bara dataframe: 23320
-2026-01-31 13:18:45,074 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
-2026-01-31 13:18:45,075 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
-2026-01-31 13:18:45,084 - Length of bara dataframe: 4176
-2026-01-31 13:18:45,087 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
-2026-01-31 13:18:45,087 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
-2026-01-31 13:18:45,156 - Length of bara dataframe: 40000
-2026-01-31 13:18:45,179 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
-2026-01-31 13:18:45,179 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
-2026-01-31 13:18:45,219 - Length of bara dataframe: 22828
-2026-01-31 13:18:45,232 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
-2026-01-31 13:18:45,233 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
-2026-01-31 13:18:45,244 - Length of bara dataframe: 5742
-2026-01-31 13:18:45,247 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
-2026-01-31 13:18:45,248 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
-2026-01-31 13:18:45,249 - Length of bara dataframe: 289
-2026-01-31 13:18:45,250 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
-2026-01-31 13:18:45,250 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
-2026-01-31 13:18:45,271 - Length of bara dataframe: 12211
-2026-01-31 13:18:45,279 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
-2026-01-31 13:18:45,280 - 22804
+2026-02-02 19:31:32,749 - GDAL_DATA found in environment.
+2026-02-02 19:31:32,749 - PROJ_DATA found in environment.
+2026-02-02 19:31:32,750 - GDAL_DATA found in environment.
+2026-02-02 19:31:32,750 - PROJ_DATA found in environment.
+2026-02-02 19:31:32,750 - Got coordinate system
+2026-02-02 19:31:32,750 - Got coordinate system
+2026-02-02 19:31:32,750 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 19:31:32,750 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 19:31:32,750 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 19:31:32,750 - Next index: 0
+2026-02-02 19:31:32,750 - Next index: 1
+2026-02-02 19:31:32,751 - Next index: 2
+2026-02-02 19:31:32,751 - Next index: 3
+2026-02-02 19:31:32,751 - Next index: 4
+2026-02-02 19:31:32,751 - Next index: 5
+2026-02-02 19:31:32,751 - Next index: 6
+2026-02-02 19:31:32,751 - Next index: 7
+2026-02-02 19:31:32,751 - Next index: 8
+2026-02-02 19:31:32,751 - Next index: 9
+2026-02-02 19:31:32,751 - Next index: 10
+2026-02-02 19:31:32,751 - Next index: 11
+2026-02-02 19:31:32,751 - Next index: 12
+2026-02-02 19:31:32,751 - Next index: 13
+2026-02-02 19:31:32,751 - Next index: 14
+2026-02-02 19:31:32,752 - Next index: 15
+2026-02-02 19:31:32,752 - Next index: 16
+2026-02-02 19:31:32,752 - Next index: 17
+2026-02-02 19:31:32,752 - Next index: 18
+2026-02-02 19:31:32,752 - Next index: 19
+2026-02-02 19:31:32,752 - Next index: 20
+2026-02-02 19:31:32,752 - Next index: 21
+2026-02-02 19:31:32,752 - Next index: 22
+2026-02-02 19:31:32,752 - Next index: 23
+2026-02-02 19:31:32,752 - Next index: 24
+2026-02-02 19:31:32,752 - Next index: 25
+2026-02-02 19:31:32,752 - Next index: 26
+2026-02-02 19:31:32,752 - Next index: 27
+2026-02-02 19:31:32,752 - Next index: 28
+2026-02-02 19:31:32,752 - Next index: 29
+2026-02-02 19:31:32,753 - Next index: 30
+2026-02-02 19:31:32,753 - Next index: 31
+2026-02-02 19:31:32,753 - Next index: 32
+2026-02-02 19:31:32,753 - Next index: 33
+2026-02-02 19:31:32,753 - Next index: 34
+2026-02-02 19:31:32,753 - Next index: 35
+2026-02-02 19:31:32,753 - Next index: 36
+2026-02-02 19:31:32,753 - Next index: 37
+2026-02-02 19:31:32,753 - Next index: 38
+2026-02-02 19:31:32,753 - Next index: 39
+2026-02-02 19:31:32,753 - Next index: 40
+2026-02-02 19:31:32,753 - Next index: 41
+2026-02-02 19:31:32,753 - Next index: 42
+2026-02-02 19:31:32,753 - Next index: 43
+2026-02-02 19:31:32,753 - Next index: 44
+2026-02-02 19:31:32,753 - Next index: 45
+2026-02-02 19:31:32,754 - Next index: 46
+2026-02-02 19:31:32,754 - Next index: 47
+2026-02-02 19:31:32,754 - Next index: 48
+2026-02-02 19:31:32,754 - Next index: 49
+2026-02-02 19:31:32,754 - Next index: 50
+2026-02-02 19:31:32,754 - Next index: 51
+2026-02-02 19:31:32,754 - Next index: 52
+2026-02-02 19:31:32,754 - Next index: 53
+2026-02-02 19:31:32,754 - Next index: 54
+2026-02-02 19:31:32,754 - Next index: 55
+2026-02-02 19:31:32,754 - Next index: 56
+2026-02-02 19:31:32,754 - Next index: 57
+2026-02-02 19:31:32,754 - Next index: 58
+2026-02-02 19:31:32,756 - Flushed buffer
+2026-02-02 19:31:32,756 - Stopped session
+2026-02-02 19:31:33,370 - GDAL_DATA found in environment.
+2026-02-02 19:31:33,370 - PROJ_DATA found in environment.
+2026-02-02 19:31:33,371 - GDAL_DATA found in environment.
+2026-02-02 19:31:33,371 - PROJ_DATA found in environment.
+2026-02-02 19:31:33,371 - Got coordinate system
+2026-02-02 19:31:33,372 - Got coordinate system
+2026-02-02 19:31:33,372 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 19:31:33,372 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 19:31:33,372 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 19:31:33,372 - Next index: 0
+2026-02-02 19:31:33,372 - Next index: 1
+2026-02-02 19:31:33,372 - Next index: 2
+2026-02-02 19:31:33,372 - Next index: 3
+2026-02-02 19:31:33,372 - Next index: 4
+2026-02-02 19:31:33,372 - Next index: 5
+2026-02-02 19:31:33,372 - Next index: 6
+2026-02-02 19:31:33,372 - Next index: 7
+2026-02-02 19:31:33,373 - Next index: 8
+2026-02-02 19:31:33,373 - Next index: 9
+2026-02-02 19:31:33,373 - Next index: 10
+2026-02-02 19:31:33,373 - Next index: 11
+2026-02-02 19:31:33,373 - Next index: 12
+2026-02-02 19:31:33,373 - Next index: 13
+2026-02-02 19:31:33,373 - Next index: 14
+2026-02-02 19:31:33,373 - Next index: 15
+2026-02-02 19:31:33,373 - Next index: 16
+2026-02-02 19:31:33,373 - Next index: 17
+2026-02-02 19:31:33,373 - Next index: 18
+2026-02-02 19:31:33,373 - Next index: 19
+2026-02-02 19:31:33,373 - Next index: 20
+2026-02-02 19:31:33,373 - Next index: 21
+2026-02-02 19:31:33,373 - Next index: 22
+2026-02-02 19:31:33,374 - Next index: 23
+2026-02-02 19:31:33,374 - Next index: 24
+2026-02-02 19:31:33,374 - Next index: 25
+2026-02-02 19:31:33,374 - Next index: 26
+2026-02-02 19:31:33,374 - Next index: 27
+2026-02-02 19:31:33,374 - Next index: 28
+2026-02-02 19:31:33,374 - Next index: 29
+2026-02-02 19:31:33,374 - Next index: 30
+2026-02-02 19:31:33,374 - Next index: 31
+2026-02-02 19:31:33,374 - Next index: 32
+2026-02-02 19:31:33,374 - Next index: 33
+2026-02-02 19:31:33,374 - Next index: 34
+2026-02-02 19:31:33,374 - Next index: 35
+2026-02-02 19:31:33,374 - Next index: 36
+2026-02-02 19:31:33,374 - Next index: 37
+2026-02-02 19:31:33,375 - Next index: 38
+2026-02-02 19:31:33,375 - Next index: 39
+2026-02-02 19:31:33,375 - Next index: 40
+2026-02-02 19:31:33,375 - Next index: 41
+2026-02-02 19:31:33,375 - Next index: 42
+2026-02-02 19:31:33,375 - Next index: 43
+2026-02-02 19:31:33,375 - Next index: 44
+2026-02-02 19:31:33,375 - Next index: 45
+2026-02-02 19:31:33,375 - Next index: 46
+2026-02-02 19:31:33,375 - Next index: 47
+2026-02-02 19:31:33,375 - Next index: 48
+2026-02-02 19:31:33,375 - Next index: 49
+2026-02-02 19:31:33,375 - Next index: 50
+2026-02-02 19:31:33,375 - Next index: 51
+2026-02-02 19:31:33,375 - Next index: 52
+2026-02-02 19:31:33,375 - Next index: 53
+2026-02-02 19:31:33,376 - Next index: 54
+2026-02-02 19:31:33,376 - Next index: 55
+2026-02-02 19:31:33,376 - Next index: 56
+2026-02-02 19:31:33,376 - Next index: 57
+2026-02-02 19:31:33,376 - Next index: 58
+2026-02-02 19:31:33,377 - Flushed buffer
+2026-02-02 19:31:33,378 - Stopped session
+2026-02-02 19:31:33,379 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
+2026-02-02 19:31:33,421 - Length of bara dataframe: 24359
+2026-02-02 19:31:33,436 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
+2026-02-02 19:31:33,436 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
+2026-02-02 19:31:33,444 - No elevation found for well_id EHF-XA3S
+2026-02-02 19:31:33,444 - Length of bara dataframe: 4018
+2026-02-02 19:31:33,447 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
+2026-02-02 19:31:33,449 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
+2026-02-02 19:31:33,451 - Length of bara dataframe: 289
+2026-02-02 19:31:33,451 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
+2026-02-02 19:31:33,451 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
+2026-02-02 19:31:33,461 - Length of bara dataframe: 4498
+2026-02-02 19:31:33,463 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
+2026-02-02 19:31:33,463 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
+2026-02-02 19:31:33,466 - Length of bara dataframe: 1119
+2026-02-02 19:31:33,467 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
+2026-02-02 19:31:33,467 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
+2026-02-02 19:31:33,507 - Length of bara dataframe: 23320
+2026-02-02 19:31:33,520 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
+2026-02-02 19:31:33,521 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
+2026-02-02 19:31:33,529 - Length of bara dataframe: 4176
+2026-02-02 19:31:33,531 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
+2026-02-02 19:31:33,532 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
+2026-02-02 19:31:33,602 - Length of bara dataframe: 40000
+2026-02-02 19:31:33,719 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
+2026-02-02 19:31:33,720 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
+2026-02-02 19:31:33,761 - Length of bara dataframe: 22828
+2026-02-02 19:31:33,774 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
+2026-02-02 19:31:33,775 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
+2026-02-02 19:31:33,786 - Length of bara dataframe: 5742
+2026-02-02 19:31:33,790 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
+2026-02-02 19:31:33,790 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
+2026-02-02 19:31:33,792 - Length of bara dataframe: 289
+2026-02-02 19:31:33,792 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
+2026-02-02 19:31:33,792 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
+2026-02-02 19:31:33,814 - Length of bara dataframe: 12211
+2026-02-02 19:31:33,822 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
+2026-02-02 19:31:33,823 - 22809
 
-2026-01-31 13:18:53,346 - ALERT: Number of deployments in convert_relativeToGround is: 7
+2026-02-02 19:31:41,862 - ALERT: Number of deployments in convert_relativeToGround is: 17
 
-2026-01-31 13:18:53,410 - Removing 18 rows where 'ground_to_water_cm' is NaN.
-2026-01-31 13:18:53,410 - Affected well_id + deployment groups:
+2026-02-02 19:31:42,054 - Removing 30 rows where 'ground_to_water_cm' is NaN.
+2026-02-02 19:31:42,055 - Affected well_id + deployment groups:
 well_id  deployment
   EET-1           1
-2026-01-31 13:18:53,412 - No deployments found where 'DateTime_biweek' has only one unique value.
-2026-01-31 13:18:53,416 - CASE not before.empty for EER-1 and 1
-2026-01-31 13:18:53,417 - CASE not before.empty for EET-1 and 1
-2026-01-31 13:18:53,421 - CASE not before.empty for EHR-1 and 1
-2026-01-31 13:18:53,425 - CASE not before.empty for EWR-1 and 1
-2026-01-31 13:18:53,425 - Sensor level dictionary has 4 elements:
-{   ('EER-1', 1): 0.7029598020730851,
-    ('EET-1', 1): 0.8662611279067121,
-    ('EHR-1', 1): 0.9631418222697417,
-    ('EWR-1', 1): 0.23725381279267763}
-2026-01-31 13:18:53,425 - Drift error dictionary has 4 elements:
-{   ('EER-1', 1): 0.005864847401270462,
-    ('EET-1', 1): 0.0011503420702053124,
-    ('EHR-1', 1): 0.003012389086006878,
-    ('EWR-1', 1): 0.015959494545881085}
-2026-01-31 13:18:55,302 - PLOTTING MANUAL BI-WEEKLY GW: EET-2 1 has no manual biweekly records
-2026-01-31 13:18:55,429 - PLOTTING MANUAL BI-WEEKLY GW: EHT-XA5S 1 has no manual biweekly records
-2026-01-31 13:18:55,663 - PLOTTING MANUAL BI-WEEKLY GW: EWT-1 1 has no manual biweekly records
-2026-01-31 13:27:05,643 - ----------
+  EWT-2           1
+  KER-1           1
+2026-02-02 19:31:42,057 - No deployments found where 'DateTime_biweek' has only one unique value.
+2026-02-02 19:31:42,061 - CASE not before.empty for EER-1 and 1
+2026-02-02 19:31:42,062 - CASE not before.empty for EET-1 and 1
+2026-02-02 19:31:42,065 - CASE not before.empty for EHR-1 and 1
+2026-02-02 19:31:42,069 - CASE not before.empty for EWR-1 and 1
+2026-02-02 19:34:33,638 - ----------
 
 Logging ON for subdaily_processing_RawToGround.py
-2026-01-31 13:27:05,649 - EER-1_2025_0525_1031.csv
-2026-01-31 13:27:06,319 - 0.1
-2026-01-31 13:27:06,320 - Nothing to cut off front end.
-2026-01-31 13:27:06,320 - Cutoff backend.
-2026-01-31 13:27:06,569 - EET-1_2025_0525_1031.csv
-2026-01-31 13:27:07,239 - 0.5
-2026-01-31 13:27:07,240 - Nothing to cut off front end.
-2026-01-31 13:27:07,241 - Cutoff backend.
-2026-01-31 13:27:07,499 - EET-2_2025_0525_1031.csv
-2026-01-31 13:27:08,180 - 0.5
-2026-01-31 13:27:08,181 - Nothing to cut off front end.
-2026-01-31 13:27:08,182 - Cutoff backend.
-2026-01-31 13:27:08,433 - EHR-1_2025_0525_1031.csv
-2026-01-31 13:27:09,103 - 0.01
-2026-01-31 13:27:09,103 - cutoff front end.
-2026-01-31 13:27:09,104 - Cutoff backend.
-2026-01-31 13:27:09,462 - EHT-XA5S_2025_0525_1031.csv
-2026-01-31 13:27:10,142 - 0.1
-2026-01-31 13:27:10,143 - Nothing to cut off front end.
-2026-01-31 13:27:10,144 - Cutoff backend.
-2026-01-31 13:27:10,396 - EWR-1_2025_0525_1031.csv
-2026-01-31 13:27:11,071 - 0.1
-2026-01-31 13:27:11,071 - Nothing to cut off front end.
-2026-01-31 13:27:11,072 - Cutoff backend.
-2026-01-31 13:27:11,334 - EWT-1_2025_0526_1031.csv
-2026-01-31 13:27:12,004 - 0.5
-2026-01-31 13:27:12,004 - Nothing to cut off front end.
-2026-01-31 13:27:12,005 - Cutoff backend.
-2026-01-31 13:27:12,254 - EWT-2_2025_0624_1105.csv
-2026-01-31 13:27:12,789 - WARNING: more/less than one row for EWT-2 in cut_logger_data(). Which one to use? Check date range in logger csv. Exiting.
-2026-01-31 13:27:12,789 - Empty DataFrame
+2026-02-02 19:34:33,645 - EER-1_2025_0525_1031.csv
+2026-02-02 19:34:34,311 - 0.1
+2026-02-02 19:34:34,312 - Nothing to cut off front end.
+2026-02-02 19:34:34,312 - Cutoff backend.
+2026-02-02 19:34:34,668 - EET-1_2025_0525_1031.csv
+2026-02-02 19:34:35,331 - 0.5
+2026-02-02 19:34:35,332 - Nothing to cut off front end.
+2026-02-02 19:34:35,333 - Cutoff backend.
+2026-02-02 19:34:35,574 - EET-2_2025_0525_1031.csv
+2026-02-02 19:34:36,242 - 0.5
+2026-02-02 19:34:36,242 - Nothing to cut off front end.
+2026-02-02 19:34:36,243 - Cutoff backend.
+2026-02-02 19:34:36,491 - EHR-1_2025_0525_1031.csv
+2026-02-02 19:34:37,160 - 0.01
+2026-02-02 19:34:37,160 - cutoff front end.
+2026-02-02 19:34:37,161 - Cutoff backend.
+2026-02-02 19:34:37,406 - EHT-XA5S_2025_0525_1031.csv
+2026-02-02 19:34:38,070 - 0.1
+2026-02-02 19:34:38,071 - Nothing to cut off front end.
+2026-02-02 19:34:38,071 - Cutoff backend.
+2026-02-02 19:34:38,441 - EWR-1_2025_0525_1031.csv
+2026-02-02 19:34:39,117 - 0.1
+2026-02-02 19:34:39,118 - Nothing to cut off front end.
+2026-02-02 19:34:39,119 - Cutoff backend.
+2026-02-02 19:34:39,388 - EWT-1_2025_0526_1031.csv
+2026-02-02 19:34:40,060 - 0.5
+2026-02-02 19:34:40,060 - Nothing to cut off front end.
+2026-02-02 19:34:40,061 - Cutoff backend.
+2026-02-02 19:34:40,309 - EWT-2_2025_0624_1031.csv
+2026-02-02 19:34:40,872 - 0.5
+2026-02-02 19:34:40,873 - cutoff front end.
+2026-02-02 19:34:40,874 - Cutoff backend.
+2026-02-02 19:34:41,170 - KEF-1_2025_0526_1101.csv
+2026-02-02 19:34:41,853 - 0.5
+2026-02-02 19:34:41,853 - Nothing to cut off front end.
+2026-02-02 19:34:41,853 - Nothing to cut off back end.
+2026-02-02 19:34:42,205 - KER-1_2025_0526_1101.csv
+2026-02-02 19:34:42,895 - 0.5
+2026-02-02 19:34:42,896 - cutoff front end.
+2026-02-02 19:34:42,896 - Cutoff backend.
+2026-02-02 19:34:43,124 - KER-2_2025_0624_1101.csv
+2026-02-02 19:34:43,689 - 0.5
+2026-02-02 19:34:43,690 - Nothing to cut off front end.
+2026-02-02 19:34:43,690 - Nothing to cut off back end.
+2026-02-02 19:34:43,973 - KET-1_2025_0526_1101.csv
+2026-02-02 19:34:44,654 - 0.5
+2026-02-02 19:34:44,654 - Nothing to cut off front end.
+2026-02-02 19:34:44,654 - Nothing to cut off back end.
+2026-02-02 19:34:44,908 - KHF-1_2025_0526_0624.csv
+2026-02-02 19:34:45,055 - 0.5
+2026-02-02 19:34:45,055 - Nothing to cut off front end.
+2026-02-02 19:34:45,055 - Nothing to cut off back end.
+2026-02-02 19:34:45,241 - KHF-1_2025_0624_1101.csv
+2026-02-02 19:34:45,801 - 0.5
+2026-02-02 19:34:45,802 - cutoff front end.
+2026-02-02 19:34:45,802 - Nothing to cut off back end.
+2026-02-02 19:34:46,134 - KHR-1_2025_0526_0624.csv
+2026-02-02 19:34:46,282 - 0.5
+2026-02-02 19:34:46,282 - Nothing to cut off front end.
+2026-02-02 19:34:46,283 - Cutoff backend.
+2026-02-02 19:34:46,575 - KHR-1_2025_0624_1101.csv
+2026-02-02 19:34:47,153 - 0.5
+2026-02-02 19:34:47,154 - cutoff front end.
+2026-02-02 19:34:47,154 - Nothing to cut off back end.
+2026-02-02 19:34:47,493 - KHT-XE5S_2025_0526_1101.csv
+2026-02-02 19:34:48,175 - 0.5
+2026-02-02 19:34:48,175 - Nothing to cut off front end.
+2026-02-02 19:34:48,176 - Nothing to cut off back end.
+2026-02-02 19:34:48,426 - KWR-1_2025_0526_1105.csv
+2026-02-02 19:34:49,116 - WARNING: more/less than one row for KWR-1 in cut_logger_data() after filtering start/endtimes. If in debug mode, dataframe printed innext line. If >1 entry, which oneto use? Check datestamped logger .csv. EXIT.
+2026-02-02 19:34:49,116 - Empty DataFrame
 Columns: [logger_no, serial_no, well_id, start, end, temp_threshold, notes, Unnamed: 7, Unnamed: 8, Unnamed: 9]
 Index: []
-2026-01-31 13:27:13,041 - GDAL_DATA found in environment.
-2026-01-31 13:27:13,041 - PROJ_DATA found in environment.
-2026-01-31 13:27:13,042 - GDAL_DATA found in environment.
-2026-01-31 13:27:13,042 - PROJ_DATA found in environment.
-2026-01-31 13:27:13,042 - Got coordinate system
-2026-01-31 13:27:13,042 - Got coordinate system
-2026-01-31 13:27:13,043 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
-2026-01-31 13:27:13,043 - OLC_FASTSETNEXTBYINDEX: 1
-2026-01-31 13:27:13,043 - OLC_FASTFEATURECOUNT: 1
-2026-01-31 13:27:13,043 - Next index: 0
-2026-01-31 13:27:13,043 - Next index: 1
-2026-01-31 13:27:13,043 - Next index: 2
-2026-01-31 13:27:13,043 - Next index: 3
-2026-01-31 13:27:13,043 - Next index: 4
-2026-01-31 13:27:13,043 - Next index: 5
-2026-01-31 13:27:13,043 - Next index: 6
-2026-01-31 13:27:13,043 - Next index: 7
-2026-01-31 13:27:13,043 - Next index: 8
-2026-01-31 13:27:13,044 - Next index: 9
-2026-01-31 13:27:13,044 - Next index: 10
-2026-01-31 13:27:13,044 - Next index: 11
-2026-01-31 13:27:13,044 - Next index: 12
-2026-01-31 13:27:13,044 - Next index: 13
-2026-01-31 13:27:13,044 - Next index: 14
-2026-01-31 13:27:13,044 - Next index: 15
-2026-01-31 13:27:13,044 - Next index: 16
-2026-01-31 13:27:13,044 - Next index: 17
-2026-01-31 13:27:13,044 - Next index: 18
-2026-01-31 13:27:13,044 - Next index: 19
-2026-01-31 13:27:13,044 - Next index: 20
-2026-01-31 13:27:13,044 - Next index: 21
-2026-01-31 13:27:13,044 - Next index: 22
-2026-01-31 13:27:13,044 - Next index: 23
-2026-01-31 13:27:13,044 - Next index: 24
-2026-01-31 13:27:13,045 - Next index: 25
-2026-01-31 13:27:13,045 - Next index: 26
-2026-01-31 13:27:13,045 - Next index: 27
-2026-01-31 13:27:13,045 - Next index: 28
-2026-01-31 13:27:13,045 - Next index: 29
-2026-01-31 13:27:13,045 - Next index: 30
-2026-01-31 13:27:13,045 - Next index: 31
-2026-01-31 13:27:13,045 - Next index: 32
-2026-01-31 13:27:13,045 - Next index: 33
-2026-01-31 13:27:13,045 - Next index: 34
-2026-01-31 13:27:13,045 - Next index: 35
-2026-01-31 13:27:13,045 - Next index: 36
-2026-01-31 13:27:13,045 - Next index: 37
-2026-01-31 13:27:13,045 - Next index: 38
-2026-01-31 13:27:13,045 - Next index: 39
-2026-01-31 13:27:13,045 - Next index: 40
-2026-01-31 13:27:13,046 - Next index: 41
-2026-01-31 13:27:13,046 - Next index: 42
-2026-01-31 13:27:13,046 - Next index: 43
-2026-01-31 13:27:13,046 - Next index: 44
-2026-01-31 13:27:13,046 - Next index: 45
-2026-01-31 13:27:13,046 - Next index: 46
-2026-01-31 13:27:13,046 - Next index: 47
-2026-01-31 13:27:13,046 - Next index: 48
-2026-01-31 13:27:13,046 - Next index: 49
-2026-01-31 13:27:13,046 - Next index: 50
-2026-01-31 13:27:13,046 - Next index: 51
-2026-01-31 13:27:13,046 - Next index: 52
-2026-01-31 13:27:13,046 - Next index: 53
-2026-01-31 13:27:13,046 - Next index: 54
-2026-01-31 13:27:13,046 - Next index: 55
-2026-01-31 13:27:13,047 - Next index: 56
-2026-01-31 13:27:13,047 - Next index: 57
-2026-01-31 13:27:13,047 - Next index: 58
-2026-01-31 13:27:13,048 - Flushed buffer
-2026-01-31 13:27:13,048 - Stopped session
-2026-01-31 13:27:13,345 - GDAL_DATA found in environment.
-2026-01-31 13:27:13,345 - PROJ_DATA found in environment.
-2026-01-31 13:27:13,345 - GDAL_DATA found in environment.
-2026-01-31 13:27:13,346 - PROJ_DATA found in environment.
-2026-01-31 13:27:13,346 - Got coordinate system
-2026-01-31 13:27:13,346 - Got coordinate system
-2026-01-31 13:27:13,346 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
-2026-01-31 13:27:13,346 - OLC_FASTSETNEXTBYINDEX: 1
-2026-01-31 13:27:13,346 - OLC_FASTFEATURECOUNT: 1
-2026-01-31 13:27:13,346 - Next index: 0
-2026-01-31 13:27:13,346 - Next index: 1
-2026-01-31 13:27:13,346 - Next index: 2
-2026-01-31 13:27:13,346 - Next index: 3
-2026-01-31 13:27:13,346 - Next index: 4
-2026-01-31 13:27:13,346 - Next index: 5
-2026-01-31 13:27:13,347 - Next index: 6
-2026-01-31 13:27:13,347 - Next index: 7
-2026-01-31 13:27:13,347 - Next index: 8
-2026-01-31 13:27:13,347 - Next index: 9
-2026-01-31 13:27:13,347 - Next index: 10
-2026-01-31 13:27:13,347 - Next index: 11
-2026-01-31 13:27:13,347 - Next index: 12
-2026-01-31 13:27:13,347 - Next index: 13
-2026-01-31 13:27:13,347 - Next index: 14
-2026-01-31 13:27:13,347 - Next index: 15
-2026-01-31 13:27:13,347 - Next index: 16
-2026-01-31 13:27:13,347 - Next index: 17
-2026-01-31 13:27:13,347 - Next index: 18
-2026-01-31 13:27:13,347 - Next index: 19
-2026-01-31 13:27:13,347 - Next index: 20
-2026-01-31 13:27:13,347 - Next index: 21
-2026-01-31 13:27:13,348 - Next index: 22
-2026-01-31 13:27:13,348 - Next index: 23
-2026-01-31 13:27:13,348 - Next index: 24
-2026-01-31 13:27:13,348 - Next index: 25
-2026-01-31 13:27:13,348 - Next index: 26
-2026-01-31 13:27:13,348 - Next index: 27
-2026-01-31 13:27:13,348 - Next index: 28
-2026-01-31 13:27:13,348 - Next index: 29
-2026-01-31 13:27:13,348 - Next index: 30
-2026-01-31 13:27:13,348 - Next index: 31
-2026-01-31 13:27:13,348 - Next index: 32
-2026-01-31 13:27:13,348 - Next index: 33
-2026-01-31 13:27:13,348 - Next index: 34
-2026-01-31 13:27:13,348 - Next index: 35
-2026-01-31 13:27:13,348 - Next index: 36
-2026-01-31 13:27:13,349 - Next index: 37
-2026-01-31 13:27:13,349 - Next index: 38
-2026-01-31 13:27:13,349 - Next index: 39
-2026-01-31 13:27:13,349 - Next index: 40
-2026-01-31 13:27:13,349 - Next index: 41
-2026-01-31 13:27:13,349 - Next index: 42
-2026-01-31 13:27:13,349 - Next index: 43
-2026-01-31 13:27:13,349 - Next index: 44
-2026-01-31 13:27:13,349 - Next index: 45
-2026-01-31 13:27:13,349 - Next index: 46
-2026-01-31 13:27:13,349 - Next index: 47
-2026-01-31 13:27:13,349 - Next index: 48
-2026-01-31 13:27:13,349 - Next index: 49
-2026-01-31 13:27:13,349 - Next index: 50
-2026-01-31 13:27:13,349 - Next index: 51
-2026-01-31 13:27:13,349 - Next index: 52
-2026-01-31 13:27:13,350 - Next index: 53
-2026-01-31 13:27:13,350 - Next index: 54
-2026-01-31 13:27:13,350 - Next index: 55
-2026-01-31 13:27:13,350 - Next index: 56
-2026-01-31 13:27:13,350 - Next index: 57
-2026-01-31 13:27:13,350 - Next index: 58
-2026-01-31 13:27:13,352 - Flushed buffer
-2026-01-31 13:27:13,352 - Stopped session
-2026-01-31 13:27:13,353 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
-2026-01-31 13:27:13,395 - Length of bara dataframe: 24359
-2026-01-31 13:27:13,410 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
-2026-01-31 13:27:13,410 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
-2026-01-31 13:27:13,418 - No elevation found for well_id EHF-XA3S
-2026-01-31 13:27:13,418 - Length of bara dataframe: 4018
-2026-01-31 13:27:13,420 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
-2026-01-31 13:27:13,423 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
-2026-01-31 13:27:13,424 - Length of bara dataframe: 289
-2026-01-31 13:27:13,425 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
-2026-01-31 13:27:13,425 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
-2026-01-31 13:27:13,434 - Length of bara dataframe: 4498
-2026-01-31 13:27:13,437 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
-2026-01-31 13:27:13,437 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
-2026-01-31 13:27:13,440 - Length of bara dataframe: 1119
-2026-01-31 13:27:13,441 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
-2026-01-31 13:27:13,441 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
-2026-01-31 13:27:13,481 - Length of bara dataframe: 23320
-2026-01-31 13:27:13,589 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
-2026-01-31 13:27:13,590 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
-2026-01-31 13:27:13,600 - Length of bara dataframe: 4176
-2026-01-31 13:27:13,602 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
-2026-01-31 13:27:13,602 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
-2026-01-31 13:27:13,673 - Length of bara dataframe: 40000
-2026-01-31 13:27:13,697 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
-2026-01-31 13:27:13,697 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
-2026-01-31 13:27:13,737 - Length of bara dataframe: 22828
-2026-01-31 13:27:13,751 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
-2026-01-31 13:27:13,752 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
-2026-01-31 13:27:13,763 - Length of bara dataframe: 5742
-2026-01-31 13:27:13,766 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
-2026-01-31 13:27:13,767 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
-2026-01-31 13:27:13,769 - Length of bara dataframe: 289
-2026-01-31 13:27:13,769 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
-2026-01-31 13:27:13,769 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
-2026-01-31 13:27:13,791 - Length of bara dataframe: 12211
-2026-01-31 13:27:13,799 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
-2026-01-31 13:27:13,800 - 22804
+2026-02-02 19:34:49,629 - GDAL_DATA found in environment.
+2026-02-02 19:34:49,630 - PROJ_DATA found in environment.
+2026-02-02 19:34:49,631 - GDAL_DATA found in environment.
+2026-02-02 19:34:49,631 - PROJ_DATA found in environment.
+2026-02-02 19:34:49,631 - Got coordinate system
+2026-02-02 19:34:49,631 - Got coordinate system
+2026-02-02 19:34:49,631 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 19:34:49,631 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 19:34:49,631 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 19:34:49,631 - Next index: 0
+2026-02-02 19:34:49,631 - Next index: 1
+2026-02-02 19:34:49,632 - Next index: 2
+2026-02-02 19:34:49,632 - Next index: 3
+2026-02-02 19:34:49,632 - Next index: 4
+2026-02-02 19:34:49,632 - Next index: 5
+2026-02-02 19:34:49,632 - Next index: 6
+2026-02-02 19:34:49,632 - Next index: 7
+2026-02-02 19:34:49,632 - Next index: 8
+2026-02-02 19:34:49,632 - Next index: 9
+2026-02-02 19:34:49,632 - Next index: 10
+2026-02-02 19:34:49,632 - Next index: 11
+2026-02-02 19:34:49,632 - Next index: 12
+2026-02-02 19:34:49,633 - Next index: 13
+2026-02-02 19:34:49,633 - Next index: 14
+2026-02-02 19:34:49,633 - Next index: 15
+2026-02-02 19:34:49,633 - Next index: 16
+2026-02-02 19:34:49,633 - Next index: 17
+2026-02-02 19:34:49,633 - Next index: 18
+2026-02-02 19:34:49,633 - Next index: 19
+2026-02-02 19:34:49,633 - Next index: 20
+2026-02-02 19:34:49,633 - Next index: 21
+2026-02-02 19:34:49,633 - Next index: 22
+2026-02-02 19:34:49,633 - Next index: 23
+2026-02-02 19:34:49,633 - Next index: 24
+2026-02-02 19:34:49,633 - Next index: 25
+2026-02-02 19:34:49,633 - Next index: 26
+2026-02-02 19:34:49,633 - Next index: 27
+2026-02-02 19:34:49,633 - Next index: 28
+2026-02-02 19:34:49,634 - Next index: 29
+2026-02-02 19:34:49,634 - Next index: 30
+2026-02-02 19:34:49,634 - Next index: 31
+2026-02-02 19:34:49,634 - Next index: 32
+2026-02-02 19:34:49,634 - Next index: 33
+2026-02-02 19:34:49,634 - Next index: 34
+2026-02-02 19:34:49,634 - Next index: 35
+2026-02-02 19:34:49,634 - Next index: 36
+2026-02-02 19:34:49,634 - Next index: 37
+2026-02-02 19:34:49,634 - Next index: 38
+2026-02-02 19:34:49,634 - Next index: 39
+2026-02-02 19:34:49,634 - Next index: 40
+2026-02-02 19:34:49,634 - Next index: 41
+2026-02-02 19:34:49,634 - Next index: 42
+2026-02-02 19:34:49,634 - Next index: 43
+2026-02-02 19:34:49,635 - Next index: 44
+2026-02-02 19:34:49,635 - Next index: 45
+2026-02-02 19:34:49,635 - Next index: 46
+2026-02-02 19:34:49,635 - Next index: 47
+2026-02-02 19:34:49,635 - Next index: 48
+2026-02-02 19:34:49,635 - Next index: 49
+2026-02-02 19:34:49,635 - Next index: 50
+2026-02-02 19:34:49,635 - Next index: 51
+2026-02-02 19:34:49,635 - Next index: 52
+2026-02-02 19:34:49,635 - Next index: 53
+2026-02-02 19:34:49,635 - Next index: 54
+2026-02-02 19:34:49,635 - Next index: 55
+2026-02-02 19:34:49,635 - Next index: 56
+2026-02-02 19:34:49,635 - Next index: 57
+2026-02-02 19:34:49,635 - Next index: 58
+2026-02-02 19:34:49,637 - Flushed buffer
+2026-02-02 19:34:49,637 - Stopped session
+2026-02-02 19:34:50,158 - GDAL_DATA found in environment.
+2026-02-02 19:34:50,158 - PROJ_DATA found in environment.
+2026-02-02 19:34:50,159 - GDAL_DATA found in environment.
+2026-02-02 19:34:50,159 - PROJ_DATA found in environment.
+2026-02-02 19:34:50,159 - Got coordinate system
+2026-02-02 19:34:50,159 - Got coordinate system
+2026-02-02 19:34:50,159 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 19:34:50,159 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 19:34:50,159 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 19:34:50,159 - Next index: 0
+2026-02-02 19:34:50,159 - Next index: 1
+2026-02-02 19:34:50,159 - Next index: 2
+2026-02-02 19:34:50,160 - Next index: 3
+2026-02-02 19:34:50,160 - Next index: 4
+2026-02-02 19:34:50,160 - Next index: 5
+2026-02-02 19:34:50,160 - Next index: 6
+2026-02-02 19:34:50,160 - Next index: 7
+2026-02-02 19:34:50,160 - Next index: 8
+2026-02-02 19:34:50,160 - Next index: 9
+2026-02-02 19:34:50,160 - Next index: 10
+2026-02-02 19:34:50,160 - Next index: 11
+2026-02-02 19:34:50,160 - Next index: 12
+2026-02-02 19:34:50,160 - Next index: 13
+2026-02-02 19:34:50,160 - Next index: 14
+2026-02-02 19:34:50,160 - Next index: 15
+2026-02-02 19:34:50,160 - Next index: 16
+2026-02-02 19:34:50,161 - Next index: 17
+2026-02-02 19:34:50,161 - Next index: 18
+2026-02-02 19:34:50,161 - Next index: 19
+2026-02-02 19:34:50,161 - Next index: 20
+2026-02-02 19:34:50,161 - Next index: 21
+2026-02-02 19:34:50,161 - Next index: 22
+2026-02-02 19:34:50,161 - Next index: 23
+2026-02-02 19:34:50,161 - Next index: 24
+2026-02-02 19:34:50,161 - Next index: 25
+2026-02-02 19:34:50,161 - Next index: 26
+2026-02-02 19:34:50,161 - Next index: 27
+2026-02-02 19:34:50,161 - Next index: 28
+2026-02-02 19:34:50,161 - Next index: 29
+2026-02-02 19:34:50,161 - Next index: 30
+2026-02-02 19:34:50,161 - Next index: 31
+2026-02-02 19:34:50,161 - Next index: 32
+2026-02-02 19:34:50,162 - Next index: 33
+2026-02-02 19:34:50,162 - Next index: 34
+2026-02-02 19:34:50,162 - Next index: 35
+2026-02-02 19:34:50,162 - Next index: 36
+2026-02-02 19:34:50,162 - Next index: 37
+2026-02-02 19:34:50,162 - Next index: 38
+2026-02-02 19:34:50,162 - Next index: 39
+2026-02-02 19:34:50,162 - Next index: 40
+2026-02-02 19:34:50,162 - Next index: 41
+2026-02-02 19:34:50,162 - Next index: 42
+2026-02-02 19:34:50,162 - Next index: 43
+2026-02-02 19:34:50,162 - Next index: 44
+2026-02-02 19:34:50,162 - Next index: 45
+2026-02-02 19:34:50,162 - Next index: 46
+2026-02-02 19:34:50,162 - Next index: 47
+2026-02-02 19:34:50,162 - Next index: 48
+2026-02-02 19:34:50,162 - Next index: 49
+2026-02-02 19:34:50,163 - Next index: 50
+2026-02-02 19:34:50,163 - Next index: 51
+2026-02-02 19:34:50,163 - Next index: 52
+2026-02-02 19:34:50,163 - Next index: 53
+2026-02-02 19:34:50,163 - Next index: 54
+2026-02-02 19:34:50,163 - Next index: 55
+2026-02-02 19:34:50,163 - Next index: 56
+2026-02-02 19:34:50,163 - Next index: 57
+2026-02-02 19:34:50,163 - Next index: 58
+2026-02-02 19:34:50,165 - Flushed buffer
+2026-02-02 19:34:50,165 - Stopped session
+2026-02-02 19:34:50,166 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
+2026-02-02 19:34:50,208 - Length of bara dataframe: 24359
+2026-02-02 19:34:50,319 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
+2026-02-02 19:34:50,320 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
+2026-02-02 19:34:50,328 - No elevation found for well_id EHF-XA3S
+2026-02-02 19:34:50,329 - Length of bara dataframe: 4018
+2026-02-02 19:34:50,331 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
+2026-02-02 19:34:50,333 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
+2026-02-02 19:34:50,335 - Length of bara dataframe: 289
+2026-02-02 19:34:50,335 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
+2026-02-02 19:34:50,335 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
+2026-02-02 19:34:50,345 - Length of bara dataframe: 4498
+2026-02-02 19:34:50,348 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
+2026-02-02 19:34:50,348 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
+2026-02-02 19:34:50,351 - Length of bara dataframe: 1119
+2026-02-02 19:34:50,351 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
+2026-02-02 19:34:50,352 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
+2026-02-02 19:34:50,392 - Length of bara dataframe: 23320
+2026-02-02 19:34:50,406 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
+2026-02-02 19:34:50,406 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
+2026-02-02 19:34:50,415 - Length of bara dataframe: 4176
+2026-02-02 19:34:50,417 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
+2026-02-02 19:34:50,417 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
+2026-02-02 19:34:50,485 - Length of bara dataframe: 40000
+2026-02-02 19:34:50,508 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
+2026-02-02 19:34:50,509 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
+2026-02-02 19:34:50,550 - Length of bara dataframe: 22828
+2026-02-02 19:34:50,663 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
+2026-02-02 19:34:50,663 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
+2026-02-02 19:34:50,675 - Length of bara dataframe: 5742
+2026-02-02 19:34:50,679 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
+2026-02-02 19:34:50,680 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
+2026-02-02 19:34:50,681 - Length of bara dataframe: 289
+2026-02-02 19:34:50,682 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
+2026-02-02 19:34:50,682 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
+2026-02-02 19:34:50,704 - Length of bara dataframe: 12211
+2026-02-02 19:34:50,712 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
+2026-02-02 19:34:50,713 - 22809
 
-2026-01-31 13:27:21,962 - ALERT: Number of deployments in convert_relativeToGround is: 7
+2026-02-02 19:34:58,753 - ALERT: Number of deployments in convert_relativeToGround is: 17
 
-2026-01-31 13:27:22,026 - Removing 18 rows where 'ground_to_water_cm' is NaN.
-2026-01-31 13:27:22,026 - Affected well_id + deployment groups:
+2026-02-02 19:34:58,889 - Removing 30 rows where 'ground_to_water_cm' is NaN.
+2026-02-02 19:34:58,889 - Affected well_id + deployment groups:
 well_id  deployment
   EET-1           1
-2026-01-31 13:27:22,028 - No deployments found where 'DateTime_biweek' has only one unique value.
-2026-01-31 13:27:22,032 - CASE not before.empty for EER-1 and 1
-2026-01-31 13:27:22,034 - CASE not before.empty for EET-1 and 1
-2026-01-31 13:27:22,037 - CASE not before.empty for EHR-1 and 1
-2026-01-31 13:27:22,041 - CASE not before.empty for EWR-1 and 1
-2026-01-31 13:27:22,041 - Sensor level dictionary has 4 elements:
-{   ('EER-1', 1): 0.7029598020730851,
-    ('EET-1', 1): 0.8662611279067121,
-    ('EHR-1', 1): 0.9631418222697417,
-    ('EWR-1', 1): 0.23725381279267763}
-2026-01-31 13:27:22,041 - Drift error dictionary has 4 elements:
-{   ('EER-1', 1): 0.005864847401270462,
-    ('EET-1', 1): 0.0011503420702053124,
-    ('EHR-1', 1): 0.003012389086006878,
-    ('EWR-1', 1): 0.015959494545881085}
-2026-01-31 13:27:23,920 - PLOTTING MANUAL BI-WEEKLY GW: EET-2 1 has no manual biweekly records
-2026-01-31 13:27:24,141 - PLOTTING MANUAL BI-WEEKLY GW: EHT-XA5S 1 has no manual biweekly records
-2026-01-31 13:27:24,270 - PLOTTING MANUAL BI-WEEKLY GW: EWT-1 1 has no manual biweekly records
+  EWT-2           1
+  KER-1           1
+2026-02-02 19:34:58,891 - No deployments found where 'DateTime_biweek' has only one unique value.
+2026-02-02 19:34:58,895 - CASE not before.empty for EER-1 and 1
+2026-02-02 19:34:58,897 - CASE not before.empty for EET-1 and 1
+2026-02-02 19:34:58,900 - CASE not before.empty for EHR-1 and 1
+2026-02-02 19:34:58,904 - CASE not before.empty for EWR-1 and 1
+2026-02-02 19:35:04,851 - ----------
+
+Logging ON for subdaily_processing_RawToGround.py
+2026-02-02 19:35:04,879 - EER-1_2025_0525_1031.csv
+2026-02-02 19:35:08,466 - 0.1
+2026-02-02 19:35:08,468 - Nothing to cut off front end.
+2026-02-02 19:35:08,469 - Cutoff backend.
+2026-02-02 19:35:08,995 - EET-1_2025_0525_1031.csv
+2026-02-02 19:35:12,557 - 0.5
+2026-02-02 19:35:12,559 - Nothing to cut off front end.
+2026-02-02 19:35:12,560 - Cutoff backend.
+2026-02-02 19:35:13,184 - EET-2_2025_0525_1031.csv
+2026-02-02 19:35:16,742 - 0.5
+2026-02-02 19:35:16,745 - Nothing to cut off front end.
+2026-02-02 19:35:16,746 - Cutoff backend.
+2026-02-02 19:35:17,281 - EHR-1_2025_0525_1031.csv
+2026-02-02 19:35:20,830 - 0.01
+2026-02-02 19:35:20,832 - cutoff front end.
+2026-02-02 19:35:20,833 - Cutoff backend.
+2026-02-02 19:35:21,357 - EHT-XA5S_2025_0525_1031.csv
+2026-02-02 19:35:24,907 - 0.1
+2026-02-02 19:35:24,908 - Nothing to cut off front end.
+2026-02-02 19:35:24,909 - Cutoff backend.
+2026-02-02 19:35:25,439 - EWR-1_2025_0525_1031.csv
+2026-02-02 19:35:29,038 - 0.1
+2026-02-02 19:35:29,040 - Nothing to cut off front end.
+2026-02-02 19:35:29,042 - Cutoff backend.
+2026-02-02 19:35:29,690 - EWT-1_2025_0526_1031.csv
+2026-02-02 19:35:33,228 - 0.5
+2026-02-02 19:35:33,230 - Nothing to cut off front end.
+2026-02-02 19:35:33,231 - Cutoff backend.
+2026-02-02 19:35:33,753 - EWT-2_2025_0624_1031.csv
+2026-02-02 19:35:36,657 - 0.5
+2026-02-02 19:35:36,659 - cutoff front end.
+2026-02-02 19:35:36,660 - Cutoff backend.
+2026-02-02 19:35:37,300 - KEF-1_2025_0526_1101.csv
+2026-02-02 19:35:40,959 - 0.5
+2026-02-02 19:35:40,961 - Nothing to cut off front end.
+2026-02-02 19:35:40,962 - Nothing to cut off back end.
+2026-02-02 19:35:41,495 - KER-1_2025_0526_1101.csv
+2026-02-02 19:35:45,129 - 0.5
+2026-02-02 19:35:45,130 - cutoff front end.
+2026-02-02 19:35:45,132 - Cutoff backend.
+2026-02-02 19:35:45,638 - KER-2_2025_0624_1101.csv
+2026-02-02 19:35:48,659 - 0.5
+2026-02-02 19:35:48,661 - Nothing to cut off front end.
+2026-02-02 19:35:48,661 - Nothing to cut off back end.
+2026-02-02 19:35:49,422 - KET-1_2025_0526_1101.csv
+2026-02-02 19:35:53,077 - 0.5
+2026-02-02 19:35:53,079 - Nothing to cut off front end.
+2026-02-02 19:35:53,079 - Nothing to cut off back end.
+2026-02-02 19:35:53,608 - KHF-1_2025_0526_0624.csv
+2026-02-02 19:35:54,405 - 0.5
+2026-02-02 19:35:54,407 - Nothing to cut off front end.
+2026-02-02 19:35:54,408 - Nothing to cut off back end.
+2026-02-02 19:35:54,890 - KHF-1_2025_0624_1101.csv
+2026-02-02 19:35:57,951 - 0.5
+2026-02-02 19:35:57,952 - cutoff front end.
+2026-02-02 19:35:57,953 - Nothing to cut off back end.
+2026-02-02 19:35:58,642 - KHR-1_2025_0526_0624.csv
+2026-02-02 19:35:59,443 - 0.5
+2026-02-02 19:35:59,445 - Nothing to cut off front end.
+2026-02-02 19:35:59,446 - Cutoff backend.
+2026-02-02 19:35:59,915 - KHR-1_2025_0624_1101.csv
+2026-02-02 19:36:03,074 - 0.5
+2026-02-02 19:36:03,076 - cutoff front end.
+2026-02-02 19:36:03,076 - Nothing to cut off back end.
+2026-02-02 19:36:03,805 - KHT-XE5S_2025_0526_1101.csv
+2026-02-02 19:36:07,534 - 0.5
+2026-02-02 19:36:07,535 - Nothing to cut off front end.
+2026-02-02 19:36:07,536 - Nothing to cut off back end.
+2026-02-02 19:36:08,207 - KWR-1_2025_0526_1105.csv
+2026-02-02 19:36:11,954 - WARNING: more/less than one row for KWR-1 in cut_logger_data() after filtering start/endtimes. If in debug mode, dataframe printed innext line. If >1 entry, which oneto use? Check datestamped logger .csv. EXIT.
+2026-02-02 19:36:11,954 - Empty DataFrame
+Columns: [logger_no, serial_no, well_id, start, end, temp_threshold, notes, Unnamed: 7, Unnamed: 8, Unnamed: 9]
+Index: []
+2026-02-02 19:36:12,485 - GDAL_DATA found in environment.
+2026-02-02 19:36:12,485 - PROJ_DATA found in environment.
+2026-02-02 19:36:12,487 - GDAL_DATA found in environment.
+2026-02-02 19:36:12,487 - PROJ_DATA found in environment.
+2026-02-02 19:36:12,487 - Got coordinate system
+2026-02-02 19:36:12,487 - Got coordinate system
+2026-02-02 19:36:12,487 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 19:36:12,487 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 19:36:12,487 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 19:36:12,488 - Next index: 0
+2026-02-02 19:36:12,488 - Next index: 1
+2026-02-02 19:36:12,488 - Next index: 2
+2026-02-02 19:36:12,489 - Next index: 3
+2026-02-02 19:36:12,489 - Next index: 4
+2026-02-02 19:36:12,489 - Next index: 5
+2026-02-02 19:36:12,489 - Next index: 6
+2026-02-02 19:36:12,490 - Next index: 7
+2026-02-02 19:36:12,490 - Next index: 8
+2026-02-02 19:36:12,490 - Next index: 9
+2026-02-02 19:36:12,490 - Next index: 10
+2026-02-02 19:36:12,491 - Next index: 11
+2026-02-02 19:36:12,491 - Next index: 12
+2026-02-02 19:36:12,491 - Next index: 13
+2026-02-02 19:36:12,492 - Next index: 14
+2026-02-02 19:36:12,492 - Next index: 15
+2026-02-02 19:36:12,492 - Next index: 16
+2026-02-02 19:36:12,492 - Next index: 17
+2026-02-02 19:36:12,493 - Next index: 18
+2026-02-02 19:36:12,493 - Next index: 19
+2026-02-02 19:36:12,493 - Next index: 20
+2026-02-02 19:36:12,494 - Next index: 21
+2026-02-02 19:36:12,494 - Next index: 22
+2026-02-02 19:36:12,494 - Next index: 23
+2026-02-02 19:36:12,494 - Next index: 24
+2026-02-02 19:36:12,495 - Next index: 25
+2026-02-02 19:36:12,495 - Next index: 26
+2026-02-02 19:36:12,495 - Next index: 27
+2026-02-02 19:36:12,495 - Next index: 28
+2026-02-02 19:36:12,496 - Next index: 29
+2026-02-02 19:36:12,496 - Next index: 30
+2026-02-02 19:36:12,496 - Next index: 31
+2026-02-02 19:36:12,497 - Next index: 32
+2026-02-02 19:36:12,497 - Next index: 33
+2026-02-02 19:36:12,497 - Next index: 34
+2026-02-02 19:36:12,497 - Next index: 35
+2026-02-02 19:36:12,498 - Next index: 36
+2026-02-02 19:36:12,498 - Next index: 37
+2026-02-02 19:36:12,498 - Next index: 38
+2026-02-02 19:36:12,498 - Next index: 39
+2026-02-02 19:36:12,499 - Next index: 40
+2026-02-02 19:36:12,499 - Next index: 41
+2026-02-02 19:36:12,499 - Next index: 42
+2026-02-02 19:36:12,500 - Next index: 43
+2026-02-02 19:36:12,500 - Next index: 44
+2026-02-02 19:36:12,500 - Next index: 45
+2026-02-02 19:36:12,500 - Next index: 46
+2026-02-02 19:36:12,501 - Next index: 47
+2026-02-02 19:36:12,501 - Next index: 48
+2026-02-02 19:36:12,501 - Next index: 49
+2026-02-02 19:36:12,501 - Next index: 50
+2026-02-02 19:36:12,502 - Next index: 51
+2026-02-02 19:36:12,502 - Next index: 52
+2026-02-02 19:36:12,502 - Next index: 53
+2026-02-02 19:36:12,503 - Next index: 54
+2026-02-02 19:36:12,503 - Next index: 55
+2026-02-02 19:36:12,503 - Next index: 56
+2026-02-02 19:36:12,503 - Next index: 57
+2026-02-02 19:36:12,504 - Next index: 58
+2026-02-02 19:36:12,506 - Flushed buffer
+2026-02-02 19:36:12,506 - Stopped session
+2026-02-02 19:36:13,470 - GDAL_DATA found in environment.
+2026-02-02 19:36:13,470 - PROJ_DATA found in environment.
+2026-02-02 19:36:13,471 - GDAL_DATA found in environment.
+2026-02-02 19:36:13,471 - PROJ_DATA found in environment.
+2026-02-02 19:36:13,471 - Got coordinate system
+2026-02-02 19:36:13,471 - Got coordinate system
+2026-02-02 19:36:13,471 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 19:36:13,471 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 19:36:13,471 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 19:36:13,471 - Next index: 0
+2026-02-02 19:36:13,471 - Next index: 1
+2026-02-02 19:36:13,472 - Next index: 2
+2026-02-02 19:36:13,472 - Next index: 3
+2026-02-02 19:36:13,472 - Next index: 4
+2026-02-02 19:36:13,473 - Next index: 5
+2026-02-02 19:36:13,473 - Next index: 6
+2026-02-02 19:36:13,473 - Next index: 7
+2026-02-02 19:36:13,473 - Next index: 8
+2026-02-02 19:36:13,474 - Next index: 9
+2026-02-02 19:36:13,474 - Next index: 10
+2026-02-02 19:36:13,474 - Next index: 11
+2026-02-02 19:36:13,475 - Next index: 12
+2026-02-02 19:36:13,475 - Next index: 13
+2026-02-02 19:36:13,475 - Next index: 14
+2026-02-02 19:36:13,475 - Next index: 15
+2026-02-02 19:36:13,476 - Next index: 16
+2026-02-02 19:36:13,476 - Next index: 17
+2026-02-02 19:36:13,476 - Next index: 18
+2026-02-02 19:36:13,476 - Next index: 19
+2026-02-02 19:36:13,477 - Next index: 20
+2026-02-02 19:36:13,477 - Next index: 21
+2026-02-02 19:36:13,477 - Next index: 22
+2026-02-02 19:36:13,478 - Next index: 23
+2026-02-02 19:36:13,478 - Next index: 24
+2026-02-02 19:36:13,478 - Next index: 25
+2026-02-02 19:36:13,478 - Next index: 26
+2026-02-02 19:36:13,479 - Next index: 27
+2026-02-02 19:36:13,479 - Next index: 28
+2026-02-02 19:36:13,479 - Next index: 29
+2026-02-02 19:36:13,479 - Next index: 30
+2026-02-02 19:36:13,480 - Next index: 31
+2026-02-02 19:36:13,480 - Next index: 32
+2026-02-02 19:36:13,480 - Next index: 33
+2026-02-02 19:36:13,481 - Next index: 34
+2026-02-02 19:36:13,481 - Next index: 35
+2026-02-02 19:36:13,481 - Next index: 36
+2026-02-02 19:36:13,481 - Next index: 37
+2026-02-02 19:36:13,482 - Next index: 38
+2026-02-02 19:36:13,482 - Next index: 39
+2026-02-02 19:36:13,482 - Next index: 40
+2026-02-02 19:36:13,482 - Next index: 41
+2026-02-02 19:36:13,483 - Next index: 42
+2026-02-02 19:36:13,483 - Next index: 43
+2026-02-02 19:36:13,483 - Next index: 44
+2026-02-02 19:36:13,484 - Next index: 45
+2026-02-02 19:36:13,484 - Next index: 46
+2026-02-02 19:36:13,484 - Next index: 47
+2026-02-02 19:36:13,484 - Next index: 48
+2026-02-02 19:36:13,485 - Next index: 49
+2026-02-02 19:36:13,485 - Next index: 50
+2026-02-02 19:36:13,485 - Next index: 51
+2026-02-02 19:36:13,485 - Next index: 52
+2026-02-02 19:36:13,486 - Next index: 53
+2026-02-02 19:36:13,486 - Next index: 54
+2026-02-02 19:36:13,486 - Next index: 55
+2026-02-02 19:36:13,487 - Next index: 56
+2026-02-02 19:36:13,487 - Next index: 57
+2026-02-02 19:36:13,487 - Next index: 58
+2026-02-02 19:36:13,490 - Flushed buffer
+2026-02-02 19:36:13,490 - Stopped session
+2026-02-02 19:36:13,492 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
+2026-02-02 19:36:13,538 - Length of bara dataframe: 24359
+2026-02-02 19:36:13,586 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
+2026-02-02 19:36:13,586 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
+2026-02-02 19:36:13,595 - No elevation found for well_id EHF-XA3S
+2026-02-02 19:36:13,596 - Length of bara dataframe: 4018
+2026-02-02 19:36:13,698 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
+2026-02-02 19:36:13,712 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
+2026-02-02 19:36:13,716 - Length of bara dataframe: 289
+2026-02-02 19:36:13,717 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
+2026-02-02 19:36:13,718 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
+2026-02-02 19:36:13,730 - Length of bara dataframe: 4498
+2026-02-02 19:36:13,739 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
+2026-02-02 19:36:13,740 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
+2026-02-02 19:36:13,746 - Length of bara dataframe: 1119
+2026-02-02 19:36:13,748 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
+2026-02-02 19:36:13,749 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
+2026-02-02 19:36:13,792 - Length of bara dataframe: 23320
+2026-02-02 19:36:13,838 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
+2026-02-02 19:36:13,840 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
+2026-02-02 19:36:13,851 - Length of bara dataframe: 4176
+2026-02-02 19:36:13,859 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
+2026-02-02 19:36:13,860 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
+2026-02-02 19:36:13,933 - Length of bara dataframe: 40000
+2026-02-02 19:36:14,013 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
+2026-02-02 19:36:14,014 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
+2026-02-02 19:36:14,057 - Length of bara dataframe: 22828
+2026-02-02 19:36:14,102 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
+2026-02-02 19:36:14,103 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
+2026-02-02 19:36:14,117 - Length of bara dataframe: 5742
+2026-02-02 19:36:14,128 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
+2026-02-02 19:36:14,129 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
+2026-02-02 19:36:14,132 - Length of bara dataframe: 289
+2026-02-02 19:36:14,133 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
+2026-02-02 19:36:14,134 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
+2026-02-02 19:36:14,158 - Length of bara dataframe: 12211
+2026-02-02 19:36:14,278 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
+2026-02-02 19:36:14,282 - 22809
+
+2026-02-02 21:31:22,314 - ----------
+
+Logging ON for subdaily_processing_RawToGround.py
+2026-02-02 21:31:22,325 - EER-1_2025_0525_1031.csv
+2026-02-02 21:31:23,019 - 0.1
+2026-02-02 21:31:23,020 - Nothing to cut off front end.
+2026-02-02 21:31:23,020 - Cutoff backend.
+2026-02-02 21:31:23,311 - EET-1_2025_0525_1031.csv
+2026-02-02 21:31:24,011 - 0.5
+2026-02-02 21:31:24,012 - Nothing to cut off front end.
+2026-02-02 21:31:24,012 - Cutoff backend.
+2026-02-02 21:31:24,403 - EET-2_2025_0525_1031.csv
+2026-02-02 21:31:25,087 - 0.5
+2026-02-02 21:31:25,088 - Nothing to cut off front end.
+2026-02-02 21:31:25,088 - Cutoff backend.
+2026-02-02 21:31:25,339 - EHR-1_2025_0525_1031.csv
+2026-02-02 21:31:26,023 - 0.01
+2026-02-02 21:31:26,024 - cutoff front end.
+2026-02-02 21:31:26,024 - Cutoff backend.
+2026-02-02 21:31:26,275 - EHT-XA5S_2025_0525_1031.csv
+2026-02-02 21:31:26,967 - 0.1
+2026-02-02 21:31:26,967 - Nothing to cut off front end.
+2026-02-02 21:31:26,968 - Cutoff backend.
+2026-02-02 21:31:27,221 - EWR-1_2025_0525_1031.csv
+2026-02-02 21:31:27,903 - 0.1
+2026-02-02 21:31:27,903 - Nothing to cut off front end.
+2026-02-02 21:31:27,904 - Cutoff backend.
+2026-02-02 21:31:28,273 - EWT-1_2025_0526_1031.csv
+2026-02-02 21:31:28,948 - 0.5
+2026-02-02 21:31:28,948 - Nothing to cut off front end.
+2026-02-02 21:31:28,949 - Cutoff backend.
+2026-02-02 21:31:29,198 - EWT-2_2025_0624_1031.csv
+2026-02-02 21:31:29,761 - 0.5
+2026-02-02 21:31:29,762 - cutoff front end.
+2026-02-02 21:31:29,763 - Cutoff backend.
+2026-02-02 21:31:30,041 - KEF-1_2025_0526_1101.csv
+2026-02-02 21:31:30,748 - 0.5
+2026-02-02 21:31:30,749 - Nothing to cut off front end.
+2026-02-02 21:31:30,749 - Nothing to cut off back end.
+2026-02-02 21:31:30,997 - KER-1_2025_0526_1101.csv
+2026-02-02 21:31:31,693 - 1.0
+2026-02-02 21:31:31,693 - cutoff front end.
+2026-02-02 21:31:31,694 - Cutoff backend.
+2026-02-02 21:31:31,923 - KER-2_2025_0624_1101.csv
+2026-02-02 21:31:32,493 - 0.5
+2026-02-02 21:31:32,494 - Nothing to cut off front end.
+2026-02-02 21:31:32,494 - Nothing to cut off back end.
+2026-02-02 21:31:32,888 - KET-1_2025_0526_1101.csv
+2026-02-02 21:31:33,601 - 0.5
+2026-02-02 21:31:33,601 - Nothing to cut off front end.
+2026-02-02 21:31:33,602 - Nothing to cut off back end.
+2026-02-02 21:31:33,854 - KHF-1_2025_0526_0624.csv
+2026-02-02 21:31:34,003 - 0.5
+2026-02-02 21:31:34,004 - Nothing to cut off front end.
+2026-02-02 21:31:34,004 - Nothing to cut off back end.
+2026-02-02 21:31:34,190 - KHF-1_2025_0624_1101.csv
+2026-02-02 21:31:34,779 - 0.5
+2026-02-02 21:31:34,779 - cutoff front end.
+2026-02-02 21:31:34,779 - Nothing to cut off back end.
+2026-02-02 21:31:35,108 - KHR-1_2025_0526_0624.csv
+2026-02-02 21:31:35,257 - 0.5
+2026-02-02 21:31:35,257 - Nothing to cut off front end.
+2026-02-02 21:31:35,258 - Cutoff backend.
+2026-02-02 21:31:35,442 - KHR-1_2025_0624_1101.csv
+2026-02-02 21:31:36,034 - 0.5
+2026-02-02 21:31:36,034 - cutoff front end.
+2026-02-02 21:31:36,034 - Nothing to cut off back end.
+2026-02-02 21:31:36,390 - KHT-XE5S_2025_0526_1101.csv
+2026-02-02 21:31:37,085 - 0.5
+2026-02-02 21:31:37,086 - Nothing to cut off front end.
+2026-02-02 21:31:37,086 - Nothing to cut off back end.
+2026-02-02 21:31:37,461 - KWR-1_2025_0526_1105.csv
+2026-02-02 21:31:38,163 - WARNING: more/less than one row for KWR-1 in cut_logger_data() after filtering start/endtimes. If in debug mode, dataframe printed innext line. If >1 entry, which oneto use? Check datestamped logger .csv. EXIT.
+2026-02-02 21:31:38,163 - Empty DataFrame
+Columns: [logger_no, serial_no, well_id, start, end, temp_threshold, notes, Unnamed: 7, Unnamed: 8, Unnamed: 9]
+Index: []
+2026-02-02 21:31:38,680 - GDAL_DATA found in environment.
+2026-02-02 21:31:38,680 - PROJ_DATA found in environment.
+2026-02-02 21:31:38,681 - GDAL_DATA found in environment.
+2026-02-02 21:31:38,681 - PROJ_DATA found in environment.
+2026-02-02 21:31:38,681 - Got coordinate system
+2026-02-02 21:31:38,681 - Got coordinate system
+2026-02-02 21:31:38,681 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 21:31:38,681 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 21:31:38,681 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 21:31:38,681 - Next index: 0
+2026-02-02 21:31:38,681 - Next index: 1
+2026-02-02 21:31:38,682 - Next index: 2
+2026-02-02 21:31:38,682 - Next index: 3
+2026-02-02 21:31:38,682 - Next index: 4
+2026-02-02 21:31:38,682 - Next index: 5
+2026-02-02 21:31:38,682 - Next index: 6
+2026-02-02 21:31:38,682 - Next index: 7
+2026-02-02 21:31:38,682 - Next index: 8
+2026-02-02 21:31:38,682 - Next index: 9
+2026-02-02 21:31:38,682 - Next index: 10
+2026-02-02 21:31:38,683 - Next index: 11
+2026-02-02 21:31:38,683 - Next index: 12
+2026-02-02 21:31:38,683 - Next index: 13
+2026-02-02 21:31:38,683 - Next index: 14
+2026-02-02 21:31:38,683 - Next index: 15
+2026-02-02 21:31:38,683 - Next index: 16
+2026-02-02 21:31:38,683 - Next index: 17
+2026-02-02 21:31:38,683 - Next index: 18
+2026-02-02 21:31:38,683 - Next index: 19
+2026-02-02 21:31:38,683 - Next index: 20
+2026-02-02 21:31:38,683 - Next index: 21
+2026-02-02 21:31:38,683 - Next index: 22
+2026-02-02 21:31:38,683 - Next index: 23
+2026-02-02 21:31:38,683 - Next index: 24
+2026-02-02 21:31:38,683 - Next index: 25
+2026-02-02 21:31:38,684 - Next index: 26
+2026-02-02 21:31:38,684 - Next index: 27
+2026-02-02 21:31:38,684 - Next index: 28
+2026-02-02 21:31:38,684 - Next index: 29
+2026-02-02 21:31:38,684 - Next index: 30
+2026-02-02 21:31:38,684 - Next index: 31
+2026-02-02 21:31:38,684 - Next index: 32
+2026-02-02 21:31:38,684 - Next index: 33
+2026-02-02 21:31:38,684 - Next index: 34
+2026-02-02 21:31:38,684 - Next index: 35
+2026-02-02 21:31:38,684 - Next index: 36
+2026-02-02 21:31:38,684 - Next index: 37
+2026-02-02 21:31:38,684 - Next index: 38
+2026-02-02 21:31:38,684 - Next index: 39
+2026-02-02 21:31:38,684 - Next index: 40
+2026-02-02 21:31:38,684 - Next index: 41
+2026-02-02 21:31:38,685 - Next index: 42
+2026-02-02 21:31:38,685 - Next index: 43
+2026-02-02 21:31:38,685 - Next index: 44
+2026-02-02 21:31:38,685 - Next index: 45
+2026-02-02 21:31:38,685 - Next index: 46
+2026-02-02 21:31:38,685 - Next index: 47
+2026-02-02 21:31:38,685 - Next index: 48
+2026-02-02 21:31:38,685 - Next index: 49
+2026-02-02 21:31:38,685 - Next index: 50
+2026-02-02 21:31:38,685 - Next index: 51
+2026-02-02 21:31:38,685 - Next index: 52
+2026-02-02 21:31:38,685 - Next index: 53
+2026-02-02 21:31:38,685 - Next index: 54
+2026-02-02 21:31:38,685 - Next index: 55
+2026-02-02 21:31:38,685 - Next index: 56
+2026-02-02 21:31:38,685 - Next index: 57
+2026-02-02 21:31:38,686 - Next index: 58
+2026-02-02 21:31:38,687 - Flushed buffer
+2026-02-02 21:31:38,687 - Stopped session
+2026-02-02 21:31:39,197 - GDAL_DATA found in environment.
+2026-02-02 21:31:39,197 - PROJ_DATA found in environment.
+2026-02-02 21:31:39,198 - GDAL_DATA found in environment.
+2026-02-02 21:31:39,198 - PROJ_DATA found in environment.
+2026-02-02 21:31:39,198 - Got coordinate system
+2026-02-02 21:31:39,198 - Got coordinate system
+2026-02-02 21:31:39,198 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 21:31:39,198 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 21:31:39,198 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 21:31:39,198 - Next index: 0
+2026-02-02 21:31:39,198 - Next index: 1
+2026-02-02 21:31:39,199 - Next index: 2
+2026-02-02 21:31:39,199 - Next index: 3
+2026-02-02 21:31:39,199 - Next index: 4
+2026-02-02 21:31:39,199 - Next index: 5
+2026-02-02 21:31:39,199 - Next index: 6
+2026-02-02 21:31:39,199 - Next index: 7
+2026-02-02 21:31:39,199 - Next index: 8
+2026-02-02 21:31:39,199 - Next index: 9
+2026-02-02 21:31:39,199 - Next index: 10
+2026-02-02 21:31:39,200 - Next index: 11
+2026-02-02 21:31:39,200 - Next index: 12
+2026-02-02 21:31:39,200 - Next index: 13
+2026-02-02 21:31:39,200 - Next index: 14
+2026-02-02 21:31:39,200 - Next index: 15
+2026-02-02 21:31:39,200 - Next index: 16
+2026-02-02 21:31:39,200 - Next index: 17
+2026-02-02 21:31:39,200 - Next index: 18
+2026-02-02 21:31:39,200 - Next index: 19
+2026-02-02 21:31:39,200 - Next index: 20
+2026-02-02 21:31:39,200 - Next index: 21
+2026-02-02 21:31:39,200 - Next index: 22
+2026-02-02 21:31:39,200 - Next index: 23
+2026-02-02 21:31:39,200 - Next index: 24
+2026-02-02 21:31:39,200 - Next index: 25
+2026-02-02 21:31:39,201 - Next index: 26
+2026-02-02 21:31:39,201 - Next index: 27
+2026-02-02 21:31:39,201 - Next index: 28
+2026-02-02 21:31:39,201 - Next index: 29
+2026-02-02 21:31:39,201 - Next index: 30
+2026-02-02 21:31:39,201 - Next index: 31
+2026-02-02 21:31:39,201 - Next index: 32
+2026-02-02 21:31:39,201 - Next index: 33
+2026-02-02 21:31:39,201 - Next index: 34
+2026-02-02 21:31:39,201 - Next index: 35
+2026-02-02 21:31:39,201 - Next index: 36
+2026-02-02 21:31:39,201 - Next index: 37
+2026-02-02 21:31:39,201 - Next index: 38
+2026-02-02 21:31:39,201 - Next index: 39
+2026-02-02 21:31:39,201 - Next index: 40
+2026-02-02 21:31:39,201 - Next index: 41
+2026-02-02 21:31:39,202 - Next index: 42
+2026-02-02 21:31:39,202 - Next index: 43
+2026-02-02 21:31:39,202 - Next index: 44
+2026-02-02 21:31:39,202 - Next index: 45
+2026-02-02 21:31:39,202 - Next index: 46
+2026-02-02 21:31:39,202 - Next index: 47
+2026-02-02 21:31:39,202 - Next index: 48
+2026-02-02 21:31:39,202 - Next index: 49
+2026-02-02 21:31:39,202 - Next index: 50
+2026-02-02 21:31:39,202 - Next index: 51
+2026-02-02 21:31:39,202 - Next index: 52
+2026-02-02 21:31:39,202 - Next index: 53
+2026-02-02 21:31:39,202 - Next index: 54
+2026-02-02 21:31:39,202 - Next index: 55
+2026-02-02 21:31:39,202 - Next index: 56
+2026-02-02 21:31:39,202 - Next index: 57
+2026-02-02 21:31:39,203 - Next index: 58
+2026-02-02 21:31:39,204 - Flushed buffer
+2026-02-02 21:31:39,204 - Stopped session
+2026-02-02 21:31:39,205 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
+2026-02-02 21:31:39,248 - Length of bara dataframe: 24359
+2026-02-02 21:31:39,262 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
+2026-02-02 21:31:39,263 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
+2026-02-02 21:31:39,271 - No elevation found for well_id EHF-XA3S
+2026-02-02 21:31:39,271 - Length of bara dataframe: 4018
+2026-02-02 21:31:39,273 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
+2026-02-02 21:31:39,275 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
+2026-02-02 21:31:39,277 - Length of bara dataframe: 289
+2026-02-02 21:31:39,277 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
+2026-02-02 21:31:39,277 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
+2026-02-02 21:31:39,287 - Length of bara dataframe: 4498
+2026-02-02 21:31:39,289 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
+2026-02-02 21:31:39,289 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
+2026-02-02 21:31:39,292 - Length of bara dataframe: 1119
+2026-02-02 21:31:39,293 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
+2026-02-02 21:31:39,293 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
+2026-02-02 21:31:39,335 - Length of bara dataframe: 23320
+2026-02-02 21:31:39,467 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
+2026-02-02 21:31:39,468 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
+2026-02-02 21:31:39,478 - Length of bara dataframe: 4176
+2026-02-02 21:31:39,481 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
+2026-02-02 21:31:39,481 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
+2026-02-02 21:31:39,552 - Length of bara dataframe: 40000
+2026-02-02 21:31:39,576 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
+2026-02-02 21:31:39,576 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
+2026-02-02 21:31:39,617 - Length of bara dataframe: 22828
+2026-02-02 21:31:39,631 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
+2026-02-02 21:31:39,631 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
+2026-02-02 21:31:39,642 - Length of bara dataframe: 5742
+2026-02-02 21:31:39,646 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
+2026-02-02 21:31:39,647 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
+2026-02-02 21:31:39,648 - Length of bara dataframe: 289
+2026-02-02 21:31:39,648 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
+2026-02-02 21:31:39,649 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
+2026-02-02 21:31:39,671 - Length of bara dataframe: 12211
+2026-02-02 21:31:39,678 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
+2026-02-02 21:31:39,680 - 22809
+
+2026-02-02 21:32:57,295 - ----------
+
+Logging ON for subdaily_processing_RawToGround.py
+2026-02-02 21:32:57,302 - EER-1_2025_0525_1031.csv
+2026-02-02 21:32:57,996 - 0.1
+2026-02-02 21:32:57,996 - Nothing to cut off front end.
+2026-02-02 21:32:57,997 - Cutoff backend.
+2026-02-02 21:32:58,250 - EET-1_2025_0525_1031.csv
+2026-02-02 21:32:58,934 - 0.5
+2026-02-02 21:32:58,935 - Nothing to cut off front end.
+2026-02-02 21:32:58,935 - Cutoff backend.
+2026-02-02 21:32:59,178 - EET-2_2025_0525_1031.csv
+2026-02-02 21:32:59,853 - 0.5
+2026-02-02 21:32:59,853 - Nothing to cut off front end.
+2026-02-02 21:32:59,854 - Cutoff backend.
+2026-02-02 21:33:00,100 - EHR-1_2025_0525_1031.csv
+2026-02-02 21:33:00,781 - 0.01
+2026-02-02 21:33:00,781 - cutoff front end.
+2026-02-02 21:33:00,782 - Cutoff backend.
+2026-02-02 21:33:01,137 - EHT-XA5S_2025_0525_1031.csv
+2026-02-02 21:33:01,818 - 0.1
+2026-02-02 21:33:01,819 - Nothing to cut off front end.
+2026-02-02 21:33:01,819 - Cutoff backend.
+2026-02-02 21:33:02,085 - EWR-1_2025_0525_1031.csv
+2026-02-02 21:33:02,756 - 0.1
+2026-02-02 21:33:02,756 - Nothing to cut off front end.
+2026-02-02 21:33:02,757 - Cutoff backend.
+2026-02-02 21:33:03,013 - EWT-1_2025_0526_1031.csv
+2026-02-02 21:33:03,691 - 0.5
+2026-02-02 21:33:03,691 - Nothing to cut off front end.
+2026-02-02 21:33:03,692 - Cutoff backend.
+2026-02-02 21:33:03,936 - EWT-2_2025_0624_1031.csv
+2026-02-02 21:33:04,488 - 0.5
+2026-02-02 21:33:04,489 - cutoff front end.
+2026-02-02 21:33:04,489 - Cutoff backend.
+2026-02-02 21:33:04,767 - KEF-1_2025_0526_1101.csv
+2026-02-02 21:33:05,459 - 0.5
+2026-02-02 21:33:05,459 - Nothing to cut off front end.
+2026-02-02 21:33:05,460 - Nothing to cut off back end.
+2026-02-02 21:33:05,812 - KER-1_2025_0526_1101.csv
+2026-02-02 21:33:06,509 - 1.0
+2026-02-02 21:33:06,509 - cutoff front end.
+2026-02-02 21:33:06,510 - Cutoff backend.
+2026-02-02 21:33:06,738 - KER-2_2025_0624_1101.csv
+2026-02-02 21:33:07,308 - 0.5
+2026-02-02 21:33:07,309 - Nothing to cut off front end.
+2026-02-02 21:33:07,309 - Nothing to cut off back end.
+2026-02-02 21:33:07,589 - KET-1_2025_0526_1101.csv
+2026-02-02 21:33:08,284 - 0.5
+2026-02-02 21:33:08,285 - Nothing to cut off front end.
+2026-02-02 21:33:08,285 - Nothing to cut off back end.
+2026-02-02 21:33:08,535 - KHF-1_2025_0526_0624.csv
+2026-02-02 21:33:08,684 - 0.5
+2026-02-02 21:33:08,684 - Nothing to cut off front end.
+2026-02-02 21:33:08,684 - Nothing to cut off back end.
+2026-02-02 21:33:08,866 - KHF-1_2025_0624_1101.csv
+2026-02-02 21:33:09,436 - 0.5
+2026-02-02 21:33:09,437 - cutoff front end.
+2026-02-02 21:33:09,437 - Nothing to cut off back end.
+2026-02-02 21:33:09,874 - KHR-1_2025_0526_0624.csv
+2026-02-02 21:33:10,023 - 0.5
+2026-02-02 21:33:10,023 - Nothing to cut off front end.
+2026-02-02 21:33:10,023 - Cutoff backend.
+2026-02-02 21:33:10,208 - KHR-1_2025_0624_1101.csv
+2026-02-02 21:33:10,787 - 0.5
+2026-02-02 21:33:10,788 - cutoff front end.
+2026-02-02 21:33:10,788 - Nothing to cut off back end.
+2026-02-02 21:33:11,130 - KHT-XE5S_2025_0526_1101.csv
+2026-02-02 21:33:11,837 - 0.5
+2026-02-02 21:33:11,838 - Nothing to cut off front end.
+2026-02-02 21:33:11,838 - Nothing to cut off back end.
+2026-02-02 21:33:12,085 - KWR-1_2025_0526_1105.csv
+2026-02-02 21:33:12,784 - WARNING: more/less than one row for KWR-1 in cut_logger_data() after filtering start/endtimes. If in debug mode, dataframe printed innext line. If >1 entry, which oneto use? Check datestamped logger .csv. EXIT.
+2026-02-02 21:33:12,784 - Empty DataFrame
+Columns: [logger_no, serial_no, well_id, start, end, temp_threshold, notes, Unnamed: 7, Unnamed: 8, Unnamed: 9]
+Index: []
+2026-02-02 21:33:13,303 - GDAL_DATA found in environment.
+2026-02-02 21:33:13,303 - PROJ_DATA found in environment.
+2026-02-02 21:33:13,304 - GDAL_DATA found in environment.
+2026-02-02 21:33:13,304 - PROJ_DATA found in environment.
+2026-02-02 21:33:13,304 - Got coordinate system
+2026-02-02 21:33:13,304 - Got coordinate system
+2026-02-02 21:33:13,304 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 21:33:13,304 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 21:33:13,304 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 21:33:13,304 - Next index: 0
+2026-02-02 21:33:13,304 - Next index: 1
+2026-02-02 21:33:13,305 - Next index: 2
+2026-02-02 21:33:13,305 - Next index: 3
+2026-02-02 21:33:13,305 - Next index: 4
+2026-02-02 21:33:13,305 - Next index: 5
+2026-02-02 21:33:13,305 - Next index: 6
+2026-02-02 21:33:13,305 - Next index: 7
+2026-02-02 21:33:13,305 - Next index: 8
+2026-02-02 21:33:13,305 - Next index: 9
+2026-02-02 21:33:13,305 - Next index: 10
+2026-02-02 21:33:13,305 - Next index: 11
+2026-02-02 21:33:13,305 - Next index: 12
+2026-02-02 21:33:13,305 - Next index: 13
+2026-02-02 21:33:13,306 - Next index: 14
+2026-02-02 21:33:13,306 - Next index: 15
+2026-02-02 21:33:13,306 - Next index: 16
+2026-02-02 21:33:13,306 - Next index: 17
+2026-02-02 21:33:13,306 - Next index: 18
+2026-02-02 21:33:13,306 - Next index: 19
+2026-02-02 21:33:13,306 - Next index: 20
+2026-02-02 21:33:13,306 - Next index: 21
+2026-02-02 21:33:13,306 - Next index: 22
+2026-02-02 21:33:13,306 - Next index: 23
+2026-02-02 21:33:13,306 - Next index: 24
+2026-02-02 21:33:13,306 - Next index: 25
+2026-02-02 21:33:13,306 - Next index: 26
+2026-02-02 21:33:13,306 - Next index: 27
+2026-02-02 21:33:13,306 - Next index: 28
+2026-02-02 21:33:13,307 - Next index: 29
+2026-02-02 21:33:13,307 - Next index: 30
+2026-02-02 21:33:13,307 - Next index: 31
+2026-02-02 21:33:13,307 - Next index: 32
+2026-02-02 21:33:13,307 - Next index: 33
+2026-02-02 21:33:13,307 - Next index: 34
+2026-02-02 21:33:13,307 - Next index: 35
+2026-02-02 21:33:13,307 - Next index: 36
+2026-02-02 21:33:13,307 - Next index: 37
+2026-02-02 21:33:13,307 - Next index: 38
+2026-02-02 21:33:13,307 - Next index: 39
+2026-02-02 21:33:13,307 - Next index: 40
+2026-02-02 21:33:13,307 - Next index: 41
+2026-02-02 21:33:13,307 - Next index: 42
+2026-02-02 21:33:13,307 - Next index: 43
+2026-02-02 21:33:13,307 - Next index: 44
+2026-02-02 21:33:13,308 - Next index: 45
+2026-02-02 21:33:13,308 - Next index: 46
+2026-02-02 21:33:13,308 - Next index: 47
+2026-02-02 21:33:13,308 - Next index: 48
+2026-02-02 21:33:13,308 - Next index: 49
+2026-02-02 21:33:13,308 - Next index: 50
+2026-02-02 21:33:13,308 - Next index: 51
+2026-02-02 21:33:13,308 - Next index: 52
+2026-02-02 21:33:13,308 - Next index: 53
+2026-02-02 21:33:13,308 - Next index: 54
+2026-02-02 21:33:13,308 - Next index: 55
+2026-02-02 21:33:13,308 - Next index: 56
+2026-02-02 21:33:13,308 - Next index: 57
+2026-02-02 21:33:13,308 - Next index: 58
+2026-02-02 21:33:13,310 - Flushed buffer
+2026-02-02 21:33:13,310 - Stopped session
+2026-02-02 21:33:13,986 - GDAL_DATA found in environment.
+2026-02-02 21:33:13,986 - PROJ_DATA found in environment.
+2026-02-02 21:33:13,987 - GDAL_DATA found in environment.
+2026-02-02 21:33:13,987 - PROJ_DATA found in environment.
+2026-02-02 21:33:13,987 - Got coordinate system
+2026-02-02 21:33:13,987 - Got coordinate system
+2026-02-02 21:33:13,987 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 21:33:13,988 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 21:33:13,988 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 21:33:13,988 - Next index: 0
+2026-02-02 21:33:13,988 - Next index: 1
+2026-02-02 21:33:13,988 - Next index: 2
+2026-02-02 21:33:13,988 - Next index: 3
+2026-02-02 21:33:13,988 - Next index: 4
+2026-02-02 21:33:13,988 - Next index: 5
+2026-02-02 21:33:13,988 - Next index: 6
+2026-02-02 21:33:13,988 - Next index: 7
+2026-02-02 21:33:13,988 - Next index: 8
+2026-02-02 21:33:13,988 - Next index: 9
+2026-02-02 21:33:13,989 - Next index: 10
+2026-02-02 21:33:13,989 - Next index: 11
+2026-02-02 21:33:13,989 - Next index: 12
+2026-02-02 21:33:13,989 - Next index: 13
+2026-02-02 21:33:13,989 - Next index: 14
+2026-02-02 21:33:13,989 - Next index: 15
+2026-02-02 21:33:13,989 - Next index: 16
+2026-02-02 21:33:13,989 - Next index: 17
+2026-02-02 21:33:13,989 - Next index: 18
+2026-02-02 21:33:13,989 - Next index: 19
+2026-02-02 21:33:13,989 - Next index: 20
+2026-02-02 21:33:13,989 - Next index: 21
+2026-02-02 21:33:13,989 - Next index: 22
+2026-02-02 21:33:13,989 - Next index: 23
+2026-02-02 21:33:13,989 - Next index: 24
+2026-02-02 21:33:13,990 - Next index: 25
+2026-02-02 21:33:13,990 - Next index: 26
+2026-02-02 21:33:13,990 - Next index: 27
+2026-02-02 21:33:13,990 - Next index: 28
+2026-02-02 21:33:13,990 - Next index: 29
+2026-02-02 21:33:13,990 - Next index: 30
+2026-02-02 21:33:13,990 - Next index: 31
+2026-02-02 21:33:13,990 - Next index: 32
+2026-02-02 21:33:13,990 - Next index: 33
+2026-02-02 21:33:13,990 - Next index: 34
+2026-02-02 21:33:13,991 - Next index: 35
+2026-02-02 21:33:13,991 - Next index: 36
+2026-02-02 21:33:13,991 - Next index: 37
+2026-02-02 21:33:13,991 - Next index: 38
+2026-02-02 21:33:13,991 - Next index: 39
+2026-02-02 21:33:13,991 - Next index: 40
+2026-02-02 21:33:13,991 - Next index: 41
+2026-02-02 21:33:13,991 - Next index: 42
+2026-02-02 21:33:13,991 - Next index: 43
+2026-02-02 21:33:13,991 - Next index: 44
+2026-02-02 21:33:13,991 - Next index: 45
+2026-02-02 21:33:13,991 - Next index: 46
+2026-02-02 21:33:13,991 - Next index: 47
+2026-02-02 21:33:13,991 - Next index: 48
+2026-02-02 21:33:13,992 - Next index: 49
+2026-02-02 21:33:13,992 - Next index: 50
+2026-02-02 21:33:13,992 - Next index: 51
+2026-02-02 21:33:13,992 - Next index: 52
+2026-02-02 21:33:13,992 - Next index: 53
+2026-02-02 21:33:13,992 - Next index: 54
+2026-02-02 21:33:13,992 - Next index: 55
+2026-02-02 21:33:13,992 - Next index: 56
+2026-02-02 21:33:13,992 - Next index: 57
+2026-02-02 21:33:13,992 - Next index: 58
+2026-02-02 21:33:13,994 - Flushed buffer
+2026-02-02 21:33:13,994 - Stopped session
+2026-02-02 21:33:13,995 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
+2026-02-02 21:33:14,040 - Length of bara dataframe: 24359
+2026-02-02 21:33:14,055 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
+2026-02-02 21:33:14,056 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
+2026-02-02 21:33:14,064 - No elevation found for well_id EHF-XA3S
+2026-02-02 21:33:14,064 - Length of bara dataframe: 4018
+2026-02-02 21:33:14,067 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
+2026-02-02 21:33:14,069 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
+2026-02-02 21:33:14,071 - Length of bara dataframe: 289
+2026-02-02 21:33:14,071 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
+2026-02-02 21:33:14,072 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
+2026-02-02 21:33:14,081 - Length of bara dataframe: 4498
+2026-02-02 21:33:14,084 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
+2026-02-02 21:33:14,084 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
+2026-02-02 21:33:14,087 - Length of bara dataframe: 1119
+2026-02-02 21:33:14,088 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
+2026-02-02 21:33:14,088 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
+2026-02-02 21:33:14,130 - Length of bara dataframe: 23320
+2026-02-02 21:33:14,144 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
+2026-02-02 21:33:14,145 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
+2026-02-02 21:33:14,155 - Length of bara dataframe: 4176
+2026-02-02 21:33:14,158 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
+2026-02-02 21:33:14,158 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
+2026-02-02 21:33:14,230 - Length of bara dataframe: 40000
+2026-02-02 21:33:14,255 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
+2026-02-02 21:33:14,256 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
+2026-02-02 21:33:14,300 - Length of bara dataframe: 22828
+2026-02-02 21:33:14,422 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
+2026-02-02 21:33:14,423 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
+2026-02-02 21:33:14,435 - Length of bara dataframe: 5742
+2026-02-02 21:33:14,438 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
+2026-02-02 21:33:14,439 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
+2026-02-02 21:33:14,441 - Length of bara dataframe: 289
+2026-02-02 21:33:14,441 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
+2026-02-02 21:33:14,441 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
+2026-02-02 21:33:14,464 - Length of bara dataframe: 12211
+2026-02-02 21:33:14,472 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
+2026-02-02 21:33:14,473 - 22809
+
+2026-02-02 22:02:20,008 - ----------
+
+Logging ON for subdaily_processing_RawToGround.py
+2026-02-02 22:02:20,019 - EER-1_2025_0525_1031.csv
+2026-02-02 22:02:20,705 - 0.1
+2026-02-02 22:02:20,705 - Nothing to cut off front end.
+2026-02-02 22:02:20,706 - Cutoff backend.
+2026-02-02 22:02:20,978 - EET-1_2025_0525_1031.csv
+2026-02-02 22:02:21,658 - 0.5
+2026-02-02 22:02:21,658 - Nothing to cut off front end.
+2026-02-02 22:02:21,659 - Cutoff backend.
+2026-02-02 22:02:22,089 - EET-2_2025_0525_1031.csv
+2026-02-02 22:02:22,784 - 0.5
+2026-02-02 22:02:22,784 - Nothing to cut off front end.
+2026-02-02 22:02:22,785 - Cutoff backend.
+2026-02-02 22:02:23,051 - EHR-1_2025_0525_1031.csv
+2026-02-02 22:02:23,734 - 0.01
+2026-02-02 22:02:23,735 - cutoff front end.
+2026-02-02 22:02:23,735 - Cutoff backend.
+2026-02-02 22:02:23,993 - EHT-XA5S_2025_0525_1031.csv
+2026-02-02 22:02:24,683 - 0.1
+2026-02-02 22:02:24,684 - Nothing to cut off front end.
+2026-02-02 22:02:24,685 - Cutoff backend.
+2026-02-02 22:02:24,953 - EWR-1_2025_0525_1031.csv
+2026-02-02 22:02:25,666 - 0.1
+2026-02-02 22:02:25,667 - Nothing to cut off front end.
+2026-02-02 22:02:25,667 - Cutoff backend.
+2026-02-02 22:02:26,045 - EWT-1_2025_0526_1031.csv
+2026-02-02 22:02:26,735 - 0.5
+2026-02-02 22:02:26,736 - Nothing to cut off front end.
+2026-02-02 22:02:26,737 - Cutoff backend.
+2026-02-02 22:02:26,994 - EWT-2_2025_0624_1031.csv
+2026-02-02 22:02:27,551 - 0.5
+2026-02-02 22:02:27,552 - cutoff front end.
+2026-02-02 22:02:27,553 - Cutoff backend.
+2026-02-02 22:02:27,830 - KEF-1_2025_0526_1101.csv
+2026-02-02 22:02:28,522 - 0.5
+2026-02-02 22:02:28,522 - Nothing to cut off front end.
+2026-02-02 22:02:28,522 - Nothing to cut off back end.
+2026-02-02 22:02:28,768 - KER-1_2025_0526_1101.csv
+2026-02-02 22:02:29,470 - 1.0
+2026-02-02 22:02:29,471 - cutoff front end.
+2026-02-02 22:02:29,471 - Cutoff backend.
+2026-02-02 22:02:29,699 - KER-2_2025_0624_1101.csv
+2026-02-02 22:02:30,287 - 0.5
+2026-02-02 22:02:30,288 - Nothing to cut off front end.
+2026-02-02 22:02:30,288 - Nothing to cut off back end.
+2026-02-02 22:02:30,683 - KET-1_2025_0526_1101.csv
+2026-02-02 22:02:31,383 - 0.5
+2026-02-02 22:02:31,384 - Nothing to cut off front end.
+2026-02-02 22:02:31,384 - Nothing to cut off back end.
+2026-02-02 22:02:31,638 - KHF-1_2025_0526_0624.csv
+2026-02-02 22:02:31,790 - 0.5
+2026-02-02 22:02:31,790 - Nothing to cut off front end.
+2026-02-02 22:02:31,790 - Nothing to cut off back end.
+2026-02-02 22:02:31,980 - KHF-1_2025_0624_1101.csv
+2026-02-02 22:02:32,568 - 0.5
+2026-02-02 22:02:32,569 - cutoff front end.
+2026-02-02 22:02:32,569 - Nothing to cut off back end.
+2026-02-02 22:02:32,899 - KHR-1_2025_0526_0624.csv
+2026-02-02 22:02:33,049 - 0.5
+2026-02-02 22:02:33,049 - Nothing to cut off front end.
+2026-02-02 22:02:33,050 - Cutoff backend.
+2026-02-02 22:02:33,233 - KHR-1_2025_0624_1101.csv
+2026-02-02 22:02:33,821 - 0.5
+2026-02-02 22:02:33,822 - cutoff front end.
+2026-02-02 22:02:33,822 - Nothing to cut off back end.
+2026-02-02 22:02:34,161 - KHT-XE5S_2025_0526_1101.csv
+2026-02-02 22:02:34,872 - 0.5
+2026-02-02 22:02:34,873 - Nothing to cut off front end.
+2026-02-02 22:02:34,873 - Nothing to cut off back end.
+2026-02-02 22:02:35,243 - KWR-1_2025_0526_1105.csv
+2026-02-02 22:02:35,932 - WARNING: more/less than one row for KWR-1 in cut_logger_data() after filtering start/endtimes. If in debug mode, dataframe printed innext line. If >1 entry, which oneto use? Check datestamped logger .csv. EXIT.
+2026-02-02 22:02:35,932 - Empty DataFrame
+Columns: [logger_no, serial_no, well_id, start, end, temp_threshold, notes, Unnamed: 7, Unnamed: 8, Unnamed: 9]
+Index: []
+2026-02-02 22:02:36,446 - GDAL_DATA found in environment.
+2026-02-02 22:02:36,446 - PROJ_DATA found in environment.
+2026-02-02 22:02:36,448 - GDAL_DATA found in environment.
+2026-02-02 22:02:36,448 - PROJ_DATA found in environment.
+2026-02-02 22:02:36,448 - Got coordinate system
+2026-02-02 22:02:36,448 - Got coordinate system
+2026-02-02 22:02:36,448 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 22:02:36,448 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 22:02:36,448 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 22:02:36,448 - Next index: 0
+2026-02-02 22:02:36,448 - Next index: 1
+2026-02-02 22:02:36,449 - Next index: 2
+2026-02-02 22:02:36,449 - Next index: 3
+2026-02-02 22:02:36,449 - Next index: 4
+2026-02-02 22:02:36,449 - Next index: 5
+2026-02-02 22:02:36,449 - Next index: 6
+2026-02-02 22:02:36,449 - Next index: 7
+2026-02-02 22:02:36,449 - Next index: 8
+2026-02-02 22:02:36,449 - Next index: 9
+2026-02-02 22:02:36,449 - Next index: 10
+2026-02-02 22:02:36,449 - Next index: 11
+2026-02-02 22:02:36,449 - Next index: 12
+2026-02-02 22:02:36,449 - Next index: 13
+2026-02-02 22:02:36,449 - Next index: 14
+2026-02-02 22:02:36,450 - Next index: 15
+2026-02-02 22:02:36,450 - Next index: 16
+2026-02-02 22:02:36,450 - Next index: 17
+2026-02-02 22:02:36,450 - Next index: 18
+2026-02-02 22:02:36,450 - Next index: 19
+2026-02-02 22:02:36,450 - Next index: 20
+2026-02-02 22:02:36,450 - Next index: 21
+2026-02-02 22:02:36,450 - Next index: 22
+2026-02-02 22:02:36,450 - Next index: 23
+2026-02-02 22:02:36,450 - Next index: 24
+2026-02-02 22:02:36,450 - Next index: 25
+2026-02-02 22:02:36,450 - Next index: 26
+2026-02-02 22:02:36,450 - Next index: 27
+2026-02-02 22:02:36,450 - Next index: 28
+2026-02-02 22:02:36,450 - Next index: 29
+2026-02-02 22:02:36,451 - Next index: 30
+2026-02-02 22:02:36,451 - Next index: 31
+2026-02-02 22:02:36,451 - Next index: 32
+2026-02-02 22:02:36,451 - Next index: 33
+2026-02-02 22:02:36,451 - Next index: 34
+2026-02-02 22:02:36,451 - Next index: 35
+2026-02-02 22:02:36,451 - Next index: 36
+2026-02-02 22:02:36,451 - Next index: 37
+2026-02-02 22:02:36,451 - Next index: 38
+2026-02-02 22:02:36,451 - Next index: 39
+2026-02-02 22:02:36,451 - Next index: 40
+2026-02-02 22:02:36,451 - Next index: 41
+2026-02-02 22:02:36,451 - Next index: 42
+2026-02-02 22:02:36,451 - Next index: 43
+2026-02-02 22:02:36,451 - Next index: 44
+2026-02-02 22:02:36,451 - Next index: 45
+2026-02-02 22:02:36,452 - Next index: 46
+2026-02-02 22:02:36,452 - Next index: 47
+2026-02-02 22:02:36,452 - Next index: 48
+2026-02-02 22:02:36,452 - Next index: 49
+2026-02-02 22:02:36,452 - Next index: 50
+2026-02-02 22:02:36,452 - Next index: 51
+2026-02-02 22:02:36,452 - Next index: 52
+2026-02-02 22:02:36,452 - Next index: 53
+2026-02-02 22:02:36,452 - Next index: 54
+2026-02-02 22:02:36,452 - Next index: 55
+2026-02-02 22:02:36,452 - Next index: 56
+2026-02-02 22:02:36,452 - Next index: 57
+2026-02-02 22:02:36,452 - Next index: 58
+2026-02-02 22:02:36,454 - Flushed buffer
+2026-02-02 22:02:36,454 - Stopped session
+2026-02-02 22:02:36,969 - GDAL_DATA found in environment.
+2026-02-02 22:02:36,969 - PROJ_DATA found in environment.
+2026-02-02 22:02:36,970 - GDAL_DATA found in environment.
+2026-02-02 22:02:36,970 - PROJ_DATA found in environment.
+2026-02-02 22:02:36,970 - Got coordinate system
+2026-02-02 22:02:36,970 - Got coordinate system
+2026-02-02 22:02:36,970 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 22:02:36,970 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 22:02:36,970 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 22:02:36,970 - Next index: 0
+2026-02-02 22:02:36,970 - Next index: 1
+2026-02-02 22:02:36,970 - Next index: 2
+2026-02-02 22:02:36,970 - Next index: 3
+2026-02-02 22:02:36,970 - Next index: 4
+2026-02-02 22:02:36,971 - Next index: 5
+2026-02-02 22:02:36,971 - Next index: 6
+2026-02-02 22:02:36,971 - Next index: 7
+2026-02-02 22:02:36,971 - Next index: 8
+2026-02-02 22:02:36,971 - Next index: 9
+2026-02-02 22:02:36,971 - Next index: 10
+2026-02-02 22:02:36,971 - Next index: 11
+2026-02-02 22:02:36,971 - Next index: 12
+2026-02-02 22:02:36,971 - Next index: 13
+2026-02-02 22:02:36,971 - Next index: 14
+2026-02-02 22:02:36,971 - Next index: 15
+2026-02-02 22:02:36,971 - Next index: 16
+2026-02-02 22:02:36,971 - Next index: 17
+2026-02-02 22:02:36,971 - Next index: 18
+2026-02-02 22:02:36,971 - Next index: 19
+2026-02-02 22:02:36,972 - Next index: 20
+2026-02-02 22:02:36,972 - Next index: 21
+2026-02-02 22:02:36,972 - Next index: 22
+2026-02-02 22:02:36,972 - Next index: 23
+2026-02-02 22:02:36,972 - Next index: 24
+2026-02-02 22:02:36,972 - Next index: 25
+2026-02-02 22:02:36,972 - Next index: 26
+2026-02-02 22:02:36,972 - Next index: 27
+2026-02-02 22:02:36,972 - Next index: 28
+2026-02-02 22:02:36,972 - Next index: 29
+2026-02-02 22:02:36,972 - Next index: 30
+2026-02-02 22:02:36,972 - Next index: 31
+2026-02-02 22:02:36,972 - Next index: 32
+2026-02-02 22:02:36,972 - Next index: 33
+2026-02-02 22:02:36,972 - Next index: 34
+2026-02-02 22:02:36,972 - Next index: 35
+2026-02-02 22:02:36,973 - Next index: 36
+2026-02-02 22:02:36,973 - Next index: 37
+2026-02-02 22:02:36,973 - Next index: 38
+2026-02-02 22:02:36,973 - Next index: 39
+2026-02-02 22:02:36,973 - Next index: 40
+2026-02-02 22:02:36,973 - Next index: 41
+2026-02-02 22:02:36,973 - Next index: 42
+2026-02-02 22:02:36,973 - Next index: 43
+2026-02-02 22:02:36,973 - Next index: 44
+2026-02-02 22:02:36,973 - Next index: 45
+2026-02-02 22:02:36,973 - Next index: 46
+2026-02-02 22:02:36,973 - Next index: 47
+2026-02-02 22:02:36,973 - Next index: 48
+2026-02-02 22:02:36,973 - Next index: 49
+2026-02-02 22:02:36,973 - Next index: 50
+2026-02-02 22:02:36,973 - Next index: 51
+2026-02-02 22:02:36,974 - Next index: 52
+2026-02-02 22:02:36,974 - Next index: 53
+2026-02-02 22:02:36,974 - Next index: 54
+2026-02-02 22:02:36,974 - Next index: 55
+2026-02-02 22:02:36,974 - Next index: 56
+2026-02-02 22:02:36,974 - Next index: 57
+2026-02-02 22:02:36,974 - Next index: 58
+2026-02-02 22:02:36,975 - Flushed buffer
+2026-02-02 22:02:36,975 - Stopped session
+2026-02-02 22:02:36,977 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
+2026-02-02 22:02:37,020 - Length of bara dataframe: 24359
+2026-02-02 22:02:37,034 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
+2026-02-02 22:02:37,034 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
+2026-02-02 22:02:37,042 - No elevation found for well_id EHF-XA3S
+2026-02-02 22:02:37,043 - Length of bara dataframe: 4018
+2026-02-02 22:02:37,045 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
+2026-02-02 22:02:37,047 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
+2026-02-02 22:02:37,049 - Length of bara dataframe: 289
+2026-02-02 22:02:37,050 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
+2026-02-02 22:02:37,050 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
+2026-02-02 22:02:37,060 - Length of bara dataframe: 4498
+2026-02-02 22:02:37,063 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
+2026-02-02 22:02:37,063 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
+2026-02-02 22:02:37,066 - Length of bara dataframe: 1119
+2026-02-02 22:02:37,066 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
+2026-02-02 22:02:37,067 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
+2026-02-02 22:02:37,109 - Length of bara dataframe: 23320
+2026-02-02 22:02:37,123 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
+2026-02-02 22:02:37,123 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
+2026-02-02 22:02:37,133 - Length of bara dataframe: 4176
+2026-02-02 22:02:37,136 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
+2026-02-02 22:02:37,136 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
+2026-02-02 22:02:37,205 - Length of bara dataframe: 40000
+2026-02-02 22:02:37,329 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
+2026-02-02 22:02:37,330 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
+2026-02-02 22:02:37,372 - Length of bara dataframe: 22828
+2026-02-02 22:02:37,386 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
+2026-02-02 22:02:37,386 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
+2026-02-02 22:02:37,398 - Length of bara dataframe: 5742
+2026-02-02 22:02:37,401 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
+2026-02-02 22:02:37,402 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
+2026-02-02 22:02:37,403 - Length of bara dataframe: 289
+2026-02-02 22:02:37,404 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
+2026-02-02 22:02:37,404 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
+2026-02-02 22:02:37,426 - Length of bara dataframe: 12211
+2026-02-02 22:02:37,433 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
+2026-02-02 22:02:37,435 - 22809
+
+2026-02-02 22:03:26,887 - ----------
+
+Logging ON for subdaily_processing_RawToGround.py
+2026-02-02 22:03:26,894 - EER-1_2025_0525_1031.csv
+2026-02-02 22:03:27,594 - 0.1
+2026-02-02 22:03:27,594 - Nothing to cut off front end.
+2026-02-02 22:03:27,595 - Cutoff backend.
+2026-02-02 22:03:27,957 - EET-1_2025_0525_1031.csv
+2026-02-02 22:03:28,633 - 0.5
+2026-02-02 22:03:28,634 - Nothing to cut off front end.
+2026-02-02 22:03:28,635 - Cutoff backend.
+2026-02-02 22:03:28,888 - EET-2_2025_0525_1031.csv
+2026-02-02 22:03:29,569 - 0.5
+2026-02-02 22:03:29,569 - Nothing to cut off front end.
+2026-02-02 22:03:29,570 - Cutoff backend.
+2026-02-02 22:03:29,816 - EHR-1_2025_0525_1031.csv
+2026-02-02 22:03:30,498 - 0.01
+2026-02-02 22:03:30,499 - cutoff front end.
+2026-02-02 22:03:30,499 - Cutoff backend.
+2026-02-02 22:03:30,747 - EHT-XA5S_2025_0525_1031.csv
+2026-02-02 22:03:31,429 - 0.1
+2026-02-02 22:03:31,430 - Nothing to cut off front end.
+2026-02-02 22:03:31,430 - Cutoff backend.
+2026-02-02 22:03:31,795 - EWR-1_2025_0525_1031.csv
+2026-02-02 22:03:32,470 - 0.1
+2026-02-02 22:03:32,470 - Nothing to cut off front end.
+2026-02-02 22:03:32,471 - Cutoff backend.
+2026-02-02 22:03:32,741 - EWT-1_2025_0526_1031.csv
+2026-02-02 22:03:33,414 - 0.5
+2026-02-02 22:03:33,414 - Nothing to cut off front end.
+2026-02-02 22:03:33,415 - Cutoff backend.
+2026-02-02 22:03:33,666 - EWT-2_2025_0624_1031.csv
+2026-02-02 22:03:34,215 - 0.5
+2026-02-02 22:03:34,216 - cutoff front end.
+2026-02-02 22:03:34,216 - Cutoff backend.
+2026-02-02 22:03:34,493 - KEF-1_2025_0526_1101.csv
+2026-02-02 22:03:35,185 - 0.5
+2026-02-02 22:03:35,185 - Nothing to cut off front end.
+2026-02-02 22:03:35,185 - Nothing to cut off back end.
+2026-02-02 22:03:35,542 - KER-1_2025_0526_1101.csv
+2026-02-02 22:03:36,232 - 1.0
+2026-02-02 22:03:36,232 - cutoff front end.
+2026-02-02 22:03:36,233 - Cutoff backend.
+2026-02-02 22:03:36,464 - KER-2_2025_0624_1101.csv
+2026-02-02 22:03:37,053 - 0.5
+2026-02-02 22:03:37,054 - Nothing to cut off front end.
+2026-02-02 22:03:37,054 - Nothing to cut off back end.
+2026-02-02 22:03:37,333 - KET-1_2025_0526_1101.csv
+2026-02-02 22:03:38,028 - 0.5
+2026-02-02 22:03:38,029 - Nothing to cut off front end.
+2026-02-02 22:03:38,029 - Nothing to cut off back end.
+2026-02-02 22:03:38,279 - KHF-1_2025_0526_0624.csv
+2026-02-02 22:03:38,429 - 0.5
+2026-02-02 22:03:38,430 - Nothing to cut off front end.
+2026-02-02 22:03:38,430 - Nothing to cut off back end.
+2026-02-02 22:03:38,615 - KHF-1_2025_0624_1101.csv
+2026-02-02 22:03:39,186 - 0.5
+2026-02-02 22:03:39,187 - cutoff front end.
+2026-02-02 22:03:39,187 - Nothing to cut off back end.
+2026-02-02 22:03:39,520 - KHR-1_2025_0526_0624.csv
+2026-02-02 22:03:39,670 - 0.5
+2026-02-02 22:03:39,670 - Nothing to cut off front end.
+2026-02-02 22:03:39,671 - Cutoff backend.
+2026-02-02 22:03:39,854 - KHR-1_2025_0624_1101.csv
+2026-02-02 22:03:40,440 - 0.5
+2026-02-02 22:03:40,440 - cutoff front end.
+2026-02-02 22:03:40,440 - Nothing to cut off back end.
+2026-02-02 22:03:40,895 - KHT-XE5S_2025_0526_1101.csv
+2026-02-02 22:03:41,585 - 0.5
+2026-02-02 22:03:41,585 - Nothing to cut off front end.
+2026-02-02 22:03:41,586 - Nothing to cut off back end.
+2026-02-02 22:03:41,832 - KWR-1_2025_0526_1105.csv
+2026-02-02 22:03:42,646 - WARNING: more/less than one row for KWR-1 in cut_logger_data() after filtering start/endtimes. If in debug mode, dataframe printed innext line. If >1 entry, which oneto use? Check datestamped logger .csv. EXIT.
+2026-02-02 22:03:42,646 - Empty DataFrame
+Columns: [logger_no, serial_no, well_id, start, end, temp_threshold, notes, Unnamed: 7, Unnamed: 8, Unnamed: 9]
+Index: []
+2026-02-02 22:03:43,169 - GDAL_DATA found in environment.
+2026-02-02 22:03:43,170 - PROJ_DATA found in environment.
+2026-02-02 22:03:43,171 - GDAL_DATA found in environment.
+2026-02-02 22:03:43,171 - PROJ_DATA found in environment.
+2026-02-02 22:03:43,171 - Got coordinate system
+2026-02-02 22:03:43,171 - Got coordinate system
+2026-02-02 22:03:43,171 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 22:03:43,171 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 22:03:43,171 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 22:03:43,171 - Next index: 0
+2026-02-02 22:03:43,171 - Next index: 1
+2026-02-02 22:03:43,172 - Next index: 2
+2026-02-02 22:03:43,172 - Next index: 3
+2026-02-02 22:03:43,172 - Next index: 4
+2026-02-02 22:03:43,172 - Next index: 5
+2026-02-02 22:03:43,172 - Next index: 6
+2026-02-02 22:03:43,172 - Next index: 7
+2026-02-02 22:03:43,172 - Next index: 8
+2026-02-02 22:03:43,172 - Next index: 9
+2026-02-02 22:03:43,172 - Next index: 10
+2026-02-02 22:03:43,172 - Next index: 11
+2026-02-02 22:03:43,173 - Next index: 12
+2026-02-02 22:03:43,173 - Next index: 13
+2026-02-02 22:03:43,173 - Next index: 14
+2026-02-02 22:03:43,173 - Next index: 15
+2026-02-02 22:03:43,173 - Next index: 16
+2026-02-02 22:03:43,173 - Next index: 17
+2026-02-02 22:03:43,173 - Next index: 18
+2026-02-02 22:03:43,173 - Next index: 19
+2026-02-02 22:03:43,173 - Next index: 20
+2026-02-02 22:03:43,173 - Next index: 21
+2026-02-02 22:03:43,173 - Next index: 22
+2026-02-02 22:03:43,173 - Next index: 23
+2026-02-02 22:03:43,173 - Next index: 24
+2026-02-02 22:03:43,173 - Next index: 25
+2026-02-02 22:03:43,173 - Next index: 26
+2026-02-02 22:03:43,174 - Next index: 27
+2026-02-02 22:03:43,174 - Next index: 28
+2026-02-02 22:03:43,174 - Next index: 29
+2026-02-02 22:03:43,174 - Next index: 30
+2026-02-02 22:03:43,174 - Next index: 31
+2026-02-02 22:03:43,174 - Next index: 32
+2026-02-02 22:03:43,174 - Next index: 33
+2026-02-02 22:03:43,174 - Next index: 34
+2026-02-02 22:03:43,174 - Next index: 35
+2026-02-02 22:03:43,174 - Next index: 36
+2026-02-02 22:03:43,174 - Next index: 37
+2026-02-02 22:03:43,174 - Next index: 38
+2026-02-02 22:03:43,174 - Next index: 39
+2026-02-02 22:03:43,174 - Next index: 40
+2026-02-02 22:03:43,174 - Next index: 41
+2026-02-02 22:03:43,174 - Next index: 42
+2026-02-02 22:03:43,175 - Next index: 43
+2026-02-02 22:03:43,175 - Next index: 44
+2026-02-02 22:03:43,175 - Next index: 45
+2026-02-02 22:03:43,175 - Next index: 46
+2026-02-02 22:03:43,175 - Next index: 47
+2026-02-02 22:03:43,175 - Next index: 48
+2026-02-02 22:03:43,175 - Next index: 49
+2026-02-02 22:03:43,175 - Next index: 50
+2026-02-02 22:03:43,175 - Next index: 51
+2026-02-02 22:03:43,175 - Next index: 52
+2026-02-02 22:03:43,175 - Next index: 53
+2026-02-02 22:03:43,175 - Next index: 54
+2026-02-02 22:03:43,175 - Next index: 55
+2026-02-02 22:03:43,175 - Next index: 56
+2026-02-02 22:03:43,175 - Next index: 57
+2026-02-02 22:03:43,176 - Next index: 58
+2026-02-02 22:03:43,177 - Flushed buffer
+2026-02-02 22:03:43,177 - Stopped session
+2026-02-02 22:03:43,692 - GDAL_DATA found in environment.
+2026-02-02 22:03:43,692 - PROJ_DATA found in environment.
+2026-02-02 22:03:43,693 - GDAL_DATA found in environment.
+2026-02-02 22:03:43,693 - PROJ_DATA found in environment.
+2026-02-02 22:03:43,693 - Got coordinate system
+2026-02-02 22:03:43,693 - Got coordinate system
+2026-02-02 22:03:43,694 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 22:03:43,694 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 22:03:43,694 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 22:03:43,694 - Next index: 0
+2026-02-02 22:03:43,694 - Next index: 1
+2026-02-02 22:03:43,694 - Next index: 2
+2026-02-02 22:03:43,694 - Next index: 3
+2026-02-02 22:03:43,694 - Next index: 4
+2026-02-02 22:03:43,694 - Next index: 5
+2026-02-02 22:03:43,694 - Next index: 6
+2026-02-02 22:03:43,694 - Next index: 7
+2026-02-02 22:03:43,694 - Next index: 8
+2026-02-02 22:03:43,694 - Next index: 9
+2026-02-02 22:03:43,695 - Next index: 10
+2026-02-02 22:03:43,695 - Next index: 11
+2026-02-02 22:03:43,695 - Next index: 12
+2026-02-02 22:03:43,695 - Next index: 13
+2026-02-02 22:03:43,695 - Next index: 14
+2026-02-02 22:03:43,695 - Next index: 15
+2026-02-02 22:03:43,695 - Next index: 16
+2026-02-02 22:03:43,695 - Next index: 17
+2026-02-02 22:03:43,695 - Next index: 18
+2026-02-02 22:03:43,695 - Next index: 19
+2026-02-02 22:03:43,695 - Next index: 20
+2026-02-02 22:03:43,695 - Next index: 21
+2026-02-02 22:03:43,695 - Next index: 22
+2026-02-02 22:03:43,695 - Next index: 23
+2026-02-02 22:03:43,695 - Next index: 24
+2026-02-02 22:03:43,696 - Next index: 25
+2026-02-02 22:03:43,696 - Next index: 26
+2026-02-02 22:03:43,696 - Next index: 27
+2026-02-02 22:03:43,696 - Next index: 28
+2026-02-02 22:03:43,696 - Next index: 29
+2026-02-02 22:03:43,696 - Next index: 30
+2026-02-02 22:03:43,696 - Next index: 31
+2026-02-02 22:03:43,696 - Next index: 32
+2026-02-02 22:03:43,696 - Next index: 33
+2026-02-02 22:03:43,696 - Next index: 34
+2026-02-02 22:03:43,696 - Next index: 35
+2026-02-02 22:03:43,696 - Next index: 36
+2026-02-02 22:03:43,696 - Next index: 37
+2026-02-02 22:03:43,696 - Next index: 38
+2026-02-02 22:03:43,696 - Next index: 39
+2026-02-02 22:03:43,696 - Next index: 40
+2026-02-02 22:03:43,697 - Next index: 41
+2026-02-02 22:03:43,697 - Next index: 42
+2026-02-02 22:03:43,697 - Next index: 43
+2026-02-02 22:03:43,697 - Next index: 44
+2026-02-02 22:03:43,697 - Next index: 45
+2026-02-02 22:03:43,697 - Next index: 46
+2026-02-02 22:03:43,697 - Next index: 47
+2026-02-02 22:03:43,697 - Next index: 48
+2026-02-02 22:03:43,697 - Next index: 49
+2026-02-02 22:03:43,697 - Next index: 50
+2026-02-02 22:03:43,697 - Next index: 51
+2026-02-02 22:03:43,697 - Next index: 52
+2026-02-02 22:03:43,697 - Next index: 53
+2026-02-02 22:03:43,697 - Next index: 54
+2026-02-02 22:03:43,697 - Next index: 55
+2026-02-02 22:03:43,697 - Next index: 56
+2026-02-02 22:03:43,698 - Next index: 57
+2026-02-02 22:03:43,698 - Next index: 58
+2026-02-02 22:03:43,699 - Flushed buffer
+2026-02-02 22:03:43,699 - Stopped session
+2026-02-02 22:03:43,700 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
+2026-02-02 22:03:43,743 - Length of bara dataframe: 24359
+2026-02-02 22:03:43,864 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
+2026-02-02 22:03:43,865 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
+2026-02-02 22:03:43,873 - No elevation found for well_id EHF-XA3S
+2026-02-02 22:03:43,874 - Length of bara dataframe: 4018
+2026-02-02 22:03:43,876 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
+2026-02-02 22:03:43,878 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
+2026-02-02 22:03:43,880 - Length of bara dataframe: 289
+2026-02-02 22:03:43,880 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
+2026-02-02 22:03:43,881 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
+2026-02-02 22:03:43,890 - Length of bara dataframe: 4498
+2026-02-02 22:03:43,893 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
+2026-02-02 22:03:43,893 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
+2026-02-02 22:03:43,896 - Length of bara dataframe: 1119
+2026-02-02 22:03:43,897 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
+2026-02-02 22:03:43,897 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
+2026-02-02 22:03:43,938 - Length of bara dataframe: 23320
+2026-02-02 22:03:43,952 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
+2026-02-02 22:03:43,952 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
+2026-02-02 22:03:43,961 - Length of bara dataframe: 4176
+2026-02-02 22:03:43,964 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
+2026-02-02 22:03:43,964 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
+2026-02-02 22:03:44,033 - Length of bara dataframe: 40000
+2026-02-02 22:03:44,056 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
+2026-02-02 22:03:44,057 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
+2026-02-02 22:03:44,097 - Length of bara dataframe: 22828
+2026-02-02 22:03:44,111 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
+2026-02-02 22:03:44,112 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
+2026-02-02 22:03:44,123 - Length of bara dataframe: 5742
+2026-02-02 22:03:44,126 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
+2026-02-02 22:03:44,126 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
+2026-02-02 22:03:44,128 - Length of bara dataframe: 289
+2026-02-02 22:03:44,128 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
+2026-02-02 22:03:44,128 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
+2026-02-02 22:03:44,151 - Length of bara dataframe: 12211
+2026-02-02 22:03:44,158 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
+2026-02-02 22:03:44,160 - 22809
+
+2026-02-02 22:03:52,591 - ALERT: Number of deployments in convert_relativeToGround is: 17
+
+2026-02-02 22:03:52,774 - Removing 30 rows where 'ground_to_water_cm' is NaN.
+2026-02-02 22:03:52,774 - Affected well_id + deployment groups:
+well_id  deployment
+  EET-1           1
+  EWT-2           1
+  KER-1           1
+2026-02-02 22:03:52,776 - No deployments found where 'DateTime_biweek' has only one unique value.
+2026-02-02 22:03:52,780 - CASE not before.empty for EER-1 and 1
+2026-02-02 22:03:52,782 - CASE not before.empty for EET-1 and 1
+2026-02-02 22:03:52,785 - CASE not before.empty for EHR-1 and 1
+2026-02-02 22:03:52,789 - CASE not before.empty for EWR-1 and 1
+2026-02-02 22:06:56,743 - ----------
+
+Logging ON for subdaily_processing_RawToGround.py
+2026-02-02 22:06:56,750 - EER-1_2025_0525_1031.csv
+2026-02-02 22:06:57,433 - 0.1
+2026-02-02 22:06:57,433 - Nothing to cut off front end.
+2026-02-02 22:06:57,433 - Cutoff backend.
+2026-02-02 22:06:57,686 - EET-1_2025_0525_1031.csv
+2026-02-02 22:06:58,373 - 0.5
+2026-02-02 22:06:58,373 - Nothing to cut off front end.
+2026-02-02 22:06:58,374 - Cutoff backend.
+2026-02-02 22:06:58,620 - EET-2_2025_0525_1031.csv
+2026-02-02 22:06:59,315 - 0.5
+2026-02-02 22:06:59,315 - Nothing to cut off front end.
+2026-02-02 22:06:59,316 - Cutoff backend.
+2026-02-02 22:06:59,678 - EHR-1_2025_0525_1031.csv
+2026-02-02 22:07:00,359 - 0.01
+2026-02-02 22:07:00,360 - cutoff front end.
+2026-02-02 22:07:00,360 - Cutoff backend.
+2026-02-02 22:07:00,606 - EHT-XA5S_2025_0525_1031.csv
+2026-02-02 22:07:01,286 - 0.1
+2026-02-02 22:07:01,286 - Nothing to cut off front end.
+2026-02-02 22:07:01,287 - Cutoff backend.
+2026-02-02 22:07:01,537 - EWR-1_2025_0525_1031.csv
+2026-02-02 22:07:02,217 - 0.1
+2026-02-02 22:07:02,218 - Nothing to cut off front end.
+2026-02-02 22:07:02,218 - Cutoff backend.
+2026-02-02 22:07:02,481 - EWT-1_2025_0526_1031.csv
+2026-02-02 22:07:03,180 - 0.5
+2026-02-02 22:07:03,180 - Nothing to cut off front end.
+2026-02-02 22:07:03,181 - Cutoff backend.
+2026-02-02 22:07:03,547 - EWT-2_2025_0624_1031.csv
+2026-02-02 22:07:04,109 - 0.5
+2026-02-02 22:07:04,110 - cutoff front end.
+2026-02-02 22:07:04,110 - Cutoff backend.
+2026-02-02 22:07:04,390 - KEF-1_2025_0526_1101.csv
+2026-02-02 22:07:05,096 - 0.5
+2026-02-02 22:07:05,096 - Nothing to cut off front end.
+2026-02-02 22:07:05,097 - Nothing to cut off back end.
+2026-02-02 22:07:05,343 - KER-1_2025_0526_1101.csv
+2026-02-02 22:07:06,036 - 1.0
+2026-02-02 22:07:06,037 - cutoff front end.
+2026-02-02 22:07:06,038 - Cutoff backend.
+2026-02-02 22:07:06,262 - KER-2_2025_0624_1101.csv
+2026-02-02 22:07:06,838 - 0.5
+2026-02-02 22:07:06,839 - Nothing to cut off front end.
+2026-02-02 22:07:06,839 - Nothing to cut off back end.
+2026-02-02 22:07:07,118 - KET-1_2025_0526_1101.csv
+2026-02-02 22:07:07,813 - 0.5
+2026-02-02 22:07:07,813 - Nothing to cut off front end.
+2026-02-02 22:07:07,814 - Nothing to cut off back end.
+2026-02-02 22:07:08,176 - KHF-1_2025_0526_0624.csv
+2026-02-02 22:07:08,328 - 0.5
+2026-02-02 22:07:08,328 - Nothing to cut off front end.
+2026-02-02 22:07:08,328 - Nothing to cut off back end.
+2026-02-02 22:07:08,514 - KHF-1_2025_0624_1101.csv
+2026-02-02 22:07:09,090 - 0.5
+2026-02-02 22:07:09,091 - cutoff front end.
+2026-02-02 22:07:09,091 - Nothing to cut off back end.
+2026-02-02 22:07:09,425 - KHR-1_2025_0526_0624.csv
+2026-02-02 22:07:09,576 - 0.5
+2026-02-02 22:07:09,577 - Nothing to cut off front end.
+2026-02-02 22:07:09,577 - Cutoff backend.
+2026-02-02 22:07:09,759 - KHR-1_2025_0624_1101.csv
+2026-02-02 22:07:10,335 - 0.5
+2026-02-02 22:07:10,336 - cutoff front end.
+2026-02-02 22:07:10,336 - Nothing to cut off back end.
+2026-02-02 22:07:10,669 - KHT-XE5S_2025_0526_1101.csv
+2026-02-02 22:07:11,362 - 0.5
+2026-02-02 22:07:11,362 - Nothing to cut off front end.
+2026-02-02 22:07:11,362 - Nothing to cut off back end.
+2026-02-02 22:07:11,610 - KWR-1_2025_0526_1101.csv
+2026-02-02 22:07:12,305 - 0.5
+2026-02-02 22:07:12,305 - Nothing to cut off front end.
+2026-02-02 22:07:12,306 - Cutoff backend.
+2026-02-02 22:07:12,539 - KWT-1_2025_0618_0624.csv
+2026-02-02 22:07:12,598 - 0.5
+2026-02-02 22:07:12,599 - cutoff front end.
+2026-02-02 22:07:12,599 - Cutoff backend.
+2026-02-02 22:07:12,865 - KWT-1_2025_0624_1101.csv
+2026-02-02 22:07:13,437 - 0.5
+2026-02-02 22:07:13,438 - cutoff front end.
+2026-02-02 22:07:13,438 - Nothing to cut off back end.
+2026-02-02 22:07:13,770 - KWT-2_2025_0618_0624.csv
+2026-02-02 22:07:13,828 - 0.5
+2026-02-02 22:07:13,829 - cutoff front end.
+2026-02-02 22:07:13,829 - Cutoff backend.
+2026-02-02 22:07:13,985 - KWT-2_2025_0624_1101.csv
+2026-02-02 22:07:14,566 - 0.5
+2026-02-02 22:07:14,566 - cutoff front end.
+2026-02-02 22:07:14,567 - Nothing to cut off back end.
+2026-02-02 22:07:15,503 - GDAL_DATA found in environment.
+2026-02-02 22:07:15,503 - PROJ_DATA found in environment.
+2026-02-02 22:07:15,504 - GDAL_DATA found in environment.
+2026-02-02 22:07:15,504 - PROJ_DATA found in environment.
+2026-02-02 22:07:15,504 - Got coordinate system
+2026-02-02 22:07:15,504 - Got coordinate system
+2026-02-02 22:07:15,504 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 22:07:15,504 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 22:07:15,504 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 22:07:15,504 - Next index: 0
+2026-02-02 22:07:15,504 - Next index: 1
+2026-02-02 22:07:15,505 - Next index: 2
+2026-02-02 22:07:15,505 - Next index: 3
+2026-02-02 22:07:15,505 - Next index: 4
+2026-02-02 22:07:15,505 - Next index: 5
+2026-02-02 22:07:15,505 - Next index: 6
+2026-02-02 22:07:15,505 - Next index: 7
+2026-02-02 22:07:15,505 - Next index: 8
+2026-02-02 22:07:15,505 - Next index: 9
+2026-02-02 22:07:15,505 - Next index: 10
+2026-02-02 22:07:15,505 - Next index: 11
+2026-02-02 22:07:15,506 - Next index: 12
+2026-02-02 22:07:15,506 - Next index: 13
+2026-02-02 22:07:15,506 - Next index: 14
+2026-02-02 22:07:15,506 - Next index: 15
+2026-02-02 22:07:15,506 - Next index: 16
+2026-02-02 22:07:15,506 - Next index: 17
+2026-02-02 22:07:15,506 - Next index: 18
+2026-02-02 22:07:15,506 - Next index: 19
+2026-02-02 22:07:15,506 - Next index: 20
+2026-02-02 22:07:15,506 - Next index: 21
+2026-02-02 22:07:15,506 - Next index: 22
+2026-02-02 22:07:15,506 - Next index: 23
+2026-02-02 22:07:15,506 - Next index: 24
+2026-02-02 22:07:15,506 - Next index: 25
+2026-02-02 22:07:15,507 - Next index: 26
+2026-02-02 22:07:15,507 - Next index: 27
+2026-02-02 22:07:15,507 - Next index: 28
+2026-02-02 22:07:15,507 - Next index: 29
+2026-02-02 22:07:15,507 - Next index: 30
+2026-02-02 22:07:15,507 - Next index: 31
+2026-02-02 22:07:15,507 - Next index: 32
+2026-02-02 22:07:15,507 - Next index: 33
+2026-02-02 22:07:15,507 - Next index: 34
+2026-02-02 22:07:15,507 - Next index: 35
+2026-02-02 22:07:15,507 - Next index: 36
+2026-02-02 22:07:15,507 - Next index: 37
+2026-02-02 22:07:15,507 - Next index: 38
+2026-02-02 22:07:15,507 - Next index: 39
+2026-02-02 22:07:15,507 - Next index: 40
+2026-02-02 22:07:15,507 - Next index: 41
+2026-02-02 22:07:15,508 - Next index: 42
+2026-02-02 22:07:15,508 - Next index: 43
+2026-02-02 22:07:15,508 - Next index: 44
+2026-02-02 22:07:15,508 - Next index: 45
+2026-02-02 22:07:15,508 - Next index: 46
+2026-02-02 22:07:15,508 - Next index: 47
+2026-02-02 22:07:15,508 - Next index: 48
+2026-02-02 22:07:15,508 - Next index: 49
+2026-02-02 22:07:15,508 - Next index: 50
+2026-02-02 22:07:15,508 - Next index: 51
+2026-02-02 22:07:15,508 - Next index: 52
+2026-02-02 22:07:15,508 - Next index: 53
+2026-02-02 22:07:15,508 - Next index: 54
+2026-02-02 22:07:15,508 - Next index: 55
+2026-02-02 22:07:15,508 - Next index: 56
+2026-02-02 22:07:15,509 - Next index: 57
+2026-02-02 22:07:15,509 - Next index: 58
+2026-02-02 22:07:15,510 - Flushed buffer
+2026-02-02 22:07:15,510 - Stopped session
+2026-02-02 22:07:16,203 - GDAL_DATA found in environment.
+2026-02-02 22:07:16,203 - PROJ_DATA found in environment.
+2026-02-02 22:07:16,204 - GDAL_DATA found in environment.
+2026-02-02 22:07:16,204 - PROJ_DATA found in environment.
+2026-02-02 22:07:16,204 - Got coordinate system
+2026-02-02 22:07:16,204 - Got coordinate system
+2026-02-02 22:07:16,204 - Matched. confidence=100, c_code=b'6417', c_name=b'EPSG'
+2026-02-02 22:07:16,204 - OLC_FASTSETNEXTBYINDEX: 1
+2026-02-02 22:07:16,204 - OLC_FASTFEATURECOUNT: 1
+2026-02-02 22:07:16,204 - Next index: 0
+2026-02-02 22:07:16,204 - Next index: 1
+2026-02-02 22:07:16,204 - Next index: 2
+2026-02-02 22:07:16,204 - Next index: 3
+2026-02-02 22:07:16,205 - Next index: 4
+2026-02-02 22:07:16,205 - Next index: 5
+2026-02-02 22:07:16,205 - Next index: 6
+2026-02-02 22:07:16,205 - Next index: 7
+2026-02-02 22:07:16,205 - Next index: 8
+2026-02-02 22:07:16,205 - Next index: 9
+2026-02-02 22:07:16,205 - Next index: 10
+2026-02-02 22:07:16,205 - Next index: 11
+2026-02-02 22:07:16,205 - Next index: 12
+2026-02-02 22:07:16,205 - Next index: 13
+2026-02-02 22:07:16,205 - Next index: 14
+2026-02-02 22:07:16,205 - Next index: 15
+2026-02-02 22:07:16,205 - Next index: 16
+2026-02-02 22:07:16,205 - Next index: 17
+2026-02-02 22:07:16,206 - Next index: 18
+2026-02-02 22:07:16,206 - Next index: 19
+2026-02-02 22:07:16,206 - Next index: 20
+2026-02-02 22:07:16,206 - Next index: 21
+2026-02-02 22:07:16,206 - Next index: 22
+2026-02-02 22:07:16,206 - Next index: 23
+2026-02-02 22:07:16,206 - Next index: 24
+2026-02-02 22:07:16,206 - Next index: 25
+2026-02-02 22:07:16,206 - Next index: 26
+2026-02-02 22:07:16,206 - Next index: 27
+2026-02-02 22:07:16,206 - Next index: 28
+2026-02-02 22:07:16,206 - Next index: 29
+2026-02-02 22:07:16,206 - Next index: 30
+2026-02-02 22:07:16,206 - Next index: 31
+2026-02-02 22:07:16,206 - Next index: 32
+2026-02-02 22:07:16,206 - Next index: 33
+2026-02-02 22:07:16,207 - Next index: 34
+2026-02-02 22:07:16,207 - Next index: 35
+2026-02-02 22:07:16,207 - Next index: 36
+2026-02-02 22:07:16,207 - Next index: 37
+2026-02-02 22:07:16,207 - Next index: 38
+2026-02-02 22:07:16,207 - Next index: 39
+2026-02-02 22:07:16,207 - Next index: 40
+2026-02-02 22:07:16,207 - Next index: 41
+2026-02-02 22:07:16,207 - Next index: 42
+2026-02-02 22:07:16,207 - Next index: 43
+2026-02-02 22:07:16,207 - Next index: 44
+2026-02-02 22:07:16,207 - Next index: 45
+2026-02-02 22:07:16,207 - Next index: 46
+2026-02-02 22:07:16,207 - Next index: 47
+2026-02-02 22:07:16,207 - Next index: 48
+2026-02-02 22:07:16,208 - Next index: 49
+2026-02-02 22:07:16,208 - Next index: 50
+2026-02-02 22:07:16,208 - Next index: 51
+2026-02-02 22:07:16,208 - Next index: 52
+2026-02-02 22:07:16,208 - Next index: 53
+2026-02-02 22:07:16,208 - Next index: 54
+2026-02-02 22:07:16,208 - Next index: 55
+2026-02-02 22:07:16,208 - Next index: 56
+2026-02-02 22:07:16,208 - Next index: 57
+2026-02-02 22:07:16,208 - Next index: 58
+2026-02-02 22:07:16,210 - Flushed buffer
+2026-02-02 22:07:16,210 - Stopped session
+2026-02-02 22:07:16,211 - Fetching baro data from Baro_KWT-1_2021_0605_1121.csv
+2026-02-02 22:07:16,255 - Length of bara dataframe: 24359
+2026-02-02 22:07:16,269 - min/max of new baro file time:2021-06-05 14:00:00 to 2021-11-21 17:40:00
+2026-02-02 22:07:16,270 - Fetching baro data from Baro_EHF-XA3S_2018_0727_0824.csv
+2026-02-02 22:07:16,278 - No elevation found for well_id EHF-XA3S
+2026-02-02 22:07:16,278 - Length of bara dataframe: 4018
+2026-02-02 22:07:16,280 - min/max of new baro file time:2018-07-27 15:00:00 to 2018-08-24 12:30:00
+2026-02-02 22:07:16,283 - Fetching baro data from Baro_KEF-1_2018_0824_0826.csv
+2026-02-02 22:07:16,284 - Length of bara dataframe: 289
+2026-02-02 22:07:16,285 - min/max of new baro file time:2018-08-24 14:30:00 to 2018-08-26 14:30:00
+2026-02-02 22:07:16,285 - Fetching baro data from Baro_KWT-1_2024_0713_0713.csv
+2026-02-02 22:07:16,294 - Length of bara dataframe: 4498
+2026-02-02 22:07:16,297 - min/max of new baro file time:2024-07-13 10:00:00 to 2024-07-13 22:29:30
+2026-02-02 22:07:16,297 - Fetching baro data from Baro_EET-1_2018_0717_0725.csv
+2026-02-02 22:07:16,300 - Length of bara dataframe: 1119
+2026-02-02 22:07:16,301 - min/max of new baro file time:2018-07-17 17:00:00 to 2018-07-25 11:20:00
+2026-02-02 22:07:16,301 - Fetching baro data from Baro_KWT-1_2019_0602_1111.csv
+2026-02-02 22:07:16,341 - Length of bara dataframe: 23320
+2026-02-02 22:07:16,355 - min/max of new baro file time:2019-06-02 12:00:00 to 2019-11-11 10:30:00
+2026-02-02 22:07:16,356 - Fetching baro data from Baro_EHR-1_2024_0712_0712.csv
+2026-02-02 22:07:16,364 - Length of bara dataframe: 4176
+2026-02-02 22:07:16,366 - min/max of new baro file time:2024-07-12 10:00:00 to 2024-07-12 21:35:50
+2026-02-02 22:07:16,367 - Fetching baro data from Baro_LWT-1_2024_0714_0718.csv
+2026-02-02 22:07:16,435 - Length of bara dataframe: 40000
+2026-02-02 22:07:16,566 - min/max of new baro file time:2024-07-14 08:30:00 to 2024-07-18 23:36:30
+2026-02-02 22:07:16,567 - Fetching baro data from Baro_EWT-1_2025_0526_1031.csv
+2026-02-02 22:07:16,608 - Length of bara dataframe: 22828
+2026-02-02 22:07:16,622 - min/max of new baro file time:2025-05-26 04:40:00 to 2025-10-31 17:10:00
+2026-02-02 22:07:16,623 - Fetching baro data from Baro_LHT-1_2024_0602_0712.csv
+2026-02-02 22:07:16,634 - Length of bara dataframe: 5742
+2026-02-02 22:07:16,638 - min/max of new baro file time:2024-06-02 12:30:00 to 2024-07-12 09:20:00
+2026-02-02 22:07:16,639 - Fetching baro data from Baro_KEF-1_2018_0725_0727.csv
+2026-02-02 22:07:16,640 - Length of bara dataframe: 289
+2026-02-02 22:07:16,640 - min/max of new baro file time:2018-07-25 12:30:00 to 2018-07-27 12:30:00
+2026-02-02 22:07:16,641 - Fetching baro data from Baro_KWT-1_2018_0826_1119.csv
+2026-02-02 22:07:16,664 - Length of bara dataframe: 12211
+2026-02-02 22:07:16,671 - min/max of new baro file time:2018-08-26 18:00:00 to 2018-11-19 13:00:00
+2026-02-02 22:07:16,672 - 22809
+
+2026-02-02 22:07:25,151 - ALERT: Number of deployments in convert_relativeToGround is: 21
+
+2026-02-02 22:07:25,351 - Removing 30 rows where 'ground_to_water_cm' is NaN.
+2026-02-02 22:07:25,351 - Affected well_id + deployment groups:
+well_id  deployment
+  EET-1           1
+  EWT-2           1
+  KER-1           1
+2026-02-02 22:07:25,353 - No deployments found where 'DateTime_biweek' has only one unique value.
+2026-02-02 22:07:25,357 - CASE not before.empty for EER-1 and 1
+2026-02-02 22:07:25,359 - CASE not before.empty for EET-1 and 1
+2026-02-02 22:07:25,363 - CASE not before.empty for EHR-1 and 1
+2026-02-02 22:07:25,366 - CASE not before.empty for EWR-1 and 1
