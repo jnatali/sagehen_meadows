@@ -1,3 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+PROCESS RAW INFRARED RADIOMETER FIELD DATA SCRIPT
+Created on 10 December 2025
+@author: kara-leah smittle, jennifer natali
+
+Plots corrected canopy temperature data.
+
+For details on how the data and processing steps for this script
+were defined, see github issue:
+    https://github.com/jnatali/sagehen_meadows/issues/19
+
+"""
+
 import os
 import glob
 import pandas as pd
