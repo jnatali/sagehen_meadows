@@ -66,9 +66,9 @@ if list_of_files:
 
     #Filter out the row that has no associated well-id 
     bad_well_name = "Patch 1 m of well w/o bare ground"
-    existing_df = existing_df[existing_df['well_id'] != bad_well_name]
+    existing_df = existing_df[(existing_df['well_id'] == 'EHT-XA5S') | (existing_df['well_id'] == 'KHF-1')]
 
-    print(f"Removed entry: '{bad_well_name}'")
+    #print(f"Removed entry: '{bad_well_name}'")
 
     # CONVERT TIME 
     # We strictly tell Python the format is Month/Day/Year Hour:Minute
@@ -150,7 +150,7 @@ if list_of_files:
         plt.gcf().autofmt_xdate() # Auto-rotates dates to fit better
 
         # -- SAVE AS EPS --
-        plot_filename = "Data validation.eps"
+        plot_filename = "Data validation for KF-1 and EHT-XA5A.eps"
         save_path = os.path.join(OUTPUT_DIR, plot_filename)
         plt.savefig(save_path, format='eps', bbox_inches='tight')
         plt.close()
