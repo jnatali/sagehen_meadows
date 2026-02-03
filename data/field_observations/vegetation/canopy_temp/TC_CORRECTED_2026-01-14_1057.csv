@@ -580,9 +580,9 @@ Time,Target,Sensor Body,source_file,well_id,target_type,percent_cover,Notes:,cor
 10/19/2025 11:19,17.674,20.1103,Data Log(37).txt,EER-1,thatch,3.0,,,
 10/19/2025 11:19,19.4109,20.1168,Data Log(37).txt,EER-1,thatch,3.0,,,
 10/19/2025 11:20,17.8226,20.1352,Data Log(37).txt,EER-1,thatch,3.0,,,
-10/19/2025 11:23,12.5165,19.6111,Data Log(36).txt,EWR-1,plant,,4.0,370.5023843939417,-357.9858843939417
-10/19/2025 11:23,12.94,19.4639,Data Log(36).txt,EWR-1,plant,,4.0,371.4565977328905,-358.5165977328905
-10/19/2025 11:24,12.1754,19.3783,Data Log(36).txt,EWR-1,plant,,4.0,369.7338314543539,-357.55843145435387
+10/19/2025 11:23,12.5165,19.6111,Data Log(36).txt,EWR-1,plant,,4.0: target Temp and 370.5023843939417 corrected,,-357.9858843939417
+10/19/2025 11:23,12.94,19.4639,Data Log(36).txt,EWR-1,plant,,4.0 target Temp and 371.4565977328905 corrected,,-358.5165977328905
+10/19/2025 11:24,12.1754,19.3783,Data Log(36).txt,EWR-1,plant,,4.0 :target Temp and 369.7338314543539corrected,,-357.55843145435387
 10/19/2025 11:36,16.0875,17.7903,Data Log(35).txt,EWT-2,plant,0.0,no leaves,,
 10/19/2025 11:36,16.2083,17.7274,Data Log(35).txt,EWT-2,plant,0.0,no leaves,,
 10/19/2025 11:37,16.8761,17.6762,Data Log(35).txt,EWT-2,plant,0.0,no leaves,,
