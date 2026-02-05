@@ -61,7 +61,7 @@ debug_gtw = True
 ### GLOBAL VARIABLES
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
 density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
-baro_standard_elevation = 1933.7 # in meters? TODO: is this Tower #1 elev?
+baro_standard_elevation = 1933.7 # Saghen Weather Tower #1 elev in meters
 
 ### SETUP DIRECTORY + FILE NAMES
 project_dir = '/VOLUMES/SANDISK_SSD_G40/GoogleDrive/GitHub/sagehen_meadows/'
@@ -188,6 +188,16 @@ def get_well_elevations(gw_df):
     # Merge elevation data into groundwater dataframe
     gw_df = gw_df.merge(well_elevations, on='well_id', how='left')
     
+    # Validate results before returning: check for missing well_ids
+    mask_nan = gw_df["elevation_m"].isna()
+    if mask_nan.any():
+        missing_wells = gw_df.loc[mask_nan, "well_id"].tolist()
+        missing_wells = np.unique(missing_wells)
+        logging.debug(
+            "Check well GPS Values! 'elevation_m' has Nan values for wells:"
+            + "\n\n".join(map(str, missing_wells))
+        )
+        
     return gw_df
 
 ## Plot subdaily logger dataframe
@@ -1169,13 +1179,23 @@ def compensate_baro(gw_df):
     #     plot_baro_compare(baro_df_solinst, baro_df_dendra)
     
     # Normalize the baro data based on both sources using an offset
-    baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
+    #baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
     # Quick hack to make 2025 work
     #baro_df = normalize_baro(baro_df_dendra, baro_df_solinst)
+    baro_df = baro_df_solinst.drop(columns="elevation_m")
     
+    # Validate baro data
+    mask_nan = baro_df["baro_Pressure_kPa"].isna()
+    if mask_nan.any():
+        missing_datetimes = baro_df.loc[mask_nan, "DateTime"].tolist()
+        logging.debug(
+            "NaN values found in 'baro_Pressure_kPa' at  following datetimes:"
+            + "\n\n".join(map(str, missing_datetimes))
+        )
+        
     # # If helpful, plot and compare the baro data sources after normalized
-    if debug_baro:
-         plot_baro_compare(baro_df_solinst, baro_df_dendra)
+    # if debug_baro:
+    #      plot_baro_compare(baro_df_solinst, baro_df_dendra)
     
     ## 2. Offset the baro pressure (convered to m) from the gw level
     
@@ -1184,12 +1204,24 @@ def compensate_baro(gw_df):
     # Merge baro and gw data
     gw_df = gw_df.merge(baro_df, on="DateTime", how="left")  # Merge baro data
     
+    # After join, there's an NaN for gw_df["baro_Pressure_kPa"]
+    
     # Adjust pressure based on elevation difference
     gw_df = adjust_pressure_elevation(gw_df, gw_df['elevation_m'], baro_standard_elevation)
     
     # 2b. Convert baro pressure to meters and compensate the raw groundwater level reading
-    gw_df['baro_Level_m'] = convert_baro_kPa_meters(gw_df['baro_Pressure_kPa']) #TODO: why does this return NaNs when gw_df has none when passing in?
+    gw_df['baro_Level_m'] = convert_baro_kPa_meters(gw_df['baro_Pressure_kPa']) 
+    #TODO: why does this return NaNs when gw_df has none when passing in?
     
+    # Validate baro_Level_m results
+    mask_nan = gw_df["baro_Level_m"].isna()
+    if mask_nan.any():
+        missing_datetimes = gw_df.loc[mask_nan, "DateTime"].tolist()
+        logging.debug(
+            "NaN values found in 'baro_Level_m' at  following datetimes:"
+            + "\n\n".join(map(str, missing_datetimes))
+        )
+        
     # Compensate by subtracting air pressure from the raw groundwater reading
     gw_df['compensated_Level_m'] = gw_df["raw_Level_m"] - gw_df["baro_Level_m"] 
         
@@ -1199,7 +1231,7 @@ def compensate_baro(gw_df):
 def calculate_sensor_level(merged_df):
     """
     Determines the depth of the sensor relative to the ground surface
-    based on the manual gw measurement and water pressure head from the sensor
+    based on the manual gw measurement and pressure head level from the sensor
     """
     # Dictionary of sensor_levels per well_id and deployment
     sensor_levels = {}
