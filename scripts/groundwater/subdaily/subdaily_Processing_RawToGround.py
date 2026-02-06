@@ -12,7 +12,7 @@ Uses manual readings to generate the needed offset,
 
 Requires data files:
     1. RAW logger data as .csv files in subdaily_dir with strict 
-        naming convention and formatting
+        file naming convention and formatting
     2. cut_times_file = groundwater_logger_times.csv (based on field notes)
     3. barometric pressure data as .csv
 
@@ -42,30 +42,52 @@ import statistics
 import logging
 import pprint
 
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+from well_utils import process_well_ids
+
+
 ### SETUP FLAGS 
 ##  for processing, logging, debugging and data validation
-process_cut = False
+
+# For 2025:
+process_cut = True
+
+# PRE-2025
+#process_cut = False
 process_baro = True #not working with false yet
 
 save_fig = False #not working yet, throwing error
 
-debug_cut = False
-debug_baro = False
-debug_gtw = False
+debug_cut = True
+debug_baro = True
+debug_gtw = True
 
 ### GLOBAL VARIABLES
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
 density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
-baro_standard_elevation = 1933.7
+baro_standard_elevation = 1933.7 # Saghen Weather Tower #1 elev in meters
 
 ### SETUP DIRECTORY + FILE NAMES
 project_dir = '/VOLUMES/SANDISK_SSD_G40/GoogleDrive/GitHub/sagehen_meadows/'
 gw_data_dir = project_dir + 'data/field_observations/groundwater/'
 
-subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_all/'
+# Year-dependent variables
+# For 2025, try to limit processing and results to 2025 only
+subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_2025/'
+gw_biweekly_file = gw_data_dir + 'manual/groundwater_manual_2025_FULL.csv' #ground_to_water in cm
+gw_daily_file = gw_data_dir + 'groundwater_daily_2025_FULL_COMBINED.csv' # manual + logger data
+subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_2025_FULL.csv'
+
+# PRE-2025
+# subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_all/'
+# gw_biweekly_file = gw_data_dir + 'biweekly_manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
+# gw_daily_file = gw_data_dir + 'groundwater_daily_FULL_COMBINED.csv' # manual + logger data
+# subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_FULL.csv'
+
 cut_dir = gw_data_dir + 'subdaily_loggers/WORKING/cut/'
 solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/RAW/baro_data/'
-station_dendra_data_dir = project_dir + 'data/station_instrumentation/climate/Dendra/'
 compensated_dir = gw_data_dir + 'subdaily_loggers/WORKING/baro_compensated/'
 gtw_logger_dir = gw_data_dir + 'subdaily_loggers/WORKING/relative_to_ground/'
 os.makedirs(gtw_logger_dir,exist_ok=True)
@@ -73,17 +95,23 @@ os.makedirs("logs",exist_ok=True)
 
 cut_times_file = gw_data_dir + 'subdaily_loggers/groundwater_logger_times.csv'
 cut_data_file = cut_dir+'cut_all_wells.csv'
-station_dendra_file = station_dendra_data_dir + 'Dendra_Sagehen_2007_2024.csv'
-#station_baro_file = station_dendra_data_dir + 'Dendra_Sagehen_2007_2024.csv'
-gw_biweekly_file = gw_data_dir + 'biweekly_manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
-gw_daily_file = gw_data_dir + 'groundwater_daily_FULL_COMBINED.csv' # manual + logger data
-subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_FULL.csv'
 well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
+
+## For 2025, try with new combined WRCC and DRI weather data
+station_dendra_data_dir = project_dir + 'data/station_instrumentation/climate/'
+station_dendra_file = station_dendra_data_dir + 'Weather_2010_2025_10min_SagehenTower1.csv'
+
+# PRE-2025
+#station_dendra_data_dir = project_dir + 'data/station_instrumentation/climate/Dendra/'
+#station_dendra_file = station_dendra_data_dir + 'RAW/Dendra_Sagehen_2007_2024.csv'
+# OLDER
+#station_baro_file = station_dendra_data_dir + 'Dendra_Sagehen_2007_2024.csv'
 
 # Configure and test logging to write to a file
 log_level=logging.INFO  # Can log different levels: INFO, DEBUG or ERROR
 if (debug_cut or debug_baro or debug_gtw):
     log_level=logging.DEBUG
+    print("LOG LEVEL IS DEBUG")
 
 # Remove any existing log handlers, force reconfiguration
 for handler in logging.root.handlers[:]:
@@ -166,6 +194,16 @@ def get_well_elevations(gw_df):
     # Merge elevation data into groundwater dataframe
     gw_df = gw_df.merge(well_elevations, on='well_id', how='left')
     
+    # Validate results before returning: check for missing well_ids
+    mask_nan = gw_df["elevation_m"].isna()
+    if mask_nan.any():
+        missing_wells = gw_df.loc[mask_nan, "well_id"].tolist()
+        missing_wells = np.unique(missing_wells)
+        logging.debug(
+            "Check well GPS Values! 'elevation_m' has Nan values for wells:"
+            + "\n\n".join(map(str, missing_wells))
+        )
+        
     return gw_df
 
 ## Plot subdaily logger dataframe
@@ -738,7 +776,7 @@ def cut_logger_data():
             #  and select matching deployments, first by well_id
             #  this result may have timing for several deployments
             well_time_df = log_time_df[log_time_df['well_id'] == well_id]
-            
+               
             ## ERROR HANDLING if no time limits found for this well deployment in field notes
             if well_time_df.empty: 
                 logging.info(f'ALERT: No time limits for {well_id}:' 
@@ -769,8 +807,10 @@ def cut_logger_data():
             ## ERROR HANDLING: only continue if one matching entry of start/stop times
             if well_time_df.shape[0] != 1:
                 warning_str = (f"WARNING: more/less than one row for {well_id} "
-                                "in cut_logger_data(). Which one to use?"
-                                " Check date range in logger csv. Exiting.")
+                                "in cut_logger_data() after filtering start/end"
+                                "times. If in debug mode, dataframe printed in"
+                                "next line. If >1 entry, which one"
+                                "to use? Check datestamped logger .csv. EXIT.")
                 logging.info(warning_str)
                 logging.debug(well_time_df)
                 break
@@ -839,7 +879,7 @@ def cut_logger_data():
             cut_count_df = pd.concat([cut_count_df, track_df])
       
             # plot water level and temp for this well
-            if debug_cut: plot_water_temp_compare(orig_deployment_df, manual_deployment_df, deployment_df,'raw_LEVEL_m',well_id)
+            if debug_cut: plot_water_temp_compare(orig_deployment_df, manual_deployment_df, deployment_df,'raw_Level_m',well_id)
             
             # save individual csv file with cut times
             deployment_df.to_csv(cut_dir+'cut_'+f, encoding='ISO-8859-1', index=False)
@@ -1015,7 +1055,14 @@ def normalize_baro(df1, df2):
                 plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
                             'Dendra Baro raw vs clean',
                             ('2024-08-16', '2024-08-18'))
-            
+            if (year==2025):
+                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+                        'Dendra Baro raw vs clean',
+                        ('2025-08-27', '2025-08-29'))
+                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+                        'Dendra Baro raw vs clean',
+                        ('2025-09-23', '2025-09-24'))
+                
         merged = df1_year[['DateTime','baro_Pressure_kPa', 'baro_Temp_C']].merge(
             df2_year[['DateTime', 'baro_Pressure_kPa', 'baro_Temp_C']], 
             on='DateTime', 
@@ -1138,11 +1185,23 @@ def compensate_baro(gw_df):
     #     plot_baro_compare(baro_df_solinst, baro_df_dendra)
     
     # Normalize the baro data based on both sources using an offset
-    baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
+    #baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
+    # Quick hack to make 2025 work
+    #baro_df = normalize_baro(baro_df_dendra, baro_df_solinst)
+    baro_df = baro_df_solinst.drop(columns="elevation_m")
     
-    # # If helpful, plot and compare the baro data sources
+    # Validate baro data
+    mask_nan = baro_df["baro_Pressure_kPa"].isna()
+    if mask_nan.any():
+        missing_datetimes = baro_df.loc[mask_nan, "DateTime"].tolist()
+        logging.debug(
+            "NaN values found in 'baro_Pressure_kPa' at  following datetimes:"
+            + "\n\n".join(map(str, missing_datetimes))
+        )
+        
+    # # If helpful, plot and compare the baro data sources after normalized
     # if debug_baro:
-    #     plot_baro_compare(baro_df_solinst, baro_df_dendra)
+    #      plot_baro_compare(baro_df_solinst, baro_df_dendra)
     
     ## 2. Offset the baro pressure (convered to m) from the gw level
     
@@ -1151,24 +1210,34 @@ def compensate_baro(gw_df):
     # Merge baro and gw data
     gw_df = gw_df.merge(baro_df, on="DateTime", how="left")  # Merge baro data
     
+    # After join, there's an NaN for gw_df["baro_Pressure_kPa"]
+    
     # Adjust pressure based on elevation difference
     gw_df = adjust_pressure_elevation(gw_df, gw_df['elevation_m'], baro_standard_elevation)
     
     # 2b. Convert baro pressure to meters and compensate the raw groundwater level reading
-    gw_df['baro_Level_m'] = convert_baro_kPa_meters(gw_df['baro_Pressure_kPa']) #TODO: why does this return NaNs when gw_df has none when passing in?
+    gw_df['baro_Level_m'] = convert_baro_kPa_meters(gw_df['baro_Pressure_kPa']) 
+    #TODO: why does this return NaNs when gw_df has none when passing in?
     
+    # Validate baro_Level_m results
+    mask_nan = gw_df["baro_Level_m"].isna()
+    if mask_nan.any():
+        missing_datetimes = gw_df.loc[mask_nan, "DateTime"].tolist()
+        logging.debug(
+            "NaN values found in 'baro_Level_m' at  following datetimes:"
+            + "\n\n".join(map(str, missing_datetimes))
+        )
+        
     # Compensate by subtracting air pressure from the raw groundwater reading
     gw_df['compensated_Level_m'] = gw_df["raw_Level_m"] - gw_df["baro_Level_m"] 
-    
-    # TODO: Remove the baro level from gw level
-    
+        
     # Return the gw data with compensated water level
     return gw_df
 
 def calculate_sensor_level(merged_df):
     """
     Determines the depth of the sensor relative to the ground surface
-    based on the manual gw measurement and water pressure head from the sensor
+    based on the manual gw measurement and pressure head level from the sensor
     """
     # Dictionary of sensor_levels per well_id and deployment
     sensor_levels = {}
@@ -1326,6 +1395,12 @@ def convert_relativeToGround(subdaily_df):
     biweek_df['DateTime'] = biweek_df['timestamp'].astype('datetime64[ns]')
     biweek_df = biweek_df.drop(columns=['timestamp'])
     biweek_df.reset_index(inplace=True)
+    
+    # Rename wells
+    #biweek_df = process_well_ids(biweek_df)
+    subdaily_df = process_well_ids(subdaily_df)
+    print('Processed well_ids')
+    
     
     # Sort and group dataframes
     subdaily_df = subdaily_df.sort_values(by=['well_id', 'DateTime'])
@@ -1512,8 +1587,6 @@ def convert_relativeToGround(subdaily_df):
               f"( {missing_percent:.1f}%)")
 
 
-
-
 ### EXECUTE FUNCTIONS TO PROCESS LOGGER DATA
 
 ## Starts with individual raw Solinst logger files 
@@ -1523,25 +1596,28 @@ def convert_relativeToGround(subdaily_df):
 ##     as indicated by drastic water level or temperature change
 if process_cut:
     waterLevel_df = cut_logger_data()
+    print("CUT COMPLETE")
 else: 
     waterLevel_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
     waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
 
 ## 2. Get elevation data for each well
 waterLevel_df = get_well_elevations(waterLevel_df)
+print("GOT WELL ELEVATIONS")
 
 ## 3. Compensate logger water level (m) based on barometer data (kPa)
 if process_baro: 
     waterLevel_df = compensate_baro(waterLevel_df)
+    print("COMPENSATION COMPLETE")
 
 ## 4. Convert water level from 'relative to sensor' to 
 ###    'relative to ground surface elevation' (in meters)
 ###   Also save combined manual and sensor-based gw readings as .csv
 waterLevel_df = convert_relativeToGround(waterLevel_df)
+print("RELATIVE TO GROUND CALCULATED")
 
 ## 5. Plot a visualization of the subdaily groundwater time series
-plot_timeseries_gridmap(waterLevel_df)
-
+#plot_timeseries_gridmap(waterLevel_df)
 
 
 print(waterLevel_df)
