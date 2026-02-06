@@ -10,12 +10,10 @@ Shallow groundwater wells were installed in each combination of HGMZs and PFTs. 
 
 Georeferenced well locations are defined in the `data/instrumentation/Sagehen_Wells_Natali_3941.geojson` file.
 
-For groundwater well naming conventions, see the key below. All uniquely named wells are listed in `Wells_Unique_Id.txt`. The first three letters of the well_id identify the well's:
+For groundwater well naming conventions, see the key below. All uniquely named wells are listed in `well_unique_id.txt`. The first three letters of the well_id identify the well's: 
 1. meadow site name (meadow_id)
 2. plant functional type (PFT)
 3. hygrogeomorphic zone (HGMZ)
-
-
 
 #### Abbreviations used in our data model
 
