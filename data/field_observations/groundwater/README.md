@@ -85,7 +85,7 @@ Column organization:
 
 A value of 32.4 represents the groundwater level that is 32.4 cm below the ground surface for a given well and a given isoweek.
 
-`groundwater_weekly_matrix_STABLE.csv`
+`groundwater_2018_2024_weekly_matrix_STABLE.csv`
 Same as above, but the well_ids have been renamed to correct for misclassified HGMZ.
 
 ###### in subdaily loggers
