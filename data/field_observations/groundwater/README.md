@@ -76,6 +76,17 @@ Variables in this file include:
 - water_binary (true/false); some wells were dry at time of measurement (then water_binary = 0).
 - meter_id; for each measurement, a meter_id is listed, which maps to an offset in the *wells_meterOffsets.csv* file.
 
+*groundwater_weekly_matrix.csv*
+Contains weekly water level readings (in cm) from 2018-2024 for all wells. 
+
+Column organization:
+- an initial column that contains the unique "well_id" (not renamed to correct for misclassified HGMZ)  
+- the remaining columns each represent a week within a year using the format 'YYYYWW' where YYYY is the year and WW is the isoweek (a standardized week numbering)  
+
+A value of 32.4 represents the groundwater level that is 32.4 cm below the ground surface for a given well and a given isoweek.
+
+
+
 ###### in subdaily loggers
 
 ###### in slug_tests
