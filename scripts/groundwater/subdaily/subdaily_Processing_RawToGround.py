@@ -42,6 +42,12 @@ import statistics
 import logging
 import pprint
 
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+from well_utils import process_well_ids
+
+
 ### SETUP FLAGS 
 ##  for processing, logging, debugging and data validation
 
@@ -1389,6 +1395,12 @@ def convert_relativeToGround(subdaily_df):
     biweek_df['DateTime'] = biweek_df['timestamp'].astype('datetime64[ns]')
     biweek_df = biweek_df.drop(columns=['timestamp'])
     biweek_df.reset_index(inplace=True)
+    
+    # Rename wells
+    #biweek_df = process_well_ids(biweek_df)
+    subdaily_df = process_well_ids(subdaily_df)
+    print('Processed well_ids')
+    
     
     # Sort and group dataframes
     subdaily_df = subdaily_df.sort_values(by=['well_id', 'DateTime'])
