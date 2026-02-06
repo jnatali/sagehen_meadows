@@ -11,11 +11,11 @@ Shallow groundwater wells were installed in each combination of HGMZs and PFTs. 
 Georeferenced well locations are defined in the `data/instrumentation/Sagehen_Wells_Natali_3941.geojson` file.
 
 For groundwater well naming conventions, see the key below. All uniquely named wells are listed in `Wells_Unique_Id.txt`. The first three letters of the well_id identify the well's:
-1. meadow site name
-2. plant functional type
-3. hygrogeomorphic zone
+1. meadow site name (meadow_id)
+2. plant functional type (PFT)
+3. hygrogeomorphic zone (HGMZ)
 
-In 2025, hydrogeomorphic zones for some wells were renamed. The field_well_id remained the same. Naming corrections are applied programmatically via `scripts/groundwater/well_utils.py`. Raw data files and physical wells at Sagehen retain the original well_ids, which are populated in the column "field_well_id" following correction.
+
 
 #### Abbreviations used in our data model
 
@@ -25,17 +25,18 @@ In 2025, hydrogeomorphic zones for some wells were renamed. The field_well_id re
 * K = Kiln
 * L = Lower
 
-##### HGMZ
-
-* R = riparian
-* F = fan
-* T = terrace
-
 ##### PFT
 * E = sedge
 * H = mixed herbaceous
 * W = willow
 * F = lodgepole pine forest
+
+##### HGMZ
+* R = riparian
+* F = fan
+* T = terrace
+
+Note that in 2025, hydrogeomorphic zones for some wells were renamed. See corrections in `well_renamed_id.csv`. In the field, the well_id did not change. We are only applying corrections to data after it's collected and entered digitally, but before analysis. See the "process_well_id()" function in `scripts/groundwater/well_utils.py` for a well_id validation and renaming tool. Raw data files and physical wells at Sagehen retain the original well_ids, which are populated in the column "field_well_id" following correction.
 
 #### Files and Data Model
 
@@ -43,7 +44,7 @@ In 2025, hydrogeomorphic zones for some wells were renamed. The field_well_id re
 * _RAW = data straight from the field (notebook or recording)
 * _WORK = data that's being processed (in progress), not yet validated
 * _FULL = data that's been processed but NOT validated
-* _STABLE = data that's been processed and appears stable, but still not final
+* _STABLE = data that's been processed and appears stable, but still not final with well_ids renamed/corrected.
 * _FINAL = data that's been processed and validated
 
 
