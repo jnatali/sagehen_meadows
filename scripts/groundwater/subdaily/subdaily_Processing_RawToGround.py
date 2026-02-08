@@ -52,7 +52,7 @@ from well_utils import process_well_ids
 ##  for processing, logging, debugging and data validation
 
 # For 2025:
-process_cut = True
+process_cut = False
 
 # PRE-2025
 #process_cut = False
@@ -70,21 +70,23 @@ density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
 baro_standard_elevation = 1933.7 # Saghen Weather Tower #1 elev in meters
 
 ### SETUP DIRECTORY + FILE NAMES
-project_dir = '/VOLUMES/SANDISK_SSD_G40/GoogleDrive/GitHub/sagehen_meadows/'
-gw_data_dir = project_dir + 'data/field_observations/groundwater/'
+#project_dir = '/VOLUMES/SANDISK_SSD_G40/GoogleDrive/GitHub/sagehen_meadows/'
+gw_data_dir = '../../../data/field_observations/groundwater/'
+subdaily_data_dir = gw_data_dir + 'subdaily_loggers/FULL/'
+
 
 # Year-dependent variables
 # For 2025, try to limit processing and results to 2025 only
 subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_2025/'
 gw_biweekly_file = gw_data_dir + 'manual/groundwater_manual_2025_FULL.csv' #ground_to_water in cm
-gw_daily_file = gw_data_dir + 'groundwater_daily_2025_FULL_COMBINED.csv' # manual + logger data
-subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_2025_FULL.csv'
+gw_daily_file = gw_data_dir + 'manual/groundwater_daily_2025_FULL_COMBINED.csv' # manual + logger data
+subdaily_full_filename = 'groundwater_subdaily_2025_FULL.csv'
 
 # PRE-2025
 # subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_all/'
-# gw_biweekly_file = gw_data_dir + 'biweekly_manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
-# gw_daily_file = gw_data_dir + 'groundwater_daily_FULL_COMBINED.csv' # manual + logger data
-# subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_FULL.csv'
+# gw_biweekly_file = gw_data_dir + 'manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
+# gw_daily_file = gw_data_dir + 'manual/groundwater_daily_FULL_COMBINED.csv' # manual + logger data
+# subdaily_full_filename = 'groundwater_subdaily_pre2025_FULL.csv'
 
 cut_dir = gw_data_dir + 'subdaily_loggers/WORKING/cut/'
 solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/RAW/baro_data/'
@@ -98,7 +100,7 @@ cut_data_file = cut_dir+'cut_all_wells.csv'
 well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
 
 ## For 2025, try with new combined WRCC and DRI weather data
-station_dendra_data_dir = project_dir + 'data/station_instrumentation/climate/'
+station_dendra_data_dir = '../../../data/station_instrumentation/climate/'
 station_dendra_file = station_dendra_data_dir + 'Weather_2010_2025_10min_SagehenTower1.csv'
 
 # PRE-2025
@@ -1532,8 +1534,15 @@ def convert_relativeToGround(subdaily_df):
     if debug_gtw:
         plot_weekly_groundwater_data_by_well(subdaily_df, biweek_df)
         plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df)
-    return subdaily_df
     
+    return subdaily_df
+
+def save_relativeToGround(subdaily_df):
+    """
+    Save subdaily dataframe as .csv
+    Extract 8am daily values, append to weekly gw time series from manual
+        measurements, and save as a .csv.
+    """
     ## SAVE subdaily logger data in single file
     # Re-order columns
     column_order = ['well_id', 'DateTime', 'deployment', 'ground_to_water_m', 
@@ -1542,8 +1551,9 @@ def convert_relativeToGround(subdaily_df):
     subdaily_df = subdaily_df.reindex(columns=column_order)  
     
     # Save subdaily data
-    subdaily_df.to_csv(gw_data_dir + subdaily_full_file, 
+    subdaily_df.to_csv(subdaily_data_dir + subdaily_full_filename, 
                        encoding='ISO-8859-1', index=False)
+    print("YES!!! subdaily saved to CSV")
     
     # COMBINE manual and subdaily logger data in single file
     # Filter subdaily_df, only select rows between 7a to 10a
@@ -1566,13 +1576,23 @@ def convert_relativeToGround(subdaily_df):
     subdaily_8am_df['ground_to_water_cm'] = subdaily_8am_df['ground_to_water_m'] * 100
     subdaily_8am_df = subdaily_8am_df.drop(columns='ground_to_water_m')
     subdaily_8am_df = subdaily_8am_df.rename(columns={'DateTime': 'timestamp'})
-    biweek_df = biweek_df.rename(columns={'DateTime': 'timestamp'})
+    
+    # Merge with biweek_df
+    # Import manual groundwater data + setup for analysis
+    biweek_df = pd.read_csv(gw_biweekly_file, index_col=0)
+    #biweek_df['DateTime'] = biweek_df['timestamp'].astype('datetime64[ns]')
+    biweek_df['timestamp'] = biweek_df['timestamp'].astype('datetime64[ns]')
+    #biweek_df = biweek_df.drop(columns=['timestamp'])
+    biweek_df.reset_index(inplace=True)
+    biweek_df = biweek_df.sort_values(by=['well_id','timestamp'])
+    #biweek_df = biweek_df.rename(columns={'DateTime': 'timestamp'})
     
     # Append and save
     daily_df = pd.concat([biweek_df, subdaily_8am_df], ignore_index=True)
     daily_df = daily_df[['well_id', 'timestamp', 'ground_to_water_cm']]
     daily_df = daily_df.sort_values(['well_id', 'timestamp'])
     daily_df.to_csv(gw_daily_file, index=False)
+    print("YES!!! daily saved to CSV")
 
     # Validated combined dataset
     if debug_gtw:
@@ -1585,7 +1605,8 @@ def convert_relativeToGround(subdaily_df):
         missing_percent = (missing_count / total_count) * 100
         print(f"Missing ground_to_water_cm values in daily_df: {missing_count}"
               f"( {missing_percent:.1f}%)")
-
+    
+    return
 
 ### EXECUTE FUNCTIONS TO PROCESS LOGGER DATA
 
@@ -1616,9 +1637,10 @@ if process_baro:
 waterLevel_df = convert_relativeToGround(waterLevel_df)
 print("RELATIVE TO GROUND CALCULATED")
 
+save_relativeToGround(waterLevel_df)
+
 ## 5. Plot a visualization of the subdaily groundwater time series
 #plot_timeseries_gridmap(waterLevel_df)
-
 
 print(waterLevel_df)
     
