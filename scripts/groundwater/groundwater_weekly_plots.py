@@ -18,7 +18,7 @@ os.makedirs(output_dir, exist_ok=True)
 SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'groundwater', 'biweekly_manual')
 
 # 3. Base name of the files to search for
-SOURCE_FILE_PATTERN = "roundwater_2018_2024_weekly_matrix_STABLE.csv"
+SOURCE_FILE_PATTERN = "groundwater_2018_2024_weekly_matrix_STABLE.csv"
 file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
 
 df = pd.read_csv(file_path)
@@ -97,12 +97,18 @@ def categorize_well(val):
 df_long[['Site', 'Plant_Type', 'Zone']] = df_long[well_id_col].apply(categorize_well)
 df_long['Level'] = pd.to_numeric(df_long['Level'], errors='coerce')
 
+
+# Calculate means so we can use them to set the axis limits
+yearly_means = df_long.groupby(['Year', 'Week'])['Level'].mean().reset_index()
+grand_mean = df_long.groupby('Week')['Level'].mean().reset_index()
+
 # --- CALCULATE GLOBAL Y-AXIS LIMITS ---
 # To make plots comparable, we find the absolute Min and Max across ALL data.
 # Note: Positive = Below Ground. Negative = Above Ground.
 # Since 0 is at the top, we want the "bottom" of the graph to be the largest positive number.
-max_depth = df_long['Level'].max() # The deepest reading (e.g. 150cm)
-min_depth = df_long['Level'].min() # The highest water level (e.g. -10cm)
+# Use the MEANS for limits
+max_depth = yearly_means['Level'].max() 
+min_depth = yearly_means['Level'].min()
 
 # Add 5cm padding for visual clarity
 y_limit_bottom = max_depth + 5 
@@ -116,12 +122,8 @@ print("Data Prep Complete.")
 # TASK 1: MEAN LEVELS ACROSS ALL WELLS
 # ==========================================
 
-# 1. Aggregate Data
-# We group by Year and Week to get one single average line per year
-yearly_means = df_long.groupby(['Year', 'Week'])['Level'].mean().reset_index()
-grand_mean = df_long.groupby('Week')['Level'].mean().reset_index()
 
-# 2. Setup Plot
+# 1. Setup Plot
 fig, axes = plt.subplots(1, 2, figsize=(16, 6), sharey=True)
 
 # Plot A: Annual Lines
@@ -141,7 +143,7 @@ axes[1].set_ylim(y_limit_bottom, y_limit_top)
 
 plt.tight_layout()
 
-# 3. Save
+# 2. Save
 save_path = f"{output_dir}mean_gw_all_wells_and_grand_mean.eps"
 plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
