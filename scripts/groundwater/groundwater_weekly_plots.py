@@ -14,7 +14,15 @@ os.makedirs(output_dir, exist_ok=True)
 
 # 1. Load Data
 # Pandas reads the CSV. Row 0 becomes the headers.
-df = pd.read_csv('data/station_instrumentation/climate/Weather_2010_2025_10min_SagehenTower1.csv')
+# --- Define SOURCE file (where you read existing data FROM) ---
+SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'groundwater', 'biweekly_manual')
+
+# 3. Base name of the files to search for
+SOURCE_FILE_PATTERN = "roundwater_2018_2024_weekly_matrix_STABLE.csv"
+file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
+
+df = pd.read_csv(file_path)
+
 
 # 2. Dynamic Column Separation
 # We identify which columns are ID info and which are Data (Weeks)
