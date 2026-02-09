@@ -115,7 +115,7 @@ grand_mean = df_long.groupby('Week')['Level'].mean().reset_index()
 print("Data Prep Complete.")
 
 
-
+"""
 # TASK 1: MEAN LEVELS ACROSS ALL WELLS
 
 # --- CALCULATE LIMITS SPECIFICALLY FOR TASK 1 ---
@@ -150,8 +150,8 @@ plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 
 plt.show()
-
-
+"""
+"""
 # TASK 2: CATEGORIZED PLOTS
 
 # Choose Category: 'Site', 'Plant_Type', or 'Zone'
@@ -200,7 +200,7 @@ for cat_val in unique_cats:
     
     plt.show()
 
-
+"""
 # TASK 3: DROUGHT (2021) vs NON-DROUGHT
 
 """
@@ -251,12 +251,10 @@ plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 
 plt.show()
+
 """
-
-
 # TASK 4: VISUALIZING SPREAD (StDev)
 
-"""
 # Calculate Mean and Standard Deviation per week
 stats = df_long.groupby(['Year', 'Week'])['Level'].agg(['mean', 'std']).reset_index()
 
@@ -265,40 +263,52 @@ stats = df_long.groupby(['Year', 'Week'])['Level'].agg(['mean', 'std']).reset_in
 t4_max = (stats['mean'] + stats['std']).max() + 5
 t4_min = (stats['mean'] - stats['std']).min() - 5
 
-plt.figure(figsize=(14, 7))
+# Create a 2x2 grid of subplots (for the 4 years)
+# sharex/sharey ensures they all use the exact same scale for comparison
+fig, axs = plt.subplots(2, 2, figsize=(14, 10), sharex=True, sharey=True)
+axs = axs.flatten()  # Flatten the 2D grid into a 1D list for easier looping
 
-for year in stats['Year'].unique():
+unique_years = sorted(stats['Year'].unique())
+
+for i, year in enumerate(unique_years):
+    # Safety check in case there are more than 4 years in data
+    if i >= len(axs): break
+    
+    ax = axs[i]
     subset = stats[stats['Year'] == year]
     
     # Retrieve the consistent color for this year
     c = year_palette.get(year, 'black')
     
     # Plot line
-    # We force the color to match our global palette
-    plt.plot(subset['Week'], subset['mean'], label=str(year), color=c, linewidth=2)
+    ax.plot(subset['Week'], subset['mean'], label=str(year), color=c, linewidth=2)
     
     # Plot spread (Mean +/- StdDev)
-    plt.fill_between(
+    ax.fill_between(
         subset['Week'], 
         subset['mean'] - subset['std'], 
         subset['mean'] + subset['std'], 
         color=c, alpha=0.15
     )
+    
+    # Subplot specific styling
+    ax.set_title(f"Year: {year}", fontweight='bold')
+    ax.grid(True, alpha=0.3)
 
-plt.title('Annual Mean Levels with Standard Deviation Spread')
-plt.ylabel('Depth Below Surface (cm)')
-plt.xlabel('ISO Week')
-plt.legend(title='Year')
-plt.grid(True, alpha=0.3)
+# Axis Handling (Applied to all subplots via sharey/sharex)
+# We set the limits on the first axis, and it propagates
+axs[0].invert_yaxis()
+axs[0].set_ylim(t4_max, t4_min) 
 
-# Axis Handling
-plt.gca().invert_yaxis()
-plt.ylim(t4_max, t4_min) # Use limits specific to spread
+# Global Labels (placed on the figure object to avoid clutter)
+fig.supylabel('Depth Below Surface (cm)')
+fig.supxlabel('ISO Week')
+
+plt.tight_layout()
 
 # Save
-save_path = f"{output_dir}annual_means_with_std_spread.eps"
+save_path = f"{output_dir}annual_means_with_std_spread_subplots.eps"
 plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 
 plt.show()
-"""
