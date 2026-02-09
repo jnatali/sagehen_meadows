@@ -8,9 +8,7 @@ import os
 output_dir = os.path.join('..', '..', 'data', 'scripts', 'groundwater', 'seasonal')
 os.makedirs(output_dir, exist_ok=True)
 
-# ==========================================
 # PART 1: DATA LOADING & PREP (Run this first)
-# ==========================================
 
 # 1. Load Data
 # Pandas reads the CSV. Row 0 becomes the headers.
@@ -98,48 +96,51 @@ df_long[['Site', 'Plant_Type', 'Zone']] = df_long[well_id_col].apply(categorize_
 df_long['Level'] = pd.to_numeric(df_long['Level'], errors='coerce')
 
 
+
+# DEFINE CONSISTENT COLORS
+
+# We create a dictionary that maps every Year to a specific Color.
+# This ensures that "2018" is always Blue (for example), even if
+# 2018 is missing from some specific graphs.
+unique_years = sorted(df_long['Year'].unique())
+year_palette = dict(zip(unique_years, sns.color_palette("tab10", len(unique_years))))
+
 # Calculate means so we can use them to set the axis limits
 yearly_means = df_long.groupby(['Year', 'Week'])['Level'].mean().reset_index()
 grand_mean = df_long.groupby('Week')['Level'].mean().reset_index()
 
-# --- CALCULATE GLOBAL Y-AXIS LIMITS ---
-# To make plots comparable, we find the absolute Min and Max across ALL data.
-# Note: Positive = Below Ground. Negative = Above Ground.
-# Since 0 is at the top, we want the "bottom" of the graph to be the largest positive number.
-# Use the MEANS for limits
-max_depth = yearly_means['Level'].max() 
-min_depth = yearly_means['Level'].min()
+# (Removed Global Y-Axis Limits Section here because we will calculate them 
+# dynamically inside each task to avoid the "off-screen" issue)
 
-# Add 5cm padding for visual clarity
-y_limit_bottom = max_depth + 5 
-y_limit_top = min_depth - 5     
-
-print(f"Global Y-Limits set: Top={y_limit_top}, Bottom={y_limit_bottom}")
 print("Data Prep Complete.")
 
 
-# ==========================================
-# TASK 1: MEAN LEVELS ACROSS ALL WELLS
-# ==========================================
 
+# TASK 1: MEAN LEVELS ACROSS ALL WELLS
+
+# --- CALCULATE LIMITS SPECIFICALLY FOR TASK 1 ---
+# We calculate min/max only based on the 'yearly_means' data used in this plot
+t1_max = yearly_means['Level'].max() + 5
+t1_min = yearly_means['Level'].min() - 5
 
 # 1. Setup Plot
 fig, axes = plt.subplots(1, 2, figsize=(16, 6), sharey=True)
 
 # Plot A: Annual Lines
-sns.lineplot(data=yearly_means, x='Week', y='Level', hue='Year', palette='tab10', marker='o', ax=axes[0])
+# Note: We use 'palette=year_palette' instead of 'tab10' to enforce consistency
+sns.lineplot(data=yearly_means, x='Week', y='Level', hue='Year', palette=year_palette, marker='o', ax=axes[0])
 axes[0].set_title('Mean GW Level by Year (All Wells)')
 axes[0].set_ylabel('Depth Below Surface (cm)')
 axes[0].grid(True, alpha=0.3)
 axes[0].invert_yaxis()             # Put 0 at the top (Surface)
-axes[0].set_ylim(y_limit_bottom, y_limit_top) # Apply global scale
+axes[0].set_ylim(t1_max, t1_min)   # Apply limits specific to this task
 
 # Plot B: Grand Mean
 sns.lineplot(data=grand_mean, x='Week', y='Level', color='black', linewidth=3, ax=axes[1])
 axes[1].set_title('Grand Mean (All Years Aggregated)')
 axes[1].grid(True, alpha=0.3)
 axes[1].invert_yaxis()             # Put 0 at the top
-axes[1].set_ylim(y_limit_bottom, y_limit_top) 
+axes[1].set_ylim(t1_max, t1_min) 
 
 plt.tight_layout()
 
@@ -151,27 +152,36 @@ print(f"Saved: {save_path}")
 plt.show()
 
 
-# ==========================================
 # TASK 2: CATEGORIZED PLOTS
-# ==========================================
-"""
+
 # Choose Category: 'Site', 'Plant_Type', or 'Zone'
 category_col = 'Site' 
 
 unique_cats = df_long[category_col].unique()
 
 for cat_val in unique_cats:
-    if cat_val == None: continue
+    if cat_val is None: continue
 
     plt.figure(figsize=(10, 5))
     
     # Filter for specific category (e.g., just 'East' meadow)
     subset = df_long[df_long[category_col] == cat_val]
+    
+    # Skip if empty to avoid errors
+    if subset.empty: continue
+
     # Calculate means for this subset
     subset_means = subset.groupby(['Year', 'Week'])['Level'].mean().reset_index()
     
+    # --- CALCULATE DYNAMIC LIMITS FOR THIS SPECIFIC CATEGORY ---
+    # This prevents the graph from going off-screen by tailoring the axis
+    # to fit only the data present in this specific meadow/zone.
+    local_max = subset_means['Level'].max() + 5
+    local_min = subset_means['Level'].min() - 5
+    
     # Plot
-    sns.lineplot(data=subset_means, x='Week', y='Level', hue='Year', palette='viridis', marker='.')
+    # Note: Using 'year_palette' here ensures colors match Task 1
+    sns.lineplot(data=subset_means, x='Week', y='Level', hue='Year', palette=year_palette, marker='.')
     
     plt.title(f'Mean GW Levels: {cat_val} ({category_col})')
     plt.ylabel('Depth Below Surface (cm)')
@@ -180,26 +190,29 @@ for cat_val in unique_cats:
     
     # Axis Handling
     plt.gca().invert_yaxis() # Surface (0) at top
-    plt.ylim(y_limit_bottom, y_limit_top) # Consistent global scale
+    plt.ylim(local_max, local_min) # Use LOCAL limits calculated above
     
     # Save with descriptive name
-    clean_cat_name = cat_val.replace(" ", "_")
+    clean_cat_name = str(cat_val).replace(" ", "_")
     save_path = f"{output_dir}mean_gw_{category_col}_{clean_cat_name}.eps"
     plt.savefig(save_path, format='eps')
     print(f"Saved: {save_path}")
     
     plt.show()
-"""
 
-# ==========================================
+
 # TASK 3: DROUGHT (2021) vs NON-DROUGHT
-# ==========================================
+
 """
 drought_year = 2021
 # Mark years as Drought vs Non-Drought
 # This logic automatically buckets 2018, 2019, 2024, etc. as Non-Drought
 df_long['Status'] = df_long['Year'].apply(lambda y: 'Drought (2021)' if y == drought_year else 'Non-Drought')
 status_means = df_long.groupby(['Status', 'Week'])['Level'].mean().reset_index()
+
+# --- CALCULATE LIMITS SPECIFICALLY FOR TASK 3 ---
+t3_max = status_means['Level'].max() + 5
+t3_min = status_means['Level'].min() - 5
 
 plt.figure(figsize=(12, 6))
 
@@ -230,7 +243,7 @@ plt.grid(True, alpha=0.3)
 
 # Axis Handling
 plt.gca().invert_yaxis()
-plt.ylim(y_limit_bottom, y_limit_top)
+plt.ylim(t3_max, t3_min) # Use limits specific to this comparison
 
 # Save
 save_path = f"{output_dir}drought_comparison_2021.eps"
@@ -240,28 +253,36 @@ print(f"Saved: {save_path}")
 plt.show()
 """
 
-# ==========================================
+
 # TASK 4: VISUALIZING SPREAD (StDev)
-# ==========================================
+
 """
 # Calculate Mean and Standard Deviation per week
 stats = df_long.groupby(['Year', 'Week'])['Level'].agg(['mean', 'std']).reset_index()
+
+# --- CALCULATE LIMITS SPECIFICALLY FOR TASK 4 ---
+# We must account for the standard deviation spread so the shading fits
+t4_max = (stats['mean'] + stats['std']).max() + 5
+t4_min = (stats['mean'] - stats['std']).min() - 5
 
 plt.figure(figsize=(14, 7))
 
 for year in stats['Year'].unique():
     subset = stats[stats['Year'] == year]
     
+    # Retrieve the consistent color for this year
+    c = year_palette.get(year, 'black')
+    
     # Plot line
-    line = plt.plot(subset['Week'], subset['mean'], label=str(year), linewidth=2)
-    color = line[0].get_color()
+    # We force the color to match our global palette
+    plt.plot(subset['Week'], subset['mean'], label=str(year), color=c, linewidth=2)
     
     # Plot spread (Mean +/- StdDev)
     plt.fill_between(
         subset['Week'], 
         subset['mean'] - subset['std'], 
         subset['mean'] + subset['std'], 
-        color=color, alpha=0.15
+        color=c, alpha=0.15
     )
 
 plt.title('Annual Mean Levels with Standard Deviation Spread')
@@ -272,7 +293,7 @@ plt.grid(True, alpha=0.3)
 
 # Axis Handling
 plt.gca().invert_yaxis()
-plt.ylim(y_limit_bottom, y_limit_top)
+plt.ylim(t4_max, t4_min) # Use limits specific to spread
 
 # Save
 save_path = f"{output_dir}annual_means_with_std_spread.eps"
