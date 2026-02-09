@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 # Create the directory for saving files
-output_dir = "data/scripts/groundwater/seasonal/"
+output_dir = os.path.join('..', '..', 'data', 'scripts', 'groundwater', 'seasonal')
 os.makedirs(output_dir, exist_ok=True)
 
 # ==========================================
