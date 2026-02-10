@@ -176,7 +176,7 @@ plt.grid(True, alpha=0.3)
 plt.savefig(f"{output_dir}COMBINED_Mean_GW_Level_by_Year.eps", format='eps')
 plt.show()
 """
-
+"""
 # --- TASK 2: CATEGORIZED COMPARISONS ---
 
 categories_to_plot = ['Site', 'Plant_Type', 'Zone']
@@ -266,7 +266,7 @@ for category_col in categories_to_plot:
     plt.savefig(f"{output_dir}TOGETHER_Grid_{category_col}.eps", bbox_inches='tight')
     plt.show()
 # TASK 3: DROUGHT (2021) vs NON-DROUGHT
-
+"""
 """
 drought_year = 2021
 # Mark years as Drought vs Non-Drought
@@ -315,9 +315,8 @@ plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 
 plt.show()
+"""
 
-"""
-"""
 # TASK 4: VISUALIZING SPREAD (StDev)
 
 # Calculate Mean and Standard Deviation per week
@@ -377,4 +376,3 @@ plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 
 plt.show()
-"""
