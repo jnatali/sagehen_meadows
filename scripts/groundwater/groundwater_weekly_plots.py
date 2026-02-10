@@ -151,56 +151,61 @@ print(f"Saved: {save_path}")
 
 plt.show()
 """
-"""
+
 # TASK 2: CATEGORIZED PLOTS
 
-# Choose Category: 'Site', 'Plant_Type', or 'Zone'
-category_col = 'Site' 
+# 1. Define the list of columns to graph
+categories_to_plot = ['Site', 'Plant_Type', 'Zone']
 
-unique_cats = df_long[category_col].unique()
+# 2. Go through each category type
+for category_col in categories_to_plot:
+    
+    # Get the unique values (e.g., "East", "Kiln" or "Sedge", "Willow")
+    unique_cats = df_long[category_col].unique()
+    
+    # 3. Go through each specific item (e.g., East -> Kiln)
+    for cat_val in unique_cats:
+        if cat_val is None: continue
 
-for cat_val in unique_cats:
-    if cat_val is None: continue
+        plt.figure(figsize=(10, 5))
+        
+        # Filter for the specific item
+        subset = df_long[df_long[category_col] == cat_val]
+        
+        # Skip if empty
+        if subset.empty: continue
 
-    plt.figure(figsize=(10, 5))
-    
-    # Filter for specific category (e.g., just 'East' meadow)
-    subset = df_long[df_long[category_col] == cat_val]
-    
-    # Skip if empty to avoid errors
-    if subset.empty: continue
+        # Calculate means
+        subset_means = subset.groupby(['Year', 'Week'])['Level'].mean().reset_index()
+        
+        # --- DYNAMIC LIMITS ---
+        local_max = subset_means['Level'].max() + 5
+        local_min = subset_means['Level'].min() - 5
+        
+        # Plot
+        sns.lineplot(data=subset_means, x='Week', y='Level', hue='Year', 
+                     palette=year_palette, marker='.')
+        
+        plt.title(f'Mean GW Levels: {cat_val} ({category_col})')
+        plt.ylabel('Depth Below Surface (cm)')
+        plt.xlabel('ISO Week')
+        plt.grid(True, alpha=0.3)
+        
+        # Axis Handling
+        plt.gca().invert_yaxis() 
+        plt.ylim(local_max, local_min)
+        
+        # Save
+        clean_cat_name = str(cat_val).replace(" ", "_")
+        save_path = f"{output_dir}mean_gw_{category_col}_{clean_cat_name}.eps"
+        plt.savefig(save_path, format='eps')
+        print(f"Saved: {save_path}")
+        
+        # SHOW THE PLOT
+        # The script will pause here until you close the window (if running in terminal)
+        plt.show()
 
-    # Calculate means for this subset
-    subset_means = subset.groupby(['Year', 'Week'])['Level'].mean().reset_index()
-    
-    # --- CALCULATE DYNAMIC LIMITS FOR THIS SPECIFIC CATEGORY ---
-    # This prevents the graph from going off-screen by tailoring the axis
-    # to fit only the data present in this specific meadow/zone.
-    local_max = subset_means['Level'].max() + 5
-    local_min = subset_means['Level'].min() - 5
-    
-    # Plot
-    # Note: Using 'year_palette' here ensures colors match Task 1
-    sns.lineplot(data=subset_means, x='Week', y='Level', hue='Year', palette=year_palette, marker='.')
-    
-    plt.title(f'Mean GW Levels: {cat_val} ({category_col})')
-    plt.ylabel('Depth Below Surface (cm)')
-    plt.xlabel('ISO Week')
-    plt.grid(True, alpha=0.3)
-    
-    # Axis Handling
-    plt.gca().invert_yaxis() # Surface (0) at top
-    plt.ylim(local_max, local_min) # Use LOCAL limits calculated above
-    
-    # Save with descriptive name
-    clean_cat_name = str(cat_val).replace(" ", "_")
-    save_path = f"{output_dir}mean_gw_{category_col}_{clean_cat_name}.eps"
-    plt.savefig(save_path, format='eps')
-    print(f"Saved: {save_path}")
-    
-    plt.show()
 
-"""
 # TASK 3: DROUGHT (2021) vs NON-DROUGHT
 
 """
@@ -252,6 +257,7 @@ print(f"Saved: {save_path}")
 
 plt.show()
 
+"""
 """
 # TASK 4: VISUALIZING SPREAD (StDev)
 
@@ -312,3 +318,4 @@ plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 
 plt.show()
+"""
