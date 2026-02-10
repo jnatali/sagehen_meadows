@@ -7,6 +7,8 @@ import os
 # Create the directory for saving files
 output_dir = os.path.join('..', '..', 'data', 'scripts', 'groundwater', 'seasonal')
 os.makedirs(output_dir, exist_ok=True)
+# FIX: Ensure directory string ends with a slash so it doesn't merge with filenames
+output_dir = output_dir + os.sep 
 
 # PART 1: DATA LOADING & PREP (Run this first)
 
@@ -132,9 +134,8 @@ grand_mean = df_long.groupby('Week')['Level'].mean().reset_index()
 
 print("Data Prep Complete.")
 
-"""
 
-#TASK 1: MEAN LEVELS ACROSS ALL WELLS 
+# --- TASK 1: MEAN LEVELS ACROSS ALL WELLS ---
 
 t1_max = yearly_means['Level'].max() + 5
 t1_min = yearly_means['Level'].min() - 5
@@ -144,22 +145,22 @@ plt.figure(figsize=(10, 6))
 sns.lineplot(data=yearly_means, x='Week', y='Level', hue='Year', palette=year_palette, marker='o')
 plt.title('Mean GW Level by Year (All Wells)')
 plt.ylabel('Depth Below Surface (cm)')
-plt.gca().invert_yaxis()
-plt.ylim(t1_max, t1_min)
 plt.grid(True, alpha=0.3)
+# FIX: Use (Deepest, Shallowest) to invert manually
+plt.ylim(t1_max, t1_min) 
 plt.savefig(f"{output_dir}Mean_GW_Level_by_Year.eps", format='eps')
-plt.show()
+# plt.show()
 
 # 2. INDIVIDUAL PLOT: Grand Mean Only
 plt.figure(figsize=(10, 6))
 sns.lineplot(data=grand_mean, x='Week', y='Level', color='black', linewidth=3, label='Grand Mean')
 plt.title('Grand Mean (All Years Aggregated)')
 plt.ylabel('Depth Below Surface (cm)')
-plt.gca().invert_yaxis()
-plt.ylim(t1_max, t1_min)
 plt.grid(True, alpha=0.3)
+# FIX: Use (Deepest, Shallowest) to invert manually
+plt.ylim(t1_max, t1_min) 
 plt.savefig(f"{output_dir}GRAND_Mean_GW_Level_by_Year.eps", format='eps')
-plt.show()
+# plt.show()
 
 # 3. COMBINED PLOT: Annual + Grand Mean Overlay
 plt.figure(figsize=(10, 6))
@@ -169,14 +170,14 @@ sns.lineplot(data=yearly_means, x='Week', y='Level', hue='Year', palette=year_pa
 sns.lineplot(data=grand_mean, x='Week', y='Level', color='black', linewidth=4, label='Grand Mean')
 plt.title('Combined: Annual Trends vs. Grand Mean (All Wells)')
 plt.ylabel('Depth Below Surface (cm)')
-plt.gca().invert_yaxis()
-plt.ylim(t1_max, t1_min)
 plt.legend()
 plt.grid(True, alpha=0.3)
+# FIX: Use (Deepest, Shallowest) to invert manually
+plt.ylim(t1_max, t1_min) 
 plt.savefig(f"{output_dir}COMBINED_Mean_GW_Level_by_Year.eps", format='eps')
-plt.show()
-"""
-"""
+plt.show() # Pausing here so you can check Task 1
+
+
 # --- TASK 2: CATEGORIZED COMPARISONS ---
 
 categories_to_plot = ['Site', 'Plant_Type', 'Zone']
@@ -188,7 +189,7 @@ for category_col in categories_to_plot:
     num_cats = len(unique_cats)
     
     # ---------------------------------------------------------
-    # PART 1: PLOT SEPARATELY (Individual files, NO MEAN)
+    # PART 1: PLOT SEPARATELY (Individual files)
     # ---------------------------------------------------------
     for cat_val in unique_cats:
         # Prepare Data
@@ -200,10 +201,12 @@ for category_col in categories_to_plot:
         sns.lineplot(data=subset_annual, x='Week', y='Level', hue='Year', palette=year_palette, marker='.')
         
         # Formatting
-        plt.title(f'Individual View: {cat_val}')
-        plt.gca().invert_yaxis()
+        plt.title(f'Individual: {cat_val}')
         plt.grid(True, alpha=0.3)
         plt.ylabel('Depth Below Surface (cm)')
+        
+        # FIX: Manual inversion for single plots
+        plt.gca().invert_yaxis() 
         
         # Save
         clean_name = str(cat_val).replace(" ", "_")
@@ -211,8 +214,9 @@ for category_col in categories_to_plot:
         plt.close() 
 
     # ---------------------------------------------------------
-    # PART 2: PLOT TOGETHER (Subplots: Ghost Years + Bold 2021 + Dashed Mean)
+    # PART 2: PLOT TOGETHER (Subplots)
     # ---------------------------------------------------------
+    # Create grid
     fig, axes = plt.subplots(1, num_cats, figsize=(5 * num_cats, 6), sharey=True)
     if num_cats == 1: axes = [axes] # Handle single-item case
 
@@ -227,47 +231,52 @@ for category_col in categories_to_plot:
         
         # Calculate means
         type_annual = type_data.groupby(['Year', 'Week'])['Level'].mean().reset_index()
-        type_grand = type_data.groupby('Week')['Level'].mean().reset_index()
-
-        # A. Plot Background Years (Transparent "Ghost" Lines)
-        # We assume '2021' is the drought year you want to highlight
-        background_years = type_annual[type_annual['Year'] != 2021]
-        if not background_years.empty:
-            sns.lineplot(data=background_years, x='Week', y='Level', hue='Year', 
-                         palette=year_palette, ax=ax, alpha=0.15, legend=False, linewidth=1)
         
-        # B. Plot 2021 (Solid, Bold, Colored)
+        # --- NEW LOGIC: Calculate Non-Drought Mean ---
+        # Filter out 2021 first, then group by Week
+        non_drought_data = type_data[type_data['Year'] != 2021]
+        non_drought_mean = non_drought_data.groupby('Week')['Level'].mean().reset_index()
+
+        # A. Plot Background Years (Non-Drought Years)
+        if not non_drought_data.empty:
+            # Alpha increased to 0.3 as requested
+            sns.lineplot(data=type_annual[type_annual['Year'] != 2021], 
+                         x='Week', y='Level', hue='Year', palette=year_palette, 
+                         ax=ax, alpha=0.3, legend=False, linewidth=1.5)
+        
+        # B. Plot 2021 (Drought Year)
         drought_year = type_annual[type_annual['Year'] == 2021]
         if not drought_year.empty:
             sns.lineplot(data=drought_year, x='Week', y='Level', color=year_palette.get(2021, 'red'), 
                          ax=ax, linewidth=3, label='2021 (Drought)' if i == num_cats-1 else None)
         
-        # C. Plot Grand Mean (Black, Dashed)
-        sns.lineplot(data=type_grand, x='Week', y='Level', color='black', 
-                     ax=ax, linewidth=2, linestyle='--', label='Grand Mean' if i == num_cats-1 else None)
+        # C. Plot Non-Drought Mean (Black, Dashed)
+        sns.lineplot(data=non_drought_mean, x='Week', y='Level', color='black', 
+                     ax=ax, linewidth=2, linestyle='--', label='Non-Drought Avg' if i == num_cats-1 else None)
         
         # Formatting
         ax.set_title(cat_val, fontweight='bold')
-        ax.set_ylim(t2_max, t2_min)
-        ax.invert_yaxis()
+        
+        # FIX: Explicitly set (Deepest, Shallowest) to force inversion
+        ax.set_ylim(t2_max, t2_min) 
+        
         ax.grid(True, alpha=0.2)
         
-        # Only show Y-label on the first plot
         if i == 0:
             ax.set_ylabel('Depth Below Surface (cm)')
         else:
             ax.set_ylabel('')
 
     # Unified Title
-    plt.suptitle(f'Comparison by {category_col}: 2021 vs Normal Range', fontsize=16, y=1.02)
+    plt.suptitle(f'Comparison by {category_col}: 2021 vs Non-Drought Average', fontsize=16, y=1.02)
     plt.tight_layout()
     
     # Save
     plt.savefig(f"{output_dir}TOGETHER_Grid_{category_col}.eps", bbox_inches='tight')
     plt.show()
-# TASK 3: DROUGHT (2021) vs NON-DROUGHT
-"""
-"""
+
+# --- TASK 3: DROUGHT (2021) vs NON-DROUGHT ---
+
 drought_year = 2021
 # Mark years as Drought vs Non-Drought
 # This logic automatically buckets 2018, 2019, 2024, etc. as Non-Drought
@@ -306,8 +315,8 @@ plt.ylabel('Depth Below Surface (cm)')
 plt.grid(True, alpha=0.3)
 
 # Axis Handling
-plt.gca().invert_yaxis()
-plt.ylim(t3_max, t3_min) # Use limits specific to this comparison
+# FIX: Explicitly set (Deepest, Shallowest) to force inversion
+plt.ylim(t3_max, t3_min) 
 
 # Save
 save_path = f"{output_dir}drought_comparison_2021.eps"
@@ -315,9 +324,9 @@ plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 
 plt.show()
-"""
 
-# TASK 4: VISUALIZING SPREAD (StDev)
+
+# --- TASK 4: VISUALIZING SPREAD (StDev) ---
 
 # Calculate Mean and Standard Deviation per week
 stats = df_long.groupby(['Year', 'Week'])['Level'].agg(['mean', 'std']).reset_index()
@@ -361,8 +370,8 @@ for i, year in enumerate(unique_years):
 
 # Axis Handling (Applied to all subplots via sharey/sharex)
 # We set the limits on the first axis, and it propagates
-axs[0].invert_yaxis()
-axs[0].set_ylim(t4_max, t4_min) 
+# FIX: Explicitly set (Deepest, Shallowest) to force inversion
+axs[0].set_ylim(t4_max, t4_min)  
 
 # Global Labels (placed on the figure object to avoid clutter)
 fig.supylabel('Depth Below Surface (cm)')
