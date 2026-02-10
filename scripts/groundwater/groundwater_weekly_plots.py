@@ -76,25 +76,43 @@ if well_id_col not in df_long.columns:
     raise ValueError(f"Column '{well_id_col}' not found in CSV")
 
 def categorize_well(val):
-    # 1. Split by '-' to get the code prefix (e.g., 'KWR')
-    # 2. Map letters to full names using dictionaries
+    # Define the valid mapping dictionaries
+    meadow_map = {'K': "Kiln", 'E': "East"}
+    plant_map = {'E': "Sedge", 'W': "Willow", 'H': "Mixed Herbaceous"}
+    zone_map = {'R': "Riparian", 'T': "Terrace", 'F': "Fan"}
+
     try:
+        # Extract the prefix (e.g., 'KWR')
         codes = str(val).strip().split('-')[0]
+        
+        # Ensure we have at least 3 characters to unpack
+        if len(codes) < 3:
+            return pd.Series([None, None, None])
+        
         m_code, p_code, z_code = codes[0], codes[1], codes[2]
         
-        meadow = "Kiln" if m_code == 'K' else "East"
-        plant = {"E": "Sedge", "W": "Willow", "H": "Mixed Herbaceous"}.get(p_code, p_code)
-        zone = {"R": "Riparian", "T": "Terrace", "F": "Fan"}.get(z_code, z_code)
-        
-        return pd.Series([meadow, plant, zone])
-    except:
+        # Validation: Check if ALL codes exist in our maps
+        if (m_code in meadow_map and 
+            p_code in plant_map and 
+            z_code in zone_map):
+            
+            return pd.Series([
+                meadow_map[m_code], 
+                plant_map[p_code], 
+                zone_map[z_code]
+            ])
+        else:
+            # If any code is unrecognized, return None
+            return pd.Series([None, None, None])
+
+    except Exception:
+        # Catch-all for malformed strings or unexpected errors
         return pd.Series([None, None, None])
-        print(f'Invalid data point found')
 
 # Apply logic specifically to the 'well_id' column
 df_long[['Site', 'Plant_Type', 'Zone']] = df_long[well_id_col].apply(categorize_well)
+df_long = df_long.dropna(subset=['Site', 'Plant_Type', 'Zone'])
 df_long['Level'] = pd.to_numeric(df_long['Level'], errors='coerce')
-
 
 
 # DEFINE CONSISTENT COLORS
@@ -114,98 +132,139 @@ grand_mean = df_long.groupby('Week')['Level'].mean().reset_index()
 
 print("Data Prep Complete.")
 
-
 """
-# TASK 1: MEAN LEVELS ACROSS ALL WELLS
 
-# --- CALCULATE LIMITS SPECIFICALLY FOR TASK 1 ---
-# We calculate min/max only based on the 'yearly_means' data used in this plot
+#TASK 1: MEAN LEVELS ACROSS ALL WELLS 
+
 t1_max = yearly_means['Level'].max() + 5
 t1_min = yearly_means['Level'].min() - 5
 
-# 1. Setup Plot
-fig, axes = plt.subplots(1, 2, figsize=(16, 6), sharey=True)
+# 1. INDIVIDUAL PLOT: Annual Lines
+plt.figure(figsize=(10, 6))
+sns.lineplot(data=yearly_means, x='Week', y='Level', hue='Year', palette=year_palette, marker='o')
+plt.title('Mean GW Level by Year (All Wells)')
+plt.ylabel('Depth Below Surface (cm)')
+plt.gca().invert_yaxis()
+plt.ylim(t1_max, t1_min)
+plt.grid(True, alpha=0.3)
+plt.savefig(f"{output_dir}Mean_GW_Level_by_Year.eps", format='eps')
+plt.show()
 
-# Plot A: Annual Lines
-# Note: We use 'palette=year_palette' instead of 'tab10' to enforce consistency
-sns.lineplot(data=yearly_means, x='Week', y='Level', hue='Year', palette=year_palette, marker='o', ax=axes[0])
-axes[0].set_title('Mean GW Level by Year (All Wells)')
-axes[0].set_ylabel('Depth Below Surface (cm)')
-axes[0].grid(True, alpha=0.3)
-axes[0].invert_yaxis()             # Put 0 at the top (Surface)
-axes[0].set_ylim(t1_max, t1_min)   # Apply limits specific to this task
+# 2. INDIVIDUAL PLOT: Grand Mean Only
+plt.figure(figsize=(10, 6))
+sns.lineplot(data=grand_mean, x='Week', y='Level', color='black', linewidth=3, label='Grand Mean')
+plt.title('Grand Mean (All Years Aggregated)')
+plt.ylabel('Depth Below Surface (cm)')
+plt.gca().invert_yaxis()
+plt.ylim(t1_max, t1_min)
+plt.grid(True, alpha=0.3)
+plt.savefig(f"{output_dir}GRAND_Mean_GW_Level_by_Year.eps", format='eps')
+plt.show()
 
-# Plot B: Grand Mean
-sns.lineplot(data=grand_mean, x='Week', y='Level', color='black', linewidth=3, ax=axes[1])
-axes[1].set_title('Grand Mean (All Years Aggregated)')
-axes[1].grid(True, alpha=0.3)
-axes[1].invert_yaxis()             # Put 0 at the top
-axes[1].set_ylim(t1_max, t1_min) 
-
-plt.tight_layout()
-
-# 2. Save
-save_path = f"{output_dir}mean_gw_all_wells_and_grand_mean.eps"
-plt.savefig(save_path, format='eps')
-print(f"Saved: {save_path}")
-
+# 3. COMBINED PLOT: Annual + Grand Mean Overlay
+plt.figure(figsize=(10, 6))
+# Plot annual lines with lower transparency (alpha) so the Grand Mean stands out
+sns.lineplot(data=yearly_means, x='Week', y='Level', hue='Year', palette=year_palette, alpha=0.4, legend=False)
+# Overlay the Grand Mean
+sns.lineplot(data=grand_mean, x='Week', y='Level', color='black', linewidth=4, label='Grand Mean')
+plt.title('Combined: Annual Trends vs. Grand Mean (All Wells)')
+plt.ylabel('Depth Below Surface (cm)')
+plt.gca().invert_yaxis()
+plt.ylim(t1_max, t1_min)
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.savefig(f"{output_dir}COMBINED_Mean_GW_Level_by_Year.eps", format='eps')
 plt.show()
 """
 
-# TASK 2: CATEGORIZED PLOTS
+# --- TASK 2: CATEGORIZED COMPARISONS ---
 
-# 1. Define the list of columns to graph
 categories_to_plot = ['Site', 'Plant_Type', 'Zone']
 
-# 2. Go through each category type
 for category_col in categories_to_plot:
     
-    # Get the unique values (e.g., "East", "Kiln" or "Sedge", "Willow")
-    unique_cats = df_long[category_col].unique()
+    # Get valid unique values
+    unique_cats = [c for c in df_long[category_col].unique() if c is not None]
+    num_cats = len(unique_cats)
     
-    # 3. Go through each specific item (e.g., East -> Kiln)
+    # ---------------------------------------------------------
+    # PART 1: PLOT SEPARATELY (Individual files, NO MEAN)
+    # ---------------------------------------------------------
     for cat_val in unique_cats:
-        if cat_val is None: continue
-
-        plt.figure(figsize=(10, 5))
-        
-        # Filter for the specific item
+        # Prepare Data
         subset = df_long[df_long[category_col] == cat_val]
-        
-        # Skip if empty
-        if subset.empty: continue
-
-        # Calculate means
-        subset_means = subset.groupby(['Year', 'Week'])['Level'].mean().reset_index()
-        
-        # --- DYNAMIC LIMITS ---
-        local_max = subset_means['Level'].max() + 5
-        local_min = subset_means['Level'].min() - 5
+        subset_annual = subset.groupby(['Year', 'Week'])['Level'].mean().reset_index()
         
         # Plot
-        sns.lineplot(data=subset_means, x='Week', y='Level', hue='Year', 
-                     palette=year_palette, marker='.')
+        plt.figure(figsize=(8, 5))
+        sns.lineplot(data=subset_annual, x='Week', y='Level', hue='Year', palette=year_palette, marker='.')
         
-        plt.title(f'Mean GW Levels: {cat_val} ({category_col})')
-        plt.ylabel('Depth Below Surface (cm)')
-        plt.xlabel('ISO Week')
+        # Formatting
+        plt.title(f'Individual View: {cat_val}')
+        plt.gca().invert_yaxis()
         plt.grid(True, alpha=0.3)
-        
-        # Axis Handling
-        plt.gca().invert_yaxis() 
-        plt.ylim(local_max, local_min)
+        plt.ylabel('Depth Below Surface (cm)')
         
         # Save
-        clean_cat_name = str(cat_val).replace(" ", "_")
-        save_path = f"{output_dir}mean_gw_{category_col}_{clean_cat_name}.eps"
-        plt.savefig(save_path, format='eps')
-        print(f"Saved: {save_path}")
+        clean_name = str(cat_val).replace(" ", "_")
+        plt.savefig(f"{output_dir}SEPARATE_{category_col}_{clean_name}.eps")
+        plt.close() 
+
+    # ---------------------------------------------------------
+    # PART 2: PLOT TOGETHER (Subplots: Ghost Years + Bold 2021 + Dashed Mean)
+    # ---------------------------------------------------------
+    fig, axes = plt.subplots(1, num_cats, figsize=(5 * num_cats, 6), sharey=True)
+    if num_cats == 1: axes = [axes] # Handle single-item case
+
+    # Global scale for this comparison
+    cat_subset = df_long[df_long[category_col].isin(unique_cats)]
+    t2_max = cat_subset['Level'].max() + 5
+    t2_min = cat_subset['Level'].min() - 5
+
+    for i, cat_val in enumerate(unique_cats):
+        ax = axes[i]
+        type_data = df_long[df_long[category_col] == cat_val]
         
-        # SHOW THE PLOT
-        # The script will pause here until you close the window (if running in terminal)
-        plt.show()
+        # Calculate means
+        type_annual = type_data.groupby(['Year', 'Week'])['Level'].mean().reset_index()
+        type_grand = type_data.groupby('Week')['Level'].mean().reset_index()
 
+        # A. Plot Background Years (Transparent "Ghost" Lines)
+        # We assume '2021' is the drought year you want to highlight
+        background_years = type_annual[type_annual['Year'] != 2021]
+        if not background_years.empty:
+            sns.lineplot(data=background_years, x='Week', y='Level', hue='Year', 
+                         palette=year_palette, ax=ax, alpha=0.15, legend=False, linewidth=1)
+        
+        # B. Plot 2021 (Solid, Bold, Colored)
+        drought_year = type_annual[type_annual['Year'] == 2021]
+        if not drought_year.empty:
+            sns.lineplot(data=drought_year, x='Week', y='Level', color=year_palette.get(2021, 'red'), 
+                         ax=ax, linewidth=3, label='2021 (Drought)' if i == num_cats-1 else None)
+        
+        # C. Plot Grand Mean (Black, Dashed)
+        sns.lineplot(data=type_grand, x='Week', y='Level', color='black', 
+                     ax=ax, linewidth=2, linestyle='--', label='Grand Mean' if i == num_cats-1 else None)
+        
+        # Formatting
+        ax.set_title(cat_val, fontweight='bold')
+        ax.set_ylim(t2_max, t2_min)
+        ax.invert_yaxis()
+        ax.grid(True, alpha=0.2)
+        
+        # Only show Y-label on the first plot
+        if i == 0:
+            ax.set_ylabel('Depth Below Surface (cm)')
+        else:
+            ax.set_ylabel('')
 
+    # Unified Title
+    plt.suptitle(f'Comparison by {category_col}: 2021 vs Normal Range', fontsize=16, y=1.02)
+    plt.tight_layout()
+    
+    # Save
+    plt.savefig(f"{output_dir}TOGETHER_Grid_{category_col}.eps", bbox_inches='tight')
+    plt.show()
 # TASK 3: DROUGHT (2021) vs NON-DROUGHT
 
 """
