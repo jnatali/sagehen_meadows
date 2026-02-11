@@ -77,14 +77,14 @@ gw_data_dir = project_dir + 'data/field_observations/groundwater/'
 # For 2025, try to limit processing and results to 2025 only
 subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_2025/'
 gw_biweekly_file = gw_data_dir + 'manual/groundwater_manual_2025_FULL.csv' #ground_to_water in cm
-gw_daily_file = gw_data_dir + 'groundwater_daily_2025_FULL_COMBINED.csv' # manual + logger data
-subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_2025_FULL.csv'
+gw_daily_file = gw_data_dir + 'manual/groundwater_daily_2025_FULL_COMBINED.csv' # manual + logger data
+subdaily_full_file = gw_data_dir +'subdaily_loggers/FULL/groundwater_subdaily_2025_FULL.csv'
 
 # PRE-2025
 # subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_all/'
-# gw_biweekly_file = gw_data_dir + 'biweekly_manual/groundwater_biweekly_FULL.csv' #ground_to_water in cm
-# gw_daily_file = gw_data_dir + 'groundwater_daily_FULL_COMBINED.csv' # manual + logger data
-# subdaily_full_file = 'subdaily_loggers/FULL/groundwater_subdaily_FULL.csv'
+# gw_biweekly_file = gw_data_dir + 'manual/groundwater_2018_2024_biweekly_FULL.csv' #ground_to_water in cm
+# gw_daily_file = gw_data_dir + 'manual/groundwater_daily_2018_2024_FULL_COMBINED.csv' # manual + logger data
+# subdaily_full_file = 'subdaily_loggers/FULL/groundwater_2018_2024_subdaily_FULL.csv'
 
 cut_dir = gw_data_dir + 'subdaily_loggers/WORKING/cut/'
 solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/RAW/baro_data/'
