@@ -15,6 +15,10 @@ For groundwater well naming conventions, see the key below. All uniquely named w
 2. plant functional type (PFT)
 3. hygrogeomorphic zone (HGMZ)
 
+**NOTE: In 2025, hydrogeomorphic zones for a few wells were renamed.** The field_well_id remained the same. Naming corrections are applied programmatically via scripts/groundwater/well_utils.py. Raw data files and physical wells at Sagehen retain the original well_ids, which are populated in the column "field_well_id" following correction.
+
+
+
 #### Abbreviations used in our data model
 
 ##### meadow_id
