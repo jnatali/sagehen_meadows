@@ -647,7 +647,7 @@ def report_groundwater_summary(gw_df: pd.DataFrame) -> pd.DataFrame:
         print(f"  Measurements after 12:00: {row.n_after_noon} "
               f"({row.pct_after_noon:.1f}%)")
         print(f"  Mean hour: {row.mean_hour:.1f}")
-        print(f"  Median hour: int{row.median_hour}")
+        print(f"  Median hour: {int(row.median_hour)}")
         print(f"  Earliest hour: {row.earliest_hour}")
         print(f"  Latest hour: {row.latest_hour}")
         print()
