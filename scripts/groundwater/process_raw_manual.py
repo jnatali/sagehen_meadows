@@ -783,6 +783,7 @@ def main():
     
     # ---- SAVE all manual groundwater data following conventions
     save_groundwater(groundwater_data)
+    print("Manual Groundwater Saved. Processing COMPLETE!")
 
     # --- DO THIS IN ANOTHER SCRIPT!! ADD transducer data ---
     # print('# OF UNIQUE WELLS: %s' % len(groundwater_data['well_id'].unique()))
