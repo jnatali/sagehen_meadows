@@ -72,9 +72,7 @@ def validate_well_ids(df, id_col):
         )
 
 ## Renaming / Correction
-def apply_well_id_corrections(
-    df
-):
+def correct_well_ids(df) -> pd.DataFrame:
     """
     Add a corrected well ID column using a lookup table.
     Original ID is preserved as field_well_id
@@ -148,7 +146,7 @@ def process_well_ids(
       3. assign categories
     """
     validate_well_ids(df, id_col=id_col)
-    df = apply_well_id_corrections(df)
+    df = correct_well_ids(df)
     df = get_well_categories(df)
 
     return df
