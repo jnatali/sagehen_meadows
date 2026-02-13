@@ -683,7 +683,6 @@ EHT-XC6S,2018-06-01 08:00:00,,False,,
 EHT-XC6S,2018-06-18 08:42:00,,False,,
 EHT-XC6S,2021-05-20 08:23:00,,False,,no water
 EHT-XC6S,2024-06-15 06:40:00,,False,dry,
-EHT-XC6S,2024-06-29 07:25:00,,,,Skip
 EHT-XC6S,2024-11-09 09:53:00,,False,frozen,no water; well depth is 5.06
 EWF-1,2018-06-01 06:50:00,35.5408,True,,
 EWF-1,2018-06-18 08:19:00,74.6145,True,,
@@ -734,37 +733,6 @@ EWF-1,2025-07-11 18:18:00,127.84,True,,
 EWF-1,2025-09-21 08:53:00,75.21,True,moist,
 EWF-1,2025-10-20 14:37:00,60.28,True,,
 EWF-1,2025-10-31 15:09:00,56.01,True,,
-EWF-XA1N,2019-06-18 07:56:00,19.1667,True,wet,bar dry
-EWF-XA1N,2019-07-06 08:31:00,41.9,True,,
-EWF-XA1N,2019-07-26 07:32:00,43.7,True,,
-EWF-XA1N,2019-08-05 06:55:00,,False,,
-EWF-XA1N,2019-09-21 10:39:00,26.5,True,,
-EWF-XA1N,2019-10-05 07:35:00,26.5333,True,,"swapped A1N and A2N, obvious mistake in field notebook"
-EWF-XA1N,2019-10-20 14:25:00,22.6667,True,,
-EWF-XA1N,2021-05-20 07:52:00,35.652,True,,"test: switching A2S and A3S readings (11/17/2024), otherwise A2S plot doesn't make sense"
-EWF-XA1N,2021-06-06 08:10:00,46.828,True,,
-EWF-XA1N,2021-06-20 07:54:00,47.336,True,,
-EWF-XA1N,2021-07-05 07:46:00,48.5552,True,,change to EWR-A1N; aside gravel bar in willows
-EWF-XA1N,2021-07-20 08:26:00,47.844,True,dry,
-EWF-XA1N,2021-08-06 08:20:00,49.5712,True,,mud
-EWF-XA1N,2021-08-22 09:35:00,47.7424,True,,"swapped A1N and A2N, obvious mistake in field notebook"
-EWF-XA1N,2021-09-08 09:04:00,51.0952,True,dry,mud near bottom
-EWF-XA1N,2021-09-24 09:35:00,48.352,True,dry,"mud, not bottom"
-EWF-XA1N,2021-10-06 09:26:00,48.4367,True,,mud at bottom
-EWF-XA1N,2021-11-14 09:25:00,26.3048,True,,
-EWF-XA1N,2024-05-19 08:59:00,13.4,True,moist,
-EWF-XA1N,2024-06-01 08:27:00,26.2,True,saturated,
-EWF-XA1N,2024-06-15 07:42:00,41.34,True,moist,
-EWF-XA1N,2024-06-29 08:18:00,48.05,True,moist,
-EWF-XA1N,2024-07-14 07:25:00,47.23,True,moist,rain
-EWF-XA1N,2024-07-27 07:59:00,47.13,True,dry-moist,willow; near bottom
-EWF-XA1N,2024-08-10 08:39:00,49.27,True,dry,
-EWF-XA1N,2024-08-22 08:46:00,47.03,True,dry,
-EWF-XA1N,2024-09-07 08:35:00,50.59,True,dry,
-EWF-XA1N,2024-09-21 08:14:00,46.02,True,dry,
-EWF-XA1N,2024-10-06 08:30:00,46.22,True,dry,
-EWF-XA1N,2024-10-21 08:53:00,29.45,True,wet,puddle nearby
-EWF-XA1N,2024-11-09 10:22:00,22.95,True,frozen,def willow
 EWR-1,2018-06-01 06:10:00,4.9677,True,,
 EWR-1,2018-06-18 07:26:00,10.7885,True,,
 EWR-1,2018-06-30 08:25:00,18.3027,True,,
@@ -814,6 +782,37 @@ EWR-1,2025-07-11 17:45:00,23.805,True,,at bottom
 EWR-1,2025-09-21 13:16:00,21.065,True,dry,
 EWR-1,2025-10-20 15:36:00,11.815,True,,
 EWR-1,2025-10-31 16:31:00,9.175,True,,
+EWR-XA1N,2019-06-18 07:56:00,19.1667,True,wet,bar dry
+EWR-XA1N,2019-07-06 08:31:00,41.9,True,,
+EWR-XA1N,2019-07-26 07:32:00,43.7,True,,
+EWR-XA1N,2019-08-05 06:55:00,,False,,
+EWR-XA1N,2019-09-21 10:39:00,26.5,True,,
+EWR-XA1N,2019-10-05 07:35:00,26.5333,True,,"swapped A1N and A2N, obvious mistake in field notebook"
+EWR-XA1N,2019-10-20 14:25:00,22.6667,True,,
+EWR-XA1N,2021-05-20 07:52:00,35.652,True,,"test: switching A2S and A3S readings (11/17/2024), otherwise A2S plot doesn't make sense"
+EWR-XA1N,2021-06-06 08:10:00,46.828,True,,
+EWR-XA1N,2021-06-20 07:54:00,47.336,True,,
+EWR-XA1N,2021-07-05 07:46:00,48.5552,True,,change to EWR-A1N; aside gravel bar in willows
+EWR-XA1N,2021-07-20 08:26:00,47.844,True,dry,
+EWR-XA1N,2021-08-06 08:20:00,49.5712,True,,mud
+EWR-XA1N,2021-08-22 09:35:00,47.7424,True,,"swapped A1N and A2N, obvious mistake in field notebook"
+EWR-XA1N,2021-09-08 09:04:00,51.0952,True,dry,mud near bottom
+EWR-XA1N,2021-09-24 09:35:00,48.352,True,dry,"mud, not bottom"
+EWR-XA1N,2021-10-06 09:26:00,48.4367,True,,mud at bottom
+EWR-XA1N,2021-11-14 09:25:00,26.3048,True,,
+EWR-XA1N,2024-05-19 08:59:00,13.4,True,moist,
+EWR-XA1N,2024-06-01 08:27:00,26.2,True,saturated,
+EWR-XA1N,2024-06-15 07:42:00,41.34,True,moist,
+EWR-XA1N,2024-06-29 08:18:00,48.05,True,moist,
+EWR-XA1N,2024-07-14 07:25:00,47.23,True,moist,rain
+EWR-XA1N,2024-07-27 07:59:00,47.13,True,dry-moist,willow; near bottom
+EWR-XA1N,2024-08-10 08:39:00,49.27,True,dry,
+EWR-XA1N,2024-08-22 08:46:00,47.03,True,dry,
+EWR-XA1N,2024-09-07 08:35:00,50.59,True,dry,
+EWR-XA1N,2024-09-21 08:14:00,46.02,True,dry,
+EWR-XA1N,2024-10-06 08:30:00,46.22,True,dry,
+EWR-XA1N,2024-10-21 08:53:00,29.45,True,wet,puddle nearby
+EWR-XA1N,2024-11-09 10:22:00,22.95,True,frozen,def willow
 EWR-XB3N,2018-07-16 09:21:00,37.8,True,,
 EWR-XB3N,2018-07-25 08:52:00,36.6667,True,,
 EWR-XB3N,2019-07-06 09:27:00,28.3,True,,
@@ -1288,12 +1287,6 @@ KHF-XD4S,2024-08-22 07:19:00,,False,dry,no water
 KHF-XD4S,2024-10-06 07:29:00,,False,dry,
 KHF-XD4S,2024-10-21 09:44:00,,False,dry,
 KHF-XD4S,2024-11-09 11:34:00,85.995,True,frozen,MH but well is within 50-60 cm of pine canopy; reading at bottom with water on sensor
-KHF-XE7S,2021-06-06 06:53:00,,True,,needs a black cap
-KHF-XE7S,2021-06-20 06:47:00,,True,,
-KHF-XE7S,2021-07-04 07:28:00,,True,,"at or near bottom, no cap, sediment?"
-KHF-XE7S,2021-07-20 07:15:00,,False,dry,no water
-KHF-XE7S,2021-08-06 07:06:00,,False,,"no water, seems shallow"
-KHF-XE7S,2024-05-19 10:23:00,,True,standing water,"water at surface, no well, pipe cracked"
 KHR-1,2019-07-05 07:26:00,16.225,True,,distributed to top well 51.0
 KHR-1,2019-07-26 06:50:00,32.1583,True,,
 KHR-1,2019-08-04 08:01:00,36.4583,True,,
@@ -1393,8 +1386,6 @@ KHR-XD2N,2018-09-16 09:15:00,56.9842,True,,
 KHR-XD2N,2018-10-01 08:27:00,55.1175,True,,
 KHR-XD2N,2018-10-14 08:54:00,53.3508,True,,
 KHR-XD2N,2018-11-18 16:42:00,46.6508,True,,dot
-KHR-XD2N,2019-09-04 00:00:00,-17.5825,True,,
-KHR-XD2N,2019-09-05 00:00:00,-17.3825,True,,
 KHR-XD2N,2024-05-19 09:47:00,,,,blocked
 KHR-XD2N,2024-06-16 08:03:00,,,,Blocked
 KHR-XE2N,2018-06-01 09:30:00,54.7442,True,,"cap screw stuck on top, removed assembly"
@@ -1408,6 +1399,54 @@ KHR-XE2N,2018-09-16 08:47:00,65.1567,True,,
 KHR-XE2N,2018-10-01 07:51:00,65.29,True,,
 KHR-XE2N,2018-10-14 08:10:00,63.59,True,standing water,
 KHR-XE2N,2018-11-18 16:25:00,58.0567,True,,"meter not working, too cold"
+KHT-1,2021-07-20 07:11:00,62.9571,True,dry,"reading was 3.27 ft, if it's really 4.27 ft then welltop WL = 130.1496 cm and ground WL = 99 cm which seems too low compared to other readings in 2021."
+KHT-1,2021-08-06 07:03:00,89.1699,True,,
+KHT-1,2021-08-22 12:03:00,88.8651,True,,grasshoppers
+KHT-1,2021-09-08 08:00:00,85.1059,True,dry,
+KHT-1,2021-09-24 08:41:00,59.7059,True,dry,
+KHT-1,2021-10-06 10:47:00,56.8242,True,dry,
+KHT-1,2021-11-14 07:51:00,,False,,no entry
+KHT-1,2024-05-19 10:09:00,-19.7125,True,standing water,"0-1 cm of ponding, hand measured in cm"
+KHT-1,2024-06-02 08:17:00,-14.1825,True,saturated,"measured in well with measuring stick; small swale flowing with water between E4, E5S about 0.5 m wide with 2 cm deep water; within a few meters of E5S"
+KHT-1,2024-06-16 08:32:00,9.2075,True,wet,
+KHT-1,2024-06-30 07:38:00,31.8675,True,moist,dremmel
+KHT-1,2024-07-13 07:47:00,48.6275,True,moist,
+KHT-1,2024-07-27 06:35:00,55.0275,True,dry,
+KHT-1,2024-08-10 07:34:00,57.3675,True,dry-moist,
+KHT-1,2024-08-22 07:04:00,60.1075,True,dry,
+KHT-1,2024-09-07 07:33:00,58.0775,True,dry,
+KHT-1,2024-09-21 09:03:00,52.8975,True,dry,
+KHT-1,2024-10-06 07:17:00,51.8875,True,dry,
+KHT-1,2024-10-21 09:31:00,47.3075,True,moist,
+KHT-1,2024-11-09 11:12:00,39.1875,True,frozen,
+KHT-1,2025-05-29 16:57:00,2.9075,True,wet,"cord loose, moved sensor"
+KHT-1,2025-06-24 16:30:00,38.2675,True,dry-moist,
+KHT-1,2025-07-14 13:19:00,59.6075,True,dry,
+KHT-1,2025-09-20 15:02:00,50.1575,True,dry,approx time based on hydrochron notes
+KHT-1,2025-10-19 17:10:00,37.8575,True,,said 2.55 in book for second and third reading; guessing it's actually 2.45 based on first reading but the first reading could be the wrong one.
+KHT-2,2021-07-20 07:13:00,61.1119,True,dry,"readings were 3.69, 3.7, 3.7; on plot, looks about 20 cm too high; unclear when new well installed; removing this reading"
+KHT-2,2021-08-06 07:04:00,83.7687,True,,
+KHT-2,2021-08-22 12:05:00,86.5119,True,,grasshoppers
+KHT-2,2021-09-08 08:04:00,88.3407,True,dry,
+KHT-2,2021-09-24 08:45:00,63.3471,True,dry,
+KHT-2,2021-10-06 10:49:00,55.7742,True,dry,
+KHT-2,2021-11-14 07:56:00,-4.5217,True,,
+KHT-2,2024-05-19 10:12:00,-30.5625,True,standing water,"0-1 cm of ponding, hand measured in cm"
+KHT-2,2024-06-02 08:29:00,-27.3625,True,saturated,"measured in well with measuring stick, about 0.5 cm of water with boot test"
+KHT-2,2024-06-16 08:33:00,-11.1225,True,wet-saturated,
+KHT-2,2024-06-30 07:39:00,13.3575,True,wet,
+KHT-2,2024-07-13 07:48:00,34.8975,True,dry-moist,
+KHT-2,2024-07-27 06:36:00,44.1475,True,dry,frozen soil
+KHT-2,2024-08-10 07:36:00,49.3275,True,dry-moist,
+KHT-2,2024-08-22 07:05:00,54.5075,True,dry,
+KHT-2,2024-09-07 07:34:00,53.0875,True,dry,
+KHT-2,2024-09-21 09:04:00,46.9875,True,moist,
+KHT-2,2024-10-06 07:19:00,47.1975,True,dry,
+KHT-2,2024-10-21 09:33:00,39.8775,True,moist,
+KHT-2,2024-11-09 11:13:00,31.5475,True,frozen,"At Kiln-2 phenocam MH is 95% blonde, a bit of green (maybe 1-2 cm) at base of DESCES and sedges"
+KHT-2,2025-05-29 18:06:00,0.0,True,wet,at surface
+KHT-2,2025-06-24 16:32:00,16.7175,True,dry-moist,
+KHT-2,2025-07-14 13:17:00,43.2275,True,dry,
 KHT-XD6N,2018-06-01 08:32:00,27.03,True,,
 KHT-XD6N,2018-06-19 08:04:00,69.3633,True,,
 KHT-XD6N,2018-07-01 06:22:00,96.3508,True,,
@@ -1515,31 +1554,6 @@ KHT-XE5S,2021-06-06 06:47:00,55.1073,True,,
 KHT-XE5S,2021-06-20 06:52:00,87.6193,True,,
 KHT-XE5S,2021-07-04 07:23:00,91.8865,True,,
 KHT-XE5S,2021-07-05 18:05:00,90.8705,True,,
-KHT-XE5S,2021-07-20 07:11:00,62.9571,True,dry,"reading was 3.27 ft, if it's really 4.27 ft then welltop WL = 130.1496 cm and ground WL = 99 cm which seems too low compared to other readings in 2021."
-KHT-XE5S,2021-08-06 07:03:00,89.1699,True,,
-KHT-XE5S,2021-08-22 12:03:00,88.8651,True,,grasshoppers
-KHT-XE5S,2021-09-08 08:00:00,85.1059,True,dry,
-KHT-XE5S,2021-09-24 08:41:00,59.7059,True,dry,
-KHT-XE5S,2021-10-06 10:47:00,56.8242,True,dry,
-KHT-XE5S,2021-11-14 07:51:00,,False,,no entry
-KHT-XE5S,2024-05-19 10:09:00,-19.7125,True,standing water,"0-1 cm of ponding, hand measured in cm"
-KHT-XE5S,2024-06-02 08:17:00,-14.1825,True,saturated,"measured in well with measuring stick; small swale flowing with water between E4, E5S about 0.5 m wide with 2 cm deep water; within a few meters of E5S"
-KHT-XE5S,2024-06-16 08:32:00,9.2075,True,wet,
-KHT-XE5S,2024-06-30 07:38:00,31.8675,True,moist,dremmel
-KHT-XE5S,2024-07-13 07:47:00,48.6275,True,moist,
-KHT-XE5S,2024-07-27 06:35:00,55.0275,True,dry,
-KHT-XE5S,2024-08-10 07:34:00,57.3675,True,dry-moist,
-KHT-XE5S,2024-08-22 07:04:00,60.1075,True,dry,
-KHT-XE5S,2024-09-07 07:33:00,58.0775,True,dry,
-KHT-XE5S,2024-09-21 09:03:00,52.8975,True,dry,
-KHT-XE5S,2024-10-06 07:17:00,51.8875,True,dry,
-KHT-XE5S,2024-10-21 09:31:00,47.3075,True,moist,
-KHT-XE5S,2024-11-09 11:12:00,39.1875,True,frozen,
-KHT-XE5S,2025-05-29 16:57:00,2.9075,True,wet,"cord loose, moved sensor"
-KHT-XE5S,2025-06-24 16:30:00,38.2675,True,dry-moist,
-KHT-XE5S,2025-07-14 13:19:00,59.6075,True,dry,
-KHT-XE5S,2025-09-20 15:02:00,50.1575,True,dry,approx time based on hydrochron notes
-KHT-XE5S,2025-10-19 17:10:00,37.8575,True,,said 2.55 in book for second and third reading; guessing it's actually 2.45 based on first reading but the first reading could be the wrong one.
 KHT-XE6S,2018-06-01 09:14:00,4.5567,True,,
 KHT-XE6S,2018-06-19 08:58:00,23.9242,True,,
 KHT-XE6S,2018-07-01 07:10:00,73.8775,True,,
@@ -1561,29 +1575,6 @@ KHT-XE6S,2019-10-05 08:30:00,,False,,
 KHT-XE6S,2021-06-06 06:52:00,39.7583,True,,
 KHT-XE6S,2021-06-20 06:50:00,80.0935,True,,
 KHT-XE6S,2021-07-04 07:25:00,138.8183,True,,at or near bottom
-KHT-XE6S,2021-07-20 07:13:00,61.1119,True,dry,"readings were 3.69, 3.7, 3.7; on plot, looks about 20 cm too high; unclear when new well installed; removing this reading"
-KHT-XE6S,2021-08-06 07:04:00,83.7687,True,,
-KHT-XE6S,2021-08-22 12:05:00,86.5119,True,,grasshoppers
-KHT-XE6S,2021-09-08 08:04:00,88.3407,True,dry,
-KHT-XE6S,2021-09-24 08:45:00,63.3471,True,dry,
-KHT-XE6S,2021-10-06 10:49:00,55.7742,True,dry,
-KHT-XE6S,2021-11-14 07:56:00,-4.5217,True,,
-KHT-XE6S,2024-05-19 10:12:00,-30.5625,True,standing water,"0-1 cm of ponding, hand measured in cm"
-KHT-XE6S,2024-06-02 08:29:00,-27.3625,True,saturated,"measured in well with measuring stick, about 0.5 cm of water with boot test"
-KHT-XE6S,2024-06-16 08:33:00,-11.1225,True,wet-saturated,
-KHT-XE6S,2024-06-30 07:39:00,13.3575,True,wet,
-KHT-XE6S,2024-07-13 07:48:00,34.8975,True,dry-moist,
-KHT-XE6S,2024-07-27 06:36:00,44.1475,True,dry,frozen soil
-KHT-XE6S,2024-08-10 07:36:00,49.3275,True,dry-moist,
-KHT-XE6S,2024-08-22 07:05:00,54.5075,True,dry,
-KHT-XE6S,2024-09-07 07:34:00,53.0875,True,dry,
-KHT-XE6S,2024-09-21 09:04:00,46.9875,True,moist,
-KHT-XE6S,2024-10-06 07:19:00,47.1975,True,dry,
-KHT-XE6S,2024-10-21 09:33:00,39.8775,True,moist,
-KHT-XE6S,2024-11-09 11:13:00,31.5475,True,frozen,"At Kiln-2 phenocam MH is 95% blonde, a bit of green (maybe 1-2 cm) at base of DESCES and sedges"
-KHT-XE6S,2025-05-29 18:06:00,0.0,True,wet,at surface
-KHT-XE6S,2025-06-24 16:32:00,16.7175,True,dry-moist,
-KHT-XE6S,2025-07-14 13:17:00,43.2275,True,dry,
 KWF-1,2018-07-01 08:25:00,54.6792,True,,
 KWF-1,2018-07-17 08:46:00,74.1333,True,,
 KWF-1,2018-07-27 08:51:00,75.3,True,,

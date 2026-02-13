@@ -71,7 +71,7 @@ def validate_well_ids(df, id_col):
             f"Invalid well_id(s) found: {sorted(invalid)}"
         )
 
-## Renaming / Correction
+## Rename well_id / Correction
 def correct_well_ids(df) -> pd.DataFrame:
     """
     Add a corrected well ID column using a lookup table.
@@ -93,6 +93,54 @@ def correct_well_ids(df) -> pd.DataFrame:
     df["well_id"] = df["well_id"].map(corrections).fillna(df["well_id"])
 
     return df
+
+## Rename well_id / Correction
+def correct_well_ids(df, datetime_name: str) -> pd.DataFrame:
+    """
+    Add a corrected well ID column using a lookup table.
+    Original ID is preserved as field_well_id
+    """
+    df = df.copy()
+    
+    # Ensure datetime column is datetime
+    if not pd.api.types.is_datetime64_any_dtype(df[datetime_name]):
+        df[datetime_name] = pd.to_datetime(df[datetime_name])
+    
+    # get corrections datafram from load_well_id_corrections(path)
+    corrections_df = load_well_id_corrections(CORRECTIONS_PATH)
+    
+    # Ensure effective_date is datetime
+    if not pd.api.types.is_datetime64_any_dtype(corrections_df["effective_date"]):
+        corrections_df["effective_date"] = pd.to_datetime(
+            corrections_df["effective_date"])
+    
+    # Preserve original ID
+    df["field_well_id"] = df["well_id"]
+    
+    # Merge corrections
+    merged = df.merge(
+        corrections_df,
+        left_on="well_id",
+        right_on="well_field_id",
+        how="left",
+        suffixes=("", "_corr")
+    )
+    
+    # Apply conditional correction
+    mask = (
+        merged["well_id_corr"].notna() &
+        (merged[datetime_name] >= merged["effective_date"])
+    )
+    
+    merged.loc[mask, "well_id"] = merged.loc[mask, "well_id_corr"]
+    
+    # Drop correction helper columns
+    merged = merged.drop(columns=[
+        "well_id_corr",
+        "effective_date"
+    ])
+
+    return merged
 
 ## Categorization of site, HGMZ, and PFT
 def get_well_categories(
@@ -138,6 +186,7 @@ def get_well_categories(
 def process_well_ids(
     df,
     id_col="well_id",
+    datetime_col="datetime"
 ):
     """
     End-to-end well ID processing:
@@ -146,7 +195,7 @@ def process_well_ids(
       3. assign categories
     """
     validate_well_ids(df, id_col=id_col)
-    df = correct_well_ids(df)
+    df = correct_well_ids(df,datetime_col)
     df = get_well_categories(df)
 
     return df

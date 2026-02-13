@@ -487,10 +487,21 @@ def get_groundwater_level(gw_df, dimension_df) -> pd.DataFrame():
         allow_exact_matches=True
     )
     
-    # Warn if dimension missing
-    missing_dim = merged["welltop_to_ground_cm"].isna()
-    if missing_dim.any():
-        print(f"WARNING: {missing_dim.sum()} records missing well dimension.")
+    # Identify and address missing dimension rows
+    missing_dim_mask = merged["welltop_to_ground_cm"].isna()
+    
+    if missing_dim_mask.any():
+        missing_records = (
+            merged.loc[missing_dim_mask, ["well_id", "timestamp"]]
+            .sort_values(["well_id", "timestamp"])
+            )
+        print(f"\nWELL DIMENSION METADATA WARNING!\n")
+        print("REMOVING the following records without well dimensions")
+        print(f"# of recods: {missing_dim_mask.sum()}")
+        print(missing_records.to_string(index=False))
+        
+        # Remove invalid records
+        merged = merged.loc[~missing_dim_mask].copy()
 
     # Vectorized groundwater calculation
     merged["ground_to_water_cm"] = (
@@ -756,8 +767,8 @@ def main():
     #    Check that all well_id's from gw raw data and well_dimension are
     #    found in well_unique_id, then correct well_ids.
     
-    groundwater_data = process_well_ids(groundwater_data)
-    well_dimension = process_well_ids(well_dimension)
+    groundwater_data = process_well_ids(groundwater_data, datetime_col="timestamp")
+    well_dimension = process_well_ids(well_dimension, datetime_col="effective_timestamp")
     print('Processed well_ids')
            
     # ---- DETERMINE welltop_to_ground_cm
