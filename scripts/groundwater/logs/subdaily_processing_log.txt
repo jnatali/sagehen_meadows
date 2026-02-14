@@ -2474,3 +2474,57 @@ well_id  deployment
     ('KWF-2', 2): 0.0164842050932541,
     ('KWR-1', 1): 0.0031622836174014413,
     ('KWT-2', 1): 0.0035368871959666247}
+2026-02-13 12:43:03,540 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 12:43:24,085 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 12:43:37,339 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 12:46:27,847 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 12:47:08,841 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 12:50:14,179 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 12:50:14,430 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 13:33:35,270 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 13:33:35,715 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 15:58:44,825 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 16:03:26,962 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 16:12:01,704 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 16:14:03,163 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 16:14:51,132 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 16:17:48,881 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 16:18:56,132 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 16:20:59,171 - ----------
+
+Logging ON for process_raw_logger.py
+2026-02-13 16:22:51,899 - ----------
+
+Logging ON for process_raw_logger.py

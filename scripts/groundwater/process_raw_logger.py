@@ -19,7 +19,7 @@ Requires data files:
 TODO: 
 
 """
-# import libraries
+# ---- IMPORTS ---- 
 import numpy as np
 import pandas as pd
 import geopandas as gpd # to handle geojson file
@@ -41,9 +41,10 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from well_utils import process_well_ids
 
+# ---- GLOBAL VARIABLES ---- 
 
-### SETUP FLAGS 
-##  for processing, logging, debugging and data validation
+## --- SETUP FLAGS 
+##     for processing, logging, debugging and data validation
 
 process_cut = True
 process_baro = True #not working with false yet
@@ -54,36 +55,38 @@ debug_cut = True
 debug_baro = True
 debug_gtw = True
 
-### GLOBAL VARIABLES
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
 density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
 baro_standard_elevation = 1933.7 # Saghen Weather Tower #1 elev in meters
 
-### SETUP DIRECTORY + FILE NAMES
-gw_data_dir = '../../data/field_observations/groundwater/manual/'
+## --- SETUP DIRECTORY + FILE NAMES --- 
+gw_data_dir = '../../data/field_observations/groundwater/'
 
-# Year-dependent variables
-subdaily_dir = gw_data_dir + 'subdaily_loggers/RAW/Solinst_levelogger_2025/'
-gw_biweekly_file = gw_data_dir + 'manual/groundwater_manual_2025_FULL.csv' #ground_to_water in cm
-gw_daily_file = gw_data_dir + 'manual/groundwater_daily_2025_FULL_COMBINED.csv' # manual + logger data
-subdaily_full_file = gw_data_dir +'subdaily_loggers/FULL/groundwater_subdaily_2025_FULL.csv'
+### --- INPUTS
+gw_logger_dir = gw_data_dir + 'loggers/RAW/'
+gw_manual_file = gw_data_dir + 'manual/PROCESSED/groundwater_manual.csv'
+cut_times_file = gw_data_dir + 'loggers/groundwater_logger_times.csv'
 
-cut_dir = gw_data_dir + 'subdaily_loggers/WORKING/cut/'
 solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/RAW/baro_data/'
-compensated_dir = gw_data_dir + 'subdaily_loggers/WORKING/baro_compensated/'
-gtw_logger_dir = gw_data_dir + 'subdaily_loggers/WORKING/relative_to_ground/'
-os.makedirs(gtw_logger_dir,exist_ok=True)
-os.makedirs("logs",exist_ok=True)
-
-cut_times_file = gw_data_dir + 'subdaily_loggers/groundwater_logger_times.csv'
-cut_data_file = cut_dir+'cut_all_wells.csv'
-well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
-
 station_dendra_data_dir = '../../data/station_instrumentation/climate/'
 station_dendra_file = station_dendra_data_dir + 'Weather_2010_2025_10min_SagehenTower1.csv'
+well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
 
+### --- WORKING
+cut_dir = gw_data_dir + 'loggers/WORKING/cut/'
+cut_data_file = cut_dir+'cut_all_wells.csv'
+compensated_dir = gw_data_dir + 'loggers/WORKING/baro_compensated/'
+gtw_logger_dir = gw_data_dir + 'loggers/WORKING/relative_to_ground/'
+os.makedirs(gtw_logger_dir,exist_ok=True)
 
-# Configure and test logging to write to a file
+### --- OUTPUTS
+gw_daily_file = gw_data_dir + 'time_series/groundwater_daily.csv' # manual + logger data
+gw_logger_output_file = gw_data_dir +'loggers/PROCESSED/groundwater_subdaily.csv'
+log_file = "logs/subdaily_processing_log.txt"
+
+## --- LOGGING: Configure to write logs to a file
+os.makedirs("logs",exist_ok=True)
+
 log_level=logging.INFO  # Can log different levels: INFO, DEBUG or ERROR
 if (debug_cut or debug_baro or debug_gtw):
     log_level=logging.DEBUG
@@ -93,12 +96,13 @@ if (debug_cut or debug_baro or debug_gtw):
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
     
-logging.basicConfig(filename="logs/subdaily_processing_log.txt", 
+logging.basicConfig(filename= log_file,
                         level=log_level, 
                         format='%(asctime)s - %(message)s')
-logging.info("----------\n\nLogging ON for subdaily_processing_RawToGround.py")
+logging.info("----------\n\nLogging ON for process_raw_logger.py")
+print(f"----------\n\nLogging ON! see {log_file}.")
 
-### DEFINE FUNCTIONS 
+# ---- DEFINE FUNCTIONS ---- 
 
 ## Helper function to filter a subset dataframe based on well_id and time range
 def filter_subset_dataframe(df, well, start, stop):
@@ -144,6 +148,135 @@ def remove_outliers(df, column_name, multiplier=1.5):
     
     return df_cleaned
 
+
+def load_logger_data() -> pd.DataFrame:
+    """
+    Consolidates all raw logger csv files into one dataframe.
+    
+    First loads raw groundwater logger data from Solinset Levelogger .csv file 
+    output. Return a DataFrame that aggregates all logger data for all years.
+    
+    Each .csv file from the logger represents a deployment of a logger 
+    within a specific well (well_id) and a well-defined start and stop 
+    timestamp with a consistent logging frequency (e.g. 10 minutes). 
+    
+    Note: There might be > 1 deployment per well_id per year, which should be
+    tracked in the returned dataframe.
+    
+    The .csv files of raw logger data are located in yearly directories
+    within gw_logger_dir. Those directories are named following convention:
+        'Solinst_Levelogger_YYYY' where YYYY is the 4-digit year
+            of measurement.
+            
+    Each raw logger .csv has a specific naming convention and internal format 
+    that should be handled consistently. 
+    
+    File naming convention: "well_id"_"YYYY"_"MMDD" of start_"MMDD" of stop.csv
+    
+    Returns dataframe with following columns; no filtering or trimming:
+        well_id
+        deployment_id
+        deploy_year
+        DT
+        raw_Level_m: raw measurement (unchanged)
+
+    """
+    data_dir = Path(gw_logger_dir)
+    
+    # Fail fast if base directory is missing
+    if not data_dir.exists():
+        raise FileNotFoundError(f"Directory not found: {data_dir}")
+    
+    # Fetch directory names that fit naming convention; 
+    #   include capture groups with () to extract key variables
+    dir_pattern = re.compile(r"^Solinst_Levelogger_(\d{4})$")
+    
+    # Fetch files that fit naming convention within each yearly directory
+    file_pattern = re.compile(
+     r"^(?P<well_id>.+)_(?P<year>\d{4})_(?P<start>\d{4})_(?P<end>\d{4})\.csv$")
+   
+    # Require the following columns in the initial file load
+    required_cols = {"Date", "Time", "LEVEL", "TEMPERATURE"}
+    
+    # Instantiate list of deployments
+    deployments: list[pd.DataFrame] = []
+    
+    # ---- Iterate over directories
+    year_dirs = []
+    
+    for d in data_dir.iterdir():
+        if d.is_dir():
+            dir_match = dir_pattern.fullmatch(d.name)
+            if dir_match:
+                year_dirs.append((d, int(dir_match.group(1))))
+    if not year_dirs:
+        raise ValueError(
+            "No directories matching 'Solinst_Levelogger_YYYY' found.")
+    
+    # ---- Iterate within directories
+    for year_dir, deploy_year in year_dirs:
+
+            # loop through matched directories        
+            for f in sorted(year_dir.glob("*.csv")):
+                
+                matched_file = file_pattern.fullmatch(f.name)   
+                if not matched_file:
+                    continue # skip to next file
+                    
+                well_id = matched_file.group("well_id")
+                deployment_id = f.stem # unique per deployment
+                       
+                # create data frame with data from this csv file
+                deployment_df = pd.read_csv(
+                    f,
+                    header=11,
+                    encoding='ISO-8859-1')
+                
+                # check for required columns and fail immediately
+                missing = required_cols - set(deployment_df.columns)
+                if missing:
+                    raise ValueError(f"{f}: missing columns {missing}")
+                
+                # Convert 'Date' to datetime and 'Time' to timedelta
+                # deployment_df.insert(3, 'DT', pd.to_datetime(deployment_df['Date'] 
+                #                     + ' ' + deployment_df['Time'], format='mixed'))
+                deployment_df.insert(0, 'DT', 
+                                     pd.to_datetime(
+                                         deployment_df['Date'] 
+                                         + ' ' + deployment_df['Time'], 
+                                         format='mixed',
+                                         errors='raise'))
+
+                # rename column
+                deployment_df = deployment_df.rename(
+                    columns={'LEVEL': 'raw_Level_m'})
+                
+                # add columns to dataframe
+                deployment_df.insert(0, 'well_id', well_id)
+                deployment_df.insert(0, 'deploy_year', deploy_year)
+                deployment_df.insert(0, 'deployment_id', deployment_id)
+                
+                # check before append
+                if deployment_df.empty:
+                    raise ValueError(f"{f}: deployment dataframe is empty")
+                
+                # append to list
+                deployments.append(deployment_df)
+                
+            # status update
+            print(f"Loaded deployment data for {deploy_year}")
+            
+    if not deployments:
+        raise ValueError(
+            "No valid logger deployment files found.")
+        
+    # should I sort by DT or deployment_id?
+    return (pd.concat(
+        deployments, 
+        ignore_index=True)
+        .sort_values(["well_id", "DT"])
+        .reset_index(drop=True))
+            
 ## Consolidate all logger csv files into one dataframe    
 def get_logger_dataframe():
     """Consolidate all logger csv filesinto one dataframe."""
@@ -727,7 +860,7 @@ def cut_logger_data():
     log_time_df['end'] = pd.to_datetime(log_time_df['end'])
     
     ## process each logger deployment file
-    for f in sorted(os.listdir(subdaily_dir)):
+    for f in sorted(os.listdir(gw_logger_dir)):
         if f.endswith('.csv'):
         
             if debug_cut: logging.debug(f)
@@ -736,7 +869,7 @@ def cut_logger_data():
             well_id = re.split('_20',f)[0]
                         
             # create data frame with data from this csv file
-            deployment_df = pd.read_csv(subdaily_dir+f, header=11, encoding='ISO-8859-1')
+            deployment_df = pd.read_csv(gw_logger_dir+f, header=11, encoding='ISO-8859-1')
             
             # Convert 'Date' to datetime and 'Time' to timedelta
             deployment_df.insert(3, 'DT', pd.to_datetime(deployment_df['Date'] 
@@ -1562,39 +1695,51 @@ def convert_relativeToGround(subdaily_df):
         print(f"Missing ground_to_water_cm values in daily_df: {missing_count}"
               f"( {missing_percent:.1f}%)")
 
+# --- MAIN ---
+# Define a main() function to allow import of functions
+# without executing the full script.
 
-### EXECUTE FUNCTIONS TO PROCESS LOGGER DATA
-
-## Starts with individual raw Solinst logger files 
-##   in the 'subdaily_dir' directory
+def main():
+    """
+    EXECUTE FUNCTIONS TO PROCESS LOGGER DATA
+    """
     
-## 1. Cut logger entries when sensor not in the well, 
-##     as indicated by drastic water level or temperature change
-if process_cut:
-    waterLevel_df = cut_logger_data()
-    print("CUT COMPLETE")
-else: 
-    waterLevel_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
-    waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
-
-## 2. Get elevation data for each well
-waterLevel_df = get_well_elevations(waterLevel_df)
-print("GOT WELL ELEVATIONS")
-
-## 3. Compensate logger water level (m) based on barometer data (kPa)
-if process_baro: 
-    waterLevel_df = compensate_baro(waterLevel_df)
-    print("COMPENSATION COMPLETE")
-
-## 4. Convert water level from 'relative to sensor' to 
-###    'relative to ground surface elevation' (in meters)
-###   Also save combined manual and sensor-based gw readings as .csv
-waterLevel_df = convert_relativeToGround(waterLevel_df)
-print("RELATIVE TO GROUND CALCULATED")
-
-## 5. Plot a visualization of the subdaily groundwater time series
-#plot_timeseries_gridmap(waterLevel_df)
-
-
-print(waterLevel_df)
+    # Load input (source data) files    
+    subdaily_gw_df = load_logger_data()
+    print("Groundwater logger files loaded.")
     
+    # ## 1. Cut logger entries when sensor not in the well, 
+    # ##     as indicated by drastic water level or temperature change
+    # if process_cut:
+    #     waterLevel_df = cut_logger_data()
+    #     print("CUT COMPLETE")
+    # else: 
+    #     waterLevel_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
+    #     waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
+    
+    # ## 2. Get elevation data for each well
+    # waterLevel_df = get_well_elevations(waterLevel_df)
+    # print("GOT WELL ELEVATIONS")
+    
+    # ## 3. Compensate logger water level (m) based on barometer data (kPa)
+    # if process_baro: 
+    #     waterLevel_df = compensate_baro(waterLevel_df)
+    #     print("COMPENSATION COMPLETE")
+    
+    # ## 4. Convert water level from 'relative to sensor' to 
+    # ###    'relative to ground surface elevation' (in meters)
+    # ###   Also save combined manual and sensor-based gw readings as .csv
+    # waterLevel_df = convert_relativeToGround(waterLevel_df)
+    # print("RELATIVE TO GROUND CALCULATED")
+    
+    # ## 5. Plot a visualization of the subdaily groundwater time series
+    # #plot_timeseries_gridmap(waterLevel_df)
+    
+    print(subdaily_gw_df)
+
+# ---- Execute MAIN ----
+# allows import of functions into another script
+# without executing this full script.
+
+if __name__ == "__main__":
+    main()

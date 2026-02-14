@@ -54,6 +54,7 @@ import numpy as np
 from pathlib import Path
 import re
 import matplotlib.pyplot as plt
+from matplotlib import colormaps
 from matplotlib.backends.backend_pdf import PdfPages
 from well_utils import process_well_ids
 
@@ -446,6 +447,24 @@ def get_groundwater_level(gw_df, dimension_df) -> pd.DataFrame():
     groundwater_dimension (pd.DataFrame()): groundwater dimensional characteristics
                                        per well_id
 
+    -----------------
+    TODO: Consider reporting on sampling interval, outliers, dry wells
+    
+    Code suggestions from chatgpt follows.
+    
+    # sampling interval consistency    
+    valid_df.groupby("well_id")["timestamp"].diff().dt.days.describe()
+    
+    # outlier flag, counted per year
+    extreme = valid_df[
+        (valid_df["ground_to_water_cm"] < 0) |
+        (valid_df["ground_to_water_cm"] > valid_df["ground_to_water_cm"].quantile(0.99))
+        ]
+    
+    # dry well rate, mean and per year
+    dry_rate = (year_df["water_binary"] == False).mean()
+
+    -------------------
     Returns:
     updated groundwater_data (pd.DataFrame())
     """
@@ -707,8 +726,15 @@ def plot_groundwater_per_well(groundwater_data) -> None:
     # Sort values
     groundwater_data = groundwater_data.sort_values(by=['well_id', 'timestamp'])
 
-    # Define color map for years    
+    # Define color map for years
+    # matplotlib colormaps at
+    # https://matplotlib.org/stable/users/explain/colors/colormaps.html
+    # and for science plots see
+    # https://github.com/garrettj403/SciencePlots
+    # https://colorcet.holoviz.org/
+    # https://cmweather.readthedocs.io/en/latest/
     cmap = plt.get_cmap("viridis")
+    #cmap = plt.get_cmap("berlin") --> more accessible for colorblind?
     
     # Generate evenly spaced colors based on year length
     plot_colors = cmap(np.linspace(0, 1, len(years)))
@@ -757,6 +783,9 @@ def plot_groundwater_per_well(groundwater_data) -> None:
 # without executing the full script.
 
 def main():
+    """
+    EXECUTE FUNCTIONS TO PROCESS MANUAL GROUNDWATER DATA
+    """
     
     # Load input (source data) files    
     groundwater_data = load_groundwater_data(groundwater_raw_data_dir)
@@ -795,6 +824,9 @@ def main():
     #     print('# of ENTRIES AFTER MERGE: %s' % len(groundwater_data))
     #     save_groundwater(groundwater_data)
     
+# ---- Execute MAIN ----
+# allows import of functions into another script
+# without executing this full script.
 
 if __name__ == "__main__":
     main()
