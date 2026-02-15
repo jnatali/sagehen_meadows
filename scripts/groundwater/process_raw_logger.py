@@ -46,10 +46,8 @@ from well_utils import process_well_ids
 ## --- SETUP FLAGS 
 ##     for processing, logging, debugging and data validation
 
-process_cut = True
-process_baro = True #not working with false yet
-
-save_fig = False #not working yet, throwing error
+USE_LOGGER_DATA_CACHE = False
+USE_CUT_DATA_CACHE = False
 
 debug_cut = True
 debug_baro = True
@@ -73,10 +71,12 @@ station_dendra_file = station_dendra_data_dir + 'Weather_2010_2025_10min_Sagehen
 well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
 
 ### --- WORKING
-cut_dir = gw_data_dir + 'loggers/WORKING/cut/'
-cut_data_file = cut_dir+'cut_all_wells.csv'
-compensated_dir = gw_data_dir + 'loggers/WORKING/baro_compensated/'
-gtw_logger_dir = gw_data_dir + 'loggers/WORKING/relative_to_ground/'
+work_dir = gw_data_dir + 'loggers/WORKING/'
+logger_data_file = work_dir + 'raw_levelogger_compiled.csv'
+cut_dir = work_dir + 'cut/'
+cut_data_file = cut_dir+'levelogger_cut_compiled.csv'
+compensated_dir = work_dir + 'baro_compensated/'
+gtw_logger_dir = work_dir + 'relative_to_ground/'
 os.makedirs(gtw_logger_dir,exist_ok=True)
 
 ### --- OUTPUTS
@@ -181,6 +181,11 @@ def load_logger_data() -> pd.DataFrame:
         raw_Level_m: raw measurement (unchanged)
 
     """
+    
+    if USE_LOGGER_DATA_CACHE:
+        print("Using logger data from CACHE!")
+        return pd.read_csv(logger_data_file)
+
     data_dir = Path(gw_logger_dir)
     
     # Fail fast if base directory is missing
@@ -215,75 +220,114 @@ def load_logger_data() -> pd.DataFrame:
     
     # ---- Iterate within directories
     for year_dir, deploy_year in year_dirs:
+                
+        # loop through matched directories        
+        for f in sorted(year_dir.glob("*.csv")):
+            
+            matched_file = file_pattern.fullmatch(f.name)   
+            if not matched_file:
+                continue # skip to next file
+                
+            well_id = matched_file.group("well_id")
+            year = int(matched_file.group("year"))
+            start_mmdd = matched_file.group("start")
+            end_mmdd = matched_file.group("end")
+            deployment_id = f.stem # unique per deployment
+            
+            deploy_start = pd.Timestamp(
+                year=year,
+                month=int(start_mmdd[:2]),
+                day=int(start_mmdd[2:]),
+                hour=0,
+                minute=0
+                )
 
-            # loop through matched directories        
-            for f in sorted(year_dir.glob("*.csv")):
-                
-                matched_file = file_pattern.fullmatch(f.name)   
-                if not matched_file:
-                    continue # skip to next file
-                    
-                well_id = matched_file.group("well_id")
-                deployment_id = f.stem # unique per deployment
-                       
-                # create data frame with data from this csv file
-                deployment_df = pd.read_csv(
-                    f,
-                    header=11,
-                    encoding='ISO-8859-1')
-                
-                # check for required columns and fail immediately
-                missing = required_cols - set(deployment_df.columns)
-                if missing:
-                    raise ValueError(f"{f}: missing columns {missing}")
-                
-                # Convert 'Date' to datetime and 'Time' to timedelta
-                # deployment_df.insert(3, 'DT', pd.to_datetime(deployment_df['Date'] 
-                #                     + ' ' + deployment_df['Time'], format='mixed'))
-                deployment_df.insert(0, 'DT', 
-                                     pd.to_datetime(
-                                         deployment_df['Date'] 
-                                         + ' ' + deployment_df['Time'], 
-                                         format='mixed',
-                                         errors='raise'))
+            deploy_end = pd.Timestamp(
+                year=year,
+                month=int(end_mmdd[:2]),
+                day=int(end_mmdd[2:]),
+                hour=23,
+                minute=59
+                )
+                   
+            # create data frame with data from this csv file
+            deployment_df = pd.read_csv(
+                f,
+                header=11,
+                usecols=required_cols,
+                encoding='ISO-8859-1')
+            
+            # check for required columns and fail immediately
+            missing = required_cols - set(deployment_df.columns)
+            if missing:
+                raise ValueError(f"{f}: missing columns {missing}")
+            
+            # Convert 'Date' to datetime and 'Time' to timedelta
+            # deployment_df.insert(3, 'DT', pd.to_datetime(deployment_df['Date'] 
+            #                     + ' ' + deployment_df['Time'], format='mixed'))
+            deployment_df.insert(0, 'DT', 
+                                 pd.to_datetime(
+                                     deployment_df['Date'] 
+                                     + ' ' + deployment_df['Time'], 
+                                     format='mixed',
+                                     errors='raise'))
 
-                # rename column
-                deployment_df = deployment_df.rename(
-                    columns={'LEVEL': 'raw_Level_m'})
-                
-                # add columns to dataframe
-                deployment_df.insert(0, 'well_id', well_id)
-                deployment_df.insert(0, 'deploy_year', deploy_year)
-                deployment_df.insert(0, 'deployment_id', deployment_id)
-                
-                # check before append
-                if deployment_df.empty:
-                    raise ValueError(f"{f}: deployment dataframe is empty")
-                
-                # append to list
-                deployments.append(deployment_df)
-                
-            # status update
-            print(f"Loaded deployment data for {deploy_year}")
+            # rename column
+            deployment_df = deployment_df.rename(
+                columns={'LEVEL': 'raw_Level_m'})
+            
+            # add columns to dataframe
+            deployment_df.insert(0, 'well_id', well_id)
+            deployment_df.insert(0, 'deploy_year', deploy_year)
+            deployment_df.insert(0, 'deployment_id', deployment_id)
+            deployment_df.insert(0, 'start', deploy_start)
+            deployment_df.insert(0, 'end', deploy_end)
+            
+            # check before append
+            if deployment_df.empty:
+                raise ValueError(f"{f}: deployment dataframe is empty")
+            
+            # append to list
+            deployments.append(deployment_df)
+            
+        # status update
+        print(f"Loaded deployment data for {deploy_year}")
             
     if not deployments:
         raise ValueError(
             "No valid logger deployment files found.")
         
-    # should I sort by DT or deployment_id?
-    return (pd.concat(
+    compiled_logger_df = (pd.concat(
         deployments, 
         ignore_index=True)
         .sort_values(["well_id", "DT"])
         .reset_index(drop=True))
+    
+    saved_columns = [
+        "well_id",
+        "DT",
+        "raw_Level_m",
+        "TEMPERATURE",
+        "deployment_id",
+        "start",
+        "end"]
+    
+    # Keep only these columns, in this order
+    compiled_logger_df = compiled_logger_df[saved_columns].copy()
+    
+    compiled_logger_df.to_csv(logger_data_file, 
+                              index=False)
+    print("Saved compiled logger data cache")
+    
+    return compiled_logger_df
             
 ## Consolidate all logger csv files into one dataframe    
-def get_logger_dataframe():
-    """Consolidate all logger csv filesinto one dataframe."""
-    for f in os.listdir(subdaily_dir):
-        log_df = pd.concat([pd.read_csv(f, header=11, encoding='ISO-8859-1')])
-    log_df['DT'] = pd.to_datetime(log_df['Date'] + ' ' + log_df['Time'])
-    return log_df
+# def get_logger_dataframe():
+#     """Consolidate all logger csv filesinto one dataframe."""
+#     for f in os.listdir(subdaily_dir):
+#         log_df = pd.concat([pd.read_csv(f, header=11, encoding='ISO-8859-1')])
+#     log_df['DT'] = pd.to_datetime(log_df['Date'] + ' ' + log_df['Time'])
+#     return log_df
 
 def get_well_elevations(gw_df):
     """
@@ -336,25 +380,31 @@ def plot_water_level(logger,water_level_column_name,well_id):
 ## Plot subdaily logger dataframe
 #  Assume dataframe has DT column converted to datetime
 def plot_water_temp(logger,water_level_column_name,well_id):
+    
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), nrows=2, sharex=True)
-    ax1.plot(logger['DT'], logger[water_level_column_name])
     ax1.set_ylabel('Water Level', size=12)
-    ax2.plot(logger['DT'], logger['TEMPERATURE'])
     ax2.set_ylabel('Temperature', size=12)
+    
+    ax1.plot(logger['DT'], logger[water_level_column_name])
+    ax2.plot(logger['DT'], logger['TEMPERATURE'])
 
     for tick in ax1.yaxis.get_major_ticks():
         tick.label.set_fontsize(10)
     for tick in ax2.yaxis.get_major_ticks():
-        tick.label.set_fontsize(10)
+        tick.label.set_fontsize(8)
     for tick in ax2.xaxis.get_major_ticks():
-        tick.label.set_fontsize(10)
+        tick.label.set_fontsize(8)
 
     fig.suptitle('Groundwater Level and Temperature at Well '+ well_id, size=12)
     plt.show()
     
 ## Plot subdaily logger dataframe before/after cut times
 #  Assume dataframe has DT column converted to datetime
-def plot_water_temp_compare(before_df, after_df, water_level_column_name, well_id):
+def plot_water_temp_compare(before_df, 
+                            after_df, 
+                            water_level_column_name, 
+                            well_id):
+    
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), nrows=2, sharex=True)
     ax1.set_ylabel('Water Level', size=12)
     ax2.set_ylabel('Temperature', size=12)
@@ -366,39 +416,34 @@ def plot_water_temp_compare(before_df, after_df, water_level_column_name, well_i
     ax1.plot(after_df['DT'], after_df[water_level_column_name],'r')
     ax2.plot(after_df['DT'], after_df['TEMPERATURE'], 'r')
     
-    for tick in ax1.yaxis.get_major_ticks():
-        tick.label.set_fontsize(10)
-    for tick in ax2.yaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
-    for tick in ax2.xaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
+    ax1.tick_params(axis="y", labelsize=10)
+    ax2.tick_params(axis="y", labelsize=8)
+    ax2.tick_params(axis="x", labelsize=8)
 
-    fig.suptitle('Before/After cut of GW Level and Temp at Well '+ well_id, size=12)
+    fig.suptitle('Before/After cut of GW Level and Temp at Well '+ well_id, 
+                 size=12)
     plt.show()
+    plt.close(fig)
     
 ## Plot subdaily logger dataframe before/after cut times
 #  Assume dataframe has DT column converted to datetime
-def plot_water_temp_compare(before_df, manual_df, after_df, water_level_column_name, well_id):
+def plot_water_temp_compare(before_df, mid_df, after_df, water_level_column_name, well_id):
     fig, (ax1, ax2) = plt.subplots(figsize=(10, 5), nrows=2, sharex=True)
     ax1.set_ylabel('Water Level', size=12)
     ax2.set_ylabel('Temperature', size=12)
 
     ax1.plot(before_df['DT'], before_df[water_level_column_name], color="b", linewidth=0.6, label="Cut due to date")
     ax2.plot(before_df['DT'], before_df['TEMPERATURE'], color="b", linewidth=0.6, label="Cut due to date")
-    
-    ax1.plot(manual_df['DT'], manual_df[water_level_column_name], color="g", linewidth=0.6, label="Cut due to Temp change")
-    ax2.plot(manual_df['DT'], manual_df['TEMPERATURE'], color="g", linewidth=0.6, label="Cut due to Temp change")
-    
+
+    ax1.plot(mid_df['DT'], mid_df[water_level_column_name], color="g", linewidth=0.6, label="Cut due to Temp change")
+    ax2.plot(mid_df['DT'], mid_df['TEMPERATURE'], color="g", linewidth=0.6, label="Cut due to Temp change")
+
     ax1.plot(after_df['DT'], after_df[water_level_column_name], color="r", linewidth=0.6, label="Remaining data")
     ax2.plot(after_df['DT'], after_df['TEMPERATURE'], color="r", linewidth=0.6, label="Remaining data")
 
-    # Throwing error --> AttributeError: 'YTick' object has no attribute 'label'
-    # for tick in ax1.yaxis.get_major_ticks():
-    #     tick.label.set_fontsize(10)
-    # for tick in ax2.yaxis.get_major_ticks():
-    #     tick.label.set_fontsize(8)
-    # for tick in ax2.xaxis.get_major_ticks():
-    #     tick.label.set_fontsize(8)
+    ax1.tick_params(axis="y", labelsize=10)
+    ax2.tick_params(axis="y", labelsize=8)
+    ax2.tick_params(axis="x", labelsize=8)
 
     plt.legend()
     fig.suptitle(f"Cut of GW Level and Temp at Well {well_id}\n"
@@ -406,6 +451,7 @@ def plot_water_temp_compare(before_df, manual_df, after_df, water_level_column_n
                  + f"{max(after_df['DT'])}", size=10)
     plt.xticks(rotation=45)
     plt.show()
+    plt.close(fig)
 
 def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_only=True):
     """
@@ -839,168 +885,244 @@ def plot_timeseries_gridmap(df):
 ## Cut or trim logger data at front/back end of data
 ## to account for when logger not in the well.
 ## 
-## for each logger file, cut times based on three factors:
+## for each logger file, cut times based on at least 2 factors:
 ## 1. the defined start/stop times in groundwater_logger_times file
 ## 2. based on an extreme temp change, signaling sensor out of water
-## 3. (next step) the manual well measurement
-def cut_logger_data():
+## 3. (consider if needed later) the manual well measurement
+## 4. (consider if needed later) is the logger submerged in the water? may need to hold off on this until after correct for barometric pressure.
+def cut_logger_data(gw_df) -> pd.DataFrame:
     """Cut logger data at front/back 
        to account for when logger not in the well."""
 
-    ## new dataframes
-    # to hold all well logger data
-    cut_logger_df = pd.DataFrame()
+    gw_df = gw_df.copy()
     
-    ## to track # of rows cutoff for each logger file
+    # ---- Instantiate dataframes, setup date vars and validate columns
+    # to contain all cut groundwater logger deployments
+    cut_logger_df = pd.DataFrame()
+
+    # to track # of rows cutoff for each logger deployment
     cut_count_df = pd.DataFrame()
     
-    ## from csv with start + end times for each logger deployment
-    log_time_df = pd.read_csv(cut_times_file)
+    ## get csv with cut times for each logger deployment
+    expected_cols = {'well_id',
+                     'start',
+                     'end',
+                     'temp_threshold'}
+    
+    log_time_df = pd.read_csv(cut_times_file, usecols=expected_cols)
+    
+    # validate columns
+    missing = expected_cols - set(log_time_df.columns)
+    
+    if missing:
+        raise ValueError(f"cut_times_file missing columns: {missing}")
+    
+    # setup datetime objects
+    gw_df['DT'] = pd.to_datetime(gw_df['DT'])
+    gw_df['start'] = pd.to_datetime(gw_df['start'])
+    gw_df['end'] = pd.to_datetime(gw_df['end'])
     log_time_df['start'] = pd.to_datetime(log_time_df['start'])
     log_time_df['end'] = pd.to_datetime(log_time_df['end'])
     
-    ## process each logger deployment file
-    for f in sorted(os.listdir(gw_logger_dir)):
-        if f.endswith('.csv'):
-        
-            if debug_cut: logging.debug(f)
-            
-            # get well_id based on filename
-            well_id = re.split('_20',f)[0]
-                        
-            # create data frame with data from this csv file
-            deployment_df = pd.read_csv(gw_logger_dir+f, header=11, encoding='ISO-8859-1')
-            
-            # Convert 'Date' to datetime and 'Time' to timedelta
-            deployment_df.insert(3, 'DT', pd.to_datetime(deployment_df['Date'] 
-                                                         + ' ' + deployment_df['Time'], format='mixed'))
-            
-            # add well_id to dataframe
-            deployment_df.insert(0, 'well_id', well_id)
+    # use dates only as merge keys
+    gw_df['start_date'] = gw_df['start'].dt.normalize()
+    gw_df['end_date'] = gw_df['end'].dt.normalize()
+    log_time_df['start_date'] = log_time_df['start'].dt.normalize()
+    log_time_df['end_date'] = log_time_df['end'].dt.normalize()
     
-            # save original version for comparison plot later
-            orig_deployment_df = deployment_df.rename(columns={'LEVEL': 'raw_Level_m'})  
-            
-            ## Calculate difference between raw datetime and field notes start_time and end_time
-            #  and select matching deployments, first by well_id
-            #  this result may have timing for several deployments
-            well_time_df = log_time_df[log_time_df['well_id'] == well_id]
-               
-            ## ERROR HANDLING if no time limits found for this well deployment in field notes
-            if well_time_df.empty: 
-                logging.info(f'ALERT: No time limits for {well_id}:' 
-                      + 'check if well name is correct. Exiting cut process.')
-                break
-                       
-            # Strip timing of deployment from the filename
-            # Extract YYYY, MMDD_min, MMDD_max using regex
-            match = re.search(r"_(\d{4})_(\d{4})_(\d{4})\.csv", f)
-            if match:
-                year, min_mmdd, max_mmdd = match.groups()
-                
-                # Construct timestamps
-                start_time = pd.Timestamp(f"{year}-{min_mmdd[:2]}-{min_mmdd[2:]} 00:00:00")
-                end_time = pd.Timestamp(f"{year}-{max_mmdd[:2]}-{max_mmdd[2:]} 00:00:00")
-            else: 
-                logging.debug(f'ALERT: No min/max time from {f}. Exiting cut process.')
-                break
-            
-            time_delta = pd.Timedelta(hours=48)
-            well_time_df = well_time_df[
-                ((well_time_df['start'] >= (start_time - time_delta)) & 
-                (well_time_df['start'] <= (start_time + time_delta))) & 
-                ((well_time_df['end'] >= (end_time - time_delta)) & 
-                (well_time_df['end'] <= (end_time + time_delta)))
-            ]
+    # ---- Join gw_df and log_time_df to setup loop
+    # based on well_id, start and end times
+    merged = gw_df.merge(
+        log_time_df,
+        on=["well_id", "start_date"],
+        how="left",
+        validate="many_to_one"
+        )
+    merged = merged.drop(columns=["start_date"])
+    merged = merged.rename(
+        columns={
+            "start_x": "deploy_start",
+            "end_x": "deploy_end",
+            "start_y": "cut_start",
+            "end_y": "cut_end",
+            })
+    
+    # missing = merged["start_y"].isna()  # or any field-notes-only column
 
-            ## ERROR HANDLING: only continue if one matching entry of start/stop times
-            if well_time_df.shape[0] != 1:
-                warning_str = (f"WARNING: more/less than one row for {well_id} "
-                                "in cut_logger_data() after filtering start/end"
-                                "times. If in debug mode, dataframe printed in"
-                                "next line. If >1 entry, which one"
-                                "to use? Check datestamped logger .csv. EXIT.")
-                logging.info(warning_str)
-                logging.debug(well_time_df)
-                break
+    # if missing.any():
+    #     bad = (
+    #         merged.loc[missing, ["well_id", "start", "end"]]
+    #         .drop_duplicates()
+    #         .sort_values(["well_id", "start"])
+    #         )
+    #     raise ValueError(
+    #         "No matching log_time entry for deployments:\n"
+    #         + bad.to_string(index=False)
+    #         )
+    
+    # check that each merged entry has a temp threshold
+    no_temp = merged["temp_threshold"].isna()
+
+    if no_temp.any():
+        bad = (
+            merged.loc[no_temp, ["well_id", "deploy_start", "deploy_end"]]
+            .drop_duplicates()
+            .sort_values(["well_id", "deploy_start"])
+        )
+        raise ValueError(
+            "No matching cut-times entry for deployments:\n"
+            + bad.to_string(index=False)
+        )
+     
+    # ---- Loop through well deployments    
+    for (well_id, cut_start, cut_end), df in merged.groupby(
+            ["well_id", "cut_start", "cut_end"], sort=False): 
+            
+            # Sort the deployment by DT
+            df = df.sort_values("DT").copy()
+            orig_df = df.copy()
             
             ## Select logger data rows within start/end times from field notes
-            # number of minutes to subtract or add from start/end times
             time_delta=pd.Timedelta(minutes=10) 
             
-            start_time = well_time_df['start'].iloc[0] - time_delta
-            end_time = well_time_df['end'].iloc[0] + time_delta
+            # ---- Trim by cut start/end datetimes
+            mask = ((df["DT"] >= (
+                cut_start - time_delta)) & (df["DT"] <= (
+                    cut_end + time_delta)))
+            df_cut = df.loc[mask].copy()
             
-            # apply filtering mask
-            deployment_df = deployment_df[(deployment_df['DT'] >= start_time) & (deployment_df['DT'] <= end_time)]
+            if df_cut.empty:
+                raise ValueError(
+                    f"{well_id}: no data left after time cut "
+                    f"({cut_start}–{cut_end})")
+                
+            # copy for plotting "time only" cut, prior to "temp change" cut
+            df_cut_time_only = df_cut.copy()
             
-            # take snapshot of dataframe to plot and validate later
-            manual_deployment_df = deployment_df.rename(columns={'LEVEL': 'raw_Level_m'})
-            
+            # ---- Trim by temperature change rate
             ## Calculate temperature rate of change
-            # temp change threshold that controls cutoff points
-            change_threshold = well_time_df['temp_threshold'].iloc[0]
-            if debug_cut: logging.debug(str(change_threshold))
-            deployment_df['Rate of Change'] = np.append(np.abs(
-                (deployment_df['TEMPERATURE'].iloc[:-1].values - 
-                 deployment_df['TEMPERATURE'].iloc[1:].values)/(10)), 0.0001)
+            ## Temp change rate threshold controls cutoff points
+            
+            change_threshold = df_cut['temp_threshold'].iloc[0]
+            
+            #if debug_cut: logging.debug(str(change_threshold))
+            
+            # df_cut['Rate of Change'] = np.append(np.abs(
+            #     (df_cut['TEMPERATURE'].iloc[:-1].values - 
+            #      df_cut['TEMPERATURE'].iloc[1:].values)/(10)), 0.0001)
 
+            # Alternative to above that's "native" to Pandas (maybe faster)
+            df_cut["Rate of Change"] = (
+                df_cut["TEMPERATURE"]
+                .diff()
+                .abs()
+                .div(10)
+                .fillna(0.0001)
+            )
             # Split data in half
-            first = deployment_df.iloc[:int(deployment_df.shape[0]/2)]
-            second = deployment_df.iloc[int(deployment_df.shape[0]/2):]
+            first = df_cut.iloc[:int(df_cut.shape[0]/2)]
+            second = df_cut.iloc[int(df_cut.shape[0]/2):]
         
-            # In first half, cut out all data before the last point that has a rate of change greater than the change threshold
-            try:
-                index = first.loc[(first['Rate of Change'] >= 
-                                   change_threshold), :].index[-1]
-                first_cut = first.iloc[index:]
-                if debug_cut: logging.debug('cutoff front end.')
-            except IndexError as err:
+            # In first half, cut out all data before the last point 
+            # that has a rate of change greater than the change threshold
+            front_mask = first['Rate of Change'] >= change_threshold
+            if front_mask.any():
+                begin_cut = front_mask[front_mask].index[-1]
+                first_cut = first.loc[begin_cut:]
+            else:
                 first_cut = first
-                if debug_cut: logging.debug('Nothing to cut off front end.')
+            
+            # In second half, cut out all data after the first point 
+            # that has a rate of change greater than the change threshold
+            back_mask = second['Rate of Change'] >= change_threshold
+            if back_mask.any():
+                first_cut_label = back_mask[back_mask].index[0]
+                first_cut_position = second.index.get_loc(first_cut_label)
+                
+                if first_cut_position > 0:
+                    end_cut = second.index[first_cut_position - 1]
+                    second_cut = second.loc[:end_cut]
+                else:
+                    second_cut = second.iloc[:0]
+            else:
+                second_cut = second
+            
+            # try:
+            #     i = first.loc[(first['Rate of Change'] >= 
+            #                        change_threshold), :].index[-1]
+            #     first_cut = first.iloc[i:]
+            #     if debug_cut: logging.debug(
+            #             f'Temp change: {well_id} cutoff front end.')
+            # except IndexError as err:
+            #     first_cut = first
+            #     if debug_cut: logging.debug(
+            #             f'Temp change: {well_id} no front end cut.')
             
     
-            # In second half, cut out all data after the first point that has a rate of change greater than the change threshold
-            try:
-                index = second.loc[(second['Rate of Change'] >= change_threshold), :].index[0]
-                #second_cut = second.loc[(second.index < index)]
-                second_cut = second.loc[(second.index <= index)]
-                if debug_cut: logging.debug('Cutoff backend.')
-            except IndexError as err:
-                second_cut = second
-                if debug_cut: logging.debug('Nothing to cut off back end.')
-        
-            # Snip both halfs back together
-            deployment_df = pd.concat((first_cut, second_cut), axis=0)
-            deployment_df.rename(columns={'LEVEL': 'raw_Level_m'}, inplace=True)
+
+            # try:
+            #     index = second.loc[(second['Rate of Change'] >= 
+            #                         change_threshold), :].index[0]
+            #     #second_cut = second.loc[(second.index < index)]
+            #     second_cut = second.loc[(second.index <= index)]
+            #     if debug_cut: logging.debug(
+            #             f'Temp change: {well_id} cutoff backend.')
+            # except IndexError as err:
+            #     second_cut = second
+            #     if debug_cut: logging.debug(
+            #             f'Temp change: {well_id} no backend cut.')
             
-            # track cut info for each well
+            # ---- (Re-)assemble final dataframes
+       
+            # Snip both halfs back together
+            df_cut = pd.concat((first_cut, second_cut), axis=0)
+            
+            #deployment_df.rename(columns={'LEVEL': 'raw_Level_m'}, inplace=True)
+            
+            # Track cut info for each well
             track_df = pd.DataFrame(
                     {
                            'well_id':  well_id,
+                           'cut_start': cut_start,
+                           'cut_end': cut_end,
+                           'temp_threshold': change_threshold,
                            'front_cutoff': first.shape[0] - first_cut.shape[0],
                            'back_cutoff': second.shape[0] - second_cut.shape[0]
                     }, index=[0]
             )
             
-            # append 
-            # cut_count_df = cut_count_df.append(track_df)
+            # append track cut
             cut_count_df = pd.concat([cut_count_df, track_df])
       
             # plot water level and temp for this well
-            if debug_cut: plot_water_temp_compare(orig_deployment_df, manual_deployment_df, deployment_df,'raw_Level_m',well_id)
+            if debug_cut: 
+                plot_water_temp_compare(orig_df,
+                                        df_cut_time_only,
+                                        df_cut,
+                                        'raw_Level_m',
+                                        well_id)
+
+            # manage column names for saving and propagating fwd
+            df_cut.rename(columns={'DT': 'DateTime', 'TEMPERATURE': 'Temp_c'}, inplace=True)
+            cut_logger_cols = [
+                "well_id",
+                "DateTime",
+                "raw_Level_m",
+                "Temp_c",
+                "deployment_id",
+                "Rate of Change",
+                "temp_threshold"]
+            df_cut = df_cut[cut_logger_cols].copy()
             
             # save individual csv file with cut times
-            deployment_df.to_csv(cut_dir+'cut_'+f, encoding='ISO-8859-1', index=False)
-            
-            # cut_logger_df = cut_logger_df.append(log_df)
-            cut_logger_df = pd.concat([cut_logger_df, deployment_df])
+            filename = f'cut_{df_cut["deployment_id"].iloc[0]}.csv'
+            df_cut.to_csv(cut_dir+filename,
+                          encoding='ISO-8859-1', index=False)
+            cut_logger_df = pd.concat([cut_logger_df, df_cut])
     
     # cleanup logger data to save in human-readable format
-    cut_logger_df.drop(['Date', 'Time', 'ms', 'Rate of Change'], axis=1, inplace=True)
-    cut_logger_df.rename(columns={'DT': 'DateTime', 'TEMPERATURE': 'Temp_c'}, inplace=True)
+    #cut_logger_df.drop(['Rate of Change'], axis=1, inplace=True)
     cut_logger_df.to_csv(cut_data_file, index=False)
-    #cut_count_df.to_csv(cut_dir+'cut_count_'+str(change_threshold)+'.csv')
     cut_count_df.to_csv(cut_dir+'cut_count.csv', index=False)
     
     return cut_logger_df
@@ -1704,15 +1826,16 @@ def main():
     EXECUTE FUNCTIONS TO PROCESS LOGGER DATA
     """
     
-    # Load input (source data) files    
-    subdaily_gw_df = load_logger_data()
+    # ---- Load inputs / source data files    
+    gw_df = load_logger_data()
     print("Groundwater logger files loaded.")
     
-    # ## 1. Cut logger entries when sensor not in the well, 
-    # ##     as indicated by drastic water level or temperature change
-    # if process_cut:
-    #     waterLevel_df = cut_logger_data()
-    #     print("CUT COMPLETE")
+    # ---- Cut logger data 
+    #      for entries when sensor not in the well, 
+    #      as indicated by drastic water level or temperature change
+    if not USE_CUT_DATA_CACHE:
+        gw_df = cut_logger_data(gw_df)
+        print("CUT COMPLETE")
     # else: 
     #     waterLevel_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
     #     waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
@@ -1735,7 +1858,7 @@ def main():
     # ## 5. Plot a visualization of the subdaily groundwater time series
     # #plot_timeseries_gridmap(waterLevel_df)
     
-    print(subdaily_gw_df)
+    print(gw_df)
 
 # ---- Execute MAIN ----
 # allows import of functions into another script
