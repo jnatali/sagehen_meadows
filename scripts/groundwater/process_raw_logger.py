@@ -46,10 +46,11 @@ from well_utils import process_well_ids
 ## --- SETUP FLAGS 
 ##     for processing, logging, debugging and data validation
 
-USE_LOGGER_DATA_CACHE = False
+USE_LOGGER_DATA_CACHE = True
 USE_CUT_DATA_CACHE = False
+USE_COMPENSATED_DATA_CACHE = False
 
-debug_cut = True
+debug_cut = False
 debug_baro = True
 debug_gtw = True
 
@@ -65,9 +66,9 @@ gw_logger_dir = gw_data_dir + 'loggers/RAW/'
 gw_manual_file = gw_data_dir + 'manual/PROCESSED/groundwater_manual.csv'
 cut_times_file = gw_data_dir + 'loggers/groundwater_logger_times.csv'
 
-solinst_baro_data_dir = gw_data_dir + 'subdaily_loggers/RAW/baro_data/'
-station_dendra_data_dir = '../../data/station_instrumentation/climate/'
-station_dendra_file = station_dendra_data_dir + 'Weather_2010_2025_10min_SagehenTower1.csv'
+solinst_baro_data_dir = gw_data_dir + 'loggers/RAW/baro_data/'
+station_dendra_data_dir = '../../data/station_instrumentation/climate/Dendra/'
+station_dendra_file = station_dendra_data_dir + 'Dendra_baro_temp_2018_2025.csv'
 well_elevation_file = gw_data_dir + 'Sagehen_Wells_Natali_6417.geojson'
 
 ### --- WORKING
@@ -118,7 +119,7 @@ def filter_subset_dataframe(df, well, deploy):
         (df['deployment'] >= deploy)]
     return subset_df
 
-def remove_outliers(df, column_name, multiplier=1.5):
+def remove_outliers_IQR(df, column_name, multiplier=1.5):
     """
     Remove outliers based on IQR method.
     
@@ -148,179 +149,67 @@ def remove_outliers(df, column_name, multiplier=1.5):
     
     return df_cleaned
 
-
-def load_logger_data() -> pd.DataFrame:
+def remove_outliers_MAD(df, column_name, multiplier=1.5, return_mask=False):
     """
-    Consolidates all raw logger csv files into one dataframe.
-    
-    First loads raw groundwater logger data from Solinset Levelogger .csv file 
-    output. Return a DataFrame that aggregates all logger data for all years.
-    
-    Each .csv file from the logger represents a deployment of a logger 
-    within a specific well (well_id) and a well-defined start and stop 
-    timestamp with a consistent logging frequency (e.g. 10 minutes). 
-    
-    Note: There might be > 1 deployment per well_id per year, which should be
-    tracked in the returned dataframe.
-    
-    The .csv files of raw logger data are located in yearly directories
-    within gw_logger_dir. Those directories are named following convention:
-        'Solinst_Levelogger_YYYY' where YYYY is the 4-digit year
-            of measurement.
-            
-    Each raw logger .csv has a specific naming convention and internal format 
-    that should be handled consistently. 
-    
-    File naming convention: "well_id"_"YYYY"_"MMDD" of start_"MMDD" of stop.csv
-    
-    Returns dataframe with following columns; no filtering or trimming:
-        well_id
-        deployment_id
-        deploy_year
-        DT
-        raw_Level_m: raw measurement (unchanged)
+    Remove spurious outliers from a time series using
+    Median Absolute Deviation (MAD).
 
+    Outliers are replaced with NaN.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input dataframe.
+    column_name : str
+        Column containing the time series.
+    multiplier : float, optional
+        MAD threshold (default 5.0).
+    return_mask : bool, optional
+        If True, also return boolean mask of good values.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with outliers replaced by NaN.
+    (optional) pandas.Series
+        Boolean mask where True = retained value.
     """
-    
-    if USE_LOGGER_DATA_CACHE:
-        print("Using logger data from CACHE!")
-        return pd.read_csv(logger_data_file)
+    out = df.copy()
+    x = out[column_name]
 
-    data_dir = Path(gw_logger_dir)
-    
-    # Fail fast if base directory is missing
-    if not data_dir.exists():
-        raise FileNotFoundError(f"Directory not found: {data_dir}")
-    
-    # Fetch directory names that fit naming convention; 
-    #   include capture groups with () to extract key variables
-    dir_pattern = re.compile(r"^Solinst_Levelogger_(\d{4})$")
-    
-    # Fetch files that fit naming convention within each yearly directory
-    file_pattern = re.compile(
-     r"^(?P<well_id>.+)_(?P<year>\d{4})_(?P<start>\d{4})_(?P<end>\d{4})\.csv$")
-   
-    # Require the following columns in the initial file load
-    required_cols = {"Date", "Time", "LEVEL", "TEMPERATURE"}
-    
-    # Instantiate list of deployments
-    deployments: list[pd.DataFrame] = []
-    
-    # ---- Iterate over directories
-    year_dirs = []
-    
-    for d in data_dir.iterdir():
-        if d.is_dir():
-            dir_match = dir_pattern.fullmatch(d.name)
-            if dir_match:
-                year_dirs.append((d, int(dir_match.group(1))))
-    if not year_dirs:
-        raise ValueError(
-            "No directories matching 'Solinst_Levelogger_YYYY' found.")
-    
-    # ---- Iterate within directories
-    for year_dir, deploy_year in year_dirs:
-                
-        # loop through matched directories        
-        for f in sorted(year_dir.glob("*.csv")):
-            
-            matched_file = file_pattern.fullmatch(f.name)   
-            if not matched_file:
-                continue # skip to next file
-                
-            well_id = matched_file.group("well_id")
-            year = int(matched_file.group("year"))
-            start_mmdd = matched_file.group("start")
-            end_mmdd = matched_file.group("end")
-            deployment_id = f.stem # unique per deployment
-            
-            deploy_start = pd.Timestamp(
-                year=year,
-                month=int(start_mmdd[:2]),
-                day=int(start_mmdd[2:]),
-                hour=0,
-                minute=0
-                )
+    # Drop NaNs for robust stats
+    median = x.median()
+    mad = (x - median).abs().median()
 
-            deploy_end = pd.Timestamp(
-                year=year,
-                month=int(end_mmdd[:2]),
-                day=int(end_mmdd[2:]),
-                hour=23,
-                minute=59
-                )
-                   
-            # create data frame with data from this csv file
-            deployment_df = pd.read_csv(
-                f,
-                header=11,
-                usecols=required_cols,
-                encoding='ISO-8859-1')
-            
-            # check for required columns and fail immediately
-            missing = required_cols - set(deployment_df.columns)
-            if missing:
-                raise ValueError(f"{f}: missing columns {missing}")
-            
-            # Convert 'Date' to datetime and 'Time' to timedelta
-            # deployment_df.insert(3, 'DT', pd.to_datetime(deployment_df['Date'] 
-            #                     + ' ' + deployment_df['Time'], format='mixed'))
-            deployment_df.insert(0, 'DT', 
-                                 pd.to_datetime(
-                                     deployment_df['Date'] 
-                                     + ' ' + deployment_df['Time'], 
-                                     format='mixed',
-                                     errors='raise'))
+    # Guard against degenerate cases
+    if mad == 0 or x.isna().all():
+        good = x.notna()
+    else:
+        good = (x - median).abs() <= multiplier * mad
 
-            # rename column
-            deployment_df = deployment_df.rename(
-                columns={'LEVEL': 'raw_Level_m'})
-            
-            # add columns to dataframe
-            deployment_df.insert(0, 'well_id', well_id)
-            deployment_df.insert(0, 'deploy_year', deploy_year)
-            deployment_df.insert(0, 'deployment_id', deployment_id)
-            deployment_df.insert(0, 'start', deploy_start)
-            deployment_df.insert(0, 'end', deploy_end)
-            
-            # check before append
-            if deployment_df.empty:
-                raise ValueError(f"{f}: deployment dataframe is empty")
-            
-            # append to list
-            deployments.append(deployment_df)
-            
-        # status update
-        print(f"Loaded deployment data for {deploy_year}")
-            
-    if not deployments:
-        raise ValueError(
-            "No valid logger deployment files found.")
-        
-    compiled_logger_df = (pd.concat(
-        deployments, 
-        ignore_index=True)
-        .sort_values(["well_id", "DT"])
-        .reset_index(drop=True))
-    
-    saved_columns = [
-        "well_id",
-        "DT",
-        "raw_Level_m",
-        "TEMPERATURE",
-        "deployment_id",
-        "start",
-        "end"]
-    
-    # Keep only these columns, in this order
-    compiled_logger_df = compiled_logger_df[saved_columns].copy()
-    
-    compiled_logger_df.to_csv(logger_data_file, 
-                              index=False)
-    print("Saved compiled logger data cache")
-    
-    return compiled_logger_df
-            
+    out.loc[~good, column_name] = np.nan
+
+    if return_mask:
+        return out, good
+
+    return out
+
+def remove_outliers_rolling_mad(
+    df, column_name, window=48, mad_multiplier=6):
+    df = df.copy()
+    rolling_med = df[column_name].rolling(window, center=True).median()
+    rolling_mad = (
+        (df[column_name] - rolling_med)
+        .abs()
+        .rolling(window, center=True)
+        .median()
+    )
+
+    threshold = mad_multiplier * rolling_mad
+    mask = (df[column_name] - rolling_med).abs() > threshold
+    df.loc[mask, column_name] = np.nan
+    return df
+
 ## Consolidate all logger csv files into one dataframe    
 # def get_logger_dataframe():
 #     """Consolidate all logger csv filesinto one dataframe."""
@@ -738,6 +627,7 @@ def plot_baro_compare(df1, df2):
     
     fig, axes = plt.subplots(len(common_years), 1, 
                              figsize=(10, 5 * len(common_years)), sharex=True)
+    
     if len(common_years) == 1:
         axes = [axes]  # Ensure axes is iterable
     
@@ -754,9 +644,9 @@ def plot_baro_compare(df1, df2):
 
         
         # Plot data with smaller lines and markers
-        ax.plot(df1_year['DayOfYear'], df1_year['baro_Pressure_kPa'], label='Solinst', linestyle='-', linewidth=0.9)
-        ax.plot(df2_year['DayOfYear'], df2_year['baro_Pressure_kPa'], label='Dendra', linestyle='-',  linewidth=0.7)
-        ax.plot(df3_year['DayOfYear'], df3_year['baro_Pressure_kPa'], label='Offset Correction', linestyle='--', linewidth=0.5)
+        ax.plot(df1_year['DayOfYear'], df1_year['baro_Pressure_kPa'], label='Solinst', linestyle='-', linewidth=0.5)
+        ax.plot(df2_year['DayOfYear'], df2_year['baro_Pressure_kPa'], label='Dendra', linestyle='-',  linewidth=0.5)
+        ax.plot(df3_year['DayOfYear'], df3_year['baro_Pressure_kPa'], label='Offset Correction', linestyle='--', linewidth=0.7)
 
         # Formatting
         ax.set_title(f'Barometric Pressure Comparison for {year}')
@@ -768,7 +658,132 @@ def plot_baro_compare(df1, df2):
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
+    plt.close(fig)
     return
+
+
+def plot_baro_compare(df1, df2, df3):
+    """
+    Plots and compares barometric data from two dataframes.
+    Each year's data is plotted in a separate subplot.
+    Only years where both dataframes have data are included.
+    
+    Parameters:
+    df1, df2: pandas DataFrame
+        DataFrames contain 'DateTime' and 'baro_LEVEL_kPa' columns.
+    """
+
+    # Extract years present in initial datasets
+    years_df1 = set(df1['DateTime'].dt.year)
+    years_df2 = set(df2['DateTime'].dt.year)
+    common_years = sorted(years_df1.intersection(years_df2))
+    
+    if not common_years:
+        print("No common years with data between the two datasets.")
+        return
+    
+    fig, axes = plt.subplots(len(common_years), 1, 
+                             figsize=(10, 5 * len(common_years)), sharex=True)
+    
+    if len(common_years) == 1:
+        axes = [axes]  # Ensure axes is iterable
+    
+    for ax, year in zip(axes, common_years):
+        # Filter data for the given year
+        df1_year = df1[df1['DateTime'].dt.year == year].copy()
+        df2_year = df2[df2['DateTime'].dt.year == year].copy()
+        df3_year = df3[df3['DateTime'].dt.year == year].copy()
+
+        # Convert DateTime to day of the year
+        df1_year['DayOfYear'] = df1_year['DateTime'].dt.dayofyear
+        df2_year['DayOfYear'] = df2_year['DateTime'].dt.dayofyear
+        df3_year['DayOfYear'] = df3_year['DateTime'].dt.dayofyear
+
+        
+        # Plot data with smaller lines and markers
+        ax.plot(df1_year['DayOfYear'], df1_year['baro_Pressure_kPa'], label='DF-1', linestyle='-', linewidth=0.5)
+        ax.plot(df2_year['DayOfYear'], df2_year['baro_Pressure_kPa'], label='DF-2', linestyle='-',  linewidth=0.5)
+        ax.plot(df3_year['DayOfYear'], df3_year['baro_Pressure_kPa'], label='DF-Correction', linestyle='--', linewidth=0.7)
+
+        # Formatting
+        ax.set_title(f'Barometric Pressure Comparison for {year}')
+        ax.set_ylabel('Barometric Pressure (kPa)')
+        ax.legend()
+        ax.grid(True)
+    
+    plt.xlabel('Day of Year')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+    plt.close(fig)
+    return
+
+# def plot_baro_compare(
+#     baro_solinst,
+#     baro_dendra,
+#     baro_adjusted,
+#     *,
+#     time_window=None,
+#     title="Barometric pressure comparison",
+# ):
+#     """
+#     Plot raw and normalized barometric pressure time series for validation.
+
+#     Parameters
+#     ----------
+#     baro_solinst : DataFrame
+#         Must contain columns ['DateTime', 'baro_Pressure_kPa'].
+#     baro_dendra : DataFrame
+#         Must contain columns ['DateTime', 'baro_Pressure_kPa'].
+#     baro_adjusted : DataFrame
+#         Output of normalize_baro(); must contain same columns.
+#     time_window : tuple(str or Timestamp, str or Timestamp), optional
+#         (start, end) for zoomed inspection.
+#     title : str
+#         Figure title.
+#     """
+
+#     def _subset(df):
+#         if time_window is None:
+#             return df
+#         start, end = time_window
+#         return df[(df["DateTime"] >= start) & (df["DateTime"] <= end)]
+
+#     sol = _subset(baro_solinst)
+#     den = _subset(baro_dendra)
+#     adj = _subset(baro_adjusted)
+
+#     fig, ax = plt.subplots(figsize=(12, 5))
+
+#     ax.plot(
+#         sol["DateTime"],
+#         sol["baro_Pressure_kPa"],
+#         label="Solinst (raw)",
+#         alpha=0.7,
+#     )
+#     ax.plot(
+#         den["DateTime"],
+#         den["baro_Pressure_kPa"],
+#         label="Field station (raw)",
+#         alpha=0.7,
+#     )
+#     ax.plot(
+#         adj["DateTime"],
+#         adj["baro_Pressure_kPa"],
+#         label="Normalized baro",
+#         color="black",
+#         linewidth=1.5,
+#     )
+
+#     ax.set_ylabel("Barometric pressure (kPa)")
+#     ax.set_xlabel("DateTime")
+#     ax.set_title(title)
+#     ax.legend()
+#     ax.grid(True, alpha=0.3)
+
+#     plt.tight_layout()
+#     plt.show()
+#     plt.close(fig)
 
 def plot_timeseries_gridmap(df):
     # Add DOY and year columns
@@ -880,6 +895,178 @@ def plot_timeseries_gridmap(df):
     fig.suptitle("Groundwater Well Data Overlap by DOY and Category", fontsize=14)
     plt.tight_layout(rect=[0, 0.15, 1, 0.96])
     plt.show()
+
+def load_logger_data() -> pd.DataFrame:
+    """
+    Consolidates all raw logger csv files into one dataframe.
+    
+    First loads raw groundwater logger data from Solinset Levelogger .csv file 
+    output. Return a DataFrame that aggregates all logger data for all years.
+    
+    Each .csv file from the logger represents a deployment of a logger 
+    within a specific well (well_id) and a well-defined start and stop 
+    timestamp with a consistent logging frequency (e.g. 10 minutes). 
+    
+    Note: There might be > 1 deployment per well_id per year, which should be
+    tracked in the returned dataframe.
+    
+    The .csv files of raw logger data are located in yearly directories
+    within gw_logger_dir. Those directories are named following convention:
+        'Solinst_Levelogger_YYYY' where YYYY is the 4-digit year
+            of measurement.
+            
+    Each raw logger .csv has a specific naming convention and internal format 
+    that should be handled consistently. 
+    
+    File naming convention: "well_id"_"YYYY"_"MMDD" of start_"MMDD" of stop.csv
+    
+    Returns dataframe with following columns; no filtering or trimming:
+        well_id
+        deployment_id
+        deploy_year
+        DT
+        raw_Level_m: raw measurement (unchanged)
+
+    """
+    
+    if USE_LOGGER_DATA_CACHE:
+        print("Using logger data from CACHE!")
+        return pd.read_csv(logger_data_file)
+
+    data_dir = Path(gw_logger_dir)
+    
+    # Fail fast if base directory is missing
+    if not data_dir.exists():
+        raise FileNotFoundError(f"Directory not found: {data_dir}")
+    
+    # Fetch directory names that fit naming convention; 
+    #   include capture groups with () to extract key variables
+    dir_pattern = re.compile(r"^Solinst_Levelogger_(\d{4})$")
+    
+    # Fetch files that fit naming convention within each yearly directory
+    file_pattern = re.compile(
+     r"^(?P<well_id>.+)_(?P<year>\d{4})_(?P<start>\d{4})_(?P<end>\d{4})\.csv$")
+   
+    # Require the following columns in the initial file load
+    required_cols = {"Date", "Time", "LEVEL", "TEMPERATURE"}
+    
+    # Instantiate list of deployments
+    deployments: list[pd.DataFrame] = []
+    
+    # ---- Iterate over directories
+    year_dirs = []
+    
+    for d in data_dir.iterdir():
+        if d.is_dir():
+            dir_match = dir_pattern.fullmatch(d.name)
+            if dir_match:
+                year_dirs.append((d, int(dir_match.group(1))))
+    if not year_dirs:
+        raise ValueError(
+            "No directories matching 'Solinst_Levelogger_YYYY' found.")
+    
+    # ---- Iterate within directories
+    for year_dir, deploy_year in year_dirs:
+                
+        # loop through matched directories        
+        for f in sorted(year_dir.glob("*.csv")):
+            
+            matched_file = file_pattern.fullmatch(f.name)   
+            if not matched_file:
+                continue # skip to next file
+                
+            well_id = matched_file.group("well_id")
+            year = int(matched_file.group("year"))
+            start_mmdd = matched_file.group("start")
+            end_mmdd = matched_file.group("end")
+            deployment_id = f.stem # unique per deployment
+            
+            deploy_start = pd.Timestamp(
+                year=year,
+                month=int(start_mmdd[:2]),
+                day=int(start_mmdd[2:]),
+                hour=0,
+                minute=0
+                )
+
+            deploy_end = pd.Timestamp(
+                year=year,
+                month=int(end_mmdd[:2]),
+                day=int(end_mmdd[2:]),
+                hour=23,
+                minute=59
+                )
+                   
+            # create data frame with data from this csv file
+            deployment_df = pd.read_csv(
+                f,
+                header=11,
+                usecols=required_cols,
+                encoding='ISO-8859-1')
+            
+            # check for required columns and fail immediately
+            missing = required_cols - set(deployment_df.columns)
+            if missing:
+                raise ValueError(f"{f}: missing columns {missing}")
+            
+            # Convert 'Date' to datetime and 'Time' to timedelta
+            # deployment_df.insert(3, 'DT', pd.to_datetime(deployment_df['Date'] 
+            #                     + ' ' + deployment_df['Time'], format='mixed'))
+            deployment_df.insert(0, 'DT', 
+                                 pd.to_datetime(
+                                     deployment_df['Date'] 
+                                     + ' ' + deployment_df['Time'], 
+                                     format='mixed',
+                                     errors='raise'))
+
+            # rename column
+            deployment_df = deployment_df.rename(
+                columns={'LEVEL': 'raw_Level_m'})
+            
+            # add columns to dataframe
+            deployment_df.insert(0, 'well_id', well_id)
+            deployment_df.insert(0, 'deploy_year', deploy_year)
+            deployment_df.insert(0, 'deployment_id', deployment_id)
+            deployment_df.insert(0, 'start', deploy_start)
+            deployment_df.insert(0, 'end', deploy_end)
+            
+            # check before append
+            if deployment_df.empty:
+                raise ValueError(f"{f}: deployment dataframe is empty")
+            
+            # append to list
+            deployments.append(deployment_df)
+            
+        # status update
+        print(f"Loaded deployment data for {deploy_year}")
+            
+    if not deployments:
+        raise ValueError(
+            "No valid logger deployment files found.")
+        
+    compiled_logger_df = (pd.concat(
+        deployments, 
+        ignore_index=True)
+        .sort_values(["well_id", "DT"])
+        .reset_index(drop=True))
+    
+    saved_columns = [
+        "well_id",
+        "DT",
+        "raw_Level_m",
+        "TEMPERATURE",
+        "deployment_id",
+        "start",
+        "end"]
+    
+    # Keep only these columns, in this order
+    compiled_logger_df = compiled_logger_df[saved_columns].copy()
+    
+    compiled_logger_df.to_csv(logger_data_file, 
+                              index=False)
+    print("Saved compiled logger data cache")
+    
+    return compiled_logger_df
 
 
 ## Cut or trim logger data at front/back end of data
@@ -1121,7 +1308,6 @@ def cut_logger_data(gw_df) -> pd.DataFrame:
             cut_logger_df = pd.concat([cut_logger_df, df_cut])
     
     # cleanup logger data to save in human-readable format
-    #cut_logger_df.drop(['Rate of Change'], axis=1, inplace=True)
     cut_logger_df.to_csv(cut_data_file, index=False)
     cut_count_df.to_csv(cut_dir+'cut_count.csv', index=False)
     
@@ -1234,93 +1420,231 @@ def get_baro_dendra(start_time, end_time):
 
     return new_baro
 
-def normalize_baro(df1, df2):
+def preprocess_baro(df, freq="5min"):
+    return (
+    df
+    .set_index("DateTime")
+    .sort_index()
+    .resample(freq)
+    .median()
+    .interpolate(method="time")
+    )
+
+def baro_completeness(df):
+    return {
+        "n_total": df["baro_Pressure_kPa"].sum(),
+        "n_present": df["baro_Pressure_kPa"].notna().sum(),
+        "mean": df["baro_Pressure_kPa"].mean(),
+        "pct_present": df["baro_Pressure_kPa"].notna().sum()/df["baro_Pressure_kPa"].sum()
+    }
+
+def normalize_baro(df_ref, df_to_adjust, freq="5min", multi=5):
     """
-    Computes the mean offset correction for barometric pressure data in df2 
-    based on df1. 
-    
-    Also adjusts time interval between readings from 10 to 5 minuts.
-    
-    Returns df2 with corrected values.
+    Normalize df_to_adjust barometric pressure to df_ref using
+    a year-wise median offset; restricted to growing season (May-Nov)
 
-    Parameters:
-        df1, df2: pandas DataFrame
-        DataFrames containing 'DateTime' and 'baro_Pressure_kPa' columns.
+    Parameters
+    ----------
+    df_ref : pandas.DataFrame
+        Reference barometric dataset (trusted baseline).
+    df_to_adjust : pandas.DataFrame
+        Barometric dataset to be adjusted.
+    freq : str
+        Resampling frequency (default "5min").
+    mad_multiplier : float
+        Threshold for outlier rejection using median absolute deviation.
+        It defines how far from the median a value can be before it's 
+            considered an outlier.
 
-    Returns:
-        df2_offset: pandas DataFrame
+    Returns
+    -------
+    pandas.DataFrame
+        df_to_adjust with baro_Pressure_kPa normalized.
     """
+    
+    df_adj = df_to_adjust.copy()
+    df_ref = df_ref.copy()
+    
+    # Instantiate list of new baro dataframes
+    new_ref: list[pd.Dataframe] = []
 
-    # initialize df2_offset
-    df2_offset = df2.copy()
-
-    # determine and apply unique offset for each year
-    years_df1 = set(df1['DateTime'].dt.year)
-    years_df2 = set(df2['DateTime'].dt.year)
-    common_years = sorted(years_df1.intersection(years_df2))
-
+    # Identify overlapping years only
+    years_ref = set(df_ref["DateTime"].dt.year)
+    years_adj = set(df_adj["DateTime"].dt.year)
+    common_years = sorted(years_ref & years_adj)
+    
     if not common_years:
-        print("No common years with data between the two datasets.")
-        return df2_offset
-
-    for year in common_years:
-        df1_year_raw = df1[df1['DateTime'].dt.year == year].copy()
-        df2_year_raw = df2[df2['DateTime'].dt.year == year].copy()
-        
-        # Remove outliers for the year
-        # - need multiplier of 5 based on plots for 2018-2024
-        df1_year = remove_outliers(df1_year_raw, 'baro_Pressure_kPa', 5.0)
-        df2_year = remove_outliers(df2_year_raw, 'baro_Pressure_kPa', 5.0)
-        
-        if debug_baro:
-            # Compare plots before/after outlier removal
-            plot_dataframes(df1_year_raw, df1_year, 'baro_Pressure_kPa', 
-                            'Solinst Baro raw vs clean')
-            plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
-                        'Dendra Baro raw vs clean')
-            if (year==2021): 
-                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
-                            'Dendra Baro raw vs clean',
-                            ('2021-11-15', '2021-11-16'))
-            if (year==2024): 
-                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
-                            'Dendra Baro raw vs clean',
-                            ('2024-08-16', '2024-08-18'))
-            if (year==2025):
-                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
-                        'Dendra Baro raw vs clean',
-                        ('2025-08-27', '2025-08-29'))
-                plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
-                        'Dendra Baro raw vs clean',
-                        ('2025-09-23', '2025-09-24'))
-                
-        merged = df1_year[['DateTime','baro_Pressure_kPa', 'baro_Temp_C']].merge(
-            df2_year[['DateTime', 'baro_Pressure_kPa', 'baro_Temp_C']], 
-            on='DateTime', 
-            suffixes=('_df1', '_df2')
-            )
+        raise ValueError("No overlapping years between barometric datasets.")
     
-        if not merged.empty:
-            mean_offset = (merged['baro_Pressure_kPa_df1'] - 
-                           merged['baro_Pressure_kPa_df2']).mean()
-        else:
-            mean_offset = 0  # No common data points
-        
-        # Select rows where the 'DateTime' column matches the current year
-        mask = df2_offset['DateTime'].dt.year == year
+    for year in common_years:
 
-        # Apply the offset only to those rows
-        df2_offset.loc[mask, 'baro_Pressure_kPa'] = ( 
-            df2_offset.loc[mask, 'baro_Pressure_kPa'] + mean_offset)
-        
-    # Sort values and ensure DateTime is a proper index
-    df2_offset = df2_offset.sort_values('DateTime').set_index('DateTime')
-        
-    # Resample to 5-minute intervals to match the finest gw_df interval
-    df2_offset = df2_offset.resample("5min").interpolate(method="linear").reset_index()
+        # Restrict to growing season explicitly
+        ref_year = df_ref[
+            (df_ref["DateTime"].dt.year == year) &
+            (df_ref["DateTime"].dt.month.between(5, 11))
+        ]
 
-    # Reset index and return the offset data with increased interval
-    return df2_offset
+        adj_year = df_adj[
+            (df_adj["DateTime"].dt.year == year) &
+            (df_adj["DateTime"].dt.month.between(5, 11))
+        ]
+
+        if ref_year.empty or adj_year.empty:
+            continue
+        
+        # Remove outliers (rare spurious measurement) from each time series
+        ref_clean = remove_outliers_rolling_mad(ref_year, "baro_Pressure_kPa", mad_multiplier=multi)
+        #adj_clean = remove_outliers_MAD(adj_year, "baro_Pressure_kPa", multi)
+        
+        # Preprocess baro time series to desired frequency
+        ref_p = preprocess_baro(ref_clean, freq)
+        #adj_p = preprocess_baro(adj_clean, freq)
+        
+        new_ref.append(ref_p)
+
+
+        # merged = ref_clean.join(
+        #     adj_clean,
+        #     how="inner",
+        #     lsuffix="_ref",
+        #     rsuffix="_adj"
+        # )
+        
+        # # Difference series
+        # diff = (
+        #     merged["baro_Pressure_kPa_ref"] -
+        #     merged["baro_Pressure_kPa_adj"]
+        #     )
+        
+        # # Calculate and offset the median difference between the time series
+        # offset = diff.median()
+        # print(f"OFFSET between baro data is {offset}")
+        # #mad = (diff - median).abs().median()
+
+        # # if mad == 0 or diff.isna().all():
+        # #     offset = median
+        # # else:
+        # #     good = (diff - median).abs() < mad_multiplier * mad
+        # #     offset = diff[good].median()
+
+        # Apply cleaned reference kPa ONLY to that year's growing season
+        # mask = (
+        #     (df_adj["DateTime"].dt.year == year) &
+        #     (df_adj["DateTime"].dt.month.between(5, 11))
+        # )
+
+        #df_adj.loc[mask, "baro_Pressure_kPa"] += offset
+        
+       #plot_baro_compare(df_ref, 
+                          # df_adj_orig, 
+                          # df_adj,
+                          # title=f"Baro Comparison for {year}"
+                          # )
+        
+        
+        
+    # # Final sort + uniform resampling
+    # df_adj = (
+    #     df_adj
+    #     .set_index("DateTime")
+    #     .sort_index()
+    #     .resample(freq)
+    #     .interpolate(method="time")
+    #     .reset_index()
+    # )
+    
+    # Final sort + uniform resampling
+    compiled_ref = (pd.concat(new_ref))
+    
+    df_adjusted_ref = (
+        compiled_ref
+        #.set_index("DateTime")
+        .sort_index()
+        .resample(freq)
+        .interpolate(method="time")
+        .reset_index()
+    )
+
+    return df_adjusted_ref
+
+    # # initialize df2_offset
+    # df2_offset = df2.copy()
+
+    # # determine and apply unique offset for each year
+    # years_df1 = set(df1['DateTime'].dt.year)
+    # years_df2 = set(df2['DateTime'].dt.year)
+    # common_years = sorted(years_df1.intersection(years_df2))
+
+    # if not common_years:
+    #     print("No common years with data between the two datasets.")
+    #     return df2_offset
+
+    # for year in common_years:
+    #     df1_yr = df1[df1['DateTime'].dt.year == year].copy()
+    #     df2_yr = df2[df2['DateTime'].dt.year == year].copy()
+        
+    #     # Reject outliers on the difference between values
+    #     aligned = df1_yr.join(df2_yr, how="inner", lsuffix="_1", rsuffix="_2")
+    #     diff = aligned["baro_Pressure_kPa_1"] - aligned["baro_Pressure_kPa_2"]
+    #     median = diff.median()
+    #     mad = (diff - median).abs().median()
+    #     offset = diff[(diff - median).abs() < 5 * mad].median()
+        
+                        
+    #     # Remove outliers for the year
+    #     # - need multiplier of 5 based on plots for 2018-2024
+    #     df1_year = remove_outliers(df1_year_raw, 'baro_Pressure_kPa', 5.0)
+    #     df2_year = remove_outliers(df2_year_raw, 'baro_Pressure_kPa', 5.0)
+        
+    #     if debug_baro:
+    #         # Compare plots before/after outlier removal
+    #         plot_dataframes(df1_year_raw, df1_year, 'baro_Pressure_kPa', 
+    #                         'Solinst Baro raw vs clean')
+    #         plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+    #                     'Dendra Baro raw vs clean')
+    #         if (year==2021): 
+    #             plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+    #                         'Dendra Baro raw vs clean',
+    #                         ('2021-11-15', '2021-11-16'))
+    #         if (year==2024): 
+    #             plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+    #                         'Dendra Baro raw vs clean',
+    #                         ('2024-08-16', '2024-08-18'))
+    #         if (year==2025):
+    #             plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+    #                     'Dendra Baro raw vs clean',
+    #                     ('2025-08-27', '2025-08-29'))
+    #             plot_dataframes(df2_year_raw, df2_year, 'baro_Pressure_kPa', 
+    #                     'Dendra Baro raw vs clean',
+    #                     ('2025-09-23', '2025-09-24'))
+                
+    #     merged = df1_year[['DateTime','baro_Pressure_kPa', 'baro_Temp_C']].merge(
+    #         df2_year[['DateTime', 'baro_Pressure_kPa', 'baro_Temp_C']], 
+    #         on='DateTime', 
+    #         suffixes=('_df1', '_df2')
+    #         )
+    
+    #     if not merged.empty:
+    #         mean_offset = (merged['baro_Pressure_kPa_df1'] - 
+    #                        merged['baro_Pressure_kPa_df2']).mean()
+    #     else:
+    #         mean_offset = 0  # No common data points
+        
+    #     # Select rows where the 'DateTime' column matches the current year
+    #     mask = df2_offset['DateTime'].dt.year == year
+
+    #     # Apply the offset only to those rows
+    #     df2_offset.loc[mask, 'baro_Pressure_kPa'] = ( 
+    #         df2_offset.loc[mask, 'baro_Pressure_kPa'] + mean_offset)
+        
+    # # Sort values and ensure DateTime is a proper index
+    # df2_offset = df2_offset.sort_values('DateTime').set_index('DateTime')
+        
+    # # Resample to 5-minute intervals to match the finest gw_df interval
+    # df2_offset = df2_offset.resample("5min").interpolate(method="linear").reset_index()
+
+    # # Reset index and return the offset data with increased interval
+    # return df2_offset
 
 
 ## Converts barometric pressure reading
@@ -1380,6 +1704,41 @@ def adjust_pressure_elevation(df, to_elevation=baro_standard_elevation, from_ele
     
     return df
 
+def validate_baro_data(solinst, dendra):
+    baro_compare = (
+        solinst[["DateTime", "baro_Pressure_kPa"]]
+            .rename(columns={"baro_Pressure_kPa": "baro_solinst"})
+            .merge(
+                dendra[["DateTime", "baro_Pressure_kPa"]]
+                .rename(columns={"baro_Pressure_kPa": "baro_dendra"}),
+                on="DateTime",
+                how="outer",   # important: preserve all timestamps
+            ))
+    
+    nan_solinst = baro_compare["baro_solinst"].isna()
+    nan_dendra = baro_compare["baro_dendra"].isna()
+    
+    nan_both = nan_solinst & nan_dendra
+
+    nan_solinst_only = nan_solinst & ~nan_dendra
+    nan_dendra_only = nan_dendra & ~nan_solinst
+    
+    logging.info(
+        f"Baro NaN summary:\n"
+        f"  Solinst only: {nan_solinst_only.sum()}\n"
+        f"  Dendra only: {nan_dendra_only.sum()}\n"
+        f"  Both missing: {nan_both.sum()}"
+    )
+    
+    if nan_both.any():
+        overlap_times = baro_compare.loc[nan_both, "DateTime"]
+        logging.warning(
+            "Overlapping barometric NaNs at:\n"
+            + "\n".join(map(str, overlap_times[:10]))
+            + ("\n..." if len(overlap_times) > 10 else "")
+        )
+    
+    return
 
 def compensate_baro(gw_df):
     """
@@ -1411,28 +1770,40 @@ def compensate_baro(gw_df):
     baro_df_solinst = adjust_pressure_elevation(baro_df_solinst,
                                                 baro_standard_elevation, None)
         
-    # If helpful, plot and compare the baro data sources
-    # if debug_baro:
-    #     plot_baro_compare(baro_df_solinst, baro_df_dendra)
-    
+
     # Normalize the baro data based on both sources using an offset
     #baro_df = normalize_baro(baro_df_solinst, baro_df_dendra)
     # Quick hack to make 2025 work
     #baro_df = normalize_baro(baro_df_dendra, baro_df_solinst)
     baro_df = baro_df_solinst.drop(columns="elevation_m")
     
-    # Validate baro data
-    mask_nan = baro_df["baro_Pressure_kPa"].isna()
-    if mask_nan.any():
-        missing_datetimes = baro_df.loc[mask_nan, "DateTime"].tolist()
-        logging.debug(
-            "NaN values found in 'baro_Pressure_kPa' at  following datetimes:"
-            + "\n\n".join(map(str, missing_datetimes))
-        )
-        
-    # # If helpful, plot and compare the baro data sources after normalized
+    validate_baro_data(baro_df_solinst, baro_df_dendra)
+    # # Validate baro data
+    # mask_nan = baro_df["baro_Pressure_kPa"].isna()
+    # if mask_nan.any():
+    #     missing_datetimes = baro_df.loc[mask_nan, "DateTime"].tolist()
+    #     logging.debug(
+    #         "NaN values found in 'baro_Pressure_kPa' at  following datetimes:"
+    #         + "\n\n".join(map(str, missing_datetimes))
+    #     )
+    
+    # # If helpful, plot and compare the baro data sources
     # if debug_baro:
-    #      plot_baro_compare(baro_df_solinst, baro_df_dendra)
+    #      plot_baro_compare(baro_df_dendra, baro_df_solinst)
+    
+    
+    # Normalize barometric data to the field station measurements
+    # Assume that field station measurement will be most stable between yrs
+    baro_df = normalize_baro(baro_df_dendra, baro_df_solinst)
+    
+    # If helpful, plot and compare the baro data sources
+    if debug_baro:
+         plot_baro_compare(baro_df_dendra, baro_df_solinst, baro_df)
+    
+    # If helpful, plot and compare the baro data sources after normalized
+    # if debug_baro:
+    #       plot_baro_compare(baro_df_solinst, baro_df_dendra)
+
     
     ## 2. Offset the baro pressure (convered to m) from the gw level
     
@@ -1836,18 +2207,18 @@ def main():
     if not USE_CUT_DATA_CACHE:
         gw_df = cut_logger_data(gw_df)
         print("CUT COMPLETE")
-    # else: 
-    #     waterLevel_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
-    #     waterLevel_df['DateTime'] = waterLevel_df.DateTime.astype('datetime64[ns]')
+    else: 
+         gw_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
+         gw_df['DateTime'] = gw_df.DateTime.astype('datetime64[ns]')
     
-    # ## 2. Get elevation data for each well
-    # waterLevel_df = get_well_elevations(waterLevel_df)
-    # print("GOT WELL ELEVATIONS")
+    # ---- Get elevation data for each well
+    gw_df = get_well_elevations(gw_df)
+    print("GOT WELL ELEVATIONS")
     
     # ## 3. Compensate logger water level (m) based on barometer data (kPa)
-    # if process_baro: 
-    #     waterLevel_df = compensate_baro(waterLevel_df)
-    #     print("COMPENSATION COMPLETE")
+    if not USE_COMPENSATED_DATA_CACHE:
+         gw_df= compensate_baro(gw_df)
+         print("COMPENSATION COMPLETE")
     
     # ## 4. Convert water level from 'relative to sensor' to 
     # ###    'relative to ground surface elevation' (in meters)
