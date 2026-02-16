@@ -9,7 +9,7 @@ import math
 # PART 1: SETUP & DATA LOADING
 
 # Define Output Directory
-output_csv_dir = os.path.join('..', '..', 'results', 'plot', 'groundwater', 'mean_comparison')
+output_csv_dir = os.path.join('..', '..', 'results', 'plots', 'groundwater', 'mean_comparison')
 os.makedirs(output_csv_dir , exist_ok=True)
 output_dir = output_csv_dir  + os.sep 
 

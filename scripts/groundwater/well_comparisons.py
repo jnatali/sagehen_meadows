@@ -10,7 +10,7 @@ from scipy.stats import linregress
 # PART 1: SETUP & DATA LOADING
 
 # Define Output Directory
-output_csv_dir = os.path.join('..', '..', 'results', 'plot', 'groundwater', 'regression_comparison')
+output_csv_dir = os.path.join('..', '..', 'results', 'plots', 'groundwater', 'regression_comparison')
 os.makedirs(output_csv_dir , exist_ok=True)
 output_dir = output_csv_dir  + os.sep 
 
@@ -102,7 +102,6 @@ comparison['Similarity_Score'] = comparison['Slope_Diff'].abs()
 meta = df_long[['well_id', 'Plant_Type', 'Zone']].drop_duplicates('well_id')
 comparison = pd.merge(comparison, meta, on='well_id')
 
-# Filter: Only keep wells with a reliable baseline (R^2 > 0.5) if desired
 valid_wells = comparison.copy()
 
 # Sort by Similarity (Most stable on top)
@@ -219,7 +218,6 @@ for i, well_id in enumerate(unique_wells):
         if ax.get_legend():
             ax.get_legend().remove()
 
-# --- FIX: INVERT Y-AXIS ONCE ---
 # Because sharey=True, inverting the first axis inverts them all.
 axes[0].invert_yaxis() 
 
@@ -228,12 +226,12 @@ for j in range(i + 1, len(axes)):
     axes[j].axis('off')
 
 plt.suptitle(f"Most Stable (Regression) Category: {winning_plant} - {winning_zone}\n(Individual Well Performance: 2021 vs Normal Average)", fontsize=16, y=0.99)
-plt.tight_layout()
+plt.tight_layout(rect=[0, 0, 1, 0.95])
 
 # Save
 filename = f"subplot_regression_winner_{winning_plant}_{winning_zone}.eps"
 save_path = os.path.join(output_dir, filename)
-plt.savefig(save_path)
+plt.savefig(save_path, bbox_inches='tight')
 print(f"Saved figure to: {save_path}")
 
 plt.show()
