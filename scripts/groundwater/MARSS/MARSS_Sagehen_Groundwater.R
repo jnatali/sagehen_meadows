@@ -72,12 +72,12 @@ repository_name = 'sagehen_meadows'
 repository_dir = paste(home_dir, repository_name, '/', sep='')
 
 groundwater_matrix_filename = 'groundwater_weekly_matrix.csv'
-groundwater_data_dir = 'data/field_observations/groundwater/biweekly_manual/'
+groundwater_data_dir = 'data/field_observations/groundwater/time_series/'
 marss_script_dir = 'scripts/groundwater/MARSS/'
 marss_results_dir = paste(home_dir, repository_name, '/results/MARSS/', sep='')
 
 groundwater_rawdata_filepath = paste(repository_dir, groundwater_data_dir,
-                                     'groundwater_daily_FULL_COMBINED.csv',
+                                     'groundwater_daily.csv',
                                      sep='')
 groundwater_weekly_matrix_filepath = paste(repository_dir, groundwater_data_dir,
                                            groundwater_matrix_filename,
@@ -761,15 +761,22 @@ run_single_model <- function(response_matrix, param_list, model_id){
   #model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations), fit=FALSE)
   
   # Fit the model
-  model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations))
+  model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations, trace=1))
   
   # Track runtime
   end_time <- Sys.time()
   execution_minutes <- as.numeric(difftime(end_time, start_time, units = "mins"))
+ 
+  #model_summary <- tidy(model)
+  # 0505 UPDATE Run 62: Skip MARSSparamCIs() 
+  #model_summary <- tidy(model, method = "none")
   
-  # get model summary (for this model output csv)
-  model_summary <- tidy(model)
+  # 0505 UPDATE Run 63: Call MARSSparamCIs() with fewer bootstraps and in parallel
+  model_CIs <- MARSSparamCIs(model, method = "parametric", nboot = 100, parallel = TRUE)
   
+  # 0505 UPDATE Run 63: Use the above step to get model summary (for this model output csv)
+  model_summary <- tidy(model_CIs)
+
   # append well_id info to summary
   model_summary <- bind_rows(model_summary, well_index_dataframe)
   
