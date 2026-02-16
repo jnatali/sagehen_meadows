@@ -32,7 +32,7 @@ logger_no,serial_no,well_id,start,end,temp_threshold,old_temp_threshold,notes,ma
 5,2092377,EHT-XA5S,6/5/21 16:02,7/3/21 11:19,0.5,0.5,source Fall 2029 Yellow p40,,,,,
 3,2092351,EHT-XA5S,6/2/24 12:35,7/12/24 7:30,0.05,0.05,,,,"0.1, 0.5 not cut enuff",,"1.725, 1.73, 1.75, 1.8, 1.9, 2 not cutting off enough, at 0.1, 0.25, 0.4, 0.5, 0.75, 1, 1.5, 1.7, 1.72 was cutting too far into the real data"
 4,,EHT-XA5S,5/26/25 8:00,10/31/25 16:00,0.05,0.1,,x for EHF-XA5S,x for EHF-XA5S; no water after mid-July,0.5 not cut enuff,,
-5,2092377,EWF-XA2S,7/17/18 17:00,7/25/18 11:00,0.2,0.5,source 2018-19 Black p 23,,,,,
+5,2092377,EFF-XA2S,7/17/18 17:00,7/25/18 11:00,0.2,0.5,source 2018-19 Black p 23,,,,,
 2,2092352,EWR-1,7/17/18 17:00,7/25/18 11:00,0.2,0.5,source 2018-19 Black p 23,,,,,
 2,2092352,EWR-1,7/27/18 15:00,8/24/18 8:00,0.01,0.01,see 2018-19 Black p 32,,manually changed end time from 8:10 am,,,
 2,2092352,EWR-1,8/26/18 18:00,9/29/18 12:37,0.05,0.1,see 2018-19 Black p 38,,,,,

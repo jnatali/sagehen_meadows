@@ -112,7 +112,7 @@ def correct_well_ids(df, datetime_name: str) -> pd.DataFrame:
     # Ensure effective_date is datetime
     if not pd.api.types.is_datetime64_any_dtype(corrections_df["effective_date"]):
         corrections_df["effective_date"] = pd.to_datetime(
-            corrections_df["effective_date"])
+            corrections_df["effective_date"], format='mixed')
     
     # Preserve original ID
     df["field_well_id"] = df["well_id"]

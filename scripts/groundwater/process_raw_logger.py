@@ -51,7 +51,7 @@ USE_CUT_DATA_CACHE = False
 USE_COMPENSATED_DATA_CACHE = False
 
 debug_cut = False
-debug_baro = True
+debug_baro = False
 debug_gtw = True
 
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
@@ -1105,11 +1105,11 @@ def cut_logger_data(gw_df) -> pd.DataFrame:
         raise ValueError(f"cut_times_file missing columns: {missing}")
     
     # setup datetime objects
-    gw_df['DT'] = pd.to_datetime(gw_df['DT'])
-    gw_df['start'] = pd.to_datetime(gw_df['start'])
+    gw_df['DT'] = pd.to_datetime(gw_df['DT'], format='mixed')
+    gw_df['start'] = pd.to_datetime(gw_df['start'], format='mixed')
     gw_df['end'] = pd.to_datetime(gw_df['end'])
-    log_time_df['start'] = pd.to_datetime(log_time_df['start'])
-    log_time_df['end'] = pd.to_datetime(log_time_df['end'])
+    log_time_df['start'] = pd.to_datetime(log_time_df['start'], format='mixed')
+    log_time_df['end'] = pd.to_datetime(log_time_df['end'], format='mixed')
     
     # use dates only as merge keys
     gw_df['start_date'] = gw_df['start'].dt.normalize()
@@ -1363,7 +1363,13 @@ def get_baro_solinst(start_time, end_time):
                 str_b_range = 'min/max of new baro file time:' + str(min(new_baro['DateTime'])) + ' to ' + str(max(new_baro['DateTime']))
                 logging.debug(str_b_range)
                 
-            all_baro_data = pd.concat([all_baro_data, new_baro],
+            # Throws UserWarning about empty or NA entries
+            # all_baro_data = pd.concat([all_baro_data, new_baro],
+            #                           ignore_index=True, sort=True)
+            
+            # JN Fix on 02/15/2026
+            all_baro_data = pd.concat([i.dropna(axis=1, how='all')
+                                       for i in [all_baro_data, new_baro]],
                                       ignore_index=True, sort=True)
     
     # Filter baro data so only store those relevant to gw data
@@ -1993,16 +1999,14 @@ def convert_relativeToGround(subdaily_df):
     measurement_frequency_interval=10
     
     # Import manual groundwater data + setup for analysis
-    biweek_df = pd.read_csv(gw_biweekly_file, index_col=0)
+    biweek_df = pd.read_csv(gw_manual_file, index_col=0)
     biweek_df['DateTime'] = biweek_df['timestamp'].astype('datetime64[ns]')
     biweek_df = biweek_df.drop(columns=['timestamp'])
     biweek_df.reset_index(inplace=True)
     
-    # Rename wells
-    #biweek_df = process_well_ids(biweek_df)
-    subdaily_df = process_well_ids(subdaily_df)
+    # Rename wells so comparable to manual well data
+    subdaily_df = process_well_ids(subdaily_df, datetime_col='DateTime')
     print('Processed well_ids')
-    
     
     # Sort and group dataframes
     subdaily_df = subdaily_df.sort_values(by=['well_id', 'DateTime'])
@@ -2048,24 +2052,24 @@ def convert_relativeToGround(subdaily_df):
                           <= (3*measurement_frequency_interval)]
 
     # Remove and log where ground_to_water_cm for a deployment is nan
-    deploy_group = merged_df.groupby(['well_id', 'deployment'])
+    deploy_group = merged_df.groupby(['well_id', 'deployment_id'])
     
     # Remove any deployment where all NaNs for the deployment
     nan_group_all = deploy_group['ground_to_water_cm'].transform(
          lambda x: x.isna().all())
     
     nan_deployments = merged_df.loc[nan_group_all,['well_id',
-                                               'deployment']].drop_duplicates()
+                                               'deployment_id']].drop_duplicates()
     
     for _, row in nan_deployments.iterrows():
         logging.info("WARNING: Assume well was dry for *full* deployment.\n" 
-                     + f"Removing {row['well_id']}-{row['deployment']}"
+                     + f"Removing {row['deployment_id']}"
                      + " from subdaily dataframe.\n")
     
     # Remove NaN deployments from subdaily_df
     # with an inner join (tags subdaily_df rows that match nan_deployment)
     subdaily_df = subdaily_df.merge(nan_deployments, on=['well_id', 
-                                                         'deployment'], 
+                                                         'deployment_id'], 
                                     how='left', 
                                     indicator=True)
 
@@ -2080,11 +2084,13 @@ def convert_relativeToGround(subdaily_df):
     num_dropped_rows = len(nan_rows)
     # Get unique well_id + deployment groups affected
     affected_deployments = nan_rows[['well_id', 
-                                     'deployment']].drop_duplicates()
+                                     'deployment_id']].drop_duplicates()
 
     # Log the results
-    logging.info(f"Removing {num_dropped_rows} rows where 'ground_to_water_cm' is NaN.")
-    logging.info(f"Affected well_id + deployment groups:\n{affected_deployments.to_string(index=False)}")
+    logging.info(f"Removing {num_dropped_rows} rows.\n"
+                 + " where 'ground_to_water_cm' is NaN.")
+    logging.info(f"Affected well_id + deployment groups:\n"
+                 + f"{affected_deployments.to_string(index=False)}")
 
     # Drop NaN rows from merged_df
     merged_df = merged_df.dropna(subset=['ground_to_water_cm'])
@@ -2093,24 +2099,25 @@ def convert_relativeToGround(subdaily_df):
     if (debug_gtw):
         # Identify deployments with only one unique 'DateTime_biweek'
         single_biweek_deployments = (
-            merged_df.groupby(['well_id', 'deployment'])['DateTime_biweek']
+            merged_df.groupby(['well_id', 'deployment_id'])['DateTime_biweek']
             .nunique()
             .reset_index()
         )
         
         # Filter to deployments with exactly one unique 'DateTime_biweek'
-        single_biweek_deployments = single_biweek_deployments[single_biweek_deployments['DateTime_biweek'] == 1]
+        single_biweek_deployments = single_biweek_deployments[
+            single_biweek_deployments['DateTime_biweek'] == 1]
         
         # Merge to get relevant details
         single_biweek_details = merged_df.merge(
-            single_biweek_deployments[['well_id', 'deployment']], 
-                                        on=['well_id', 'deployment'])
+            single_biweek_deployments[['well_id', 'deployment_id']], 
+                                        on=['well_id', 'deployment_id'])
         
         # Log the affected deployments
         if not single_biweek_details.empty:
             logging.info("Deployments with only ONE unique manual measure:\n" + 
                 single_biweek_details[['well_id', 
-                'deployment']].drop_duplicates().to_string(index=False))
+                'deployment_id']].drop_duplicates().to_string(index=False))
         else:
             logging.info("No deployments found where 'DateTime_biweek' has only one unique value.")
         
@@ -2134,17 +2141,19 @@ def convert_relativeToGround(subdaily_df):
     if debug_gtw:
         plot_weekly_groundwater_data_by_well(subdaily_df, biweek_df)
         plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df)
-    return subdaily_df
+    
+    #return subdaily_df
     
     ## SAVE subdaily logger data in single file
     # Re-order columns
-    column_order = ['well_id', 'DateTime', 'deployment', 'ground_to_water_m', 
+    column_order = ['well_id', 'DateTime', 'deployment', 'deploymnet_id', 
+                    'ground_to_water_m', 
                     'raw_Level_m', 'baro_Level_m', 
                     'compensated_Level_m', 'Temp_c']
     subdaily_df = subdaily_df.reindex(columns=column_order)  
     
     # Save subdaily data
-    subdaily_df.to_csv(gw_data_dir + subdaily_full_file, 
+    subdaily_df.to_csv(gw_logger_output_file, 
                        encoding='ISO-8859-1', index=False)
     
     # COMBINE manual and subdaily logger data in single file
@@ -2223,8 +2232,8 @@ def main():
     # ## 4. Convert water level from 'relative to sensor' to 
     # ###    'relative to ground surface elevation' (in meters)
     # ###   Also save combined manual and sensor-based gw readings as .csv
-    # waterLevel_df = convert_relativeToGround(waterLevel_df)
-    # print("RELATIVE TO GROUND CALCULATED")
+    gw_df = convert_relativeToGround(gw_df)
+    print("RELATIVE TO GROUND CALCULATED")
     
     # ## 5. Plot a visualization of the subdaily groundwater time series
     # #plot_timeseries_gridmap(waterLevel_df)
