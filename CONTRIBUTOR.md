@@ -14,7 +14,7 @@ Key Points
 - Work in *your issue's branch*. It's your safe space to make changes with confidence. If you're not sure what branch to use, please ask. I don't mind, I want your code and results to be backed up.
 - Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not paying attention.
 - Write short, clear commit messages.
-- Don't push directly to main. We'll do this when the work is complete or needs to be shared. If you try to push to `main`, your request should be blocked.
+- A PULL REQUEST (PR) into the main branch can happen at any time. You can use the Pull Request to help track changes against the 'main' branch. Once your task is completed, rename your Pull Request as "Ready to Review". We'll review together, merge the code, then close the issue and the sub-branch. We'll do this when the work is complete or needs to be shared, which should happen within a 1-4 weeks. We'll try to keep issues focused and reviews frequent.
 
 
 ### Workflow Steps
@@ -68,9 +68,11 @@ git push
 ```
 
 #### 6. Open a **Pull Request** to merge `your issue's branch` into `main` ####
-Do this once the work in your branch is fully operational (i.e. it's complete) and ready to integrate into the stable code base. 
-The request will need to be reviewed before it's integrated into `main` 
+You can open a Pull Request as soon as you start working on your issue, just name it as a DRAFT. 
 
+Once work in your branch is fully operational (i.e. it's complete) and ready to integrate into the stable code base, we'll review it together before we inegrate into the `main` branch. To signal that the branch is ready, rename your Pull Request to READY FOR REVIEW.
+
+To start a Pull Request:
 - Go to the github repository at https://github.com/jnatali/sagehen_meadows
 - Click **"Compare & pull request"** for your branch.
 - Important: Make sure the base branch is your issue branch, not main.
@@ -86,4 +88,11 @@ The request will need to be reviewed before it's integrated into `main`
 ### Using Git with Visual Studio
 - [Visual Studio site on github integration](https://visualstudio.microsoft.com/vs/github/)
 - [Working with GitHub in VS Code tutorial](https://code.visualstudio.com/docs/sourcecontrol/github)
+- 
+## Coding Guidelines
 
+### Python: Use PEP 8 Style Guide
+[PEP 8](https://peps.python.org/pep-0008/) supports consistent, readable code. Please follow this standard.
+
+### R: Use Tidyverse Style Guide
+[Tidyverse Style Guide](https://style.tidyverse.org/) supports consistent, readable code. Please follow this standard.
