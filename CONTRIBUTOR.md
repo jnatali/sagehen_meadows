@@ -14,7 +14,7 @@ Key Points
 - Work in *your issue's branch*. It's your safe space to make changes with confidence. If you're not sure what branch to use, please ask. I don't mind, I want your code and results to be backed up.
 - Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not paying attention.
 - Write short, clear commit messages.
-- A PULL REQUEST (PR) into the main branch will only be evaluated once we're ready to close the issue and the sub-branch. We'll do this when the work is complete or needs to be shared, which should happen within a 1-4 weeks. We'll try to keep issues focused and reviews frequent.
+- A PULL REQUEST (PR) into the main branch can happen at any time. You can use the Pull Request to help track changes against the 'main' branch. Once your task is completed, rename your Pull Request as "Ready to Review". We'll review together, merge the code, then close the issue and the sub-branch. We'll do this when the work is complete or needs to be shared, which should happen within a 1-4 weeks. We'll try to keep issues focused and reviews frequent.
 
 
 ### Workflow Steps
