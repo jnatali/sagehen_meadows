@@ -2556,7 +2556,7 @@ def generate_exploratory_bin(
        # ------------------------------------------------------------------
        summary = (
            binned_df
-           .groupby(["year", "bin_center_doy"])
+           .groupby(["year", "doy"])
            .agg(
                mean_cm=("ground_to_water_cm", "mean"),
                q25=("ground_to_water_cm", lambda x: x.quantile(0.25)),
@@ -2564,7 +2564,7 @@ def generate_exploratory_bin(
                n=("ground_to_water_cm", "count"),
            )
            .reset_index()
-           .sort_values(["year", "bin_center_doy"])
+           .sort_values(["year", "doy"])
        )
    
        # ------------------------------------------------------------------
@@ -2575,13 +2575,13 @@ def generate_exploratory_bin(
    
            for year, g in summary.groupby("year"):
                ax.plot(
-                   g["bin_center_doy"],
+                   g["doy"],
                    g["mean_cm"],
                    label=str(year),
                    linewidth=2,
                )
                ax.fill_between(
-                   g["bin_center_doy"],
+                   g["doy"],
                    g["q25"],
                    g["q75"],
                    alpha=0.2,
