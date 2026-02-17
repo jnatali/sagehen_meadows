@@ -2242,12 +2242,17 @@ def summarize_daily_time_series(daily_df) -> pd.DataFrame:
           decide the date range and which wells to include/exclude.
     
     Focus on completeness, quick visualizations, and weighing options.
+    
+    Saves report to: gw_daily_report_file
+    Plots to: plots_dir + 'time_series/doy_completeness.png'
         
     Parameters:
         daily_df = daily_df[['well_id', 'timestamp', 'ground_to_water_cm']]
         
-    Saves report to: gw_daily_report_file
-    Plots to: plots_dir + 'time_series/doy_completeness.png'
+
+    Returns: 
+        well_all, a sorted dataframe; completeness as 'pct_complete_all_years'
+    
     '''
     df = daily_df.copy()
 
@@ -2366,6 +2371,7 @@ def summarize_daily_time_series(daily_df) -> pd.DataFrame:
         .sum()
         .reset_index(name="n_bins_present_all")
     )
+    
     well_all["pct_complete_all_years"] = (
         well_all["n_bins_present_all"] /
         (n_bins_total * df["year"].nunique()) * 100
@@ -2379,10 +2385,224 @@ def summarize_daily_time_series(daily_df) -> pd.DataFrame:
         .sort_values("pct_complete_all_years", ascending=False)
     )
     
-    summary.to_csv(gw_daily_report_file)
+    summary.to_csv(gw_daily_report_file, index=False)
     
-    return summary
+    return well_all
+
+
+def filter_by_completeness(df, completeness_df, min_pct=20):
+    """
+    Remove wells with completeness below threshold.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Must contain well_id
+    completeness_df : DataFrame
+        Columns: well_id, completeness_frac
+    min_frac : float
+        Minimum fraction required to keep a well
+    """
+
+    keep_wells = (
+        completeness_df
+        .loc[completeness_df["pct_complete_all_years"] >= min_pct, "well_id"]
+        .unique()
+    )
     
+    before_wells = len(df["well_id"].unique())
+    print(f"Before filtering # of wells: {before_wells}")
+    print(f"After filtering # of wells: {len(keep_wells)}")
+    
+    return df[df["well_id"].isin(keep_wells)].copy()
+
+def generate_exploratory_bin(
+       daily_df,
+       completeness_df,
+       start_doy=120,
+       end_doy=325,
+       bin_days=14,
+       plot=True) -> pd.DataFrame:
+       """
+       Generate a DOY-binned exploratory groundwater time series and plot
+       yearly means with spread.
+   
+       Parameters
+       ----------
+       daily_df : pandas.DataFrame
+           Must contain columns:
+           ['well_id', 'timestamp', 'ground_to_water_cm']
+       completeness_df : pandas.DataFrame
+           Must contain columns:
+           ['well_id', 'pct_complete_all_years']
+       start_doy : int
+           First DOY to include (default 120)
+       end_doy : int
+           Last DOY to include (default 325)
+       bin_days : int
+           Width of DOY bins (default 14)
+       plot : bool
+           Whether to generate exploratory plot
+   
+       Returns
+       -------
+       binned_df : pandas.DataFrame
+           Long-format binned dataset with columns:
+           ['well_id', 'timestamp', 'ground_to_water_cm',
+            'year', 'doy', 'bin']
+       """
+   
+       df = daily_df.copy()
+       
+       # ------------------------------------------------------------------
+       # Filter by completeness
+       # ------------------------------------------------------------------
+       df = filter_by_completeness(df, completeness_df)
+   
+       # ------------------------------------------------------------------
+       # 1. Time fields
+       # ------------------------------------------------------------------
+       df["timestamp"] = pd.to_datetime(df["timestamp"])
+       df["year"] = df["timestamp"].dt.year
+       df["doy"] = df["timestamp"].dt.dayofyear
+   
+       # Restrict to DOY window
+       df = df[(df["doy"] >= (start_doy - (bin_days/2))) & (df["doy"] <= end_doy)]
+   
+       # ------------------------------------------------------------------
+       # 2. DOY binning
+       # ------------------------------------------------------------------
+       bins = np.arange(start_doy, end_doy + bin_days, bin_days)
+       labels = range(len(bins) - 1)
+       
+       half = bin_days / 2
+       bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
+
+       df["bin"] = ((df["doy"] - (start_doy - half)) // bin_days).astype("Int64")
+
+       # Keep only bins in range
+       df = df[df["bin"].between(0, len(bin_centers) - 1)]
+       df["bin_center_doy"] = start_doy + df["bin"] * bin_days
+       # bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
+       
+       # bin_edges = np.concatenate((
+       #     [bin_centers[0] - half],
+       #     bin_centers[:-1] + half,
+       #     [bin_centers[-1] + half]
+       # ))
+       
+       # df["bin"] = pd.cut(
+       #     df["doy"],
+       #     bins=bin_edges,
+       #     labels=range(len(bin_centers)),
+       #     include_lowest=True,
+       # )
+       
+       # df["bin_center_doy"] = df["bin"].map(
+       #     dict(enumerate(bin_centers))
+       # )
+       
+       # ---- Aggregate: ONE value per well × year × bin
+       binned = (
+           df
+           .sort_values("timestamp")
+           .groupby(["well_id", "year", "bin"], as_index=False)
+           .agg(
+               ground_to_water_cm=("ground_to_water_cm", "mean"),
+               bin_center_doy=("bin_center_doy", "first"),
+           )
+       )
+       
+       binned = binned.rename(columns={'bin_center_doy': 'doy'})
+       
+       binned["timestamp"] = (
+           pd.to_datetime(binned["year"].astype(str) + "-01-01")
+           + pd.to_timedelta(binned["doy"] - 1, unit="D")
+           )
+       
+
+       # df["bin"] = pd.cut(
+       #     df["doy"],
+       #     bins=bins,
+       #     labels=labels,
+       #     include_lowest=True,
+       # )
+   
+       # # Representative timestamp for plotting (bin center)
+       # bin_centers = {
+       #     i: int(bins[i] + bin_days / 2) for i in labels
+       # }
+       # df["bin_center_doy"] = df["bin"].map(bin_centers)
+   
+       # ------------------------------------------------------------------
+       # 3. Save long-format binned data
+       # ------------------------------------------------------------------
+       binned_df = binned[
+           [
+               "well_id",
+               "timestamp",
+               "ground_to_water_cm",
+               "year",
+               "doy",
+               "bin",
+           ]
+       ].copy()
+   
+
+       binned_df.to_csv(gw_bin_by_doy_file, index=False)
+   
+       # ------------------------------------------------------------------
+       # 4. Aggregate for plotting
+       # ------------------------------------------------------------------
+       summary = (
+           binned_df
+           .groupby(["year", "bin_center_doy"])
+           .agg(
+               mean_cm=("ground_to_water_cm", "mean"),
+               q25=("ground_to_water_cm", lambda x: x.quantile(0.25)),
+               q75=("ground_to_water_cm", lambda x: x.quantile(0.75)),
+               n=("ground_to_water_cm", "count"),
+           )
+           .reset_index()
+           .sort_values(["year", "bin_center_doy"])
+       )
+   
+       # ------------------------------------------------------------------
+       # 5. Plot
+       # ------------------------------------------------------------------
+       if plot:
+           fig, ax = plt.subplots(figsize=(10, 5))
+   
+           for year, g in summary.groupby("year"):
+               ax.plot(
+                   g["bin_center_doy"],
+                   g["mean_cm"],
+                   label=str(year),
+                   linewidth=2,
+               )
+               ax.fill_between(
+                   g["bin_center_doy"],
+                   g["q25"],
+                   g["q75"],
+                   alpha=0.2,
+               )
+   
+           ax.set_xlabel("Day of Year")
+           ax.set_ylabel("Groundwater depth (cm below ground)")
+           ax.set_title(
+               f"Groundwater depth by DOY (bin = {bin_days} days)"
+           )
+   
+           ax.invert_yaxis()
+           ax.legend(title="Year")
+           ax.grid(alpha=0.3)
+   
+           plt.tight_layout()
+           plt.show()
+   
+       return binned_df
+   
+
 # --- MAIN ---
 # Define a main() function to allow import of functions
 # without executing the full script.
@@ -2427,176 +2647,12 @@ def main():
     #       Save as .csv
     daily_df = generate_daily_time_series(subdaily_df, manual_df)
     
-    
     # ---- Summarize daily data; focus on completeness
-    summary = summarize_daily_time_series(daily_df)
-    summary["pct_complete_all_years"].head()
+    well_completeness = summarize_daily_time_series(daily_df)
+    print(well_completeness.head())
     
-    # ---- Create binned time series for exploratory analysis
-    #      save as .csv
-    def generate_exploratory_bin(
-        daily_df,
-        start_doy=120,
-        end_doy=325,
-        bin_days=14,
-        plot=True):
-        """
-        Generate a DOY-binned exploratory groundwater time series and plot
-        yearly means with spread.
-    
-        Parameters
-        ----------
-        daily_df : pandas.DataFrame
-            Must contain columns:
-            ['well_id', 'timestamp', 'ground_to_water_cm']
-        start_doy : int
-            First DOY to include (default 120)
-        end_doy : int
-            Last DOY to include (default 325)
-        bin_days : int
-            Width of DOY bins (default 14)
-        plot : bool
-            Whether to generate exploratory plot
-    
-        Returns
-        -------
-        binned_df : pandas.DataFrame
-            Long-format binned dataset with columns:
-            ['well_id', 'timestamp', 'ground_to_water_cm',
-             'year', 'doy', 'bin']
-        """
-    
-        df = daily_df.copy()
-    
-        # ------------------------------------------------------------------
-        # 1. Time fields
-        # ------------------------------------------------------------------
-        df["timestamp"] = pd.to_datetime(df["timestamp"])
-        df["year"] = df["timestamp"].dt.year
-        df["doy"] = df["timestamp"].dt.dayofyear
-    
-        # Restrict to DOY window
-        df = df[(df["doy"] >= (start_doy - (bin_days/2))) & (df["doy"] <= end_doy)]
-    
-        # ------------------------------------------------------------------
-        # 2. DOY binning
-        # ------------------------------------------------------------------
-        bins = np.arange(start_doy, end_doy + bin_days, bin_days)
-        labels = range(len(bins) - 1)
-        
-        half = bin_days / 2
-
-        bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
-        
-        bin_edges = np.concatenate((
-            [bin_centers[0] - half],
-            bin_centers[:-1] + half,
-            [bin_centers[-1] + half]
-        ))
-        
-        df["bin"] = pd.cut(
-            df["doy"],
-            bins=bin_edges,
-            labels=range(len(bin_centers)),
-            include_lowest=True,
-        )
-        
-        df["bin_center_doy"] = df["bin"].map(
-            dict(enumerate(bin_centers))
-        )
-        
-        # ---- Aggregate: ONE value per well × year × bin
-        binned = (
-            df
-            .sort_values("timestamp")
-            .groupby(["well_id", "year", "bin"], as_index=False)
-            .agg(
-                ground_to_water_cm=("ground_to_water_cm", "mean"),
-                bin_center_doy=("bin_center_doy", "first"),
-            )
-        )
-
-        # df["bin"] = pd.cut(
-        #     df["doy"],
-        #     bins=bins,
-        #     labels=labels,
-        #     include_lowest=True,
-        # )
-    
-        # # Representative timestamp for plotting (bin center)
-        # bin_centers = {
-        #     i: int(bins[i] + bin_days / 2) for i in labels
-        # }
-        # df["bin_center_doy"] = df["bin"].map(bin_centers)
-    
-        # ------------------------------------------------------------------
-        # 3. Save long-format binned data
-        # ------------------------------------------------------------------
-        binned_df = binned[
-            [
-                "well_id",
-                "timestamp",
-                "ground_to_water_cm",
-                "year",
-                "doy",
-                "bin",
-                "bin_center_doy",
-            ]
-        ].copy()
-    
-
-        binned_df.to_csv(bin_by_doy_file, index=False)
-    
-        # ------------------------------------------------------------------
-        # 4. Aggregate for plotting
-        # ------------------------------------------------------------------
-        summary = (
-            binned_df
-            .groupby(["year", "bin_center_doy"])
-            .agg(
-                mean_cm=("ground_to_water_cm", "mean"),
-                q25=("ground_to_water_cm", lambda x: x.quantile(0.25)),
-                q75=("ground_to_water_cm", lambda x: x.quantile(0.75)),
-                n=("ground_to_water_cm", "count"),
-            )
-            .reset_index()
-            .sort_values(["year", "bin_center_doy"])
-        )
-    
-        # ------------------------------------------------------------------
-        # 5. Plot
-        # ------------------------------------------------------------------
-        if plot:
-            fig, ax = plt.subplots(figsize=(10, 5))
-    
-            for year, g in summary.groupby("year"):
-                ax.plot(
-                    g["bin_center_doy"],
-                    g["mean_cm"],
-                    label=str(year),
-                    linewidth=2,
-                )
-                ax.fill_between(
-                    g["bin_center_doy"],
-                    g["q25"],
-                    g["q75"],
-                    alpha=0.2,
-                )
-    
-            ax.set_xlabel("Day of Year")
-            ax.set_ylabel("Groundwater depth (cm below ground)")
-            ax.set_title(
-                f"Groundwater depth by DOY (bin = {bin_days} days)"
-            )
-    
-            ax.invert_yaxis()
-            ax.legend(title="Year")
-            ax.grid(alpha=0.3)
-    
-            plt.tight_layout()
-            plt.show()
-    
-        return binned_df
+    # ---- Generate binned time series, filter on completeness
+    gw_binned = generate_exploratory_bin(daily_df, well_completeness)
     
     # ## 5. Plot a visualization of the subdaily groundwater time series
     # #plot_timeseries_gridmap(waterLevel_df)
