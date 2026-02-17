@@ -15,14 +15,13 @@ output_dir = output_dir + os.sep
 # 1. Load Data
 # Pandas reads the CSV. Row 0 becomes the headers.
 # --- Define SOURCE file (where you read existing data FROM) ---
-SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'groundwater', 'biweekly_manual')
+SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'groundwater', 'time_series')
 
 # 3. Base name of the files to search for
-SOURCE_FILE_PATTERN = "groundwater_2018_2024_weekly_matrix_STABLE.csv"
+SOURCE_FILE_PATTERN = "groundwater_weekly_matrix.csv"
 file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
 
 df = pd.read_csv(file_path)
-
 
 # 2. Dynamic Column Separation
 # We identify which columns are ID info and which are Data (Weeks)
@@ -148,7 +147,8 @@ plt.ylabel('Depth Below Surface (cm)')
 plt.grid(True, alpha=0.3)
 # FIX: Use (Deepest, Shallowest) to invert manually
 plt.ylim(t1_max, t1_min) 
-plt.savefig(f"{output_dir}Mean_GW_Level_by_Year.eps", format='eps')
+#plt.savefig(f"{output_dir}Mean_GW_Level_by_Year.eps", format='eps')
+plt.savefig(f"{output_dir}Mean_by_year.eps", format='eps')
 # plt.show()
 
 # 2. INDIVIDUAL PLOT: Grand Mean Only
@@ -159,7 +159,8 @@ plt.ylabel('Depth Below Surface (cm)')
 plt.grid(True, alpha=0.3)
 # FIX: Use (Deepest, Shallowest) to invert manually
 plt.ylim(t1_max, t1_min) 
-plt.savefig(f"{output_dir}GRAND_Mean_GW_Level_by_Year.eps", format='eps')
+#plt.savefig(f"{output_dir}GRAND_Mean_GW_Level_by_Year.eps", format='eps')
+plt.savefig(f"{output_dir}Mean_by_year_grand_only.eps", format='eps')
 # plt.show()
 
 # 3. COMBINED PLOT: Annual + Grand Mean Overlay
@@ -174,7 +175,9 @@ plt.legend()
 plt.grid(True, alpha=0.3)
 # FIX: Use (Deepest, Shallowest) to invert manually
 plt.ylim(t1_max, t1_min) 
-plt.savefig(f"{output_dir}COMBINED_Mean_GW_Level_by_Year.eps", format='eps')
+#plt.savefig(f"{output_dir}COMBINED_Mean_GW_Level_by_Year.eps", format='eps')
+plt.savefig(f"{output_dir}Mean_by_Year_grand.eps", format='eps')
+
 plt.show() # Pausing here so you can check Task 1
 
 
@@ -319,7 +322,9 @@ plt.grid(True, alpha=0.3)
 plt.ylim(t3_max, t3_min) 
 
 # Save
-save_path = f"{output_dir}drought_comparison_2021.eps"
+#save_path = f"{output_dir}drought_comparison_2021.eps"
+save_path = f"{output_dir}Mean_by_year_drought.eps"
+
 plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 
@@ -380,7 +385,9 @@ fig.supxlabel('ISO Week')
 plt.tight_layout()
 
 # Save
-save_path = f"{output_dir}annual_means_with_std_spread_subplots.eps"
+#save_path = f"{output_dir}annual_means_with_std_spread_subplots.eps"
+save_path = f"{output_dir}Mean_by_year_std_spread.eps"
+
 plt.savefig(save_path, format='eps')
 print(f"Saved: {save_path}")
 

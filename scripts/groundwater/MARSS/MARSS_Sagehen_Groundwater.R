@@ -34,7 +34,7 @@ library(tidyr)
 # ------ INITIALIZE GLOBAL VARIABLES ------
 #### Info about the data
 # TODO: set as model param
-year_range <- c(2018,2019,2021,2024)
+year_range <- c(2018,2019,2021,2024,2025)
 # seemed to be working with 2021 + 2024 only
 #year_range <- c(2018, 2019, 2021, 2024)
 #year_range <- c(2018)
@@ -91,8 +91,9 @@ model_parameter_filepath = paste(repository_dir, marss_script_dir,
 #### PREPARE GROUNDWATER DATA
 # by: JNatali
 # on: 18 Nov 2024
-# purpose: opens biweekly groundwater data 
-#          (manually measured then transformed relative to ground), 
+# purpose: opens groundwater data 
+#          (orig: weekly, manually measured then transformed relative to ground) 
+#          (as of 02/16/2026: daily with all manual at anytime, all logger at 8am only)
 #          manipulates into matrix form, saves it.
 # returns: groundwater_weekly_matrix, evenly-spaced weekly matrix of groundwater
 #          well readings for all years.
@@ -150,6 +151,8 @@ prepare_groundwater_data <- function(){
       .groups = "drop"
     )
 
+  # TODO 02/16/2026: output this to csv now? use for plotting? report on completion?
+  
   # create a complete grid of all well_id and year_week values
   groundwater_full_grid <- expand_grid(
     well_id = unique(groundwater$well_id),
@@ -1007,7 +1010,7 @@ run_all_models <- function(response_matrix) {
 # NOT YET DEFINED
 
 # ------ MAIN PROCEDURAL SCRIPT ------
-# Create matrix from data in groundwater_daily_FULL_COMBINED.csv
+# Create matrix from data in groundwater_daily.csv
 groundwater_data <- prepare_groundwater_data()
 response_matrix <- load_response_data(groundwater_data)
 results_dataframe <- run_all_models(response_matrix)

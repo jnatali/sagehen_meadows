@@ -47,12 +47,12 @@ from well_utils import process_well_ids
 ##     for processing, logging, debugging and data validation
 
 USE_LOGGER_DATA_CACHE = True
-USE_CUT_DATA_CACHE = False
+USE_CUT_DATA_CACHE = True
 USE_COMPENSATED_DATA_CACHE = False
 
 debug_cut = False
 debug_baro = False
-debug_gtw = True
+debug_gtw = False
 
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
 density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
@@ -60,6 +60,7 @@ baro_standard_elevation = 1933.7 # Saghen Weather Tower #1 elev in meters
 
 ## --- SETUP DIRECTORY + FILE NAMES --- 
 gw_data_dir = '../../data/field_observations/groundwater/'
+plots_dir = '../../results/plots/groundwater/'
 
 ### --- INPUTS
 gw_logger_dir = gw_data_dir + 'loggers/RAW/'
@@ -82,7 +83,9 @@ os.makedirs(gtw_logger_dir,exist_ok=True)
 
 ### --- OUTPUTS
 gw_daily_file = gw_data_dir + 'time_series/groundwater_daily.csv' # manual + logger data
+gw_daily_report_file = gw_data_dir + 'time_series/summary_report.csv'
 gw_logger_output_file = gw_data_dir +'loggers/PROCESSED/groundwater_subdaily.csv'
+gw_bin_by_doy_file = gw_data_dir + 'time_series/groundwater_bin_14d.csv'
 log_file = "logs/subdaily_processing_log.txt"
 
 ## --- LOGGING: Configure to write logs to a file
@@ -357,7 +360,7 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
     """
     # Define time for extracting subdaily measurement 
     #  i.e time that represents equivalent of manual readings
-    manual_reading_start_time = 6
+    manual_reading_start_time = 5
     manual_reading_stop_time = 10
     
     # Extract unique well_ids from both datasets
@@ -466,6 +469,7 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
 
         plt.tight_layout()
         plt.show()
+        plt.close()
 
 def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df, 
                                             plot_rain=False):
@@ -896,6 +900,25 @@ def plot_timeseries_gridmap(df):
     plt.tight_layout(rect=[0, 0.15, 1, 0.96])
     plt.show()
 
+def load_manual_data() -> pd.DataFrame:
+    # Import manual groundwater data + setup for analysis
+    biweek_df = pd.read_csv(gw_manual_file, index_col=0)
+    biweek_df['DateTime'] = biweek_df['timestamp'].astype('datetime64[ns]')
+    biweek_df = biweek_df.drop(columns=['timestamp'])
+    biweek_df.reset_index(inplace=True)
+    
+    # Calculate and report on the mean time of the data between 2018 and 2024
+    years = [2018, 2019, 2021, 2024]
+    biweek_df["year"] = biweek_df["DateTime"].dt.year
+    year_mask = biweek_df["year"].isin(years)
+    filtered_df = biweek_df[year_mask]
+    timestr_series = filtered_df["DateTime"].dt.time.astype(str)
+    time_delta_series = pd.to_timedelta(timestr_series)
+    mean_timedelta = time_delta_series.mean()
+    mean_time = (datetime.datetime.min + mean_timedelta).time()
+    print(f"Mean time of measurement: {mean_time} for {years}")
+    return biweek_df
+    
 def load_logger_data() -> pd.DataFrame:
     """
     Consolidates all raw logger csv files into one dataframe.
@@ -930,7 +953,7 @@ def load_logger_data() -> pd.DataFrame:
     """
     
     if USE_LOGGER_DATA_CACHE:
-        print("Using logger data from CACHE!")
+        print("Using LOGGER data from CACHED file!")
         return pd.read_csv(logger_data_file)
 
     data_dir = Path(gw_logger_dir)
@@ -1988,7 +2011,7 @@ def calculate_sensor_level(merged_df):
 
 ## Convert baro-compensated water level from sensor 
 ## so that it's relative to the ground surface, not the sensor level
-def convert_relativeToGround(subdaily_df):
+def convert_relativeToGround(subdaily_df, biweek_df):
     """
     With groundwater dataframe as argument, 
     convert baro-compensated water level 
@@ -1998,15 +2021,9 @@ def convert_relativeToGround(subdaily_df):
     #   use to detect deployment breaks
     measurement_frequency_interval=10
     
-    # Import manual groundwater data + setup for analysis
-    biweek_df = pd.read_csv(gw_manual_file, index_col=0)
-    biweek_df['DateTime'] = biweek_df['timestamp'].astype('datetime64[ns]')
-    biweek_df = biweek_df.drop(columns=['timestamp'])
-    biweek_df.reset_index(inplace=True)
-    
     # Rename wells so comparable to manual well data
     subdaily_df = process_well_ids(subdaily_df, datetime_col='DateTime')
-    print('Processed well_ids')
+    print('PROCESSED well_ids')
     
     # Sort and group dataframes
     subdaily_df = subdaily_df.sort_values(by=['well_id', 'DateTime'])
@@ -2139,7 +2156,7 @@ def convert_relativeToGround(subdaily_df):
 
     # Plot to validate
     if debug_gtw:
-        plot_weekly_groundwater_data_by_well(subdaily_df, biweek_df)
+        plot_weekly_groundwater_data_by_well(subdaily_df, biweek_df, plot_subdaily_only=False)
         plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df)
     
     #return subdaily_df
@@ -2156,18 +2173,21 @@ def convert_relativeToGround(subdaily_df):
     subdaily_df.to_csv(gw_logger_output_file, 
                        encoding='ISO-8859-1', index=False)
     
+    return subdaily_df
+    
+def generate_daily_time_series(subdaily_df, biweek_df) -> pd.DataFrame:
     # COMBINE manual and subdaily logger data in single file
-    # Filter subdaily_df, only select rows between 7a to 10a
+    # Filter subdaily_df, only select rows between 4a to 11a
     subdaily_df['DateTime'] = pd.to_datetime(subdaily_df['DateTime'])
     subdaily_df['date'] = subdaily_df['DateTime'].dt.date
     subdaily_df['time'] = subdaily_df['DateTime'].dt.time
    
-    mask = subdaily_df['time'].between(time(7, 0), time(10, 0))
+    mask = subdaily_df['time'].between(time(4, 0), time(11, 0))
     subdaily_am_df = subdaily_df[mask].copy()
     
-    # Target the measurement closest to 8am
+    # Target the measurement closest to 8:50am (mean of 2018-2024)
     subdaily_am_df['target_time'] = pd.to_datetime(
-            subdaily_am_df['date'].astype(str) + ' 08:00')
+            subdaily_am_df['date'].astype(str) + ' 08:50')
     subdaily_am_df['time_diff'] = (subdaily_am_df['DateTime'] - subdaily_am_df['target_time']).abs()
     
     subdaily_am_df = subdaily_am_df.sort_values(['well_id', 'date', 'time_diff', 'DateTime'])
@@ -2179,24 +2199,190 @@ def convert_relativeToGround(subdaily_df):
     subdaily_8am_df = subdaily_8am_df.rename(columns={'DateTime': 'timestamp'})
     biweek_df = biweek_df.rename(columns={'DateTime': 'timestamp'})
     
+    # Track if it's logger, then keep logger data preferentially for each day
+    subdaily_df["is_logger"] = True
+    biweek_df["is_logger"] = False
+    
     # Append and save
     daily_df = pd.concat([biweek_df, subdaily_8am_df], ignore_index=True)
-    daily_df = daily_df[['well_id', 'timestamp', 'ground_to_water_cm']]
+    
+    # Keep logger data preferentially for each day
+    daily_df["year"] = daily_df["timestamp"].dt.year
+    daily_df["doy"] = daily_df["timestamp"].dt.dayofyear
+    daily_df = (
+         daily_df.sort_values("is_logger", ascending=False)
+         .drop_duplicates(subset=["well_id", "year", "doy"])
+    )
+    
+    daily_df = daily_df[['well_id', 'timestamp', 'ground_to_water_cm', 'year', 'doy']]
     daily_df = daily_df.sort_values(['well_id', 'timestamp'])
     daily_df.to_csv(gw_daily_file, index=False)
 
     # Validated combined dataset
-    if debug_gtw:
-        #Compare count of original versus combined dataset
-        print(f"biweek_df rows: {len(biweek_df)}, "
-              f"daily_df rows: {len(daily_df)}" 
-              f" ({(len(daily_df) - len(biweek_df)) / len(biweek_df) * 100:.1f}% change)")
-        missing_count = daily_df['ground_to_water_cm'].isna().sum()
-        total_count = len(daily_df)
-        missing_percent = (missing_count / total_count) * 100
-        print(f"Missing ground_to_water_cm values in daily_df: {missing_count}"
-              f"( {missing_percent:.1f}%)")
 
+    #Compare count of original versus combined dataset
+    print(f"biweek_df rows: {len(biweek_df)}, "
+          f"daily_df rows: {len(daily_df)}" 
+          f" ({(len(daily_df) - len(biweek_df)) / len(biweek_df) * 100:.1f}% change)")
+    missing_count = daily_df['ground_to_water_cm'].isna().sum()
+    total_count = len(daily_df)
+    missing_percent = (missing_count / total_count) * 100
+    print(f"Missing ground_to_water_cm values in daily_df: {missing_count}"
+          f"( {missing_percent:.1f}%)")
+    
+    return daily_df
+
+def summarize_daily_time_series(daily_df) -> pd.DataFrame:
+    '''
+    Generates a report summary as csv and plot to help guide approaches 
+    for how to represent the data for different purposes 
+    (e.g. exploratory analysis and plots, MARSS time series matrix)
+    
+    Goal: understand how to best bin the data (time spacing),
+          decide the date range and which wells to include/exclude.
+    
+    Focus on completeness, quick visualizations, and weighing options.
+        
+    Parameters:
+        daily_df = daily_df[['well_id', 'timestamp', 'ground_to_water_cm']]
+        
+    Saves report to: gw_daily_report_file
+    Plots to: plots_dir + 'time_series/doy_completeness.png'
+    '''
+    df = daily_df.copy()
+
+    start_doy = 120 # ~May 1
+    end_doy = 325 # 
+    bin_days = 14
+    
+    # 1. Add DOY column and value for each measurement entry (row) based on DateTime
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df["year"] = df["timestamp"].dt.year
+    df["doy"] = df["timestamp"].dt.dayofyear
+    
+    # Restrict to DOY window
+    df = df[df["doy"].between(start_doy, end_doy)]
+    
+    # 2. Assess completeness for each DOY
+    # - count # of valid measurements per DOY across all years of data (or mean fraction present)
+    # - plot x = DOY versus y = # of contributing wells per day with ribbon for min-max across years
+    
+    # # Presence/absence per well-day
+    # presence = (
+    #     df.groupby(["year", "doy", "well_id"])
+    #     .size()
+    #     .reset_index(name="n")
+    # )
+    # presence["present"] = 1
+    
+    unique_presence = (
+        df[["well_id", "year", "doy"]]
+        .drop_duplicates()
+        )
+    
+    # Count wells per DOY per year
+    doy_counts = (
+        unique_presence.groupby("doy")["well_id"]
+        .nunique()
+        #.sum()
+        .reset_index(name="n_wells"))
+    
+    # Simple plot
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(doy_counts["doy"], doy_counts["n_wells"])
+    ax.set_xlabel("Day of Year")
+    ax.set_ylabel("Number of wells with ≥1 observation")
+    ax.set_title("Groundwater data availability by DOY (all years combined)")
+    ax.grid(alpha=0.3)
+    fig.savefig(plots_dir + 'time_series/doy_completeness.png', dpi=150)
+    plt.show()
+    plt.close()
+    
+    # # Plot
+    # fig, ax = plt.subplots(figsize=(10, 4))
+    
+    # ax.plot(doy_summary["doy"], doy_summary["mean"], label="Mean wells/day")
+    # ax.fill_between(
+    #     doy_summary["doy"],
+    #     doy_summary["min"],
+    #     doy_summary["max"],
+    #     alpha=0.3,
+    #     label="Min–max across years",
+    # )
+    
+    # ax.set_xlabel("Day of Year")
+    # ax.set_ylabel("Number of wells")
+    # ax.set_title("Daily groundwater data completeness by DOY")
+    # ax.legend()
+    # ax.grid(alpha=0.3)
+    
+    # fig.tight_layout()
+    # fig.savefig(plots_dir + 'time_series/doy_completeness.png', dpi=150)
+    # plt.close(fig)
+    
+    
+    # 3. Compute completeness for each well based on a coarse 14-day binning
+    # - start ~May 15, end Oct 31
+    # - report in a csv with columns for well_id, % complete for each year, % complete for all years; sort by % complete all years.
+    # - will use to remove wells with unreasonable incompleteness before choosing a final binning scheme
+    # - consider that wells that went dry may have high incompleteness, want to separate these from wells with hardly any readings across all years (a few exist)
+    
+    # Define bins
+    df["bin"] = ((df["doy"] - start_doy) // bin_days).astype(int)
+    
+    # Presence per well/bin/year
+    bin_presence = (
+        df.groupby(["well_id", "year", "bin"])
+        .size()
+        .reset_index(name="n")
+    )
+    bin_presence["present"] = 1
+    
+    # Total possible bins per year (within DOY window)
+    n_bins_total = (
+        int(np.floor((end_doy - start_doy + 1) / bin_days)) + 1
+    )
+    
+    # Completeness per well per year
+    well_year = (
+        bin_presence.groupby(["well_id", "year"])["present"]
+        .sum()
+        .reset_index(name="n_bins_present")
+    )
+    well_year["pct_complete"] = (
+        well_year["n_bins_present"] / n_bins_total * 100
+    )
+    
+    # Pivot to wide format
+    well_year_wide = well_year.pivot(
+        index="well_id",
+        columns="year",
+        values="pct_complete"
+    )
+    
+    # Overall completeness across all years
+    well_all = (
+        bin_presence.groupby("well_id")["present"]
+        .sum()
+        .reset_index(name="n_bins_present_all")
+    )
+    well_all["pct_complete_all_years"] = (
+        well_all["n_bins_present_all"] /
+        (n_bins_total * df["year"].nunique()) * 100
+    )
+    
+    summary = (
+        well_year_wide
+        .merge(well_all[["well_id", "pct_complete_all_years"]],
+               left_index=True, right_on="well_id")
+        .set_index("well_id")
+        .sort_values("pct_complete_all_years", ascending=False)
+    )
+    
+    summary.to_csv(gw_daily_report_file)
+    
+    return summary
+    
 # --- MAIN ---
 # Define a main() function to allow import of functions
 # without executing the full script.
@@ -2217,8 +2403,9 @@ def main():
         gw_df = cut_logger_data(gw_df)
         print("CUT COMPLETE")
     else: 
-         gw_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
-         gw_df['DateTime'] = gw_df.DateTime.astype('datetime64[ns]')
+        gw_df = pd.read_csv(cut_data_file).dropna(axis=1, how="all")
+        gw_df['DateTime'] = gw_df.DateTime.astype('datetime64[ns]')
+        print("Using CUT data from CACHED files!")
     
     # ---- Get elevation data for each well
     gw_df = get_well_elevations(gw_df)
@@ -2229,11 +2416,187 @@ def main():
          gw_df= compensate_baro(gw_df)
          print("COMPENSATION COMPLETE")
     
-    # ## 4. Convert water level from 'relative to sensor' to 
-    # ###    'relative to ground surface elevation' (in meters)
-    # ###   Also save combined manual and sensor-based gw readings as .csv
-    gw_df = convert_relativeToGround(gw_df)
+    # ---- Convert water level from 'relative to sensor' to 
+    #      'relative to ground surface elevation' (in meters)
+    #       Save subdaily logger data as .csv
+    manual_df = load_manual_data()
+    subdaily_df = convert_relativeToGround(gw_df, manual_df)
     print("RELATIVE TO GROUND CALCULATED")
+    
+    # ----  Combine manual and logger readings into daily time series
+    #       Save as .csv
+    daily_df = generate_daily_time_series(subdaily_df, manual_df)
+    
+    
+    # ---- Summarize daily data; focus on completeness
+    summary = summarize_daily_time_series(daily_df)
+    summary["pct_complete_all_years"].head()
+    
+    # ---- Create binned time series for exploratory analysis
+    #      save as .csv
+    def generate_exploratory_bin(
+        daily_df,
+        start_doy=120,
+        end_doy=325,
+        bin_days=14,
+        plot=True):
+        """
+        Generate a DOY-binned exploratory groundwater time series and plot
+        yearly means with spread.
+    
+        Parameters
+        ----------
+        daily_df : pandas.DataFrame
+            Must contain columns:
+            ['well_id', 'timestamp', 'ground_to_water_cm']
+        start_doy : int
+            First DOY to include (default 120)
+        end_doy : int
+            Last DOY to include (default 325)
+        bin_days : int
+            Width of DOY bins (default 14)
+        plot : bool
+            Whether to generate exploratory plot
+    
+        Returns
+        -------
+        binned_df : pandas.DataFrame
+            Long-format binned dataset with columns:
+            ['well_id', 'timestamp', 'ground_to_water_cm',
+             'year', 'doy', 'bin']
+        """
+    
+        df = daily_df.copy()
+    
+        # ------------------------------------------------------------------
+        # 1. Time fields
+        # ------------------------------------------------------------------
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+        df["year"] = df["timestamp"].dt.year
+        df["doy"] = df["timestamp"].dt.dayofyear
+    
+        # Restrict to DOY window
+        df = df[(df["doy"] >= (start_doy - (bin_days/2))) & (df["doy"] <= end_doy)]
+    
+        # ------------------------------------------------------------------
+        # 2. DOY binning
+        # ------------------------------------------------------------------
+        bins = np.arange(start_doy, end_doy + bin_days, bin_days)
+        labels = range(len(bins) - 1)
+        
+        half = bin_days / 2
+
+        bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
+        
+        bin_edges = np.concatenate((
+            [bin_centers[0] - half],
+            bin_centers[:-1] + half,
+            [bin_centers[-1] + half]
+        ))
+        
+        df["bin"] = pd.cut(
+            df["doy"],
+            bins=bin_edges,
+            labels=range(len(bin_centers)),
+            include_lowest=True,
+        )
+        
+        df["bin_center_doy"] = df["bin"].map(
+            dict(enumerate(bin_centers))
+        )
+        
+        # ---- Aggregate: ONE value per well × year × bin
+        binned = (
+            df
+            .sort_values("timestamp")
+            .groupby(["well_id", "year", "bin"], as_index=False)
+            .agg(
+                ground_to_water_cm=("ground_to_water_cm", "mean"),
+                bin_center_doy=("bin_center_doy", "first"),
+            )
+        )
+
+        # df["bin"] = pd.cut(
+        #     df["doy"],
+        #     bins=bins,
+        #     labels=labels,
+        #     include_lowest=True,
+        # )
+    
+        # # Representative timestamp for plotting (bin center)
+        # bin_centers = {
+        #     i: int(bins[i] + bin_days / 2) for i in labels
+        # }
+        # df["bin_center_doy"] = df["bin"].map(bin_centers)
+    
+        # ------------------------------------------------------------------
+        # 3. Save long-format binned data
+        # ------------------------------------------------------------------
+        binned_df = binned[
+            [
+                "well_id",
+                "timestamp",
+                "ground_to_water_cm",
+                "year",
+                "doy",
+                "bin",
+                "bin_center_doy",
+            ]
+        ].copy()
+    
+
+        binned_df.to_csv(bin_by_doy_file, index=False)
+    
+        # ------------------------------------------------------------------
+        # 4. Aggregate for plotting
+        # ------------------------------------------------------------------
+        summary = (
+            binned_df
+            .groupby(["year", "bin_center_doy"])
+            .agg(
+                mean_cm=("ground_to_water_cm", "mean"),
+                q25=("ground_to_water_cm", lambda x: x.quantile(0.25)),
+                q75=("ground_to_water_cm", lambda x: x.quantile(0.75)),
+                n=("ground_to_water_cm", "count"),
+            )
+            .reset_index()
+            .sort_values(["year", "bin_center_doy"])
+        )
+    
+        # ------------------------------------------------------------------
+        # 5. Plot
+        # ------------------------------------------------------------------
+        if plot:
+            fig, ax = plt.subplots(figsize=(10, 5))
+    
+            for year, g in summary.groupby("year"):
+                ax.plot(
+                    g["bin_center_doy"],
+                    g["mean_cm"],
+                    label=str(year),
+                    linewidth=2,
+                )
+                ax.fill_between(
+                    g["bin_center_doy"],
+                    g["q25"],
+                    g["q75"],
+                    alpha=0.2,
+                )
+    
+            ax.set_xlabel("Day of Year")
+            ax.set_ylabel("Groundwater depth (cm below ground)")
+            ax.set_title(
+                f"Groundwater depth by DOY (bin = {bin_days} days)"
+            )
+    
+            ax.invert_yaxis()
+            ax.legend(title="Year")
+            ax.grid(alpha=0.3)
+    
+            plt.tight_layout()
+            plt.show()
+    
+        return binned_df
     
     # ## 5. Plot a visualization of the subdaily groundwater time series
     # #plot_timeseries_gridmap(waterLevel_df)

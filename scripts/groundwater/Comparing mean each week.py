@@ -9,13 +9,13 @@ import math
 # PART 1: SETUP & DATA LOADING
 
 # Define Output Directory
-output_csv_dir = os.path.join('..', '..', 'results', 'plot', 'groundwater', 'mean_comparison')
+output_csv_dir = os.path.join('..', '..', 'results', 'plots', 'groundwater', 'mean_comparison')
 os.makedirs(output_csv_dir , exist_ok=True)
 output_dir = output_csv_dir  + os.sep 
 
 # Define Source File
-SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'groundwater', 'biweekly_manual')
-SOURCE_FILE_PATTERN = "groundwater_2018_2024_weekly_matrix_STABLE.csv"
+SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'groundwater', 'time_series')
+SOURCE_FILE_PATTERN = "groundwater_weekly_matrix.csv"
 file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
 
 print(f"Loading data from: {file_path}")
