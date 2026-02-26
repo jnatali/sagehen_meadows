@@ -61,8 +61,8 @@ density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
 baro_standard_elevation = 1933.7 # Saghen Weather Tower #1 elev in meters
 
 MIN_COMPLETENESS_PCT = 20
-BIN_DAYS = 16
-WINDOW_BUFFER = 3
+BIN_DAYS = 14
+WINDOW_BUFFER = 0
 
 ## --- SETUP DIRECTORY + FILE NAMES --- 
 gw_data_dir = '../../data/field_observations/groundwater/'
@@ -91,7 +91,7 @@ os.makedirs(gtw_logger_dir,exist_ok=True)
 gw_daily_file = gw_data_dir + 'time_series/groundwater_daily.csv' # manual + logger data
 gw_daily_report_file = gw_data_dir + 'time_series/groundwater_daily_report.csv'
 gw_logger_output_file = gw_data_dir +'loggers/PROCESSED/groundwater_subdaily.csv'
-gw_bin_by_doy_file = gw_data_dir + f'time_series/groundwater_bin_{BIN_DAYS}d.csv'
+gw_bin_by_doy_file = gw_data_dir + f'time_series/groundwater_bin_{BIN_DAYS}d_{WINDOW_BUFFER}buf.csv'
 log_file = "logs/subdaily_processing_log.txt"
 
 ## --- LOGGING: Configure to write logs to a file
@@ -2281,15 +2281,7 @@ def summarize_daily_time_series(daily_df) -> pd.DataFrame:
     # 2. Assess completeness for each DOY
     # - count # of valid measurements per DOY across all years of data (or mean fraction present)
     # - plot x = DOY versus y = # of contributing wells per day with ribbon for min-max across years
-    
-    # # Presence/absence per well-day
-    # presence = (
-    #     df.groupby(["year", "doy", "well_id"])
-    #     .size()
-    #     .reset_index(name="n")
-    # )
-    # presence["present"] = 1
-    
+      
     unique_presence = (
         df[["well_id", "year", "doy"]]
         .drop_duplicates()
@@ -2312,30 +2304,7 @@ def summarize_daily_time_series(daily_df) -> pd.DataFrame:
     fig.savefig(plots_dir + 'time_series/doy_completeness.png', dpi=150)
     plt.show()
     plt.close()
-    
-    # # Plot
-    # fig, ax = plt.subplots(figsize=(10, 4))
-    
-    # ax.plot(doy_summary["doy"], doy_summary["mean"], label="Mean wells/day")
-    # ax.fill_between(
-    #     doy_summary["doy"],
-    #     doy_summary["min"],
-    #     doy_summary["max"],
-    #     alpha=0.3,
-    #     label="Min–max across years",
-    # )
-    
-    # ax.set_xlabel("Day of Year")
-    # ax.set_ylabel("Number of wells")
-    # ax.set_title("Daily groundwater data completeness by DOY")
-    # ax.legend()
-    # ax.grid(alpha=0.3)
-    
-    # fig.tight_layout()
-    # fig.savefig(plots_dir + 'time_series/doy_completeness.png', dpi=150)
-    # plt.close(fig)
-    
-    
+      
     # 3. Compute completeness for each well based on a coarse 14-day binning
     # - start ~May 15, end Oct 31
     # - report in a csv with columns for well_id, % complete for each year, % complete for all years; sort by % complete all years.
