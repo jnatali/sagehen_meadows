@@ -48,7 +48,9 @@ from well_utils import process_well_ids
 
 USE_LOGGER_DATA_CACHE = True
 USE_CUT_DATA_CACHE = True
-USE_COMPENSATED_DATA_CACHE = False
+USE_COMPENSATED_DATA_CACHE = False 
+# compensated data cache not yet implemented
+# need to save .csv in compensate_baro(), see TODO
 
 debug_cut = False
 debug_baro = False
@@ -57,6 +59,10 @@ debug_gtw = False
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
 density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
 baro_standard_elevation = 1933.7 # Saghen Weather Tower #1 elev in meters
+
+MIN_COMPLETENESS_PCT = 20
+BIN_DAYS = 16
+WINDOW_BUFFER = 3
 
 ## --- SETUP DIRECTORY + FILE NAMES --- 
 gw_data_dir = '../../data/field_observations/groundwater/'
@@ -83,9 +89,9 @@ os.makedirs(gtw_logger_dir,exist_ok=True)
 
 ### --- OUTPUTS
 gw_daily_file = gw_data_dir + 'time_series/groundwater_daily.csv' # manual + logger data
-gw_daily_report_file = gw_data_dir + 'time_series/summary_report.csv'
+gw_daily_report_file = gw_data_dir + 'time_series/groundwater_daily_report.csv'
 gw_logger_output_file = gw_data_dir +'loggers/PROCESSED/groundwater_subdaily.csv'
-gw_bin_by_doy_file = gw_data_dir + 'time_series/groundwater_bin_14d.csv'
+gw_bin_by_doy_file = gw_data_dir + f'time_series/groundwater_bin_{BIN_DAYS}d.csv'
 log_file = "logs/subdaily_processing_log.txt"
 
 ## --- LOGGING: Configure to write logs to a file
@@ -424,7 +430,7 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
         well_manual = well_manual.sort_values(by='x_pos')
 
         # Plot
-        plt.figure(figsize=(12, 5))
+        fig = plt.figure(figsize=(12, 5))
 
         # Scatter plot for subdaily data (ENSURES circular markers)
         # plt.scatter(
@@ -469,6 +475,7 @@ def plot_weekly_groundwater_data_by_well(subdaily_df, manual_df, plot_subdaily_o
 
         plt.tight_layout()
         plt.show()
+        fig.savefig(plots_dir + f'time_series/weekly_{well_id}.png', dpi=150)
         plt.close()
 
 def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df, 
@@ -548,7 +555,6 @@ def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df,
         ax1.grid(True)
         plot_title = "Subdaily Groundwater Levels"
         
-        
     
         # Plot rainfall
         if plot_rain:
@@ -572,6 +578,8 @@ def plot_subdaily_groundwater_by_deployment(subdaily_df, biweek_df,
         plt.title(plot_title)
         plt.tight_layout()
         plt.show()
+        fig.savefig(plots_dir + f'time_series/subdaily_{well_id}_{deployment}.png', dpi=150)
+        plt.close()
 
 def plot_dataframes(df1, df2, column_name, title, timespan=None):
     """
@@ -1860,7 +1868,9 @@ def compensate_baro(gw_df):
         )
         
     # Compensate by subtracting air pressure from the raw groundwater reading
-    gw_df['compensated_Level_m'] = gw_df["raw_Level_m"] - gw_df["baro_Level_m"] 
+    gw_df['compensated_Level_m'] = gw_df["raw_Level_m"] - gw_df["baro_Level_m"]
+    
+    # TODO P2: save the compensated data so can use the cache
         
     # Return the gw data with compensated water level
     return gw_df
@@ -2258,7 +2268,7 @@ def summarize_daily_time_series(daily_df) -> pd.DataFrame:
 
     start_doy = 120 # ~May 1
     end_doy = 325 # 
-    bin_days = 14
+    bin_days = 15
     
     # 1. Add DOY column and value for each measurement entry (row) based on DateTime
     df["timestamp"] = pd.to_datetime(df["timestamp"])
@@ -2385,12 +2395,12 @@ def summarize_daily_time_series(daily_df) -> pd.DataFrame:
         .sort_values("pct_complete_all_years", ascending=False)
     )
     
-    summary.to_csv(gw_daily_report_file, index=False)
+    summary.to_csv(gw_daily_report_file, index=True)
     
     return well_all
 
 
-def filter_by_completeness(df, completeness_df, min_pct=20):
+def filter_by_completeness(df, completeness_df, min_pct=MIN_COMPLETENESS_PCT):
     """
     Remove wells with completeness below threshold.
 
@@ -2421,7 +2431,7 @@ def generate_exploratory_bin(
        completeness_df,
        start_doy=120,
        end_doy=325,
-       bin_days=14,
+       bin_days=BIN_DAYS,
        plot=True) -> pd.DataFrame:
        """
        Generate a DOY-binned exploratory groundwater time series and plot
@@ -2476,9 +2486,11 @@ def generate_exploratory_bin(
        labels = range(len(bins) - 1)
        
        half = bin_days / 2
+       window_days = half + WINDOW_BUFFER
        bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
 
-       df["bin"] = ((df["doy"] - (start_doy - half)) // bin_days).astype("Int64")
+       #df["bin"] = ((df["doy"] - (start_doy - half)) // bin_days).astype("Int64")
+       df["bin"] = ((df["doy"] - (start_doy - window_days)) // bin_days).astype("Int64")
 
        # Keep only bins in range
        df = df[df["bin"].between(0, len(bin_centers) - 1)]

@@ -173,7 +173,7 @@ else:
             ax.set_xlabel("")
             
         if i % cols == 0:
-            ax.set_ylabel("Depth (ft)")
+            ax.set_ylabel("Depth (cm)")
         else:
             ax.set_ylabel("")
 
