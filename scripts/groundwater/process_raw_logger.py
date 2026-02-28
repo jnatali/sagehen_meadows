@@ -39,7 +39,7 @@ import pprint
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-from well_utils import process_well_ids
+from well_utils import process_well_ids, get_well_categories
 
 # ---- GLOBAL VARIABLES ---- 
 
@@ -55,14 +55,19 @@ USE_COMPENSATED_DATA_CACHE = False
 debug_cut = False
 debug_baro = False
 debug_gtw = False
+debug_bin = True
 
 gravity_sagehen = 9.800698845791 # based on gravity at 1934 meters
 density_factor = 1/gravity_sagehen # to convert kPa to m of pressure
 baro_standard_elevation = 1933.7 # Saghen Weather Tower #1 elev in meters
 
-MIN_COMPLETENESS_PCT = 20
-BIN_DAYS = 14
+START_BIN_DOY = 141 # 
+END_BIN_DOY = 325
+BIN_DAYS = 13
 WINDOW_BUFFER = 0
+MARSS_BIN_DAYS = 13
+MIN_COMPLETENESS_PCT = 20
+
 
 ## --- SETUP DIRECTORY + FILE NAMES --- 
 gw_data_dir = '../../data/field_observations/groundwater/'
@@ -92,6 +97,8 @@ gw_daily_file = gw_data_dir + 'time_series/groundwater_daily.csv' # manual + log
 gw_daily_report_file = gw_data_dir + 'time_series/groundwater_daily_report.csv'
 gw_logger_output_file = gw_data_dir +'loggers/PROCESSED/groundwater_subdaily.csv'
 gw_bin_by_doy_file = gw_data_dir + f'time_series/groundwater_bin_{BIN_DAYS}d_{WINDOW_BUFFER}buf.csv'
+#marss_output_file = gw_data_dir + f'time_series/groundwater_bin_matrix.csv'
+marss_output_file = gw_data_dir + f'time_series/groundwater_bin_{MARSS_BIN_DAYS}d_matrix.csv'
 log_file = "logs/subdaily_processing_log.txt"
 
 ## --- LOGGING: Configure to write logs to a file
@@ -907,6 +914,266 @@ def plot_timeseries_gridmap(df):
     fig.suptitle("Groundwater Well Data Overlap by DOY and Category", fontsize=14)
     plt.tight_layout(rect=[0, 0.15, 1, 0.96])
     plt.show()
+    return
+
+# ---- PLOTS FOR MARSS BINNING DECISIONS
+
+# Plot bin window support methods
+def compute_bin_windows(
+    start_doy,
+    end_doy,
+    bin_days,
+    window_buffer=0,
+    ):
+    """
+    Returns list of (center, left, right) tuples.
+    """
+    half = bin_days / 2
+    window = half + window_buffer
+
+    centers = np.arange(start_doy, end_doy + 1, bin_days)
+
+    windows = [
+        (c, c - window, c + window)
+        for c in centers
+    ]
+
+    return windows
+
+def overlay_bin_scheme(
+    ax,
+    start_doy,
+    end_doy,
+    bin_days,
+    window_buffer=0,
+    center_color="red",
+    window_color="red",
+    ):
+    """
+    Overlay bin centers and windows on an existing DOY plot.
+    """
+
+    windows = compute_bin_windows(
+        start_doy=start_doy,
+        end_doy=end_doy,
+        bin_days=bin_days,
+        window_buffer=window_buffer,
+    )
+
+    alpha_span_1 = 0.14
+    alpha_span_2 = 0.06
+    alpha_span = alpha_span_1
+    
+    for center, left, right in windows:
+        if alpha_span == alpha_span_2:
+            alpha_span=alpha_span_1
+        else: 
+            alpha_span=alpha_span_2
+            
+        # window
+        ax.axvspan(
+            left,
+            right,
+            color=window_color,
+            alpha=alpha_span,
+            zorder=1,
+        )
+        
+        # center
+        ax.axvline(
+            center,
+            color=center_color,
+            linestyle="--",
+            linewidth=1.1,
+            alpha=0.8,
+            zorder=2,
+        )
+    return
+
+def plot_bin_scheme_grid(
+    manual_df,
+    start_doy_range=range(139, 146),
+    bin_days_range=range(12, 15),
+    end_doy=END_BIN_DOY,
+    window_buffer=0,
+    out_dir=None,
+    ):
+    """
+    Systematically visualize candidate MARSS bin schemes.
+    """
+
+    manual_df = get_well_categories(manual_df)
+
+    for start_doy in start_doy_range:
+        for bin_days in bin_days_range:
+
+            fig, ax = plt.subplots(figsize=(18, 6))
+
+            # ---- Base observation plot (reuse your logic)
+            plot_observations_by_doy(
+                manual_df,
+                ax=ax,
+                xmin=start_doy - bin_days,
+                xmax=end_doy + bin_days,
+                show=False,
+            )
+
+            # ---- Overlay bins
+            overlay_bin_scheme(
+                ax,
+                start_doy=start_doy,
+                end_doy=end_doy,
+                bin_days=bin_days,
+                window_buffer=window_buffer,
+            )
+
+            ax.set_title(
+                f"Candidate MARSS bins: start={start_doy}, bin={bin_days}d"
+            )
+
+            plt.tight_layout()
+
+            if out_dir is not None:
+                fname = f"bin_test_start{start_doy}_bin{bin_days}.png"
+                fig.savefig(
+                    Path(out_dir) / fname,
+                    dpi=150,
+                )
+
+            plt.show()
+            plt.close(fig)
+    return
+
+
+def plot_observations_by_doy(
+    manual_df,
+    xmin=START_BIN_DOY - MARSS_BIN_DAYS,
+    xmax=END_BIN_DOY + MARSS_BIN_DAYS,
+    #bin_days=BIN_DAYS,
+    ax=None,
+    show=True
+    ):
+    """
+    Visualize manual groundwater observation timing by DOY and year,
+    stratified by meadow site.
+
+    Parameters
+    ----------
+    manual_df : DataFrame
+        Must contain ['well_id', 'ground_to_water_cm', 'DateTime', 'year']
+    """
+
+    df = manual_df.copy()
+
+    MEADOW_OFFSETS = {
+    "East":  0.25,
+    "Kiln":  0.00,
+    "Low":  -0.25,
+    }
+    
+    MEADOW_COLORS = {
+        "East":  "#1f77b4",
+        "Kiln":  "#2ca02c",
+        "Low":   "#d62728",
+    }
+
+
+    # ------------------------------------------------------------------
+    # Add meadow_id and DOY
+    # ------------------------------------------------------------------
+    df = get_well_categories(df)
+
+    df["DateTime"] = pd.to_datetime(df["DateTime"])
+    df["doy"] = df["DateTime"].dt.dayofyear
+    df["year"] = df["DateTime"].dt.year
+
+    # Restrict DOY window
+    #xmin = start_doy - bin_days - 1
+    #xmax = end_doy + bin_days
+    df = df[df["doy"].between(xmin, xmax)]
+
+    years = sorted(df["year"].unique())
+
+    # ------------------------------------------------------------------
+    # Plot
+    # ------------------------------------------------------------------
+    created_fig = False
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(18, 6))
+        created_fig = True
+        
+    # --- Vertical DOY grid (light)
+    for d in range(xmin, xmax + 1):
+        ax.axvline(d, color="0.9", linewidth=0.3, zorder=0)
+
+    # --- Horizontal year × meadow guide lines
+    for y in years:
+        for meadow, offset in MEADOW_OFFSETS.items():
+            ax.hlines(
+                y + offset,
+                xmin,
+                xmax,
+                color="0.85",
+                linewidth=0.6,
+                zorder=0,
+            )
+
+    # --- Scatter observations
+    for meadow, color in MEADOW_COLORS.items():
+        sub = df[df["meadow_id"] == meadow]
+
+        yvals = sub["year"] + sub["meadow_id"].map(MEADOW_OFFSETS)
+
+        ax.scatter(
+            sub["doy"],
+            yvals,
+            s=18,
+            color=color,
+            edgecolor="none",
+            alpha=0.9,
+            label=meadow,
+            zorder=3,
+        )
+
+    # ------------------------------------------------------------------
+    # Axes formatting
+    # ------------------------------------------------------------------
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(min(years) - 0.6, max(years) + 0.6)
+
+    ax.set_xlabel("Day of Year")
+    ax.set_ylabel("Year")
+
+    ax.set_yticks(years)
+    ax.set_yticklabels([str(y) for y in years])
+    
+    # X-axis ticks every 10 DOY
+    xticks = np.arange(xmin, xmax + 1, 10)
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xticks)
+    ax.tick_params(axis="x", labelrotation=0)
+    
+    for d in range(xmin, xmax + 1):
+        if d % 10 == 0:
+            ax.axvline(d, color="0.8", linewidth=0.6, zorder=0)
+        else:
+            ax.axvline(d, color="0.92", linewidth=0.3, zorder=0)
+
+    ax.set_title("Manual groundwater observation timing by DOY and meadow")
+
+    ax.legend(
+        title="Meadow",
+        loc="upper right",
+        frameon=False,
+    )
+
+    if created_fig and show:
+        plt.tight_layout()
+        plt.show()
+        plt.close()
+    return
+
+# ---- LOAD DATA FUNCTIONS
 
 def load_manual_data() -> pd.DataFrame:
     # Import manual groundwater data + setup for analysis
@@ -2185,6 +2452,176 @@ def convert_relativeToGround(subdaily_df, biweek_df):
     
     return subdaily_df
     
+def bin_groundwater_by_doy(    
+    daily_df,
+    start_doy=120,
+    end_doy=135,
+    bin_days=14,
+    window_buffer=0,
+    max_offset=0) -> pd.DataFrame:
+    """
+    Core DOY binning logic shared by exploratory plots and MARSS.
+    
+    Parameters
+    ----------
+    daily_df : pandas.DataFrame
+        Must contain columns:
+        ['well_id', 'timestamp', 'ground_to_water_cm']
+    start_doy : int
+        First DOY to include (default 120)
+    end_doy : int
+        Last DOY to include (default 325)
+    bin_days : int
+        Width of DOY bins (default 14)
+
+    Returns pandas.dataframe with one row per well_id × year × bin.
+    """
+    print(f"BINNING: {bin_days}d with start at {start_doy}, end at {end_doy}, buffer of {window_buffer}d")
+    df = daily_df.copy()
+    
+    # set time fields
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df["year"] = df["timestamp"].dt.year
+    df["doy"] = df["timestamp"].dt.dayofyear
+    
+    # DOY binning
+    half = bin_days / 2
+    window = half + window_buffer
+    
+    # restrict DOY window
+    df = df[df["doy"].between(start_doy-window, end_doy+window)]
+    
+    # # NEW define bin centers
+    # bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
+    # centers = np.asarray(bin_centers)
+    
+    # # NEW assign nearest bin center
+    # df["bin_center_doy"] = df["doy"].apply(
+    #     lambda x: centers[np.argmin(np.abs(centers - x))]
+    # )
+    
+    # # NEW get Distance from assigned bin and enforce tolerance
+    # df["bin_offset"] = (df["doy"] - df["bin_center_doy"]).abs()
+    
+    # if debug_bin:
+        
+    #     # A. Offset histogram
+    #     fig, ax = plt.subplots(figsize=(6, 4))
+    #     ax.hist(df["bin_offset"], bins=range(0, max_offset + 3), edgecolor="k")
+    #     ax.set_xlabel("Absolute DOY offset from bin center")
+    #     ax.set_ylabel("Count")
+    #     ax.set_title("Measurement alignment to bin centers")
+    #     plt.tight_layout()
+    #     plt.show()
+        
+    # df = df[df["bin_offset"] <= max_offset]
+    
+    # binned = (
+    #     df
+    #     .groupby(["well_id", "year", "bin_center_doy"], as_index=False)
+    #     .agg(
+    #         ground_to_water_cm=("ground_to_water_cm", "mean"),
+    #         n_obs=("ground_to_water_cm", "count"),
+    #     )
+    #     .sort_values(["well_id", "year", "bin_center_doy"])
+    # )
+    
+    # if debug_bin:
+        
+    #     # A. Offset histogram
+    #     fig, ax = plt.subplots(figsize=(6, 4))
+    #     ax.hist(df["bin_offset"], bins=range(0, max_offset + 3), edgecolor="k")
+    #     ax.set_xlabel("Absolute DOY offset from bin center")
+    #     ax.set_ylabel("Count")
+    #     ax.set_title("Measurement alignment to bin centers")
+    #     plt.tight_layout()
+    #     plt.show()
+
+    #     # B. Alignment scatter
+    #     fig, ax = plt.subplots(figsize=(6, 6))
+    #     ax.scatter(df["doy"], df["bin_center_doy"], alpha=0.3)
+    #     ax.plot(bin_centers, bin_centers, color="red", linewidth=2)
+    #     ax.set_xlabel("Observed DOY")
+    #     ax.set_ylabel("Assigned bin center DOY")
+    #     ax.set_title("Nearest-bin assignment check")
+    #     plt.tight_layout()
+    #     plt.show()
+
+    #     # C. Coverage check
+    #     coverage = (
+    #         binned
+    #         .groupby(["year", "bin_center_doy"])
+    #         .size()
+    #         .unstack("year")
+    #     )
+    #     print("Bin coverage (rows = bin centers, cols = years):")
+    #     print(coverage.notna().sum(axis=1).to_frame("n_years_with_data"))
+        
+    #     summary = (
+    #         binned
+    #         .groupby(["year", "bin_center_doy"])
+    #         .agg(
+    #             mean_cm=("ground_to_water_cm", "mean"),
+    #             q25=("ground_to_water_cm", lambda x: x.quantile(0.25)),
+    #             q75=("ground_to_water_cm", lambda x: x.quantile(0.75)),
+    #             n=("ground_to_water_cm", "count"),
+    #         )
+    #         .reset_index()
+    #     )
+    
+    #     fig, ax = plt.subplots(figsize=(10, 5))
+        
+    #     for year, g in summary.groupby("year"):
+    #         ax.plot(g["bin_center_doy"], g["mean_cm"], label=str(year))
+    #         ax.fill_between(
+    #             g["bin_center_doy"],
+    #             g["q25"],
+    #             g["q75"],
+    #             alpha=0.2
+    #         )
+        
+    #     ax.set_xlabel("Day of Year (bin center)")
+    #     ax.set_ylabel("Groundwater depth (cm)")
+    #     ax.set_title(f"14-day binned groundwater (±{max_offset} d tolerance)")
+    #     ax.invert_yaxis()
+    #     ax.legend()
+    #     ax.grid(alpha=0.3)
+    #     plt.tight_layout()
+    #     plt.show()
+    
+    # integer bin index and doy bin centers
+    df["bin"] = ((df["doy"] - (start_doy - window)) // bin_days).astype("Int64")
+    
+    n_bins = int(np.floor((end_doy - start_doy) / bin_days)) + 1
+    df = df[df["bin"].between(0, n_bins - 1)]
+    
+    df["bin_center_doy"] = start_doy + df["bin"] * bin_days
+    
+    # TODO: count # of unique well_id overlaps per bin-year
+    # A validation step, should be very low for MARSS data 
+    
+    # aggregate
+    binned = (
+        df
+        .sort_values("timestamp")
+        .groupby(["well_id", "year", "bin"], as_index=False)
+        .agg(
+            ground_to_water_cm=("ground_to_water_cm", "mean"),
+            doy=("bin_center_doy", "first"),
+        )
+    )
+    
+    binned = binned.rename(columns={"bin_center_doy":"doy"})
+
+    binned["date"] = (
+        pd.to_datetime(binned["year"].astype(str) + "-01-01")
+        #+ pd.to_timedelta(binned["bin_center_doy"] - 1, unit="D")
+        + pd.to_timedelta(binned["doy"] - 1, unit="D")
+
+    )
+    
+    return binned
+
 def generate_daily_time_series(subdaily_df, biweek_df) -> pd.DataFrame:
     # COMBINE manual and subdaily logger data in single file
     # Filter subdaily_df, only select rows between 4a to 11a
@@ -2266,9 +2703,9 @@ def summarize_daily_time_series(daily_df) -> pd.DataFrame:
     '''
     df = daily_df.copy()
 
-    start_doy = 120 # ~May 1
-    end_doy = 325 # 
-    bin_days = 15
+    start_doy = START_BIN_DOY
+    end_doy = END_BIN_DOY 
+    bin_days = BIN_DAYS
     
     # 1. Add DOY column and value for each measurement entry (row) based on DateTime
     df["timestamp"] = pd.to_datetime(df["timestamp"])
@@ -2398,9 +2835,10 @@ def filter_by_completeness(df, completeness_df, min_pct=MIN_COMPLETENESS_PCT):
 def generate_exploratory_bin(
        daily_df,
        completeness_df,
-       start_doy=120,
-       end_doy=325,
+       start_doy=START_BIN_DOY,
+       end_doy=END_BIN_DOY,
        bin_days=BIN_DAYS,
+       window_buffer=WINDOW_BUFFER,
        plot=True) -> pd.DataFrame:
        """
        Generate a DOY-binned exploratory groundwater time series and plot
@@ -2414,12 +2852,6 @@ def generate_exploratory_bin(
        completeness_df : pandas.DataFrame
            Must contain columns:
            ['well_id', 'pct_complete_all_years']
-       start_doy : int
-           First DOY to include (default 120)
-       end_doy : int
-           Last DOY to include (default 325)
-       bin_days : int
-           Width of DOY bins (default 14)
        plot : bool
            Whether to generate exploratory plot
    
@@ -2427,7 +2859,7 @@ def generate_exploratory_bin(
        -------
        binned_df : pandas.DataFrame
            Long-format binned dataset with columns:
-           ['well_id', 'timestamp', 'ground_to_water_cm',
+           ['well_id', 'date', 'ground_to_water_cm',
             'year', 'doy', 'bin']
        """
    
@@ -2437,98 +2869,76 @@ def generate_exploratory_bin(
        # Filter by completeness
        # ------------------------------------------------------------------
        df = filter_by_completeness(df, completeness_df)
-   
-       # ------------------------------------------------------------------
-       # 1. Time fields
-       # ------------------------------------------------------------------
-       df["timestamp"] = pd.to_datetime(df["timestamp"])
-       df["year"] = df["timestamp"].dt.year
-       df["doy"] = df["timestamp"].dt.dayofyear
-   
-       # Restrict to DOY window
-       df = df[(df["doy"] >= (start_doy - (bin_days/2))) & (df["doy"] <= end_doy)]
-   
-       # ------------------------------------------------------------------
-       # 2. DOY binning
-       # ------------------------------------------------------------------
-       bins = np.arange(start_doy, end_doy + bin_days, bin_days)
-       labels = range(len(bins) - 1)
        
-       half = bin_days / 2
-       window_days = half + WINDOW_BUFFER
-       bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
-
-       #df["bin"] = ((df["doy"] - (start_doy - half)) // bin_days).astype("Int64")
-       df["bin"] = ((df["doy"] - (start_doy - window_days)) // bin_days).astype("Int64")
-
-       # Keep only bins in range
-       df = df[df["bin"].between(0, len(bin_centers) - 1)]
-       df["bin_center_doy"] = start_doy + df["bin"] * bin_days
+       binned_df = bin_groundwater_by_doy(
+           df, 
+           start_doy=start_doy,
+           end_doy=end_doy,
+           bin_days=bin_days,
+           window_buffer=window_buffer,
+           )
+   
+       # # ------------------------------------------------------------------
+       # # 1. Time fields
+       # # ------------------------------------------------------------------
+       # df["timestamp"] = pd.to_datetime(df["timestamp"])
+       # df["year"] = df["timestamp"].dt.year
+       # df["doy"] = df["timestamp"].dt.dayofyear
+   
+       # # Restrict to DOY window
+       # df = df[(df["doy"] >= (start_doy - (bin_days/2))) & (df["doy"] <= end_doy)]
+   
+       # # ------------------------------------------------------------------
+       # # 2. DOY binning
+       # # ------------------------------------------------------------------
+       # bins = np.arange(start_doy, end_doy + bin_days, bin_days)
+       # labels = range(len(bins) - 1)
+       
+       # half = bin_days / 2
+       # window_days = half + WINDOW_BUFFER
        # bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
+
+       # df["bin"] = ((df["doy"] - (start_doy - window_days)) // bin_days).astype("Int64")
+
+       # # Keep only bins in range
+       # df = df[df["bin"].between(0, len(bin_centers) - 1)]
+       # df["bin_center_doy"] = start_doy + df["bin"] * bin_days
+       # # bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
        
-       # bin_edges = np.concatenate((
-       #     [bin_centers[0] - half],
-       #     bin_centers[:-1] + half,
-       #     [bin_centers[-1] + half]
-       # ))
        
-       # df["bin"] = pd.cut(
-       #     df["doy"],
-       #     bins=bin_edges,
-       #     labels=range(len(bin_centers)),
-       #     include_lowest=True,
+       # # ---- Aggregate: ONE value per well × year × bin
+       # binned = (
+       #     df
+       #     .sort_values("timestamp")
+       #     .groupby(["well_id", "year", "bin"], as_index=False)
+       #     .agg(
+       #         ground_to_water_cm=("ground_to_water_cm", "mean"),
+       #         bin_center_doy=("bin_center_doy", "first"),
+       #     )
        # )
        
-       # df["bin_center_doy"] = df["bin"].map(
-       #     dict(enumerate(bin_centers))
-       # )
+       # binned = binned.rename(columns={'bin_center_doy': 'doy'})
        
-       # ---- Aggregate: ONE value per well × year × bin
-       binned = (
-           df
-           .sort_values("timestamp")
-           .groupby(["well_id", "year", "bin"], as_index=False)
-           .agg(
-               ground_to_water_cm=("ground_to_water_cm", "mean"),
-               bin_center_doy=("bin_center_doy", "first"),
-           )
-       )
-       
-       binned = binned.rename(columns={'bin_center_doy': 'doy'})
-       
-       binned["timestamp"] = (
-           pd.to_datetime(binned["year"].astype(str) + "-01-01")
-           + pd.to_timedelta(binned["doy"] - 1, unit="D")
-           )
+       # binned["date"] = (
+       #     pd.to_datetime(binned["year"].astype(str) + "-01-01")
+       #     + pd.to_timedelta(binned["doy"] - 1, unit="D")
+       #     )
        
 
-       # df["bin"] = pd.cut(
-       #     df["doy"],
-       #     bins=bins,
-       #     labels=labels,
-       #     include_lowest=True,
-       # )
-   
-       # # Representative timestamp for plotting (bin center)
-       # bin_centers = {
-       #     i: int(bins[i] + bin_days / 2) for i in labels
-       # }
-       # df["bin_center_doy"] = df["bin"].map(bin_centers)
    
        # ------------------------------------------------------------------
        # 3. Save long-format binned data
        # ------------------------------------------------------------------
-       binned_df = binned[
+       binned_df = binned_df[
            [
                "well_id",
-               "timestamp",
+               "date",
                "ground_to_water_cm",
                "year",
                "doy",
-               "bin",
+               #"bin",
            ]
-       ].copy()
-   
+       ]
 
        binned_df.to_csv(gw_bin_by_doy_file, index=False)
    
@@ -2582,7 +2992,195 @@ def generate_exploratory_bin(
            plt.show()
    
        return binned_df
+ 
+def generate_marss_time_grid(start_doy, end_doy, bin_days, years):
+    """
+    Returns a sorted list of YEAR_DOY strings for all bins in all years.
+    """
+
+    doy_centers = np.arange(start_doy, end_doy + 1, bin_days)
+
+    time_index = [
+        f"{year}_{int(doy)}"
+        for year in years
+        for doy in doy_centers
+        ]
+
+    return time_index
+
+def generate_marss_matrix_from_combined(
+        daily_df,
+        start_doy=START_BIN_DOY,
+        end_doy=END_BIN_DOY,
+        bin_days=MARSS_BIN_DAYS):
+    """
+    Create MARSS-ready matrix:
+    rows = well_id
+    columns = YEAR_DOY
+    
+    Save to .csv
+    """    
+
+    binned = bin_groundwater_by_doy(
+        daily_df,
+        start_doy=start_doy,
+        end_doy=end_doy,
+        bin_days=bin_days,
+        window_buffer=0,
+        max_offset=0)   # IMPORTANT: no smoothing
+
+    
+    # get years from the data
+    years = sorted(binned["year"].unique())
+    
+    
+    # construct time series column labels <YEAR>_<DOY>
+    time_grid = generate_marss_time_grid(start_doy, end_doy, bin_days, years)
+
+    binned["time_col"] = (
+        binned["year"].astype(str) + "_" + binned["doy"].astype(int).astype(str)
+    )
+    
+    # pivot dataframe
+    marss_matrix = (
+        binned
+        .pivot(index="well_id", columns="time_col", values="ground_to_water_cm")
+        .sort_index(axis=1)
+        )
+    
+    # represent all time steps and NaN values
+    marss_matrix = marss_matrix.reindex(columns=time_grid)
+    
+    marss_matrix.reset_index().to_csv(marss_output_file, index=False)
+    return marss_matrix
+
+def generate_marss_matrix(
+        manual_df, 
+        daily_df,
+        start_doy=START_BIN_DOY,
+        end_doy=END_BIN_DOY,
+        bin_days=MARSS_BIN_DAYS):
+    """
+    Create MARSS-ready matrix:
+    rows = well_id
+    columns = YEAR_DOY
+    
+    Save to .csv
+    """    
+
+    # reformat manual df to daily_df standard
+    manual_df = manual_df.copy().rename(columns={'DateTime':'timestamp'})
+    manual_df["doy"] = manual_df["timestamp"].dt.dayofyear
+    
+    # one-off adjustment to keep meadow site measurement together
+    # and align data with binning; specific to one binning setup.
+    # only adjust in 2019 for rows where doy=187, move back one day (east)
+    if (start_doy == 141 and bin_days == 13):
+        mask = (manual_df["doy"] == 187) & (manual_df["year"] == 2019)
+        manual_df.loc[mask, "doy"] = 186
+    
+    binned = bin_groundwater_by_doy(
+        manual_df,
+        start_doy=start_doy,
+        end_doy=end_doy,
+        bin_days=bin_days,
+        window_buffer=0,
+        max_offset=0)   # IMPORTANT: no smoothing
+
+    # Tag the manual-derived data for later use in R matrix
+    binned["source"] = "manual"
    
+    # ------------------------------------------------------------
+    # Cherry-pick logger data at exact bin-center DOY
+    # ------------------------------------------------------------
+    # Insert the "cherry-picked" logger data from daily_df
+    # on the exact center day of the bin.
+    # Logger data should be between 8-9a.
+    # Do a check to make sure there are not duplicate entries for each bin.
+    # If so, report them (could be an error) and then take the average
+    
+    logger = daily_df.copy()
+    
+    logger["timestamp"] = pd.to_datetime(logger["timestamp"])
+    logger["year"] = logger["timestamp"].dt.year
+    logger["doy"] = logger["timestamp"].dt.dayofyear
+    
+    # Define bin centers explicitly
+    bin_centers = np.arange(start_doy, end_doy + 1, bin_days)
+    
+    # Keep only exact bin-center days
+    logger = logger[logger["doy"].isin(bin_centers)]
+    
+    # Restrict logger to expected measurement window (e.g., 08–09)
+    logger = logger[
+        (logger["timestamp"].dt.hour >= 8) &
+        (logger["timestamp"].dt.hour < 9)
+    ]
+    
+    # Aggregate duplicates (but detect them first)
+    dupes = (
+        logger
+        .groupby(["well_id", "year", "doy"])
+        .size()
+        .reset_index(name="n")
+    )
+    
+    problem_dupes = dupes[dupes["n"] > 1]
+    if not problem_dupes.empty:
+        print("WARNING: duplicate logger values at bin centers:")
+        print(problem_dupes)
+    
+    logger_center = (
+        logger
+        .groupby(["well_id", "year", "doy"], as_index=False)
+        .agg(
+            ground_to_water_cm=("ground_to_water_cm", "mean"),
+            source=("ground_to_water_cm", lambda _: "logger"),
+        )
+    )
+    # ------------------------------------------------------------
+    # Combine manual + logger, preferring logger
+    # ------------------------------------------------------------
+    combined = pd.concat([binned, logger_center], ignore_index=True)
+    
+    combined = (
+        combined
+        .sort_values(
+            by=["well_id", "year", "doy", "source"],
+            key=lambda s: s.map({"logger": 0, "manual": 1})
+        )
+        .drop_duplicates(
+            subset=["well_id", "year", "doy"],
+            keep="first"
+        )
+    )
+    
+    
+    # get years from the data
+    years = sorted(combined["year"].unique())
+    
+
+    
+    # construct time series column labels <YEAR>_<DOY>
+    time_grid = generate_marss_time_grid(start_doy, end_doy, bin_days, years)
+
+    combined["time_col"] = (
+        combined["year"].astype(str) + "_" + combined["doy"].astype(int).astype(str)
+    )
+    
+    # pivot dataframe
+    marss_matrix = (
+        combined
+        .pivot(index="well_id", columns="time_col", values="ground_to_water_cm")
+        .sort_index(axis=1)
+        )
+    
+    # represent all time steps and NaN values
+    marss_matrix = marss_matrix.reindex(columns=time_grid)
+    
+    marss_matrix.reset_index().to_csv(marss_output_file, index=False)
+    return marss_matrix
+
 
 # --- MAIN ---
 # Define a main() function to allow import of functions
@@ -2628,15 +3226,31 @@ def main():
     #       Save as .csv
     daily_df = generate_daily_time_series(subdaily_df, manual_df)
     
-    # ---- Summarize daily data; focus on completeness
+    # ---- Summarize daily data; focus on completenes    
     well_completeness = summarize_daily_time_series(daily_df)
     print(well_completeness.head())
     
+    # ---- Visualize manual data for MARSS analysis
+    if debug_bin:
+        plot_bin_scheme_grid(manual_df)
+    
     # ---- Generate binned time series, filter on completeness
     gw_binned = generate_exploratory_bin(daily_df, well_completeness)
+    marss_matrix = generate_marss_matrix_from_combined(daily_df)
     
     # ## 5. Plot a visualization of the subdaily groundwater time series
     # #plot_timeseries_gridmap(waterLevel_df)
+    
+    doy_range_by_year = (
+        daily_df
+        .groupby("year", as_index=False)
+        .agg(
+            min_doy=("doy", "min"),
+            max_doy=("doy", "max"),
+        ))
+    
+    print(doy_range_by_year)
+    
     
     print(gw_df)
 

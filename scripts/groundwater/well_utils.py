@@ -160,8 +160,8 @@ def get_well_categories(
     meadow_map = {
     "E": "East",
     "K": "Kiln",
-    "L": "Lower",
-    "U": "Upper",
+    "L": "Low",
+    "U": "Up",
     }
 
     zone_map = {

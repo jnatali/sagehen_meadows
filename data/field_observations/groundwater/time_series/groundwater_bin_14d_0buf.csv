@@ -1,4 +1,4 @@
-well_id,timestamp,ground_to_water_cm,year,doy,bin
+well_id,date,ground_to_water_cm,year,doy,bin
 EEF-1,2018-05-28,4.7887,2018,148,2
 EEF-1,2018-06-25,2.88365,2018,176,4
 EEF-1,2018-07-23,24.46880086032293,2018,204,6
