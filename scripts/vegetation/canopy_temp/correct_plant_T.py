@@ -22,15 +22,16 @@ import os
 import glob
 from datetime import datetime
 
-# --- Configuration ---
-# These paths are relative to the script's location (assuming script is in 'scripts/')
-RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
-SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
-SOURCE_FILE_PATTERN = "TC_CORRECTED_*.csv"
+# ---- Configuration ----
+# These paths are relative to the script's location (assuming script is in 'scripts/vegetation/canopy_temp')
+DATA_DIR = os.path.join('..','..','..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+RAW_DATA_DIR = os.path.join(DATA_DIR, 'RAW')
+#SOURCE_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+SOURCE_FILE_PATTERN = "WORKING_*.csv"
 
-OUTPUT_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+#OUTPUT_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
 OUTPUT_FILENAME = "TC_CORRECTED_.csv" 
-OUTPUT_GRAPH_DIR = os.path.join('..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
+OUTPUT_GRAPH_DIR = os.path.join('..','..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
 
 # Sources of emissivity estimates from Hillel p 312 and Mira et al 2007
 EMISSIVITY = {
@@ -42,7 +43,7 @@ EMISSIVITY = {
 }
 
 
-# --- Functions ---
+# ---- Functions ----
 
 def get_date_from_filename(file_path):
     """
@@ -58,13 +59,13 @@ def get_date_from_filename(file_path):
         print(f"Warning: Filename '{file_path}' does not match expected pattern. Skipping.")
         return "0000-00-00_0000"
 
-# --- Main Processing ---
+# ---- Main Processing ----
 
 # 1. Find the latest file using the pattern defined in config
-list_of_files = glob.glob(os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN))
+list_of_files = glob.glob(os.path.join(DATA_DIR, SOURCE_FILE_PATTERN))
 
 if not list_of_files:
-    print(f"No files matching {SOURCE_FILE_PATTERN} found in {SOURCE_DIR}. Exiting.")
+    print(f"No files matching {SOURCE_FILE_PATTERN} found in {DATA_DIR}. Exiting.")
     exit(0)
 
 latest_file = max(list_of_files, key=get_date_from_filename)
@@ -123,17 +124,21 @@ def solve_tc(row):
 df_original['corrected_Tc'] = df_original.apply(solve_tc, axis=1)
 df_original['Tc_Difference'] = df_original['Target'] - df_original['corrected_Tc']
 
-# 6. Save the final file
+# 6. Save the final "corrected" file with all data
 # Create output directory if it doesn't exist
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+if not os.path.exists(DATA_DIR):
+    os.makedirs(DATA_DIR)
 
 timestamp = datetime.now().strftime('%Y-%m-%d_%H%M')
-final_output = os.path.join(OUTPUT_DIR, f"TC_CORRECTED_{timestamp}.csv")
+final_output = os.path.join(DATA_DIR, f"TC_CORRECTED_{timestamp}.csv")
 
 # Clean up temporary columns and save
 cols_to_drop = ['Date', 'target_type_lower', 'sum_noise']
-df_original.drop(columns=cols_to_drop).to_csv(final_output, index=False)
+df_original.drop(columns=cols_to_drop).sort_values(by=['well_id', 'Time']).to_csv(final_output, index=False)
 
 print(f"Success! Corrected file saved as: {final_output}")
+
+
+# 7. Averaged "corrected" temp for each well
+
 

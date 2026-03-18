@@ -22,13 +22,13 @@ import matplotlib.pyplot as plt
 # --- Configuration ---
 
 # --- Define SOURCE file (where you read existing data FROM) ---
-SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+SOURCE_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
 
 # 3. Base name of the files to search for
 SOURCE_FILE_PATTERN = "TC_CORRECTED_*.csv"
 
 # --- Define OUTPUT file (where you save the new graphs TO) ---
-OUTPUT_DIR = os.path.join('..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
+OUTPUT_DIR = os.path.join('..','..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
 
 # Saved current date/time in (Year-Month-Day_Hour_Minute) format.
 today_date_str = datetime.now().strftime('%Y-%m-%d_%H%M')

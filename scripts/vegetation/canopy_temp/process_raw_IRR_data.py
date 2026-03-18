@@ -25,20 +25,20 @@ import matplotlib.pyplot as plt
 
 # --- Configuration ---
 # Define the relative paths from the script's location in 'scripts/'
-RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
+RAW_DATA_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
 
 
 # --- Define SOURCE file (where you read existing data FROM) ---
-SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+SOURCE_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
 
 
 # 3. Base name of the files to search for
 SOURCE_FILE_PATTERN = "WORKING_*.csv"
 
-OUTPUT_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+OUTPUT_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
 OUTPUT_FILENAME = "WORKING.csv" # The name for the new output file
 
-OUTPUT_GRAPH_DIR = os.path.join('..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
+OUTPUT_GRAPH_DIR = os.path.join('..','..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
 
 # Saved current date/time in (Year-Month-Day_Hour_Minute) format.
 today_date_str = datetime.now().strftime('%Y-%m-%d_%H%M')

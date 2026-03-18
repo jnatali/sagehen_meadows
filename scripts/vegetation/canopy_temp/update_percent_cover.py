@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 
 # --- Configuration ---
 # Define the relative paths from the script's location in 'scripts/'
-RAW_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
-SOURCE_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
-OUTPUT_DIR = os.path.join('..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+RAW_DATA_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
+SOURCE_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
+OUTPUT_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
 
 # File patterns and naming
 SOURCE_FILE_PATTERN = "WORKING_*.csv"
