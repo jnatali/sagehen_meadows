@@ -7,9 +7,10 @@ Created on 10 October 2025
 
 Takes RAW .txt data files from Apogee IRR instrument,
 as collected in the field, to build a single csv file
-of all observations. This allows data entry from field notes
-to associate each observation with a groundwater well_id
-and patch type, based on the timestamp of the data entry.
+of all observations. This allows data entry from field notes,
+followed by association of each observation with 
+a groundwater well_id and patch type, 
+based on the timestamp of the data entry.
 
 For details on how the data and processing steps for this script
 were defined, see github issue:
@@ -55,7 +56,9 @@ dated_filename = f"{base_name}_{today_date_str}{extension}"
 output_file_path = os.path.join(OUTPUT_DIR, dated_filename)
 
 #Sets date time format for all files
-DATE_FORMAT_STRING = '%m/%d/%Y %H:%M'
+#DATE_FORMAT_STRING = '%m/%d/%Y %H:%M'
+DATE_FORMAT_STRING = 'mixed'
+
 
 #Validate final columns
 FINAL_COLUMNS = [
@@ -303,10 +306,11 @@ else:
     exit(0)
 
 #Filter out the row that has no associated well-id 
-bad_well_name = "Patch 1 m of well w/o bare ground"
-plant_df = plant_df[plant_df['well_id'] != bad_well_name]
+# bad_well_name = "Patch 1 m of well w/o bare ground"
+# plant_df = plant_df[plant_df['well_id'] != bad_well_name]
+# print(f"Removed entry: '{bad_well_name}'")
 
-print(f"Removed entry: '{bad_well_name}'")
+# TODO: Validate well_ids using scripts/well_util.py
 
 # CONVERT TIME 
 # We strictly tell Python the format is Month/Day/Year Hour:Minute
@@ -369,7 +373,7 @@ for well in unique_wells:
 
     # -- SAVE AS EPS --
     clean_filename = well.replace(" ", "_")
-    plot_filename = f"Plot_Well_{clean_filename}.eps"
+    plot_filename = f"CanopyTemp_RAW_{clean_filename}.eps"
     save_path = os.path.join(OUTPUT_GRAPH_DIR, plot_filename)
     
     plt.savefig(save_path, format='eps', bbox_inches='tight')

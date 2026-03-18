@@ -4,6 +4,10 @@ import pandas as pd
 from datetime import datetime 
 import matplotlib.pyplot as plt
 
+## TODO: Confirm that this validation is only for two wells: EHT-XA5S, KHF-1
+##       Do we need validation plots for all?
+##       Plots include plant temp, thatch temp and % cover
+
 # --- Configuration ---
 
 # --- Define SOURCE file (where you read existing data FROM) ---

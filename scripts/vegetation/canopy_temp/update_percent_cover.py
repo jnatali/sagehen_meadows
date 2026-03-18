@@ -4,6 +4,11 @@ import pandas as pd
 from datetime import datetime 
 import matplotlib.pyplot as plt
 
+## TODO: Convert this script into a function; 
+##       Insert into process_raw_IRR_data.py
+##       So that processing steps are clear.
+##       Note: output is same as input (WORKING_*.csv) with new date stamp
+
 # --- Configuration ---
 # Define the relative paths from the script's location in 'scripts/'
 RAW_DATA_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp', 'RAW')
