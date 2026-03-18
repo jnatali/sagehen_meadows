@@ -1,38 +1,20 @@
 ### Sagehen Canopy Temperature
-This directory contains canopy temperature readings from July to October 2025. 
+This directory contains canopy temperature data collected at Sagehen between July to October 2025. 
 
-Canopy temperatures were recorded with an Apogee sensor around wells in two meadows, representing three hydrogeomorphic zones (HGMZ) and three plant functional types (PFT).
+Canopy temperature was recorded with an Apogee sensor around wells in two meadows at well sites
+representing three hydrogeomorphic zones (HGMZ) and three plant functional types (PFT).
 
 Files in the RAW folder are files uploaded directly from the Apogee senesor. 
 
-For groundwater well naming conventions, see the key below. 
-
-#### Abbreviations used in our data model
-
-##### meadow_id
-
-* E = East
-* K = Kiln
-
-##### HGMZ
-
-* R = riparian
-* F = fan
-* T = terrace
-
-##### PFT
-
-* E = sedge
-* H = mixed herbaceous
-* W = willow
+For groundwater well naming conventions, see the key of Abbreviations in the groundwater directory README.
 
 #### Files and Data Model
 
 ##### File Naming Convention  
-* TC_CORRECTED_YYYY-MM-DD_HHMM = data corrected for emissivity and plant_type in the field of view
-* WORKING_YYYY-MM-DD_HHMM = data straight from the apogee sensor
+* canopy_temp_CORRECTED.csv = data corrected for non-veg ground cover in the field of view
+* WORKING_YYYY-MM-DD_HHMM = data straight from the apogee sensor with field notes manually added
 
-##### Data Model: Columns for CSV
+##### Data Model: Columns for WORKING_*CSV
 * Time; format M/DD/YYYY HH:MM
 * Target; 
 * Sensor Body;
@@ -42,9 +24,11 @@ For groundwater well naming conventions, see the key below.
 * percent_cover; percent of plant_type in sensor's field of view
 * Notes; notes from field book or recording
 
-##### Additional Columns for TC_CORRECTED CSV
-* corrected_Tc; plant temperature corrected for emissivity and other plant_type in the field of view
-* Tc_Difference; difference of Target temperature and corrected_temperature
+##### Data Model for canopy_temp_CORRECTED
+* Temp_canopy_C; plant temperature (in Celsius) corrected for emissivity and non-veg ground cover in the field of view
+* Date; date of observation, but not time since aggregated from multiple observations
+* well_id; follows conventions and unique naming id for groundwater wells, as documented in data/groundwater README
+
   
 
 
