@@ -22,8 +22,8 @@ file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
 print(f"Loading data from: {file_path}")
 df = pd.read_csv(file_path)
 
-df['start depth (cm)'] = df['start depth (in)'] * 2.54
-df['stop depth (cm)'] = df['stop depth (in)'] * 2.54
+df['start depth (cm)'] = (df['start depth (in)'] * 2.54).round(2)
+df['stop depth (cm)'] = (df['stop depth (in)'] * 2.54).round(2)
 
 df.to_csv(output_path, index=False)
 print(f"Saved updated data to: {output_path}")

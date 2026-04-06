@@ -38,8 +38,8 @@
 ,EWT-1,5/31/18,black spiral p8,30.48,45.72,12.0,18.0,,,"clay loam, GR",saturated,"M/F, C/VF","brown, reddish",,"gritty, subangular gravel, 6-20 mm"
 ,EWT-1,5/31/18,black spiral p8,45.72,69.85,18.0,27.5,,,"sandy clay to clay, GR",saturated,F/F,"brown, reddish",,"subangular gravel, 6-30 mm"
 ,EWT-1,5/31/18,black spiral p8,69.85,80.01,27.5,31.5,,,"clay loam, GR",saturated,"C/M, F/C",brown,,
-,EWT-1,5/31/18,black spiral p8,80.01,83.82000000000001,31.5,33.0,,,clay,saturated,F/F,brown,,
-,EWT-1,5/31/18,black spiral p8,83.82000000000001,91.44,33.0,36.0,,,clay,saturated,F/VF,light brown,,"some grit, red-orange oxide"
+,EWT-1,5/31/18,black spiral p8,80.01,83.82,31.5,33.0,,,clay,saturated,F/F,brown,,
+,EWT-1,5/31/18,black spiral p8,83.82,91.44,33.0,36.0,,,clay,saturated,F/VF,light brown,,"some grit, red-orange oxide"
 ,EWT-1,5/31/18,black spiral p8,91.44,97.79,36.0,38.5,,,clay loam,saturated,F/F,"light brown, mottled",,"white-red mottling, red-orange oxide"
 ,EWT-1,5/31/18,black spiral p8,97.79,109.22,38.5,43.0,,,clay loam,saturated,,light brown,,"backfill with sand to 39"" depth"
 ,,,,,,,,,,,,,,,
@@ -54,7 +54,7 @@
 ,KER-1,6/18/18,black spiral p14,52.07,63.5,20.5,25.0,,fibers,clay loam,saturated,"F/C, C/F-VF",dark brown,,"interlayered with sandy clay loam, charcoal "
 ,KER-1,6/18/18,black spiral p14,63.5,71.12,25.0,28.0,,,"clay, VGR",saturated,VF/F-VF,brown,,coarse sand; pebbles to 12 mm rounded
 ,KER-1,6/18/18,black spiral p14,71.12,81.28,28.0,32.0,,fibers midway,"sandy loam, GR",saturated,"C/F, C/C",brown gray,,"roots especialy midway; pebbles to 22 mm, rounded"
-,KER-1,6/18/18,black spiral p14,81.28,83.82000000000001,32.0,33.0,,,GR,saturated,"C/C, C/F-M/VF",brown gray,,"bottom of hole, pebbles and gravel"
+,KER-1,6/18/18,black spiral p14,81.28,83.82,32.0,33.0,,,GR,saturated,"C/C, C/F-M/VF",brown gray,,"bottom of hole, pebbles and gravel"
 ,,,,,,,,,,,,,,,
 9.0,KWT-1,6/20/18,black spiral p14,0.0,12.7,0.0,5.0,,fibrous,"hummus, clay, HO",moist,M/C-F,dark brown,,
 ,KWT-1,6/20/18,black spiral p14,12.7,19.05,5.0,7.5,,,XST,,,,,extracted big rock
@@ -70,8 +70,8 @@
 ,E4S,6/20/18,black spiral p16,27.94,40.64,11.0,16.0,,,clay,moist,"F/C-F, C/VF",dark brown,,water in hole
 ,E4S,6/20/18,black spiral p16,40.64,50.8,16.0,20.0,,,"sandy clay, FGR",saturated,F/F,brown,,small pebbles
 ,E4S,6/20/18,black spiral p16,50.8,58.42,20.0,23.0,,,clay,saturated,F/F,tan; mottled orange,,"slight grit, few gravels ~16 mm"
-,E4S,6/20/18,black spiral p16,58.42,83.82000000000001,23.0,33.0,,few fibers,clay,saturated,F/F-VF,tan to gray-tan,,"angular gravels and decomposed pebbles, mottling"
-,E4S,6/20/18,black spiral p16,83.82000000000001,85.09,33.0,33.5,,,GR,,,,,"gravels stopped auger, bottom of hole"
+,E4S,6/20/18,black spiral p16,58.42,83.82,23.0,33.0,,few fibers,clay,saturated,F/F-VF,tan to gray-tan,,"angular gravels and decomposed pebbles, mottling"
+,E4S,6/20/18,black spiral p16,83.82,85.09,33.0,33.5,,,GR,,,,,"gravels stopped auger, bottom of hole"
 ,,,,,,,,,,,,,,,
 11.0,E1N,6/20/18,black spiral p16,0.0,5.08,0.0,2.0,,fibrous,HO,dry-moist,M/C-F,dark brown,,
 ,E1N,6/20/18,black spiral p16,5.08,15.24,2.0,6.0,,,sandy clay,moist,M/C-F,dark brown,,
@@ -85,7 +85,7 @@
 ,KWR-1,6/20/18,black spiral p17,10.16,25.4,4.0,10.0,,,clay loam,wet,"M/C, M/F-F/F",dark brown,,
 ,KWR-1,6/20/18,black spiral p17,25.4,63.5,10.0,25.0,,,clay loam,saturated,"C/C, F/VC",brown,,
 ,KWR-1,6/20/18,black spiral p17,63.5,81.28,25.0,32.0,,,"sandy clay loam, GR",saturated,C/F-VF,brown,,"mostly pebbles, a few gravels > 11 mm"
-,KWR-1,6/20/18,black spiral p17,81.28,83.82000000000001,32.0,33.0,,,GR,saturated,,,,bottom of well
+,KWR-1,6/20/18,black spiral p17,81.28,83.82,32.0,33.0,,,GR,saturated,,,,bottom of well
 ,,,,,,,,,,,,,,,
 13.0,KHF-1,6/30/18,black spiral p17,0.0,12.7,0.0,5.0,,"HO, grassy, HPM",clay,moist,"M/C-VF, fibrous",dark brown,,fibrous roots throughout
 ,KHF-1,6/30/18,black spiral p17,12.7,24.13,5.0,9.5,,,clay,moist,"M/F-VF, F/C-M",dark brown,,
@@ -108,8 +108,8 @@
 16.0,KWF-1,6/30/18,black spiral p19,0.0,20.32,0.0,8.0,,"HO, grassy",clay,moist,M/C-F,dark brown,,
 ,KWF-1,6/30/18,black spiral p19,20.32,38.1,8.0,15.0,,,"sandy clay, FGR",wet,"C/C-F, M/VF",dark brown,,
 ,KWF-1,6/30/18,black spiral p19,38.1,67.31,15.0,26.5,,,"sandy clay loam, FGR, CGR",wet-saturated,C/F-VF,red brown,,
-,KWF-1,6/30/18,black spiral p19,67.31,83.82000000000001,26.5,33.0,,,"sandy clay, FGR",saturated,,tan,,
-,KWF-1,6/30/18,black spiral p19,83.82000000000001,88.9,33.0,35.0,,,"sandy clay, VGR (M-F)",,,tan,,
+,KWF-1,6/30/18,black spiral p19,67.31,83.82,26.5,33.0,,,"sandy clay, FGR",saturated,,tan,,
+,KWF-1,6/30/18,black spiral p19,83.82,88.9,33.0,35.0,,,"sandy clay, VGR (M-F)",,,tan,,
 ,KWF-1,6/30/18,black spiral p19,88.9,91.44,35.0,36.0,,,GR,,,,,"loose gravel; bottom of well at 35"""
 ,,,,,,,,,,,,,,,
 17.0,KHR-1,7/4/19,orange p70,,,,,,HO,HO,moist,"C/VF, F/M, M/F","7.5 YR, 2.5/1; mottled yellow",,
