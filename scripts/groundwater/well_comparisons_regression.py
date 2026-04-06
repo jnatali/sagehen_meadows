@@ -94,6 +94,9 @@ baseline_df = pd.DataFrame(baseline_stats)
 drought_df = pd.DataFrame(drought_stats)
 comparison = pd.merge(baseline_df, drought_df, on='well_id')
 
+# Drop any well where the regression failed (returned NaN) for either period
+comparison = comparison.dropna(subset=['Slope_NonDrought', 'Slope_Drought'])
+
 # METRIC: Similarity Score (Absolute Difference)
 comparison['Slope_Diff'] = comparison['Slope_Drought'] - comparison['Slope_NonDrought']
 comparison['Similarity_Score'] = comparison['Slope_Diff'].abs()
