@@ -23,54 +23,56 @@ print(f"Loading data from: {file_path}")
 df = pd.read_csv(file_path)
 
 word_to_code_mapping = {
-    'Coarse Sand': 'COS',
-    'Sand': 'S',
-    'Fine Sand': 'FS',
-    'Very Fine Sand': 'VFS',
-    'Loamy Coarse Sand': 'LCOS',
-    'Loamy Sand': 'LS',
-    'Loamy Fine Sand': 'LFS',
-    'Loamy Very Fine Sand': 'LVFS',
-    'Coarse Sandy Loam': 'COSL',
-    'Sandy Loam': 'SL',
-    'Fine Sandy Loam': 'FSL',
-    'Very Fine Sandy Loam': 'VFSL',
-    'Loam': 'L',
-    'Silt Loam': 'SIL',
-    'Silt': 'SI',
-    'Sandy Clay Loam': 'SCL',
-    'Clay Loam': 'CL',
-    'Silty Clay Loam': 'SICL',
-    'Sandy Clay': 'SC',
-    'Silty Clay': 'SIC',
-    'Clay': 'C'
+    'coarse sand': 'COS',
+    'sand': 'S',
+    'fine sand': 'FS',
+    'very fine sand': 'VFS',
+    'loamy coarse sand': 'LCOS',
+    'loamy sand': 'LS',
+    'loamy fine sand': 'LFS',
+    'loamy very fine sand': 'LVFS',
+    'coarse sandy loam': 'COSL',
+    'sandy loam': 'SL',
+    'fine sandy loam': 'FSL',
+    'very fine sandy loam': 'VFSL',
+    'loam': 'L',
+    'silt loam': 'SIL',
+    'silt': 'SI',
+    'sandy clay loam': 'SCL',
+    'clay loam': 'CL',
+    'silty clay loam': 'SICL',
+    'sandy clay': 'SC',
+    'silty clay': 'SIC',
+    'clay': 'C'
 }
 
 gravel_size_map = {
-    # General, Very, and Extremely Gravelly (
-    'GR': '>2 - 76 mm', 'VGR': '>2 - 76 mm', 'XGR': '>2 - 76 mm',
-    'GRV': '>2 - 76 mm', 'GRX': '>2 - 76 mm',
+    #left end exclusive
+    # General, Very, and Extremely Gravelly (>2 - 76 mm)
+    'GR': (2, 76), 'VGR': (2, 76), 'XGR': (2, 76),
+    'GRV': (2, 76), 'GRX': (2, 76),
     
-    # Fine Gravelly
-    'FGR': '>2 - 5 mm', 'GRF': '>2 - 5 mm',
+    # Fine Gravelly (>2 - 5 mm)
+    'FGR': (2, 5), 'GRF': (2, 5),
     
-    # Medium Gravelly
-    'MGR': '>5 - 20 mm', 'GRM': '>5 - 20 mm',
+    # Medium Gravelly (>5 - 20 mm)
+    'MGR': (5, 20), 'GRM': (5, 20),
     
-    # Coarse Gravelly
-    'CGR': '>20 - 76 mm', 'GRC': '>20 - 76 mm'
+    # Coarse Gravelly (>20 - 76 mm)
+    'CGR': (20, 76), 'GRC': (20, 76)
 }
 
 gravel_amount_map = {
-    # Standard Gravelly (15-35%)
-    'GR': '>=15% to <35%', 'FGR': '>=15% to <35%', 'MGR': '>=15% to <35%', 
-    'CGR': '>=15% to <35%', 'GRF': '>=15% to <35%', 'GRM': '>=15% to <35%', 'GRC': '>=15% to <35%',
+    #These are all right end exclusive
+    # Standard Gravelly (15->35%)
+    'GR': (0.15, 0.35), 'FGR': (0.15, 0.35), 'MGR': (0.15, 0.35), 
+    'CGR': (0.15, 0.35), 'GRF': (0.15, 0.35), 'GRM': (0.15, 0.35), 'GRC': (0.15, 0.35),
     
-    # Very Gravelly (35-60%)
-    'VGR': '>=35% to <60%', 'GRV': '>=35% to <60%',
+    # Very Gravelly (35->60%)
+    'VGR': (0.35, 0.60), 'GRV': (0.35, 0.60),
     
-    # Extremely Gravelly (60-90%)
-    'XGR': '>=60% to <90%', 'GRX': '>=60% to <90%'
+    # Extremely Gravelly (60->90%)
+    'XGR': (0.60, 0.90), 'GRX': (0.60, 0.90)
 }
 
 #Function to check for 'G' and extract the info
@@ -95,16 +97,16 @@ df['start depth (cm)'] = (df['start depth (in)'] * 2.54).round(2)
 df['stop depth (cm)'] = (df['stop depth (in)'] * 2.54).round(2)
 
 # Split the 'soil texture' column at the first comma and expand into two columns
-df[['texture', 'sub-clas']] = df['soil texture'].str.split(',', n=1, expand=True)
+df[['texture', 'sub-class']] = df['soil texture'].str.split(',', n=1, expand=True)
 
-#strip any leftover whitespace (e.g., turning " HO" into "HO")
+#strip any leftover whitespace 
 df['texture'] = df['texture'].str.strip()
-df['sub-class'] = df['sub-clas'].str.strip()
+df['sub-class'] = df['sub-class'].str.strip()
 
-# This takes the full words in 'soil texture' and creates a new column with the short codes
+#takes the full words in 'soil texture' and creates a new column with the short codes
 df['soil texture code'] = df['soil texture'].map(word_to_code_mapping)
 
-# 3. Apply the function to create the two new columns
+#Apply the function to create the two new columns
 df[['gravel size', 'gravel amount']] = df['sub-class'].apply(extract_gravel_info)
 
 df.to_csv(output_path, index=False)
