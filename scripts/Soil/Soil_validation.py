@@ -100,11 +100,11 @@ df['stop depth (cm)'] = (df['stop depth (in)'] * 2.54).round(2)
 df[['texture', 'sub-class']] = df['soil texture'].str.split(',', n=1, expand=True)
 
 #strip any leftover whitespace 
-df['texture'] = df['texture'].str.strip()
+df['texture'] = df['texture'].str.strip().str.lower()
 df['sub-class'] = df['sub-class'].str.strip()
 
 #takes the full words in 'soil texture' and creates a new column with the short codes
-df['soil texture code'] = df['soil texture'].map(word_to_code_mapping)
+df['soil texture code'] = df['texture'].map(word_to_code_mapping)
 
 #Apply the function to create the two new columns
 df[['gravel size', 'gravel amount']] = df['sub-class'].apply(extract_gravel_info)
