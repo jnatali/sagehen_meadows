@@ -24,6 +24,8 @@ import matplotlib.pyplot as plt
 SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
 
 ## Directory and Filenames based on structure in github
+# TODO: update source file
+# TODO: where is 2025-only processed logger data or filter for 2025 only or get ET for ALL years?
 groundwater_data_dir = '../../data/field_observations/groundwater/subdaily_loggers/FULL/'
 groundwater_subdaily_filepath = groundwater_data_dir + 'groundwater_subdaily_2025_FULL.csv'
 
