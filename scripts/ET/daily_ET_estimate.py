@@ -10,7 +10,7 @@ starting with simplest (White 1932 with constant Sy* with best guess
                         from Loheide et al 2005 Fig 10).
 
 """
-# --- IMPORTS ---
+# ---- IMPORTS ---
 
 # import basic libraries
 import pandas as pd
@@ -19,7 +19,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 #import numpy as np
 
-# --- INITIALIZE GLOBAL VARIABLES ---
+# ---- INITIALIZE GLOBAL VARIABLES ---
 
 SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
 
@@ -30,7 +30,10 @@ groundwater_subdaily_filepath = groundwater_data_dir + 'groundwater_subdaily_202
 weather_data_dir = '../../data/station_instrumentation/climate/'
 weather_subdaily_filepath = weather_data_dir + 'Weather_2010_2025_10min_SagehenTower1.csv'
 
-# --- FUNCTIONS ---
+ET_calc_data_dir = '../../data/ET_calculations/'
+ET_calc_filepath = ET_calc_data_dir + 'ET_daily_2025_White_constantSy.csv'
+
+# ---- FUNCTIONS ---
 
 ## TODO: Split out as a weather_util.py for the project
 
@@ -108,9 +111,8 @@ def daily_cumulative_precip(precip_df) -> pd.DataFrame:
 def load_all_groundwater(gw_dir) -> pd.DataFrame:
     """
     Load all subdaily groundwater data
-    Currently a DRAFT
+
     """
-    ## DRAFT from chatgpt; need to parse through files in a directory
     dfs = []
     
     # TODO: filter files to checkout from gw_dir
@@ -191,7 +193,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     
     df = daily_df.copy()
     
-    # Calculate R, overnight recharge rate
+    # Calculate R, overnight recharge rate in cm/day
     df["R_cm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
     
     
@@ -258,7 +260,7 @@ def plot_ET(
         well_df = well_df.sort_values("date")
 
         fig, ax1 = plt.subplots(figsize=(8, 4))
-        fig.suptitle(f"Daily ET for {well_id}")
+        fig.suptitle(f"Daily ET via {method_id} for {well_id}")
         ax1.plot(
             well_df["date"],
             well_df["ET_gw_cm"],
@@ -305,7 +307,7 @@ def plot_gw_ET_overlay(gw_df, et_df, year):
     
     return
 
-# --- MAIN PROCEDURES ---
+# ---- MAIN PROCEDURES ---
 
 def main():
     # I/O: load subdaily groundwater input (source data) file
@@ -318,8 +320,9 @@ def main():
     print("got gw levels")
     
     # Calculate daily ET
-    daily_ET_df = estimate_ET_White_constant_Sy(daily_gw_df) 
-    print("calculated ET")
+    daily_ET_df = estimate_ET_White_constant_Sy(daily_gw_df)
+    daily_ET_df.to_csv(ET_calc_filepath, index=False)
+    print("calculated and saved ET")
     
     # Plot daily ET
     # plot_ET(daily_ET_df, "White_constantSy", 2025, save_dir=None)
@@ -334,6 +337,7 @@ def main():
             precip_df=daily_precip_df, 
             save_dir=None)
     print("PRECIP + ET plotted")
+    
     
     print("COMPLETE!!")
 
