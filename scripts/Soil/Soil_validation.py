@@ -49,8 +49,8 @@ word_to_code_mapping = {
 gravel_size_map = {
     #left end exclusive
     # General, Very, and Extremely Gravelly (>2 - 76 mm)
-    'GR': (2, 76), 'VGR': (2, 76), 'XGR': (2, 76),
-    'GRV': (2, 76), 'GRX': (2, 76),
+    'GR': (5, 20), 'VGR': (5, 20), 'XGR': (5, 20),
+    'GRV': (5, 20), 'GRX': (5, 20),
     
     # Fine Gravelly (>2 - 5 mm)
     'FGR': (2, 5), 'GRF': (2, 5),
@@ -91,10 +91,19 @@ def extract_gravel_info(subclass_str):
             return pd.Series([gravel_size_map[word], gravel_amount_map[word]])
             
     # Return empty if no gravel codes are found
-    return pd.Series([None, None])
+    return pd.Series([None, 0])
 
-df['start depth (cm)'] = (df['start depth (in)'] * 2.54).round(2)
-df['stop depth (cm)'] = (df['stop depth (in)'] * 2.54).round(2)
+#Clean up any empty strings (like "") by converting them to actual NaNs so pandas can see them
+df['start depth (cm)'] = df['start depth (cm)'].replace(r'^\s*$', np.nan, regex=True)
+df['stop depth (cm)'] = df['stop depth (cm)'].replace(r'^\s*$', np.nan, regex=True)
+
+# Convert start depth inches to cm ONLY where the cm column is missing
+missing_start = df['start depth (cm)'].isna()
+df.loc[missing_start, 'start depth (cm)'] = (df.loc[missing_start, 'start depth (in)'] * 2.54).round(2)
+
+# Convert stop depth inches to cm ONLY where the cm column is missing
+missing_stop = df['stop depth (cm)'].isna()
+df.loc[missing_stop, 'stop depth (cm)'] = (df.loc[missing_stop, 'stop depth (in)'] * 2.54).round(2)
 
 # Split the 'soil texture' column at the first comma and expand into two columns
 df[['texture', 'sub-class']] = df['soil texture'].str.split(',', n=1, expand=True)
