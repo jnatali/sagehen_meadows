@@ -1,0 +1,1872 @@
+well_id,timestamp,ground_to_water_cm,water_binary,soil_moisture,notes
+EEF-1,2018-06-01 07:45:00,4.7887,True,,
+EEF-1,2018-06-18 08:32:00,1.1903,True,,
+EEF-1,2018-06-30 08:55:00,4.577,True,,
+EEF-1,2018-07-16 08:40:00,16.117,True,,
+EEF-1,2018-07-25 08:16:00,23.5503,True,,
+EEF-1,2018-08-10 07:20:00,7.0837,True,,
+EEF-1,2018-08-24 08:39:00,1.817,True,,
+EEF-1,2018-09-16 07:57:00,2.317,True,,
+EEF-1,2018-09-29 08:39:00,0.617,True,standing water,"water at surface (photos), cone path to line of trees"
+EEF-1,2018-11-18 13:16:00,0.017,True,,logger L4 locked in ice
+EEF-1,2019-06-02 19:00:00,-2.0,True,standing,pond at surface 2 cm deep; so welltop_to_ground_cm = 59.383 - 2
+EEF-1,2019-06-18 08:55:00,1.6503,True,saturated,
+EEF-1,2019-07-06 09:01:00,18.0503,True,,
+EEF-1,2019-07-26 07:47:00,49.017,True,,
+EEF-1,2019-08-05 07:14:00,56.1503,True,,
+EEF-1,2019-08-20 09:12:00,39.4837,True,,
+EEF-1,2019-09-03 08:54:00,20.017,True,,
+EEF-1,2019-09-21 09:34:00,1.717,True,saturated,
+EEF-1,2019-10-05 07:12:00,3.2503,True,,
+EEF-1,2019-10-20 14:51:00,5.017,True,standing,
+EEF-1,2021-05-20 08:20:00,13.1594,True,wet-saturated,
+EEF-1,2021-06-06 08:31:00,38.153,True,saturated,
+EEF-1,2021-06-20 08:17:00,69.0394,True,moist-wet,
+EEF-1,2021-07-05 08:17:00,76.3546,True,,carex and juncus
+EEF-1,2021-07-20 08:42:00,79.301,True,dry,
+EEF-1,2021-08-06 08:34:00,79.301,True,,near bottom
+EEF-1,2021-08-22 09:51:00,79.6058,True,,mud at bottom
+EEF-1,2021-09-08 09:17:00,83.7714,True,dry,"at bottom mud, no water"
+EEF-1,2021-09-24 09:47:00,83.4666,True,dry,"mud at bottom, not soppy mud"
+EEF-1,2021-10-06 09:40:00,,False,,no water
+EEF-1,2021-11-14 09:52:00,7.673,True,,
+EEF-1,2024-05-19 08:06:00,1.245,True,saturated,
+EEF-1,2024-06-01 07:41:00,2.155,True,saturated,less than 1 cm of standing water
+EEF-1,2024-06-15 06:58:00,21.155,True,wet,Well ID entry was originally B8S
+EEF-1,2024-06-29 07:42:00,48.995,True,moist,
+EEF-1,2024-07-14 06:51:00,83.035,True,moist,
+EEF-1,2024-07-27 07:40:00,85.575,True,dry-moist,
+EEF-1,2024-08-10 08:10:00,67.585,True,dry-moist,
+EEF-1,2024-08-22 08:25:00,75.715,True,dry-moist,total well depth is 4.85
+EEF-1,2024-09-07 08:56:00,38.225,True,dry-moist,
+EEF-1,2024-09-21 07:51:00,21.465,True,dry-moist,frost
+EEF-1,2024-10-06 08:11:00,16.995,True,moist,
+EEF-1,2024-10-21 08:30:00,10.895,True,wet,
+EEF-1,2024-11-09 09:58:00,8.655,True,frozen,"Fan and Fen. Well in deep shadow, lots of ice. Is distance from meadow edge (esp with north shadow) important to plant pheno?"
+EEF-2,2019-07-06 08:44:00,81.6833,True,,
+EEF-2,2019-07-26 07:40:00,114.75,True,,
+EEF-2,2019-07-26 12:09:00,109.75,True,,
+EEF-2,2019-09-03 09:08:00,134.65,True,,muck at bottom
+EEF-2,2019-10-20 14:35:00,92.95,True,,
+EEF-2,2021-05-20 08:02:00,92.5252,True,moist-saturated,
+EEF-2,2021-06-06 08:16:00,115.4868,True,,
+EEF-2,2021-06-20 08:02:00,134.8924,True,,near bottom
+EEF-2,2021-07-05 07:57:00,135.6036,True,dry-moist,mud
+EEF-2,2021-07-16 08:45:00,,False,,new well
+EEF-2,2021-07-20 08:31:00,,False,dry,no water
+EEF-2,2021-11-14 09:40:00,-3.0601,True,,
+EEF-2,2024-05-19 08:32:00,-18.15,True,standing water,measured by hand in cm
+EEF-2,2024-06-01 08:09:00,1.32,True,saturated,"measured in well with meter stick, water too high to read with solinst"
+EEF-2,2024-06-15 07:29:00,59.61,True,moist,Needs dremel
+EEF-2,2024-06-29 08:11:00,91.2,True,dry-moist,
+EEF-2,2024-07-14 07:18:00,131.23,True,moist,
+EEF-2,2024-07-27 07:53:00,,False,dry-moist,bottom at 5.13
+EEF-2,2024-08-10 08:30:00,,False,dry,max depth 5.13
+EEF-2,2024-08-22 08:38:00,,False,dry,no water; well depth is 5.13
+EEF-2,2024-09-07 08:41:00,,False,dry,
+EEF-2,2024-09-21 08:09:00,,False,dry-moist,no water
+EEF-2,2024-10-06 08:25:00,,False,dry,
+EEF-2,2024-10-21 08:48:00,,False,moist,
+EEF-2,2024-11-09 10:16:00,,False,frozen,no snow right here
+EEF-2,2025-05-29 08:22:00,41.93,True,moist,"cap needs oil; cord loose, moved sensor up"
+EEF-2,2025-07-11 18:32:00,140.89,True,,
+EEF-2,2025-09-21 08:47:00,141.9,True,dry-moist,
+EEF-2,2025-10-20 14:37:00,,False,,"no water; ibutton hygrochron and cone on ground on 10/19/2025, cone cracked; re-installed at that time"
+EEF-2,2025-10-31 15:27:00,72.41,True,,
+EEF-XA3S,2018-06-01 06:40:00,3.384,True,,
+EEF-XA3S,2018-06-18 08:07:00,4.8657,True,,
+EEF-XA3S,2018-06-30 08:45:00,20.9523,True,,
+EEF-XA3S,2018-07-16 08:19:00,51.7773,True,,
+EEF-XA3S,2018-07-25 07:45:00,77.5773,True,,
+EEF-XA3S,2018-08-10 06:50:00,,False,,
+EEF-XA3S,2018-08-24 08:19:00,,False,,
+EEF-XA3S,2018-09-16 07:44:00,,False,,
+EEF-XA3S,2018-09-29 09:03:00,,False,,dot
+EEF-XA3S,2018-11-18 14:22:00,15.7773,True,,dot
+EEF-XA3S,2019-06-02 11:55:00,-0.0893,True,standing,"pond at surface 5 cm, 37 cm to east, flow 18 cm wide"
+EEF-XA3S,2019-06-18 08:07:00,3.6107,True,saturated,
+EEF-XA3S,2019-07-06 08:41:00,6.444,True,,
+EEF-XA3S,2019-07-26 07:38:00,40.044,True,,
+EEF-XA3S,2019-08-05 06:59:00,63.7107,True,,
+EEF-XA3S,2019-08-20 09:01:00,,False,,
+EEF-XA3S,2019-09-21 10:40:00,22.4773,True,,
+EEF-XA3S,2019-10-05 07:28:00,18.544,True,,
+EEF-XA3S,2019-10-20 14:29:00,13.4107,True,,
+EEF-XA3S,2021-05-20 07:57:00,15.5224,True,moist-saturated,
+EEF-XA3S,2021-06-06 08:12:00,39.6016,True,,
+EEF-XA3S,2021-06-20 07:58:00,86.744,True,,mud at bottom
+EEF-XA3S,2021-07-05 07:50:00,,False,,no water; dry on 07/03 at 12pm; 1 mm of mud at bottom
+EEF-XA3S,2021-11-14 09:32:00,3.8672,True,,
+EEF-XA3S,2024-05-19 08:35:00,1.1788,True,standing water,
+EEF-XA3S,2024-06-01 08:18:00,1.7287,True,saturated,needs backfill; standing water within 2 feet of well
+EEF-XA3S,2024-06-15 07:36:00,5.6988,True,saturated,
+EEF-XA3S,2024-06-29 08:14:00,38.6188,True,moist-wet,
+EEF-XA3S,2024-07-14 07:20:00,96.6288,True,moist,rain; near bottom
+EEF-XA3S,2024-07-27 07:56:00,,False,dry,
+EEF-XA3S,2024-08-10 08:34:00,,False,dry,max depth 5.12
+EEF-XA3S,2024-08-22 08:41:00,,False,dry,well depth is 5.14
+EEF-XA3S,2024-09-07 08:38:00,,False,dry,
+EEF-XA3S,2024-09-21 08:11:00,,False,dry,
+EEF-XA3S,2024-10-06 08:28:00,,False,dry,
+EEF-XA3S,2024-10-21 08:49:00,87.5888,True,dry-moist,needs backfill; don't trust reading
+EEF-XA3S,2024-11-09 10:19:00,18.1888,True,frozen,sedge + terrace if not fan; patches of snow in front of camera
+EER-1,2018-05-31 08:40:00,17.2537,True,,
+EER-1,2018-06-18 07:21:00,29.3187,True,,
+EER-1,2018-06-30 08:20:00,38.3146,True,,
+EER-1,2018-07-16 07:57:00,42.2437,True,,
+EER-1,2018-07-25 07:25:00,41.3771,True,,
+EER-1,2018-08-10 06:35:00,42.5437,True,,
+EER-1,2018-08-24 08:00:00,41.0771,True,,
+EER-1,2018-09-16 07:25:00,35.8771,True,,
+EER-1,2018-09-29 08:21:00,32.4104,True,,
+EER-1,2018-11-18 13:56:00,24.9771,True,,L1 at 2:00 PM
+EER-1,2019-06-02 08:07:00,2.6104,True,,
+EER-1,2019-06-18 07:36:00,14.0104,True,wet,not saturated
+EER-1,2019-07-06 08:15:00,33.0187,True,,
+EER-1,2019-07-26 07:20:00,37.9104,True,,
+EER-1,2019-08-05 06:42:00,39.0437,True,,
+EER-1,2019-08-20 08:51:00,39.2771,True,,
+EER-1,2019-09-03 08:44:00,39.1104,True,,
+EER-1,2019-09-21 09:25:00,24.9437,True,,
+EER-1,2019-10-05 07:04:00,23.7771,True,,
+EER-1,2019-10-20 14:14:00,22.2771,True,,
+EER-1,2021-05-20 07:40:00,28.7317,True,,
+EER-1,2021-06-06 08:01:00,37.7741,True,,
+EER-1,2021-06-20 07:45:00,40.5173,True,,
+EER-1,2021-07-05 07:32:00,41.1269,True,,
+EER-1,2021-07-20 08:18:00,46.5117,True,dry,
+EER-1,2021-08-06 08:11:00,48.2389,True,,
+EER-1,2021-08-22 09:26:00,44.2765,True,,
+EER-1,2021-09-08 08:55:00,43.7685,True,dry,
+EER-1,2021-09-24 09:28:00,39.8061,True,dry,
+EER-1,2021-09-24 17:23:00,45.5973,True,,repeat from AM
+EER-1,2021-10-06 08:43:00,35.6405,True,dry-moist,"thick thatch, dew"
+EER-1,2021-11-14 09:07:00,17.0477,True,,
+EER-1,2024-05-19 09:10:00,-9.0,True,saturated,"crooked; replaced in following weeks, don't have good top to ground; originally entered as -8 cm, which is probably height above ground?"
+EER-1,2024-06-01 08:49:00,16.64,True,wet,"well is very crooked, cannot push plumb; needs replacement and a fencepost; sedges are pretty big"
+EER-1,2024-06-15 08:19:00,27.41,True,moist-wet,Crooked
+EER-1,2024-06-29 08:32:00,34.31,True,moist-wet,
+EER-1,2024-07-14 07:40:00,38.58,True,moist,rain
+EER-1,2024-07-27 08:10:00,42.04,True,dry-moist,
+EER-1,2024-08-10 08:49:00,39.29,True,dry-moist,
+EER-1,2024-08-22 08:55:00,38.89,True,dry,
+EER-1,2024-09-07 08:26:00,36.45,True,dry,
+EER-1,2024-09-21 08:23:00,30.35,True,dry,
+EER-1,2024-10-06 08:37:00,27.61,True,dry,
+EER-1,2024-10-21 08:58:00,21.51,True,wet,
+EER-1,2024-11-09 10:29:00,20.6,True,frozen,"patches of snow, abou 1"" deep in front of camera but not directly at well"
+EER-1,2025-05-29 08:40:00,22.515,True,moist,"cord loose, moved sensor up"
+EER-1,2025-07-11 17:44:00,50.865,True,,
+EER-1,2025-09-21 13:12:00,27.085,True,dry-moist,
+EER-1,2025-10-20 15:41:00,20.485,True,,
+EER-1,2025-10-31 16:22:00,19.165,True,,
+EER-XB4S,2018-07-16 09:11:00,39.2,True,,
+EER-XB4S,2019-07-06 09:15:00,26.1333,True,,
+EER-XB4S,2019-07-26 08:05:00,,False,,
+EER-XB4S,2019-08-20 09:20:00,,False,,depth 146.5
+EER-XB4S,2019-10-20 13:04:00,24.8,True,,
+EER-XB4S,2021-05-20 08:35:00,17.7912,True,wet-saturated,
+EER-XB4S,2021-06-06 08:38:00,27.1384,True,,
+EER-XB4S,2021-06-20 08:27:00,38.924,True,,sedge dominant
+EER-XB4S,2021-07-05 08:33:00,43.0896,True,,"EER? sedge or MH? downslope of terrace, out of pine canopy, >5m from tree"
+EER-XB4S,2021-07-20 08:51:00,53.148,True,dry,mud
+EER-XB4S,2021-08-06 08:42:00,,False,,no water
+EER-XB4S,2021-08-22 10:02:00,,False,,no water
+EER-XB4S,2021-09-24 09:51:00,50.7096,True,dry,mud at bottom
+EER-XB4S,2021-10-06 09:46:00,41.4367,True,,
+EER-XB4S,2021-11-14 10:06:00,-18.1752,True,,
+EER-XB4S,2024-05-19 08:16:00,5.745,True,standing water,
+EER-XB4S,2024-06-01 07:50:00,11.225,True,saturated,
+EER-XB4S,2024-06-15 07:10:00,25.865,True,moist-wet,
+EER-XB4S,2024-06-29 07:56:00,34.395,True,moist,
+EER-XB4S,2024-07-14 07:03:00,47.395,True,dry,
+EER-XB4S,2024-07-27 07:46:00,,False,dry,bottom at 5.02
+EER-XB4S,2024-08-10 08:18:00,,False,dry,
+EER-XB4S,2024-08-22 08:32:00,,False,dry,
+EER-XB4S,2024-09-07 08:51:00,,False,dry,
+EER-XB4S,2024-09-21 07:58:00,38.055,True,dry,
+EER-XB4S,2024-10-06 08:16:00,39.065,True,dry,
+EER-XB4S,2024-10-21 08:39:00,28.605,True,dry-moist,
+EER-XB4S,2024-11-09 10:06:00,25.555,True,frozen,"def sedge, looks like riparian; kind of on edge between terrace and riparian but it's downslope from B5S terrace; interesting to analyze topo from LiDAR"
+EET-1,2018-06-01 07:56:00,8.9092,True,,
+EET-1,2018-06-18 08:38:00,48.2792,True,,
+EET-1,2018-06-30 09:00:00,85.9558,True,,
+EET-1,2018-07-16 08:47:00,88.5433,True,,mud at bottom
+EET-1,2018-07-25 08:25:00,,False,,6 cm of wet mud
+EET-1,2018-08-10 07:23:00,88.9433,True,,mud muck near bottom
+EET-1,2018-08-24 08:45:00,,False,,
+EET-1,2018-09-16 08:02:00,,False,,dot
+EET-1,2018-09-29 08:34:00,,False,,"dot, 0.5 cm muck at bottom, well depth is 146"
+EET-1,2018-11-18 13:39:00,71.51,True,,
+EET-1,2019-06-02 18:40:00,-1.89,True,saturated,needs clay fill
+EET-1,2019-06-18 09:00:00,27.4767,True,wet,not saturated
+EET-1,2019-07-26 07:51:00,87.61,True,,wet muck at bottom
+EET-1,2019-08-05 07:18:00,87.61,True,,
+EET-1,2019-08-20 09:15:00,,False,,mud at bottom
+EET-1,2019-09-21 09:31:00,,False,,0.5 cm mud at bottom
+EET-1,2019-10-20 15:00:00,84.0433,True,,
+EET-1,2021-05-20 08:22:00,45.4612,True,wet-saturated,
+EET-1,2021-06-06 08:34:00,50.2364,True,,
+EET-1,2021-06-20 08:20:00,83.9676,True,dry-moist,
+EET-1,2021-07-05 08:24:00,,False,,"no water; new phenocam spot, EHW present."
+EET-1,2021-07-20 08:45:00,89.3524,True,dry,some mud at bottom
+EET-1,2021-08-06 08:37:00,,False,,no water
+EET-1,2021-11-14 09:59:00,13.1524,True,,
+EET-1,2024-05-19 08:02:00,5.1675,True,saturated,
+EET-1,2024-06-01 07:37:00,32.7975,True,wet,
+EET-1,2024-06-15 06:54:00,59.7275,True,moist-wet,
+EET-1,2024-06-29 07:38:00,,False,dry,No water
+EET-1,2024-07-14 06:47:00,,False,dry,no water; needs PAM on wellcap
+EET-1,2024-07-27 07:37:00,,False,dry,"no water; sedge herbivory, no grasshoppers present"
+EET-1,2024-08-10 08:07:00,,False,dry,no water
+EET-1,2024-08-22 08:22:00,,False,dry,
+EET-1,2024-09-07 08:58:00,,False,dry,
+EET-1,2024-09-21 07:46:00,,False,dry-moist,frost; sedge herbivory
+EET-1,2024-10-06 08:09:00,,False,dry,
+EET-1,2024-10-21 08:28:00,,False,moist-wet,
+EET-1,2024-11-09 09:56:00,81.9775,True,frozen,ice on cap
+EET-1,2025-05-29 08:09:00,38.3875,True,moist,
+EET-1,2025-07-11 17:56:00,,False,,
+EET-1,2025-09-21 09:36:00,,False,dry-moist,
+EET-1,2025-10-20 15:12:00,,False,,no water
+EET-1,2025-10-31 15:52:00,82.8875,True,,
+EFF-XA2N,2018-05-31 08:55:00,11.4342,True,,
+EFF-XA2N,2018-06-18 07:35:00,18.7367,True,,
+EFF-XA2N,2018-06-30 08:31:00,27.3092,True,,
+EFF-XA2N,2018-07-16 08:10:00,32.575,True,,
+EFF-XA2N,2018-07-25 07:36:00,32.8417,True,,
+EFF-XA2N,2018-08-10 06:45:00,38.7083,True,,
+EFF-XA2N,2018-08-24 08:13:00,35.0083,True,,pine roots pushing well crooked
+EFF-XA2N,2018-09-16 07:39:00,32.9417,True,,dot
+EFF-XA2N,2018-09-29 09:00:00,25.4417,True,,
+EFF-XA2N,2018-11-18 14:14:00,10.375,True,,"ice plug visible, but also water"
+EFF-XA2N,2019-06-18 07:52:00,7.7083,True,wet-saturated,
+EFF-XA2N,2019-07-06 08:29:00,20.0417,True,,
+EFF-XA2N,2019-07-26 07:30:00,28.575,True,,
+EFF-XA2N,2019-08-05 06:52:00,31.875,True,,
+EFF-XA2N,2019-08-20 08:58:00,31.9083,True,,
+EFF-XA2N,2019-09-03 08:59:00,31.9417,True,,shade
+EFF-XA2N,2019-09-21 10:41:00,17.4083,True,,
+EFF-XA2N,2019-10-05 07:34:00,13.775,True,,"swapped A1N and A2N, obvious mistake in field notebook"
+EFF-XA2N,2019-10-20 14:23:00,11.075,True,,
+EFF-XA2N,2021-05-20 07:50:00,13.0358,True,,
+EFF-XA2N,2021-06-06 08:09:00,22.383,True,,
+EFF-XA2N,2021-06-20 07:53:00,29.2918,True,,"had entered as 3.32, 3.33, 3.33 ft in fieldbook, but was working solo and think I mis-entered it by 1 ft (after looking at the plot). This could very well have happened."
+EFF-XA2N,2021-07-05 07:43:00,32.6446,True,,"EFR-A2N. Riparian? Pines within 2m, also sedge and horsetail locally, big bar to north"
+EFF-XA2N,2021-07-20 08:25:00,37.0134,True,dry,
+EFF-XA2N,2021-08-06 08:18:00,37.623,True,,
+EFF-XA2N,2021-08-22 09:35:00,36.5054,True,,"swapped A1N and A2N, obvious mistake in field notebook"
+EFF-XA2N,2021-09-08 09:02:00,37.623,True,dry,
+EFF-XA2N,2021-09-24 09:34:00,30.9174,True,dry,
+EFF-XA2N,2021-10-06 09:24:00,26.345,True,,switched to homemade meter for the rest of 10/06 readings
+EFF-XA2N,2021-11-14 09:23:00,12.0198,True,,
+EFF-XA2N,2024-05-19 08:59:00,3.485,True,wet-saturated,
+EFF-XA2N,2024-06-01 08:28:00,9.585,True,saturated,standing water within 3 ft of well
+EFF-XA2N,2024-06-15 07:43:00,19.745,True,moist-wet,
+EFF-XA2N,2024-06-29 08:19:00,25.735,True,wet,
+EFF-XA2N,2024-07-14 07:25:00,30.305,True,moist,rain
+EFF-XA2N,2024-07-27 08:00:00,32.445,True,dry-moist,
+EFF-XA2N,2024-08-10 08:40:00,31.835,True,dry,
+EFF-XA2N,2024-08-22 08:47:00,32.445,True,dry,
+EFF-XA2N,2024-09-07 08:34:00,30.005,True,dry,
+EFF-XA2N,2024-09-21 08:15:00,21.165,True,moist,
+EFF-XA2N,2024-10-06 08:31:00,20.355,True,dry,
+EFF-XA2N,2024-10-21 08:54:00,14.765,True,moist,
+EFF-XA2N,2024-11-09 10:23:00,9.275,True,frozen,"def pine, elevated from pine so probably a terrace but also another bar with angular boulders and backwater channel in between the bar and well"
+EFF-XA2S,2018-06-01 06:24:00,10.1705,True,,
+EFF-XA2S,2018-06-18 08:10:00,19.6955,True,,
+EFF-XA2S,2018-06-30 08:40:00,39.8038,True,,
+EFF-XA2S,2018-07-16 08:16:00,51.8022,True,,
+EFF-XA2S,2018-07-25 07:42:00,,False,,
+EFF-XA2S,2018-08-10 06:48:00,,False,,
+EFF-XA2S,2018-08-24 08:18:00,,False,,
+EFF-XA2S,2018-09-16 07:42:00,,False,,dot
+EFF-XA2S,2018-09-29 09:02:00,,False,,dot
+EFF-XA2S,2018-11-18 14:20:00,31.9688,True,,dot
+EFF-XA2S,2019-06-02 11:55:00,,False,saturated,"couldn't measure depth, no bldngs present, looks like riparian, bend cut into terrace"
+EFF-XA2S,2019-06-18 08:04:00,16.9355,True,wet,not saturated
+EFF-XA2S,2019-07-06 08:40:00,21.1688,True,,
+EFF-XA2S,2019-07-26 07:35:00,46.7355,True,,
+EFF-XA2S,2019-08-05 06:58:00,,False,,
+EFF-XA2S,2019-09-21 10:41:00,,False,,
+EFF-XA2S,2019-10-05 07:30:00,44.3022,True,,
+EFF-XA2S,2019-10-21 02:27:00,34.4355,True,,
+EFF-XA2S,2021-05-20 07:55:00,34.4755,True,,
+EFF-XA2S,2021-06-06 08:13:00,50.4267,True,,"3.45, 3.45, 3.46"
+EFF-XA2S,2021-06-20 07:57:00,58.3515,True,,near bottom
+EFF-XA2S,2021-07-05 07:49:00,,False,,no water; dry on 07/03 at 12pm; 0 mm of mud at bottom
+EFF-XA2S,2021-07-20 08:28:00,,False,dry,"no water, mud"
+EFF-XA2S,2021-08-06 08:19:00,,False,,no water
+EFF-XA2S,2021-11-14 09:31:00,14.0634,True,,
+EFF-XA2S,2024-05-19 08:36:00,4.6137,True,saturated,
+EFF-XA2S,2024-06-01 08:20:00,11.6238,True,wet-saturated,
+EFF-XA2S,2024-06-15 07:39:00,30.8238,True,moist-wet,
+EFF-XA2S,2024-06-29 08:15:00,43.0237,True,dry-moist,
+EFF-XA2S,2024-07-14 07:21:00,,False,dry,no water
+EFF-XA2S,2024-07-27 07:57:00,,False,dry,bottom at 4.3; need to clean cap and oil it
+EFF-XA2S,2024-08-10 08:35:00,,False,dry,max depth 4.29
+EFF-XA2S,2024-08-22 08:42:00,,False,dry,
+EFF-XA2S,2024-09-07 08:37:00,,False,dry,
+EFF-XA2S,2024-09-21 08:12:00,,False,dry-moist,dew
+EFF-XA2S,2024-10-06 08:28:00,,False,dry,
+EFF-XA2S,2024-10-21 08:51:00,,False,dry,needs backfill
+EFF-XA2S,2024-11-09 10:20:00,41.3938,True,frozen,in canopy of pine (at edge) and willow
+EFR-XB1S,2018-06-01 07:40:00,34.4473,True,,
+EFR-XB1S,2018-06-18 07:56:00,40.1623,True,,
+EFR-XB1S,2018-06-30 09:10:00,43.4432,True,,
+EFR-XB1S,2018-07-16 08:54:00,45.5373,True,,
+EFR-XB1S,2018-07-25 08:41:00,44.0373,True,,mud at bottom
+EFR-XB1S,2018-08-10 07:31:00,45.6373,True,,pine pushing well crooked
+EFR-XB1S,2018-08-24 08:51:00,45.504,True,,
+EFR-XB1S,2018-09-16 08:07:00,46.6373,True,,dot
+EFR-XB1S,2018-09-29 08:19:00,46.404,True,,
+EFR-XB1S,2018-11-18 13:50:00,44.9373,True,,
+EFR-XB1S,2019-07-06 09:22:00,35.2707,True,,
+EFR-XB1S,2019-07-26 08:05:00,41.004,True,,
+EFR-XB1S,2019-10-20 15:09:00,45.604,True,,
+EFR-XB1S,2021-05-20 08:41:00,45.3496,True,moist,
+EFR-XB1S,2021-06-06 08:42:00,47.6864,True,,
+EFR-XB1S,2021-06-20 08:42:00,48.296,True,,
+EFR-XB1S,2021-07-05 08:41:00,49.5152,True,,Forest <2m from pine
+EFR-XB1S,2021-07-20 08:54:00,50.2264,True,dry,
+EFR-XB1S,2021-08-06 08:45:00,51.1408,True,,
+EFR-XB1S,2021-08-22 10:05:00,52.1568,True,,
+EFR-XB1S,2021-09-08 09:22:00,50.836,True,dry,
+EFR-XB1S,2021-09-24 09:53:00,50.2264,True,dry,
+EFR-XB1S,2021-10-06 09:45:00,47.7407,True,,
+EFR-XB1S,2021-11-14 10:09:00,41.692,True,,
+EFR-XB1S,2024-05-19 08:20:00,16.305,True,moist,
+EFR-XB1S,2024-06-01 07:58:00,27.785,True,moist,
+EFR-XB1S,2024-06-15 07:15:00,36.015,True,moist,
+EFR-XB1S,2024-06-29 08:00:00,40.685,True,dry-moist,
+EFR-XB1S,2024-07-14 07:35:00,43.735,True,dry,
+EFR-XB1S,2024-07-27 08:13:00,45.765,True,dry,
+EFR-XB1S,2024-08-10 08:22:00,45.765,True,dry,
+EFR-XB1S,2024-08-22 08:57:00,46.075,True,dry,well is very crooked
+EFR-XB1S,2024-09-07 08:47:00,46.475,True,dry,
+EFR-XB1S,2024-09-21 08:02:00,45.875,True,dry,
+EFR-XB1S,2024-10-06 08:19:00,45.465,True,dry,
+EFR-XB1S,2024-10-21 08:41:00,44.855,True,moist,well pushed up by pine
+EFR-XB1S,2024-11-09 10:09:00,43.735,True,frozen,"def in pine canopy, well pushed up by pine roots; creek looks slightly higher than last time"
+EFR-XB2S,2018-07-16 07:57:00,,False,,
+EFR-XB2S,2019-07-06 09:19:00,,False,,"note says: no water, but water levrel entry is 117 cm"
+EFR-XB2S,2019-07-26 08:05:00,,False,,no water
+EFR-XB2S,2019-08-20 09:22:00,,False,,
+EFR-XB2S,2019-10-20 15:07:00,,False,,
+EFR-XB2S,2021-05-20 08:39:00,38.8408,True,wet-saturated,
+EFR-XB2S,2021-06-06 08:41:00,44.9368,True,,
+EFR-XB2S,2021-06-20 08:30:00,,False,,no water
+EFR-XB2S,2021-07-05 08:39:00,,False,,no water; Forest 2.7m from tree
+EFR-XB2S,2021-07-20 08:53:00,57.1288,True,dry,at bottom water present
+EFR-XB2S,2021-08-06 08:44:00,56.824,True,,
+EFR-XB2S,2021-08-22 10:03:00,,False,,no water
+EFR-XB2S,2021-11-14 10:08:00,33.0496,True,,
+EFR-XB2S,2024-05-19 08:19:00,18.245,True,moist,new strap to post
+EFR-XB2S,2024-06-01 07:56:00,,False,moist,at 4.0 bottom at well; new well here?
+EFR-XB2S,2024-06-15 07:13:00,,False,moist,No water
+EFR-XB2S,2024-06-29 07:58:00,,False,moist,
+EFR-XB2S,2024-07-14 07:37:00,,False,moist,rain; no water
+EFR-XB2S,2024-07-27 08:12:00,48.725,True,moist,
+EFR-XB2S,2024-08-10 08:21:00,,False,dry,
+EFR-XB2S,2024-08-22 08:33:00,,False,dry,
+EFR-XB2S,2024-09-07 08:49:00,,False,dry,
+EFR-XB2S,2024-09-21 08:02:00,,False,dry,soil frozen
+EFR-XB2S,2024-10-06 08:18:00,,False,dry,
+EFR-XB2S,2024-10-21 08:40:00,42.935,True,moist,
+EFR-XB2S,2024-11-09 10:08:00,,False,frozen,no water; in pine canopy and surrounded by pines
+EFR-XB3S,2018-07-16 07:58:00,,False,,
+EFR-XB3S,2019-07-06 09:17:00,50.7,True,,
+EFR-XB3S,2019-07-26 08:00:00,55.2833,True,,
+EFR-XB3S,2019-10-20 15:05:00,50.35,True,,
+EFR-XB3S,2021-05-20 08:37:00,39.2276,True,wet-saturated,
+EFR-XB3S,2021-06-06 08:39:00,50.81,True,,
+EFR-XB3S,2021-06-20 08:29:00,64.7292,True,,
+EFR-XB3S,2021-07-05 08:38:00,,False,,no water; Forest <2 m from pine
+EFR-XB3S,2021-07-20 08:51:00,,False,dry,no water no mud
+EFR-XB3S,2021-10-06 09:47:00,,False,,no water
+EFR-XB3S,2021-11-14 10:07:00,26.7308,True,,
+EFR-XB3S,2024-05-19 08:19:00,18.295,True,moist,
+EFR-XB3S,2024-06-01 07:55:00,27.235,True,moist,
+EFR-XB3S,2024-06-15 07:10:00,44.915,True,moist,
+EFR-XB3S,2024-06-29 07:57:00,57.715,True,dry-moist,
+EFR-XB3S,2024-07-14 07:33:00,,False,dry,at bottom; no water
+EFR-XB3S,2024-07-27 07:47:00,,False,dry,bottom at 5.08
+EFR-XB3S,2024-08-10 08:19:00,,False,dry,
+EFR-XB3S,2024-08-22 08:33:00,,False,dry,
+EFR-XB3S,2024-09-07 08:50:00,,False,dry,
+EFR-XB3S,2024-09-21 07:59:00,,False,dry,soil frozen
+EFR-XB3S,2024-10-06 08:17:00,,False,dry,
+EFR-XB3S,2024-10-21 08:39:00,56.595,True,dry,
+EFR-XB3S,2024-11-09 10:07:00,48.365,True,frozen,"def in pine canopy, think it's riparian; side channel within 3 m of well"
+EFT-XC3S,2024-05-19 07:52:00,3.44,True,saturated,crooked
+EFT-XC3S,2024-06-01 07:25:00,13.5,True,moist-wet,"slightly crooked, does not need to be replaced; pine"
+EFT-XC3S,2024-06-15 06:43:00,46.92,True,moist,
+EFT-XC3S,2024-06-29 07:27:00,62.16,True,dry-moist,
+EFT-XC3S,2024-07-14 06:43:00,75.58,True,dry,
+EFT-XC3S,2024-07-27 07:32:00,57.59,True,dry,well slightly crooked
+EFT-XC3S,2024-08-10 08:00:00,88.68,True,dry,
+EFT-XC3S,2024-08-22 08:16:00,,False,dry,
+EFT-XC3S,2024-09-07 09:05:00,88.99,True,dry,
+EFT-XC3S,2024-09-21 07:43:00,71.92,True,dry,
+EFT-XC3S,2024-10-06 13:16:00,80.95,True,dry,meter not turned on; later at 1:16pm measured 18.8 cm of water from the bottom using a tape measure; well depth recorded as 152.8 cm
+EFT-XC3S,2024-10-21 08:22:00,62.88,True,dry-moist,
+EFT-XC3S,2024-11-09 09:49:00,58.2,True,frozen,"in canopy of two pine trees (one alive, one dead), otherwise MH; on a terrace that butts up against the creek, looks like a big drop to the creek such that there's no floodplain on this side of the creek."
+EFT-XC4S,2024-05-19 07:54:00,5.185,True,saturated,log
+EFT-XC4S,2024-06-01 07:28:00,12.505,True,moist-wet,pine
+EFT-XC4S,2024-06-15 06:45:00,36.375,True,moist,
+EFT-XC4S,2024-06-29 07:32:00,72.855,True,dry-moist,
+EFT-XC4S,2024-07-14 06:44:00,,False,dry,no water
+EFT-XC4S,2024-07-27 07:33:00,,False,dry,no water
+EFT-XC4S,2024-08-10 08:02:00,,False,dry,no water
+EFT-XC4S,2024-08-22 08:17:00,,False,dry,
+EFT-XC4S,2024-09-07 09:00:00,,False,dry,
+EFT-XC4S,2024-09-21 07:44:00,,False,dry,logger (not mine)
+EFT-XC4S,2024-10-06 08:04:00,,False,dry,
+EFT-XC4S,2024-10-21 08:23:00,,False,dry,"within 1 m of pine trunks, MH immediately surrounding well"
+EFT-XC4S,2024-11-09 09:50:00,61.275,True,frozen,"def pine, def terrace (same as C3S)"
+EHF-XA5S,2018-06-01 06:43:00,-1.1533,True,,
+EHF-XA5S,2018-06-18 08:13:00,35.6767,True,,
+EHF-XA5S,2018-06-30 08:47:00,67.215,True,,
+EHF-XA5S,2018-07-16 08:25:00,105.0958,True,,
+EHF-XA5S,2018-07-25 07:51:00,,False,,
+EHF-XA5S,2018-08-10 06:53:00,,False,,
+EHF-XA5S,2018-08-24 08:25:00,,False,,
+EHF-XA5S,2018-09-16 07:46:00,,False,,
+EHF-XA5S,2018-09-29 09:04:00,,False,,dot
+EHF-XA5S,2018-11-18 14:26:00,22.3625,True,,
+EHF-XA5S,2019-06-02 10:34:00,-5.1708,True,standing,pond at surface 4 cm
+EHF-XA5S,2019-06-18 08:22:00,0.6292,True,saturated,
+EHF-XA5S,2019-07-06 08:46:00,54.9625,True,,
+EHF-XA5S,2019-07-26 12:12:00,91.4292,True,,
+EHF-XA5S,2019-09-03 09:05:00,,False,,hold logger at 9:10a
+EHF-XA5S,2019-09-21 09:48:00,,False,,
+EHF-XA5S,2019-10-05 00:00:00,,False,,
+EHF-XA5S,2019-10-20 14:32:00,42.8625,True,,
+EHF-XA5S,2021-06-06 08:15:00,79.1121,True,,
+EHF-XA5S,2021-06-20 08:01:00,104.8169,True,,
+EHF-XA5S,2021-07-05 07:55:00,,False,dry-moist,no water; augered to 122 cm below ground and still no water
+EHF-XA5S,2021-07-16 08:35:00,,False,,new well
+EHF-XA5S,2021-07-20 08:30:00,,False,dry,no water
+EHF-XA5S,2021-08-22 09:40:00,,False,,"no water, moist at bottom"
+EHF-XA5S,2021-11-14 09:36:00,1.2715,True,,
+EHF-XA5S,2024-05-19 08:30:00,-28.8188,True,standing water,measured by hand in cm
+EHF-XA5S,2024-06-01 08:15:00,6.5112,True,saturated,"measured in well with meter stick, water too high to read with solinst; wood trash needs to be removed"
+EHF-XA5S,2024-06-15 07:31:00,58.9412,True,wet,Needs dremel
+EHF-XA5S,2024-06-29 08:12:00,93.9913,True,dry,
+EHF-XA5S,2024-07-14 07:17:00,128.2313,True,wet,rain; near bottom
+EHF-XA5S,2024-07-27 07:55:00,,False,dry,bottom at 5.12
+EHF-XA5S,2024-08-10 08:32:00,,False,dry-moist,max depth 5.13
+EHF-XA5S,2024-09-07 08:40:00,,False,dry,
+EHF-XA5S,2024-09-21 08:10:00,,False,dry,
+EHF-XA5S,2024-10-06 08:25:00,,False,dry,
+EHF-XA5S,2024-10-21 08:48:00,,False,moist,
+EHF-XA5S,2024-11-09 10:17:00,83.3212,True,frozen,no snow right here
+EHF-XA5S,2025-05-29 08:26:00,37.6012,True,moist,cap needs oil
+EHF-XA5S,2025-07-11 18:22:00,,False,,
+EHF-XA5S,2025-09-21 08:49:00,,False,dry,
+EHF-XA5S,2025-10-20 14:50:00,63.9212,True,,
+EHF-XA5S,2025-10-31 15:31:00,29.5812,True,,
+EHF-XB7S,2019-07-06 09:20:00,4.5167,True,,
+EHF-XB7S,2019-07-26 07:56:00,3.55,True,saturated,
+EHF-XB7S,2019-08-05 07:12:00,5.85,True,,
+EHF-XB7S,2019-08-20 09:11:00,5.6167,True,saturated,
+EHF-XB7S,2019-09-03 08:56:00,5.1167,True,saturated,
+EHF-XB7S,2019-09-21 09:42:00,3.2833,True,saturated,
+EHF-XB7S,2019-10-05 07:15:00,3.45,True,saturated,
+EHF-XB7S,2019-10-20 14:45:00,3.45,True,standing,
+EHF-XB7S,2021-05-20 08:15:00,-11.6356,True,standing,"saturated and soggy, 1-2 mm of standing water"
+EHF-XB7S,2021-06-06 08:30:00,11.834,True,saturated,
+EHF-XB7S,2021-06-20 08:14:00,24.4324,True,saturated,no standing water
+EHF-XB7S,2021-07-05 08:11:00,53.5916,True,,"locally MH, tree within 2 meters"
+EHF-XB7S,2021-07-20 08:40:00,78.2804,True,wet,
+EHF-XB7S,2021-08-06 08:31:00,85.5956,True,moist,
+EHF-XB7S,2021-08-22 09:48:00,90.1676,True,dry-moist,
+EHF-XB7S,2021-09-08 09:15:00,96.8732,True,dry,
+EHF-XB7S,2021-09-24 09:46:00,81.0236,True,dry,
+EHF-XB7S,2021-10-06 09:39:00,20.12,True,,
+EHF-XB7S,2021-11-14 09:50:00,11.4276,True,,
+EHF-XB7S,2024-05-19 08:08:00,1.835,True,saturated,"notebook says B8S, but never found this well, no entry for B7S"
+EHF-XB7S,2024-06-01 07:43:00,2.855,True,moist,
+EHF-XB7S,2024-06-15 07:02:00,13.925,True,wet-saturated,
+EHF-XB7S,2024-06-29 07:47:00,28.555,True,wet,
+EHF-XB7S,2024-07-14 06:52:00,70.015,True,moist,
+EHF-XB7S,2024-07-27 07:42:00,76.515,True,moist,
+EHF-XB7S,2024-08-10 08:12:00,78.955,True,moist,
+EHF-XB7S,2024-08-22 08:28:00,,False,dry-moist,no water
+EHF-XB7S,2024-09-07 08:54:00,24.295,True,moist,
+EHF-XB7S,2024-09-21 07:53:00,12.205,True,moist-wet,
+EHF-XB7S,2024-10-06 08:13:00,10.375,True,saturated,
+EHF-XB7S,2024-10-21 08:32:00,4.375,True,saturated,
+EHF-XB7S,2024-11-09 10:01:00,3.365,True,saturated,"MH terrace, not currrently in pine canopy, but small pines close just no canopy over well"
+EHR-1,2018-05-31 08:30:00,29.555,True,,
+EHR-1,2018-06-18 07:17:00,44.3717,True,,
+EHR-1,2018-06-30 08:15:00,59.1883,True,,
+EHR-1,2018-07-16 07:52:00,66.4083,True,,
+EHR-1,2018-07-25 07:21:00,66.075,True,,
+EHR-1,2018-08-10 06:32:00,69.5083,True,,
+EHR-1,2018-08-24 07:53:00,66.1417,True,,trampled grass
+EHR-1,2018-09-16 07:21:00,58.075,True,,stabilized with fencepost
+EHR-1,2018-09-29 08:16:00,57.475,True,,
+EHR-1,2018-11-18 14:43:00,41.4083,True,,L6 at 2:39 PM
+EHR-1,2019-06-02 08:01:00,4.4417,True,,need clay pack
+EHR-1,2019-06-18 07:30:00,8.8083,True,wet,not saturated
+EHR-1,2019-07-06 08:12:00,36.4083,True,,
+EHR-1,2019-07-26 08:18:00,54.1417,True,,
+EHR-1,2019-08-05 06:39:00,61.1083,True,,
+EHR-1,2019-08-20 08:49:00,62.9083,True,,
+EHR-1,2019-09-03 08:41:00,62.775,True,,
+EHR-1,2019-09-21 09:23:00,50.4417,True,,
+EHR-1,2019-10-05 07:00:00,42.0083,True,,"5 deer, 2 young"
+EHR-1,2019-10-20 14:06:00,40.0417,True,,
+EHR-1,2021-05-20 07:38:00,45.5542,True,,
+EHR-1,2021-06-06 07:59:00,55.003,True,,
+EHR-1,2021-06-20 07:43:00,60.2862,True,,
+EHR-1,2021-07-05 07:30:00,58.559,True,,
+EHR-1,2021-07-20 08:16:00,63.639,True,dry,
+EHR-1,2021-08-06 08:09:00,65.0614,True,,
+EHR-1,2021-08-22 09:24:00,60.1846,True,,
+EHR-1,2021-09-08 08:53:00,60.7942,True,dry,
+EHR-1,2021-09-24 09:26:00,60.2862,True,dry,
+EHR-1,2021-10-06 08:41:00,58.051,True,,
+EHR-1,2021-11-14 09:05:00,29.3998,True,,
+EHR-1,2024-05-19 09:16:00,7.755,True,wet-saturated,creek at bank
+EHR-1,2024-06-01 08:58:00,26.045,True,moist-wet,creek down at least 1 ft
+EHR-1,2024-06-15 08:06:00,43.425,True,moist,
+EHR-1,2024-06-29 08:52:00,54.195,True,dry-moist,
+EHR-1,2024-07-14 07:46:00,65.465,True,moist,rain
+EHR-1,2024-07-27 08:18:00,66.895,True,dry,
+EHR-1,2024-08-10 08:55:00,64.755,True,dry,
+EHR-1,2024-08-22 09:07:00,65.165,True,dry,
+EHR-1,2024-09-07 08:20:00,61.705,True,dry,
+EHR-1,2024-09-21 08:28:00,57.445,True,dry,
+EHR-1,2024-10-06 08:43:00,54.085,True,dry,
+EHR-1,2024-10-21 09:05:00,46.165,True,moist,
+EHR-1,2024-11-09 10:35:00,38.845,True,frozen,no snow right here
+EHR-1,2025-05-29 08:48:00,28.485,True,moist,"cord loose, moved sensor up; veg tramped by 5th grade lesson"
+EHR-1,2025-07-11 18:47:00,68.415,True,,
+EHR-1,2025-09-21 13:09:00,55.005,True,dry,
+EHR-1,2025-10-20 15:49:00,38.445,True,,
+EHR-1,2025-10-31 16:13:00,35.495,True,,
+EHR-XB1N,2018-07-16 09:16:00,65.85,True,,
+EHR-XB1N,2018-07-25 08:45:00,64.2833,True,,clear water
+EHR-XB1N,2019-07-06 09:24:00,51.05,True,,
+EHR-XB1N,2019-07-26 13:04:00,59.45,True,,
+EHR-XB1N,2019-09-03 09:25:00,63.75,True,,
+EHR-XB1N,2019-10-20 14:12:00,46.8833,True,,
+EHR-XB1N,2021-05-20 08:43:00,56.1092,True,moist,
+EHR-XB1N,2021-06-06 08:43:00,66.6756,True,,
+EHR-XB1N,2021-06-20 08:33:00,71.0444,True,,
+EHR-XB1N,2021-07-05 08:44:00,73.178,True,,"MH, 4m from pine base and 3m from canopy"
+EHR-XB1N,2021-07-20 08:55:00,79.782,True,dry,
+EHR-XB1N,2021-08-06 08:46:00,76.5308,True,,
+EHR-XB1N,2021-08-22 10:07:00,71.146,True,,
+EHR-XB1N,2021-09-08 09:24:00,71.4508,True,dry,
+EHR-XB1N,2021-09-24 17:21:00,67.6916,True,dry,
+EHR-XB1N,2021-10-06 09:53:00,,False,,"no water, may have hit logger?"
+EHR-XB1N,2021-11-14 10:11:00,44.0188,True,,
+EHR-XB1N,2024-05-19 09:14:00,30.815,True,moist,
+EHR-XB1N,2024-06-01 08:50:00,41.385,True,moist,"creek is semi-high up but not to the bank, lower than last visit; water depth 49 cm between the two B1 wellpipes"
+EHR-XB1N,2024-06-15 08:32:00,52.965,True,,
+EHR-XB1N,2024-06-29 08:34:00,58.445,True,dry-moist,Popped top
+EHR-XB1N,2024-07-14 07:42:00,68.305,True,dry,
+EHR-XB1N,2024-07-27 08:14:00,69.625,True,dry,
+EHR-XB1N,2024-08-10 08:51:00,67.695,True,moist,
+EHR-XB1N,2024-08-22 09:04:00,68.205,True,dry,
+EHR-XB1N,2024-09-07 08:25:00,66.475,True,dry-moist,dew
+EHR-XB1N,2024-09-21 08:24:00,62.925,True,dry,
+EHR-XB1N,2024-10-06 08:39:00,62.815,True,dry,
+EHR-XB1N,2024-10-21 08:58:00,54.995,True,moist,creeks seems to have higher flow than last time
+EHR-XB1N,2024-11-09 10:31:00,43.925,True,frozen,MH + Riparian; other's logger
+EHR-XB2N,2018-07-16 09:19:00,25.75,True,,
+EHR-XB2N,2018-07-25 08:50:00,25.15,True,,
+EHR-XB2N,2019-07-06 09:26:00,16.95,True,,
+EHR-XB2N,2019-07-26 13:05:00,24.6167,True,,
+EHR-XB2N,2019-09-03 09:27:00,21.55,True,,
+EHR-XB2N,2019-10-20 14:11:00,15.95,True,,
+EHR-XB2N,2021-05-20 08:45:00,18.1756,True,wet-saturated,
+EHR-XB2N,2021-06-06 08:44:00,23.8652,True,,
+EHR-XB2N,2021-06-20 08:34:00,28.742,True,,
+EHR-XB2N,2021-07-05 08:46:00,28.9452,True,,clearly MH
+EHR-XB2N,2021-07-20 08:55:00,33.1108,True,dry,
+EHR-XB2N,2021-08-06 08:47:00,34.9396,True,,
+EHR-XB2N,2021-08-22 10:08:00,31.9932,True,,
+EHR-XB2N,2021-09-08 09:25:00,34.1268,True,dry,
+EHR-XB2N,2021-09-24 17:20:00,34.0252,True,dry,accidental error: had entered 3.24 ft from solinst in the field book when the reading was much more likely 2.24 ft.
+EHR-XB2N,2021-10-06 09:54:00,27.3867,True,,
+EHR-XB2N,2021-11-14 10:12:00,21.3252,True,,
+EHR-XB2N,2024-05-19 09:14:00,7.39,True,wet-saturated,
+EHR-XB2N,2024-06-01 08:54:00,12.07,True,moist,logger (not mine)
+EHR-XB2N,2024-06-15 08:27:00,19.08,True,wet,
+EHR-XB2N,2024-06-29 08:40:00,22.84,True,dry-moist,Popped top
+EHR-XB2N,2024-07-14 07:42:00,24.87,True,dry-moist,
+EHR-XB2N,2024-07-27 08:15:00,27.61,True,dry,
+EHR-XB2N,2024-08-10 08:52:00,26.6,True,moist,
+EHR-XB2N,2024-08-22 09:05:00,25.99,True,moist,
+EHR-XB2N,2024-09-07 08:24:00,23.75,True,moist,
+EHR-XB2N,2024-09-21 08:25:00,21.52,True,dry,
+EHR-XB2N,2024-10-06 08:40:00,20.6,True,dry,
+EHR-XB2N,2024-10-21 09:00:00,17.96,True,moist,
+EHR-XB2N,2024-11-09 10:31:00,15.73,True,frozen,"MH, probably Riparian"
+EHR-XB2N,2025-07-11 17:42:00,36.45,True,,
+EHR-XB2N,2025-10-20 15:54:00,21.21,True,,"mistakingly called this B2S, but 99% sure I meant B2N because it's in view of East-1 phenocam and I had intentions to measure this well."
+EHT-XB5S,2018-06-01 07:41:00,19.2967,True,,
+EHT-XB5S,2018-06-18 08:27:00,64.4875,True,,
+EHT-XB5S,2018-06-30 09:05:00,89.9933,True,,
+EHT-XB5S,2018-07-16 08:52:00,109.85,True,dry,grasshoppers in meadow; soil cracks 1-2 cm
+EHT-XB5S,2018-07-25 08:08:00,124.75,True,,clear water
+EHT-XB5S,2018-08-10 07:18:00,,False,,
+EHT-XB5S,2018-08-24 08:35:00,,False,,
+EHT-XB5S,2018-09-16 08:04:00,,False,,
+EHT-XB5S,2018-09-29 08:36:00,,False,,"dot, dead bugs at bolt"
+EHT-XB5S,2018-11-18 13:43:00,43.9167,True,,"saw water, dot"
+EHT-XB5S,2019-06-02 19:55:00,-24.15,True,standing,pond at surface 1.5 cm deep
+EHT-XB5S,2021-05-20 08:12:00,38.9196,True,moist-wet,
+EHT-XB5S,2021-06-06 08:24:00,60.9668,True,,
+EHT-XB5S,2021-06-20 08:10:00,92.7676,True,,
+EHT-XB5S,2021-07-05 08:06:00,120.5044,True,,Cobble- to boulder-sized rocks at surface
+EHT-XB5S,2021-07-20 08:36:00,,False,dry,no water
+EHT-XB5S,2021-11-14 09:41:00,-1.0702,True,standing,
+EHT-XB5S,2024-05-19 08:14:00,10.68,True,saturated,
+EHT-XB5S,2024-06-01 07:48:00,40.85,True,moist-wet,logger (not mine)
+EHT-XB5S,2024-06-15 07:09:00,74.99,True,dry,
+EHT-XB5S,2024-06-29 09:04:00,100.59,True,dry,
+EHT-XB5S,2024-07-14 07:01:00,,False,dry,no water
+EHT-XB5S,2024-07-27 07:45:00,,False,dry,
+EHT-XB5S,2024-08-10 08:17:00,,False,dry,
+EHT-XB5S,2024-08-22 08:30:00,,False,dry,
+EHT-XB5S,2024-09-21 07:57:00,,False,dry,no water
+EHT-XB5S,2024-10-06 08:16:00,,False,dry,
+EHT-XB5S,2024-10-21 08:38:00,125.89,True,dry-moist,
+EHT-XB5S,2024-11-09 10:04:00,78.55,True,frozen,patches of snow between B6S adn B5S
+EHT-XB6S,2021-05-20 08:15:00,20.7124,True,moist-wet,bear poop nearby; pines within 2.5 meters of well
+EHT-XB6S,2021-06-06 08:27:00,38.1876,True,,
+EHT-XB6S,2021-06-20 08:12:00,75.5764,True,,
+EHT-XB6S,2021-07-05 08:09:00,98.538,True,,"locally MH, tree within 2 meters"
+EHT-XB6S,2021-07-20 08:38:00,128.6116,True,dry,
+EHT-XB6S,2021-08-06 08:29:00,,False,,no water
+EHT-XB6S,2021-11-14 09:48:00,15.226,True,,
+EHT-XB6S,2024-05-19 08:11:00,18.59,True,wet-saturated,
+EHT-XB6S,2024-06-01 07:46:00,23.88,True,wet,
+EHT-XB6S,2024-06-15 07:06:00,48.16,True,moist,
+EHT-XB6S,2024-06-29 07:53:00,83.52,True,dry,
+EHT-XB6S,2024-07-14 07:00:00,122.12,True,dry,
+EHT-XB6S,2024-07-27 07:44:00,,False,dry,
+EHT-XB6S,2024-08-10 08:15:00,,False,dry,
+EHT-XB6S,2024-08-22 08:29:00,,False,dry,no water
+EHT-XB6S,2024-09-07 08:52:00,,False,dry,
+EHT-XB6S,2024-09-21 07:56:00,,False,dry,no water
+EHT-XB6S,2024-10-06 08:15:00,,False,dry,
+EHT-XB6S,2024-10-21 08:35:00,,False,moist,
+EHT-XB6S,2024-11-09 10:03:00,14.33,True,frozen,
+EHT-XC5S,2021-05-20 08:27:00,58.915,True,moist-wet,
+EHT-XC5S,2021-06-20 08:23:00,89.395,True,,past instrumentation at forest edge
+EHT-XC5S,2021-07-05 08:22:00,113.5758,True,,EHT?
+EHT-XC5S,2021-07-20 08:47:00,117.1318,True,dry,near bottom
+EHT-XC5S,2021-08-06 08:38:00,,False,,no water
+EHT-XC5S,2021-11-14 09:56:00,66.3318,True,,
+EHT-XC5S,2024-06-01 07:33:00,51.395,True,moist-wet,
+EHT-XC5S,2024-06-29 07:22:00,85.435,True,dry,
+EHT-XC5S,2024-07-27 07:35:00,110.425,True,dry,
+EHT-XC5S,2024-08-10 08:05:00,,False,dry,no water
+EHT-XC5S,2024-08-22 08:20:00,115.305,True,dry,near bottom
+EHT-XC5S,2024-09-07 08:59:00,114.695,True,dry,
+EHT-XC5S,2024-09-21 07:45:00,106.565,True,dry,logger (not mine); burrows? Overturned soil
+EHT-XC5S,2024-10-06 08:06:00,101.285,True,dry,
+EHT-XC5S,2024-10-21 08:26:00,95.895,True,moist,
+EHT-XC5S,2024-11-09 09:52:00,82.385,True,frozen,"def MH, def terrace"
+EHT-XC5S,2025-05-29 08:06:00,54.345,True,dry-moist,
+EHT-XC5S,2025-07-11 18:02:00,104.935,True,,
+EHT-XC5S,2025-09-21 09:25:00,98.535,True,dry,
+EHT-XC5S,2025-10-20 15:20:00,85.435,True,,
+EHT-XC5S,2025-10-31 15:47:00,80.255,True,,
+EHT-XC6S,2018-06-01 08:00:00,,False,,
+EHT-XC6S,2018-06-18 08:42:00,,False,,
+EHT-XC6S,2021-05-20 08:23:00,,False,,no water
+EHT-XC6S,2024-06-15 06:40:00,,False,dry,
+EHT-XC6S,2024-11-09 09:53:00,,False,frozen,no water; well depth is 5.06
+EWF-1,2018-06-01 06:50:00,35.5408,True,,
+EWF-1,2018-06-18 08:19:00,74.6145,True,,
+EWF-1,2018-06-30 08:50:00,91.1245,True,,
+EWF-1,2018-07-16 08:29:00,93.8603,True,,tip of meter hit mud at bottom
+EWF-1,2018-07-25 08:00:00,,False,,"mud 3cm from bottom; reading was 148.0 x 3 but looks wrong on plot, WT was likely lower"
+EWF-1,2018-08-10 06:56:00,,False,,"mud muck near bottom; reading was 148.5, 148.5, 148.4 but looks wrong on plot. WT probably lower."
+EWF-1,2018-08-24 08:27:00,,False,,mud at bottom
+EWF-1,2018-09-16 07:48:00,,False,,dot
+EWF-1,2018-09-29 09:05:00,,False,,"dot, calibration card down at phenocam"
+EWF-1,2018-11-18 14:28:00,48.3937,True,,dot
+EWF-1,2019-06-02 10:20:00,-35.4063,True,saturated,water at soil surface
+EWF-1,2019-06-18 08:30:00,,,wet,"not saturated, channel saturated by not flow;  fetch well depth from logger?"
+EWF-1,2019-07-06 08:52:00,76.602,True,,needs more clay
+EWF-1,2019-07-26 11:48:00,93.527,True,,"at bottom, 2.5 cm of wet mud"
+EWF-1,2019-08-05 07:03:00,,False,,
+EWF-1,2019-08-20 09:04:00,,False,,"mud at bottom, need clay backfill"
+EWF-1,2019-09-21 09:44:00,73.7937,True,,20 cm hole ring around well
+EWF-1,2019-10-05 07:24:00,59.627,True,,backfilled with clay on 10/04
+EWF-1,2019-10-20 14:37:00,53.4937,True,,
+EWF-1,2021-05-20 08:05:00,78.2566,True,moist-wet,no flow in small channel to west of well
+EWF-1,2021-06-06 08:18:00,92.1758,True,,
+EWF-1,2021-06-20 08:05:00,93.903,True,,mud at bottom
+EWF-1,2021-07-05 07:59:00,,False,dry-moist,"hit bottom but clear water reading on meter; reading was 5.0 ft = 152.4 cm. On plot, the water level looks too elevated."
+EWF-1,2021-07-16 08:40:00,134.0104,True,,"new well, no well casing yet so top to ground = 0"
+EWF-1,2021-07-20 08:32:00,133.4168,True,dry,no cap
+EWF-1,2021-08-06 08:24:00,142.764,True,,
+EWF-1,2021-08-22 09:39:00,145.812,True,,"near bottom, needs more bentonite"
+EWF-1,2021-09-08 09:08:00,143.3736,True,dry,
+EWF-1,2021-09-24 09:40:00,124.476,True,dry,
+EWF-1,2021-10-06 09:32:00,113.27,True,,
+EWF-1,2021-11-14 09:38:00,11.0904,True,,
+EWF-1,2024-05-19 08:28:00,7.24,True,wet-saturated,need backfill
+EWF-1,2024-06-01 08:06:00,69.22,True,wet,needs backfill
+EWF-1,2024-06-15 07:24:00,91.98,True,dry,
+EWF-1,2024-06-29 08:09:00,105.08,True,dry,
+EWF-1,2024-07-14 07:08:00,122.46,True,dry,soil getting wet from rain
+EWF-1,2024-07-27 07:52:00,122.76,True,dry,
+EWF-1,2024-08-10 08:27:00,120.73,True,dry,
+EWF-1,2024-08-22 08:38:00,121.85,True,dry,
+EWF-1,2024-09-07 08:42:00,110.57,True,dry,
+EWF-1,2024-09-21 08:07:00,100.21,True,dry,
+EWF-1,2024-10-06 08:24:00,86.8,True,dry,
+EWF-1,2024-10-21 08:46:00,70.95,True,dry,well looks narrower than otheres
+EWF-1,2024-11-09 10:14:00,65.46,True,frozen,"about 1"" of snow on ground"
+EWF-1,2025-05-29 08:17:00,79.18,True,dry-moist,
+EWF-1,2025-07-11 18:18:00,127.84,True,,
+EWF-1,2025-09-21 08:53:00,75.21,True,moist,
+EWF-1,2025-10-20 14:37:00,60.28,True,,
+EWF-1,2025-10-31 15:09:00,56.01,True,,
+EWR-1,2018-06-01 06:10:00,4.9677,True,,
+EWR-1,2018-06-18 07:26:00,10.7885,True,,
+EWR-1,2018-06-30 08:25:00,18.3027,True,,
+EWR-1,2018-07-16 08:01:00,19.4085,True,,
+EWR-1,2018-07-25 07:28:00,20.9085,True,,
+EWR-1,2018-08-10 06:37:00,24.4085,True,,
+EWR-1,2018-08-24 08:04:00,23.0752,True,,
+EWR-1,2018-09-16 07:30:00,22.0085,True,,
+EWR-1,2018-09-29 08:29:00,19.5752,True,,
+EWR-1,2018-11-18 13:50:00,15.0085,True,,orig time was 14:04; adjusted time by 16 minutes because logger pulled at 2:00pm
+EWR-1,2019-06-02 08:14:00,-17.5915,True,overbank,"21.5 cm above ground,  connected to stream flow"
+EWR-1,2019-06-18 07:40:00,-10.6581,True,overbank,
+EWR-1,2019-07-06 08:21:00,-1.9248,True,saturated,
+EWR-1,2019-07-26 07:32:00,17.6752,True,,
+EWR-1,2019-08-05 06:44:00,20.2419,True,,
+EWR-1,2019-08-20 08:53:00,21.5752,True,,
+EWR-1,2019-09-03 08:47:00,21.4752,True,,
+EWR-1,2019-09-21 09:26:00,18.2419,True,,
+EWR-1,2019-10-05 07:06:00,16.2085,True,,
+EWR-1,2019-10-20 14:17:00,13.5752,True,,
+EWR-1,2021-05-20 07:42:00,17.1696,True,,
+EWR-1,2021-06-06 08:02:00,22.656,True,,
+EWR-1,2021-06-20 07:46:00,24.688,True,,
+EWR-1,2021-07-05 07:35:00,25.196,True,,
+EWR-1,2021-07-20 08:19:00,26.1104,True,dry,
+EWR-1,2021-08-06 08:12:00,26.3136,True,,
+EWR-1,2021-08-22 09:28:00,25.0944,True,,
+EWR-1,2021-09-08 08:57:00,26.6184,True,dry,
+EWR-1,2021-09-24 09:29:00,24.7896,True,dry,
+EWR-1,2021-10-06 08:45:00,22.9608,True,,need top pipe collar
+EWR-1,2021-11-14 09:09:00,2.4376,True,,
+EWR-1,2024-05-19 09:07:00,-8.505,True,standing water,"crooked, 10 cm above ground"
+EWR-1,2024-06-01 08:46:00,8.265,True,saturated,"well is crooked and loose, straightened but needs backfill"
+EWR-1,2024-06-15 08:39:00,15.375,True,wet,Need collar
+EWR-1,2024-06-29 08:29:00,20.655,True,wet,
+EWR-1,2024-07-14 07:39:00,24.215,True,moist,rain
+EWR-1,2024-07-27 08:08:00,25.335,True,moist,
+EWR-1,2024-08-10 08:48:00,,False,wet,no water; max depth 3.86
+EWR-1,2024-08-22 08:53:00,26.555,True,moist,at bottom
+EWR-1,2024-09-07 08:27:00,26.045,True,moist,at bottom
+EWR-1,2024-09-21 08:21:00,24.115,True,moist,
+EWR-1,2024-10-06 08:36:00,23.195,True,moist-wet,
+EWR-1,2024-10-21 08:58:00,18.625,True,wet,"water in cap, well seems solid, needs collar maintenance; few leaves on EAST-1 willow"
+EWR-1,2024-11-09 10:28:00,14.965,True,frozen,two loose collars; about an inch of snow around the well
+EWR-1,2025-05-29 08:35:00,6.735,True,moist,
+EWR-1,2025-07-11 17:45:00,23.805,True,,at bottom
+EWR-1,2025-09-21 13:16:00,21.065,True,dry,
+EWR-1,2025-10-20 15:36:00,11.815,True,,
+EWR-1,2025-10-31 16:31:00,9.175,True,,
+EWR-XA1N,2019-06-18 07:56:00,19.1667,True,wet,bar dry
+EWR-XA1N,2019-07-06 08:31:00,41.9,True,,
+EWR-XA1N,2019-07-26 07:32:00,43.7,True,,
+EWR-XA1N,2019-08-05 06:55:00,,False,,
+EWR-XA1N,2019-09-21 10:39:00,26.5,True,,
+EWR-XA1N,2019-10-05 07:35:00,26.5333,True,,"swapped A1N and A2N, obvious mistake in field notebook"
+EWR-XA1N,2019-10-20 14:25:00,22.6667,True,,
+EWR-XA1N,2021-05-20 07:52:00,35.652,True,,"test: switching A2S and A3S readings (11/17/2024), otherwise A2S plot doesn't make sense"
+EWR-XA1N,2021-06-06 08:10:00,46.828,True,,
+EWR-XA1N,2021-06-20 07:54:00,47.336,True,,
+EWR-XA1N,2021-07-05 07:46:00,48.5552,True,,change to EWR-A1N; aside gravel bar in willows
+EWR-XA1N,2021-07-20 08:26:00,47.844,True,dry,
+EWR-XA1N,2021-08-06 08:20:00,49.5712,True,,mud
+EWR-XA1N,2021-08-22 09:35:00,47.7424,True,,"swapped A1N and A2N, obvious mistake in field notebook"
+EWR-XA1N,2021-09-08 09:04:00,51.0952,True,dry,mud near bottom
+EWR-XA1N,2021-09-24 09:35:00,48.352,True,dry,"mud, not bottom"
+EWR-XA1N,2021-10-06 09:26:00,48.4367,True,,mud at bottom
+EWR-XA1N,2021-11-14 09:25:00,26.3048,True,,
+EWR-XA1N,2024-05-19 08:59:00,13.4,True,moist,
+EWR-XA1N,2024-06-01 08:27:00,26.2,True,saturated,
+EWR-XA1N,2024-06-15 07:42:00,41.34,True,moist,
+EWR-XA1N,2024-06-29 08:18:00,48.05,True,moist,
+EWR-XA1N,2024-07-14 07:25:00,47.23,True,moist,rain
+EWR-XA1N,2024-07-27 07:59:00,47.13,True,dry-moist,willow; near bottom
+EWR-XA1N,2024-08-10 08:39:00,49.27,True,dry,
+EWR-XA1N,2024-08-22 08:46:00,47.03,True,dry,
+EWR-XA1N,2024-09-07 08:35:00,50.59,True,dry,
+EWR-XA1N,2024-09-21 08:14:00,46.02,True,dry,
+EWR-XA1N,2024-10-06 08:30:00,46.22,True,dry,
+EWR-XA1N,2024-10-21 08:53:00,29.45,True,wet,puddle nearby
+EWR-XA1N,2024-11-09 10:22:00,22.95,True,frozen,def willow
+EWR-XB3N,2018-07-16 09:21:00,37.8,True,,
+EWR-XB3N,2018-07-25 08:52:00,36.6667,True,,
+EWR-XB3N,2019-07-06 09:27:00,28.3,True,,
+EWR-XB3N,2019-07-26 13:07:00,33.1333,True,,
+EWR-XB3N,2019-09-03 09:29:00,34.2,True,,
+EWR-XB3N,2019-10-20 14:10:00,21.5667,True,,
+EWR-XB3N,2021-05-20 08:46:00,23.5568,True,wet-saturated,
+EWR-XB3N,2021-06-06 08:45:00,31.888,True,,
+EWR-XB3N,2021-06-20 08:36:00,35.2408,True,,
+EWR-XB3N,2021-07-05 08:49:00,36.0536,True,,"clearly W, at canopy edge"
+EWR-XB3N,2021-07-20 08:56:00,66.7368,True,dry,
+EWR-XB3N,2021-08-06 08:48:00,68.1592,True,,
+EWR-XB3N,2021-08-22 10:09:00,62.4696,True,,
+EWR-XB3N,2021-09-08 09:27:00,66.5336,True,dry,
+EWR-XB3N,2021-09-24 17:19:00,44.8928,True,dry,
+EWR-XB3N,2021-10-06 09:56:00,35.8367,True,,
+EWR-XB3N,2021-11-14 10:13:00,30.872,True,,
+EWR-XB3N,2024-05-19 09:13:00,11.995,True,wet-saturated,
+EWR-XB3N,2024-06-01 08:55:00,18.895,True,moist-wet,
+EWR-XB3N,2024-06-15 08:26:00,28.145,True,wet,
+EWR-XB3N,2024-06-29 08:41:00,32.615,True,moist,
+EWR-XB3N,2024-07-14 07:43:00,39.525,True,dry-moist,
+EWR-XB3N,2024-07-27 08:16:00,47.145,True,dry-moist,
+EWR-XB3N,2024-08-10 08:53:00,45.625,True,dry-moist,
+EWR-XB3N,2024-08-22 09:05:00,47.755,True,dry,
+EWR-XB3N,2024-09-07 08:23:00,40.745,True,dry,
+EWR-XB3N,2024-09-21 08:26:00,29.775,True,dry,
+EWR-XB3N,2024-10-06 08:41:00,28.555,True,dry,
+EWR-XB3N,2024-10-21 09:01:00,23.375,True,moist,
+EWR-XB3N,2024-11-09 10:32:00,20.015,True,frozen,"def willow, pine close (within 0.8 m) but not overhanging well; other's loggers"
+EWR-XB4N,2018-07-16 09:24:00,36.0333,True,,
+EWR-XB4N,2018-07-25 08:55:00,36.5,True,,
+EWR-XB4N,2019-07-06 09:28:00,26.6333,True,,
+EWR-XB4N,2019-07-26 13:09:00,36.7667,True,,
+EWR-XB4N,2019-09-03 09:31:00,36.2,True,,
+EWR-XB4N,2019-10-20 14:08:00,25.6,True,,
+EWR-XB4N,2021-05-20 08:48:00,25.8944,True,moist-wet,
+EWR-XB4N,2021-06-06 08:46:00,34.4288,True,,
+EWR-XB4N,2021-06-20 08:37:00,38.188,True,,
+EWR-XB4N,2021-07-05 08:50:00,39.6104,True,,clearly W
+EWR-XB4N,2021-07-20 08:57:00,44.792,True,dry,
+EWR-XB4N,2021-08-06 08:49:00,49.5672,True,,
+EWR-XB4N,2021-08-22 10:10:00,47.2304,True,,
+EWR-XB4N,2021-09-08 09:28:00,50.2784,True,dry,
+EWR-XB4N,2021-09-24 17:18:00,55.46,True,dry,
+EWR-XB4N,2021-10-06 09:57:00,40.6367,True,,
+EWR-XB4N,2021-11-14 10:14:00,11.1624,True,,
+EWR-XB4N,2024-05-19 09:11:00,2.87,True,wet-saturated,
+EWR-XB4N,2024-06-01 08:57:00,16.89,True,moist-wet,
+EWR-XB4N,2024-06-15 08:23:00,30.61,True,moist,
+EWR-XB4N,2024-06-29 08:44:00,37.72,True,dry-moist,
+EWR-XB4N,2024-07-14 07:44:00,41.78,True,dry,
+EWR-XB4N,2024-07-27 08:17:00,43.41,True,dry,
+EWR-XB4N,2024-08-10 08:53:00,43.71,True,dry-moist,
+EWR-XB4N,2024-08-22 09:06:00,44.93,True,dry-moist,
+EWR-XB4N,2024-09-07 08:22:00,43.21,True,dry,
+EWR-XB4N,2024-09-21 08:27:00,39.45,True,dry,
+EWR-XB4N,2024-10-06 08:42:00,37.92,True,dry,
+EWR-XB4N,2024-10-21 09:03:00,33.35,True,moist,
+EWR-XB4N,2024-11-09 10:33:00,28.47,True,frozen,"def willow, pines far; other's logger; no snow"
+EWT-2,2025-07-11 17:51:00,117.73,True,,
+EWT-2,2025-09-21 09:46:00,,False,dry,beep at bottom with mud
+EWT-2,2025-10-20 15:08:00,81.05,True,,
+EWT-2,2025-10-31 16:00:00,68.76,True,,
+KEF-1,2018-07-01 08:14:00,7.2333,True,standing,standing water at ground surface about 1m away from well
+KEF-1,2018-07-17 08:38:00,7.8333,True,,
+KEF-1,2018-07-27 08:44:00,6.5667,True,,
+KEF-1,2018-08-10 08:50:00,4.3667,True,,
+KEF-1,2018-08-25 08:33:00,4.6,True,standing water,
+KEF-1,2018-09-16 14:08:00,8.9667,True,,
+KEF-1,2018-10-01 08:51:00,5.5667,True,,
+KEF-1,2018-10-14 08:55:00,5.3667,True,,
+KEF-1,2018-11-18 15:26:00,,False,,L5
+KEF-1,2019-06-03 12:50:00,0.3333,True,standing,"ponding 1.5 to 2 cm, slow flow"
+KEF-1,2019-06-17 07:19:00,7.2,True,standing,flow at surface
+KEF-1,2019-07-05 08:37:00,2.5,True,saturated,matches field notebook
+KEF-1,2019-07-26 16:48:00,7.7,True,,
+KEF-1,2019-09-02 12:52:00,9.4667,True,,
+KEF-1,2019-10-20 12:09:00,6.6333,True,,
+KEF-1,2021-06-06 07:15:00,2.3368,True,,
+KEF-1,2021-06-20 06:23:00,3.556,True,,
+KEF-1,2021-07-04 07:57:00,2.54,True,saturated,"soggy, double-checked meter reading"
+KEF-1,2021-07-20 07:49:00,3.7592,True,dry,
+KEF-1,2021-08-06 07:38:00,6.9088,True,saturated,
+KEF-1,2021-08-22 12:27:00,6.5024,True,saturated,water at surface within 2 m distance
+KEF-1,2021-09-08 08:19:00,5.8928,True,,
+KEF-1,2021-09-24 08:59:00,4.9784,True,saturated,
+KEF-1,2021-10-06 11:14:00,5.4367,True,saturated,
+KEF-1,2021-11-14 08:28:00,1.016,True,,
+KEF-1,2024-05-19 10:52:00,5.41,True,standing water,just beyond saturation
+KEF-1,2024-06-02 09:03:00,6.84,True,saturated,1 cm of water with boot test
+KEF-1,2024-06-16 09:00:00,8.26,True,wet-saturated,
+KEF-1,2024-06-30 08:00:00,10.7,True,saturated,
+KEF-1,2024-07-13 08:18:00,17.0,True,wet,
+KEF-1,2024-07-27 07:00:00,20.25,True,wet,
+KEF-1,2024-08-10 08:07:00,17.81,True,wet,
+KEF-1,2024-08-22 07:26:00,16.28,True,wet,
+KEF-1,2024-09-07 07:54:00,13.24,True,wet,
+KEF-1,2024-09-21 09:23:00,12.63,True,wet,
+KEF-1,2024-10-06 07:34:00,11.41,True,wet,
+KEF-1,2024-10-21 09:52:00,11.1,True,saturated,
+KEF-1,2024-11-09 11:45:00,11.41,True,frozen,patches of snow
+KEF-1,2025-05-29 17:12:00,9.27,True,wet,"cord loose, moved sensor"
+KEF-1,2025-06-24 16:51:00,13.03,True,wet,
+KEF-1,2025-07-14 12:31:00,20.25,True,moist-wet,
+KEF-1,2025-09-20 16:05:00,17.3,True,moist-wet,approx time based on hydrochron notes
+KEF-1,2025-10-19 16:08:00,12.93,True,,
+KER-1,2018-06-19 08:56:00,20.5067,True,,
+KER-1,2018-07-01 06:30:00,39.345,True,,
+KER-1,2018-07-17 07:35:00,66.425,True,,
+KER-1,2018-07-27 08:06:00,72.425,True,,mud 5cm to bottom
+KER-1,2018-08-10 08:01:00,75.125,True,,mud muck near bottom
+KER-1,2018-08-25 06:43:00,,False,,mud at bottom
+KER-1,2018-09-16 14:40:00,,False,,"dot, stabilized with fenceposts"
+KER-1,2018-10-01 07:47:00,,False,,dot
+KER-1,2018-10-14 08:50:00,,False,,
+KER-1,2018-11-18 21:16:00,,False,,dot
+KER-1,2019-06-03 10:02:00,-4.6,True,overbank,"water connected to creek, must have measured outside of well at -3.5, -4.8, -5.5"
+KER-1,2019-06-17 08:42:00,2.325,True,standing,
+KER-1,2019-07-05 07:34:00,11.3583,True,,
+KER-1,2019-07-26 06:46:00,13.9583,True,,
+KER-1,2019-08-04 08:04:00,15.0917,True,,
+KER-1,2019-08-20 06:26:00,26.025,True,,
+KER-1,2019-09-02 08:25:00,43.825,True,,
+KER-1,2019-09-21 08:16:00,27.3917,True,,
+KER-1,2019-10-05 08:10:00,20.4917,True,,
+KER-1,2019-10-20 10:29:00,18.4917,True,,
+KER-1,2021-06-06 06:32:00,27.201,True,,
+KER-1,2021-06-20 07:07:00,74.445,True,,near bottom
+KER-1,2021-07-04 07:08:00,74.7498,True,,
+KER-1,2021-07-20 06:57:00,74.8514,True,,mud
+KER-1,2021-08-06 06:47:00,,False,,no water
+KER-1,2021-11-14 07:35:00,21.613,True,,
+KER-1,2024-05-19 09:53:00,0.585,True,dry,
+KER-1,2024-06-02 07:54:00,5.965,True,saturated,
+KER-1,2024-06-16 08:10:00,13.685,True,wet,
+KER-1,2024-06-30 07:19:00,33.805,True,moist,
+KER-1,2024-07-13 07:31:00,65.505,True,dry,
+KER-1,2024-07-27 06:22:00,74.245,True,dry,at bottom
+KER-1,2024-08-10 07:19:00,,False,dry,no water; bottom at 4.82
+KER-1,2024-08-22 06:51:00,,False,dry,frozen soil
+KER-1,2024-09-07 07:18:00,,False,dry,
+KER-1,2024-09-21 08:51:00,,False,dry,no water
+KER-1,2024-10-06 07:05:00,,False,dry,
+KER-1,2024-10-21 09:22:00,,False,moist,water in cap
+KER-1,2024-11-09 10:59:00,,False,frozen,"no water; fencepost and collars seem tight, ready for winter"
+KER-1,2025-05-29 18:06:00,9.925,True,moist-wet,
+KER-1,2025-06-24 16:24:00,32.585,True,moist-wet,"mostly sedge around oxbow, but indian paintbrush and arnica (fuzzy leaf) at well"
+KER-1,2025-07-14 13:37:00,,False,dry,
+KER-1,2025-09-20 14:51:00,73.635,True,dry,"at bottom, mud on sensor but did not beep each time; approx time based on hydrochron notes"
+KER-1,2025-10-19 17:33:00,,False,,no water
+KER-1,2025-11-01 14:09:00,,False,,sensor wet at bottom
+KER-2,2025-06-24 17:00:00,44.875,True,moist,
+KER-2,2025-07-14 11:30:00,52.395,True,dry-moist,
+KER-2,2025-09-20 16:36:00,55.945,True,dry,approx time based on hydrochron notes
+KER-2,2025-10-19 15:17:00,48.025,True,,
+KER-XD5N,2019-06-03 10:02:00,-0.55,True,standing,ponding 1 cm
+KER-XD5N,2019-06-17 08:42:00,-0.7167,True,saturated,
+KER-XD5N,2019-07-05 07:24:00,7.85,True,,
+KER-XD5N,2019-07-26 06:51:00,25.05,True,,
+KER-XD5N,2019-09-02 13:52:00,42.9833,True,,
+KER-XD5N,2019-10-20 07:40:00,12.7167,True,,
+KER-XD5N,2021-06-06 07:42:00,21.1332,True,,
+KER-XD5N,2021-06-20 07:12:00,41.8596,True,,
+KER-XD5N,2021-07-04 07:00:00,67.158,True,,
+KER-XD5N,2021-07-20 06:52:00,85.446,True,,
+KER-XD5N,2021-08-06 06:40:00,91.542,True,,
+KER-XD5N,2021-08-22 11:39:00,113.7924,True,,"wet mud, near bottom"
+KER-XD5N,2021-09-08 07:33:00,115.0116,True,dry,mud at bottom
+KER-XD5N,2021-09-24 08:21:00,114.7068,True,,frost
+KER-XD5N,2021-10-06 10:24:00,110.9533,True,,
+KER-XD5N,2021-11-14 07:27:00,10.77,True,,
+KER-XD5N,2024-05-19 09:43:00,0.1,True,standing water,
+KER-XD5N,2024-06-02 07:45:00,0.41,True,saturated,1 cm of water with boot test
+KER-XD5N,2024-06-16 08:00:00,13.82,True,wet,
+KER-XD5N,2024-06-30 07:11:00,28.55,True,wet,
+KER-XD5N,2024-07-13 07:26:00,48.87,True,moist,
+KER-XD5N,2024-07-27 06:14:00,65.94,True,moist,
+KER-XD5N,2024-08-10 07:12:00,82.6,True,moist,
+KER-XD5N,2024-08-22 06:44:00,85.45,True,dry,
+KER-XD5N,2024-09-07 07:12:00,85.45,True,moist,
+KER-XD5N,2024-09-21 08:45:00,80.57,True,dry,logger (not mine)
+KER-XD5N,2024-10-06 06:59:00,83.92,True,dry,
+KER-XD5N,2024-10-21 09:17:00,74.17,True,wet,logger (not mine)
+KER-XD5N,2024-11-09 10:54:00,69.6,True,frozen,other's logger
+KER-XD5N,2025-05-29 16:43:00,4.37,True,wet,
+KER-XD5N,2025-06-24 16:20:00,25.6,True,moist-wet,
+KER-XD5N,2025-07-14 13:42:00,57.51,True,moist,
+KER-XE3S,2018-07-17 08:20:00,-5.5,True,,
+KER-XE3S,2018-07-27 08:25:00,-6.0,True,,
+KER-XE3S,2018-08-10 08:30:00,-9.0,True,,
+KER-XE3S,2018-08-25 07:04:00,-7.5,True,,
+KER-XE3S,2018-09-16 09:03:00,-6.3333,True,,
+KER-XE3S,2018-10-01 08:07:00,-8.0,True,,
+KER-XE3S,2018-10-14 08:23:00,-6.6667,True,,frozen above ground surface
+KER-XE3S,2018-11-18 16:16:00,-6.3333,True,,"above surface, ice melted"
+KER-XE3S,2019-06-03 11:49:00,-6.6667,True,standing,ponded muck
+KER-XE3S,2019-06-17 08:12:00,-5.2667,True,standing,
+KER-XE3S,2019-07-05 07:52:00,-3.1667,True,,
+KER-XE3S,2019-07-26 06:33:00,-3.3333,True,,
+KER-XE3S,2019-08-04 08:22:00,-3.8333,True,,
+KER-XE3S,2019-08-20 06:51:00,-4.3333,True,,
+KER-XE3S,2019-09-02 12:51:00,-5.6667,True,,
+KER-XE3S,2019-10-05 08:25:00,-10.1667,True,,frozen where shallow
+KER-XE3S,2019-10-20 10:50:00,-5.4,True,,
+KER-XE3S,2021-06-06 06:45:00,-5.588,True,,
+KER-XE3S,2021-06-20 06:57:00,-6.6333,True,,
+KER-XE3S,2021-07-04 07:20:00,-7.559,True,,
+KER-XE3S,2021-07-20 07:08:00,-6.3,True,standing,in centimeters? not noted
+KER-XE3S,2021-08-06 06:59:00,-8.0,True,,"7, 6, 11 cm deep"
+KER-XE3S,2021-08-22 11:59:00,-5.6667,True,,"5, 5, 7 cm above surface"
+KER-XE3S,2021-09-08 07:57:00,-8.3333,True,standing,"8 cm, 8.5 cm, 8.5 cm"
+KER-XE3S,2021-09-24 08:38:00,-7.1667,True,standing,"9.5, 4, 8 cm"
+KER-XE3S,2021-10-06 10:45:00,-7.3667,True,standing,"9.5, 6.8, 5.8 CM"
+KER-XE3S,2021-11-14 07:48:00,-6.2,True,standing,"5, 6.8, 6.8 cm "
+KER-XE3S,2024-05-19 10:06:00,-8.17,True,standing water,"above surface, measured with a ruler in cm"
+KER-XE3S,2024-06-02 08:14:00,-5.1,True,standing water,
+KER-XE3S,2024-06-16 08:28:00,-4.33,True,standing water,"above surface, measured with a ruler in cm"
+KER-XE3S,2024-06-30 07:34:00,-12.17,True,standing water,cm
+KER-XE3S,2024-07-13 07:44:00,-3.73,True,standing water," -3.2,-4.5,-3.5 cm"
+KER-XE3S,2024-07-27 06:33:00,-4.0,True,standing water,
+KER-XE3S,2024-08-10 07:30:00,-4.5,True,standing water,
+KER-XE3S,2024-08-22 07:00:00,-3.17,True,standing water,
+KER-XE3S,2024-09-07 07:29:00,-3.57,True,standing water,
+KER-XE3S,2024-09-21 08:59:00,-5.67,True,standing water,
+KER-XE3S,2024-10-06 07:14:00,-3.17,True,standing water,
+KER-XE3S,2024-10-21 09:29:00,-4.5,True,standing water,
+KER-XE3S,2024-11-09 11:08:00,,True,standing water,
+KET-1,2019-07-26 06:25:00,-19.125,True,,near E wells
+KET-1,2019-08-04 08:27:00,-14.125,True,,
+KET-1,2019-08-05 08:26:00,-14.225,True,,
+KET-1,2019-08-06 08:26:00,-14.125,True,,
+KET-1,2019-08-20 06:55:00,-10.825,True,,
+KET-1,2019-09-02 08:41:00,-7.3917,True,,
+KET-1,2019-10-20 11:29:00,-3.4917,True,,"see logger notes; also need adjustment to match subdaily logger deployment, addressed in _FULL"
+KET-1,2021-06-06 06:50:00,4.0198,True,,
+KET-1,2021-06-20 06:48:00,3.4102,True,,
+KET-1,2021-07-04 07:25:00,4.223,True,,
+KET-1,2021-07-20 07:17:00,16.8214,True,dry,
+KET-1,2021-08-06 07:05:00,30.2326,True,,logger #4 installed at 7:24 a.m.
+KET-1,2021-08-22 12:07:00,38.1574,True,,grasshoppers
+KET-1,2021-09-08 08:07:00,34.195,True,dry,
+KET-1,2021-09-24 08:46:00,29.0134,True,dry,
+KET-1,2021-10-06 10:50:00,28.7117,True,dry,
+KET-1,2021-11-14 07:57:00,1.9878,True,,
+KET-1,2024-05-19 10:10:00,-19.75,True,standing water,"cracked well top, hand measured in cm"
+KET-1,2024-06-02 08:33:00,-15.82,True,saturated,"cracked top, measuring with no cap; another channel about 1 m wide and 4 cm water depth, flowing from the fan"
+KET-1,2024-06-16 08:34:00,-5.5,True,wet,
+KET-1,2024-06-30 07:42:00,11.27,True,moist-wet,
+KET-1,2024-07-13 07:49:00,15.13,True,moist,
+KET-1,2024-07-27 06:38:00,15.74,True,dry-moist,
+KET-1,2024-08-10 07:36:00,18.08,True,dry-moist,
+KET-1,2024-08-22 07:06:00,21.12,True,dry,dew
+KET-1,2024-09-07 07:35:00,21.73,True,dry,
+KET-1,2024-09-21 09:05:00,23.05,True,moist,
+KET-1,2024-10-06 07:20:00,20.31,True,dry,
+KET-1,2024-10-21 09:33:00,20.01,True,moist,"cap has crack, but didn't move"
+KET-1,2024-11-09 11:14:00,16.96,True,frozen,
+KET-1,2025-05-29 17:00:00,-5.9,True,wet,
+KET-1,2025-06-24 16:34:00,16.75,True,moist-wet,"some mixed herbaceous here (trifolium, sidalcea oregana), but dominated by sedge; no time specified, so estimated"
+KET-1,2025-07-14 13:16:00,26.0,True,dry,
+KET-1,2025-09-20 15:17:00,26.41,True,dry,"at bottom, mud on sensor but did not beep each time; approx time based on hydrochron notes"
+KET-1,2025-10-19 17:06:00,24.48,True,,
+KFF-XD6S,2018-06-01 08:50:00,18.6791,True,,
+KFF-XD6S,2018-06-19 08:23:00,36.9883,True,,
+KFF-XD6S,2018-07-01 06:47:00,85.8833,True,,
+KFF-XD6S,2018-07-17 07:45:00,,False,,
+KFF-XD6S,2018-07-27 08:12:00,,False,,
+KFF-XD6S,2018-08-10 07:55:00,,False,,
+KFF-XD6S,2018-10-01 08:30:00,,False,,
+KFF-XD6S,2018-11-18 15:51:00,17.7,True,,saw water
+KFF-XD6S,2019-06-03 12:39:00,5.7,True,saturated,
+KFF-XD6S,2019-06-17 07:38:00,6.8666,True,wet-saturated,
+KFF-XD6S,2019-07-05 08:19:00,22.7666,True,,
+KFF-XD6S,2019-07-26 06:12:00,82.1333,True,,
+KFF-XD6S,2019-08-04 08:40:00,,False,,
+KFF-XD6S,2019-08-20 07:06:00,,False,,
+KFF-XD6S,2021-06-06 07:04:00,33.3533,True,,
+KFF-XD6S,2021-06-20 06:35:00,84.0517,True,,
+KFF-XD6S,2021-07-04 07:45:00,,False,,no water
+KFF-XD6S,2021-07-20 07:36:00,,False,dry,no water
+KFF-XD6S,2021-11-14 08:14:00,31.7277,True,,
+KFF-XD6S,2024-05-19 10:34:00,10.19,True,saturated,
+KFF-XD6S,2024-06-02 08:53:00,19.95,True,moist,
+KFF-XD6S,2024-06-16 08:49:00,39.45,True,moist,
+KFF-XD6S,2024-06-30 08:19:00,88.63,True,dry-moist,
+KFF-XD6S,2024-07-13 08:05:00,107.73,True,dry,At bottom
+KFF-XD6S,2024-07-27 06:49:00,,False,dry,one beep at first measure at 5.09
+KFF-XD6S,2024-08-10 07:56:00,,False,dry,
+KFF-XD6S,2024-08-22 07:18:00,,False,dry,no water
+KFF-XD6S,2024-09-21 09:15:00,,False,dry,
+KFF-XD6S,2024-10-06 07:28:00,,False,dry,
+KFF-XD6S,2024-10-21 09:43:00,,False,moist,
+KFF-XD6S,2024-11-09 11:36:00,28.48,True,frozen,other's logger
+KFR-XE1S,2018-06-01 09:23:00,43.5958,True,,
+KFR-XE1S,2018-06-19 09:00:00,52.2742,True,,
+KFR-XE1S,2018-07-01 07:50:00,55.2375,True,,
+KFR-XE1S,2018-07-17 08:17:00,58.8833,True,,
+KFR-XE1S,2018-07-27 08:28:00,59.85,True,,
+KFR-XE1S,2018-08-10 08:34:00,59.7833,True,,
+KFR-XE1S,2018-08-25 07:08:00,60.85,True,,streamflow depth is 10 cm
+KFR-XE1S,2018-09-16 08:53:00,60.7833,True,,stabilized with fence post
+KFR-XE1S,2018-10-01 08:03:00,64.4167,True,,
+KFR-XE1S,2018-10-14 08:17:00,58.2167,True,,
+KFR-XE1S,2018-11-18 16:21:00,56.85,True,,
+KFR-XE1S,2019-06-17 08:17:00,18.35,True,wet,not saturated
+KFR-XE1S,2019-07-05 07:46:00,46.1167,True,,
+KFR-XE1S,2019-07-26 06:35:00,56.0833,True,,
+KFR-XE1S,2019-08-04 08:16:00,58.85,True,,
+KFR-XE1S,2019-08-05 08:16:00,58.65,True,,
+KFR-XE1S,2019-08-06 08:16:00,57.85,True,,
+KFR-XE1S,2019-08-20 06:34:00,62.5167,True,,
+KFR-XE1S,2019-09-02 08:34:00,63.05,True,,
+KFR-XE1S,2019-09-21 08:25:00,60.0833,True,,
+KFR-XE1S,2019-10-05 08:20:00,57.6833,True,,
+KFR-XE1S,2019-10-20 10:46:00,57.45,True,,
+KFR-XE1S,2021-06-06 06:41:00,61.318,True,,
+KFR-XE1S,2021-06-20 06:58:00,63.4516,True,,
+KFR-XE1S,2021-07-04 07:17:00,63.35,True,,
+KFR-XE1S,2021-07-20 07:05:00,66.398,True,dry,
+KFR-XE1S,2021-08-06 06:55:00,66.1948,True,,
+KFR-XE1S,2021-08-22 11:57:00,64.7724,True,,
+KFR-XE1S,2021-09-08 07:52:00,64.7724,True,dry,
+KFR-XE1S,2021-09-24 08:35:00,63.1468,True,,frost
+KFR-XE1S,2021-10-06 10:48:00,57.3533,True,,
+KFR-XE1S,2021-11-14 07:46:00,56.746,True,,
+KFR-XE1S,2024-05-19 10:01:00,21.675,True,moist,10 cm from bank
+KFR-XE1S,2024-06-02 08:10:00,34.675,True,moist,
+KFR-XE1S,2024-06-16 08:23:00,44.335,True,dry,
+KFR-XE1S,2024-06-30 07:30:00,49.205,True,dry,
+KFR-XE1S,2024-07-13 07:41:00,53.575,True,dry-moist,
+KFR-XE1S,2024-07-27 06:29:00,56.315,True,dry,
+KFR-XE1S,2024-08-10 07:27:00,58.755,True,dry,
+KFR-XE1S,2024-08-22 06:58:00,59.675,True,dry,
+KFR-XE1S,2024-09-07 07:26:00,59.465,True,dry,
+KFR-XE1S,2024-09-21 08:58:00,57.235,True,dry,
+KFR-XE1S,2024-10-06 07:12:00,58.145,True,dry,
+KFR-XE1S,2024-10-21 09:27:00,55.205,True,dry,
+KFR-XE1S,2024-11-09 11:06:00,53.275,True,frozen,tight fencepost
+KFR-XE2S,2018-06-01 09:15:00,2.3425,True,,
+KFR-XE2S,2018-06-19 08:59:00,4.7767,True,,
+KFR-XE2S,2018-07-01 07:45:00,3.5067,True,,
+KFR-XE2S,2018-07-17 08:15:00,5.2,True,,
+KFR-XE2S,2018-07-27 08:26:00,6.1,True,,
+KFR-XE2S,2018-08-10 08:32:00,5.8,True,,
+KFR-XE2S,2018-08-25 07:06:00,7.7,True,,
+KFR-XE2S,2018-09-16 08:54:00,8.8333,True,,
+KFR-XE2S,2018-10-01 08:05:00,8.2,True,,
+KFR-XE2S,2018-10-14 08:19:00,8.7,True,,
+KFR-XE2S,2018-11-18 16:20:00,8.2667,True,,
+KFR-XE2S,2019-06-17 08:13:00,-2.9667,True,wet,not saturated
+KFR-XE2S,2019-07-05 07:49:00,2.9333,True,,
+KFR-XE2S,2019-07-26 06:34:00,4.1333,True,,
+KFR-XE2S,2019-08-04 08:15:00,6.5667,True,,
+KFR-XE2S,2019-08-20 06:45:00,7.6333,True,,sensor change at 6:38 am
+KFR-XE2S,2019-09-02 08:35:00,7.3667,True,,
+KFR-XE2S,2019-09-21 08:26:00,7.3333,True,,
+KFR-XE2S,2019-10-05 08:22:00,7.2333,True,,
+KFR-XE2S,2019-10-20 10:48:00,7.2333,True,,
+KFR-XE2S,2021-06-06 06:42:00,2.5048,True,,
+KFR-XE2S,2021-06-20 06:57:00,2.4032,True,,
+KFR-XE2S,2021-07-04 07:18:00,3.4192,True,saturated,soggy
+KFR-XE2S,2021-07-20 07:06:00,2.4032,True,,
+KFR-XE2S,2021-08-06 06:56:00,0.7776,True,saturated,"not standing water; readings listed as 2.3, 2.4, 2.4 ft in field notebook but should have two decimal digits; most likely an error and real reading was 2.03, 2.04, 2.04 ft"
+KFR-XE2S,2021-08-22 11:58:00,1.0824,True,standing,
+KFR-XE2S,2021-09-08 07:54:00,-0.34,True,saturated,
+KFR-XE2S,2021-09-24 08:36:00,0.2696,True,standing,
+KFR-XE2S,2021-10-06 10:41:00,-0.43,True,standing,
+KFR-XE2S,2021-11-14 07:47:00,-0.6448,True,,
+KFR-XE2S,2024-05-19 10:04:00,-2.47,True,saturated,
+KFR-XE2S,2024-06-02 08:10:00,-1.25,True,standing water,
+KFR-XE2S,2024-06-16 08:25:00,-0.95,True,saturated,
+KFR-XE2S,2024-06-30 07:31:00,0.17,True,saturated,
+KFR-XE2S,2024-07-13 07:43:00,-0.95,True,standing water,
+KFR-XE2S,2024-07-27 06:30:00,-0.34,True,saturated,
+KFR-XE2S,2024-08-10 07:28:00,-0.64,True,saturated,
+KFR-XE2S,2024-08-22 06:59:00,-0.54,True,saturated,
+KFR-XE2S,2024-09-07 07:27:00,-0.95,True,standing water,water is about 0.5cm deep
+KFR-XE2S,2024-09-21 08:59:00,-1.05,True,standing water,
+KFR-XE2S,2024-10-06 07:13:00,0.0,True,saturated,"read WL at 1.19 ft = 36.2712 cm on audio recording, but it looks absurd on plot over all 4 yrs; 2.19 ft didn't look right either; estimated at 0 since soil observed as saturated saturated"
+KFR-XE2S,2024-10-21 09:28:00,-0.44,True,standing water,0.5 cm water
+KFR-XE2S,2024-11-09 11:06:00,-0.95,True,saturated,
+KFT-XD3S,2018-06-01 08:41:00,38.9833,True,,
+KFT-XD3S,2018-10-01 08:30:00,,False,,
+KFT-XD3S,2018-11-18 16:45:00,,False,,
+KFT-XD3S,2019-06-03 12:36:00,,False,,cannot see water on fan lobe
+KFT-XD3S,2019-06-17 07:31:00,19.52,True,wet,not saturated
+KFT-XD3S,2019-07-05 08:27:00,64.0867,True,,
+KFT-XD3S,2019-07-26 06:12:00,,False,,
+KFT-XD3S,2019-08-05 08:42:00,,False,,
+KFT-XD3S,2021-06-06 07:07:00,63.0936,True,,
+KFT-XD3S,2021-06-20 06:31:00,,False,,no water
+KFT-XD3S,2021-07-04 07:47:00,,False,,no water
+KFT-XD3S,2021-11-14 08:17:00,24.9936,True,,
+KFT-XD3S,2024-05-19 10:41:00,87.93,True,saturated,water at bottom of well
+KFT-XD3S,2024-06-02 08:55:00,48.61,True,moist,logger (not mine); a lot of pine litter
+KFT-XD3S,2024-06-16 08:53:00,,False,dry,No water
+KFT-XD3S,2024-06-30 08:22:00,,False,dry,
+KFT-XD3S,2024-07-13 08:10:00,,False,dry,no water
+KFT-XD3S,2024-07-27 06:51:00,,False,dry,
+KFT-XD3S,2024-08-22 07:19:00,,False,dry,no water
+KFT-XD3S,2024-10-06 07:30:00,,False,dry,
+KFT-XD3S,2024-10-06 07:32:00,59.89,True,dry,
+KFT-XD3S,2024-10-21 09:44:00,,False,dry,def pine
+KFT-XD3S,2024-11-09 11:38:00,,False,frozen,def pine; at distal end of landslide? Big boulders right here and up to the creekbend that I surveyed with Chris and dogs. Disconnected from discharge?
+KHF-1,2018-07-01 08:18:00,63.7492,True,,
+KHF-1,2018-07-17 08:41:00,82.65,True,,
+KHF-1,2018-07-27 08:47:00,,False,,
+KHF-1,2018-08-10 08:52:00,,False,,
+KHF-1,2018-08-25 08:30:00,,False,dry,
+KHF-1,2018-09-16 14:06:00,76.7833,True,,"dot, well depth is 148.7"
+KHF-1,2018-10-01 08:49:00,68.7833,True,,
+KHF-1,2018-10-14 08:56:00,54.5167,True,,
+KHF-1,2018-11-18 15:39:00,29.4833,True,,
+KHF-1,2019-06-03 12:55:00,0.75,True,saturated,ponding nearby
+KHF-1,2019-06-17 07:12:00,-17.05,True,saturated,
+KHF-1,2019-07-05 08:39:00,26.2833,True,moist,matches field notebook
+KHF-1,2019-07-26 16:44:00,64.65,True,,
+KHF-1,2019-10-05 08:46:00,43.55,True,,
+KHF-1,2019-10-20 12:03:00,36.2833,True,,
+KHF-1,2021-06-06 07:17:00,47.4692,True,,
+KHF-1,2021-06-20 06:21:00,67.2812,True,,
+KHF-1,2021-07-04 07:58:00,59.436,True,,"ground to top is zero, no well casing"
+KHF-1,2021-07-05 17:36:00,60.7424,True,,
+KHF-1,2021-07-20 07:50:00,72.8328,True,dry,
+KHF-1,2021-08-06 07:37:00,113.676,True,,
+KHF-1,2021-08-22 12:29:00,84.212,True,,grasshopper and butterfly
+KHF-1,2021-09-08 08:21:00,88.3776,True,dry,
+KHF-1,2021-09-24 09:01:00,59.1168,True,dry,
+KHF-1,2021-10-06 11:13:00,54.1367,True,dry,verified matches field notebook
+KHF-1,2021-11-14 08:25:00,4.8624,True,,
+KHF-1,2024-05-19 10:53:00,1.2,True,standing water,just beyond saturation
+KHF-1,2024-06-02 09:04:00,8.01,True,saturated,
+KHF-1,2024-06-16 09:01:00,28.64,True,wet,
+KHF-1,2024-06-30 08:01:00,47.03,True,moist-wet,
+KHF-1,2024-07-13 08:20:00,57.9,True,moist,
+KHF-1,2024-07-27 07:00:00,60.03,True,moist,dew and frost
+KHF-1,2024-08-10 08:08:00,61.66,True,dry-moist,
+KHF-1,2024-08-22 07:27:00,63.38,True,dry,
+KHF-1,2024-09-07 07:55:00,54.85,True,dry,
+KHF-1,2024-09-21 09:25:00,34.43,True,dry-moist,
+KHF-1,2024-10-06 07:35:00,29.86,True,dry,
+KHF-1,2024-10-21 09:52:00,15.94,True,moist,
+KHF-1,2024-11-09 11:46:00,13.7,True,frozen,a few patches of snow but less dense than EF-1
+KHF-1,2025-05-29 17:14:00,14.62,True,wet,
+KHF-1,2025-06-24 16:52:00,41.44,True,dry,
+KHF-1,2025-07-14 12:14:00,60.03,True,dry,
+KHF-1,2025-09-20 16:09:00,53.94,True,dry-moist,approx time based on hydrochron notes
+KHF-1,2025-10-19 15:53:00,20.1,True,,
+KHF-XD4S,2018-06-01 08:45:00,33.4242,True,,
+KHF-XD4S,2018-07-01 08:35:00,,False,,
+KHF-XD4S,2018-07-27 08:11:00,,False,,
+KHF-XD4S,2018-08-10 08:59:00,,False,,
+KHF-XD4S,2018-10-01 08:30:00,,False,,
+KHF-XD4S,2019-06-03 12:36:00,14.4417,True,wet,can see water
+KHF-XD4S,2019-06-17 07:34:00,14.7083,True,wet,not saturated
+KHF-XD4S,2019-07-05 08:22:00,75.375,True,,
+KHF-XD4S,2019-07-26 06:12:00,,False,,
+KHF-XD4S,2019-08-04 08:42:00,,False,,
+KHF-XD4S,2021-06-06 07:06:00,70.535,True,,
+KHF-XD4S,2021-06-20 06:32:00,87.299,True,,
+KHF-XD4S,2021-07-04 07:46:00,,False,,no water
+KHF-XD4S,2021-11-14 08:16:00,21.0558,True,,
+KHF-XD4S,2024-05-19 10:39:00,14.165,True,moist,
+KHF-XD4S,2024-06-02 08:54:00,43.225,True,moist,
+KHF-XD4S,2024-06-16 08:52:00,85.695,True,dry,
+KHF-XD4S,2024-06-30 08:21:00,84.985,True,dry,
+KHF-XD4S,2024-07-13 08:07:00,85.485,True,dry,At bottom
+KHF-XD4S,2024-07-27 06:50:00,,False,dry,
+KHF-XD4S,2024-08-10 07:58:00,,False,dry,
+KHF-XD4S,2024-08-22 07:19:00,,False,dry,no water
+KHF-XD4S,2024-10-06 07:29:00,,False,dry,
+KHF-XD4S,2024-10-21 09:44:00,,False,dry,
+KHF-XD4S,2024-11-09 11:34:00,85.995,True,frozen,MH but well is within 50-60 cm of pine canopy; reading at bottom with water on sensor
+KHR-1,2019-07-05 07:26:00,16.225,True,,distributed to top well 51.0
+KHR-1,2019-07-26 06:50:00,32.1583,True,,
+KHR-1,2019-08-04 08:01:00,36.4583,True,,
+KHR-1,2019-08-20 07:28:00,38.6583,True,,
+KHR-1,2019-09-02 08:21:00,46.3917,True,,gray board down
+KHR-1,2019-10-05 08:05:00,17.025,True,,
+KHR-1,2019-10-20 07:42:00,14.8917,True,,match field notebook
+KHR-1,2021-06-06 07:41:00,35.6058,True,,
+KHR-1,2021-06-20 07:11:00,90.673,True,,
+KHR-1,2021-07-02 20:04:00,75.0266,True,,Friday night
+KHR-1,2021-07-04 07:03:00,74.5186,True,,gain of .02 inches
+KHR-1,2021-07-20 06:53:00,92.705,True,,
+KHR-1,2021-08-06 06:42:00,93.1114,True,,
+KHR-1,2021-08-22 11:40:00,93.6194,True,,mud at bottom
+KHR-1,2021-09-08 07:35:00,92.5018,True,dry,near bottom
+KHR-1,2021-09-24 08:23:00,93.6194,True,,"frost, mud at bottom"
+KHR-1,2021-10-06 10:26:00,,False,,no water
+KHR-1,2021-11-14 08:50:00,11.2218,True,,
+KHR-1,2024-05-19 09:44:00,7.365,True,saturated,sedge dominant
+KHR-1,2024-06-02 07:50:00,9.395,True,saturated,"water up to 5 cm in depth in the small swale next to the well; riparian well, yes! Took photos"
+KHR-1,2024-06-16 08:01:00,19.855,True,wet,
+KHR-1,2024-06-30 07:13:00,32.865,True,moist-wet,
+KHR-1,2024-07-13 07:27:00,50.645,True,moist,
+KHR-1,2024-07-27 06:16:00,65.065,True,dry-moist,
+KHR-1,2024-08-10 07:14:00,83.155,True,dry-moist,
+KHR-1,2024-08-22 06:46:00,93.615,True,dry,frozen soil
+KHR-1,2024-09-07 07:13:00,,False,dry,no water
+KHR-1,2024-09-21 08:46:00,93.925,True,dry,frozen soil; at bottom
+KHR-1,2024-10-06 07:01:00,93.615,True,dry,hitting bottom
+KHR-1,2024-10-21 09:18:00,94.225,True,moist-wet,at bottom
+KHR-1,2024-11-09 10:55:00,89.655,True,frozen,"tiny patches of snow, ~1 cm thick"
+KHR-1,2025-05-29 16:45:00,18.945,True,moist,"cord loose, moved sensor"
+KHR-1,2025-06-24 16:21:00,36.015,True,moist,
+KHR-1,2025-07-14 13:40:00,63.135,True,dry,
+KHR-1,2025-09-20 14:39:00,94.125,True,dry,at bottom; approx time based on hydrochron notes
+KHR-1,2025-10-19 17:38:00,93.315,True,,
+KHR-XD1N,2019-06-03 12:36:00,-11.0,True,overbank,"on overbank flowpath, must have measured outside of the well as -10, -11, -12"
+KHR-XD1N,2019-06-17 08:43:00,-9.9,True,overbank,
+KHR-XD1N,2019-07-05 07:30:00,29.7667,True,,
+KHR-XD1N,2019-07-26 15:03:00,41.7,True,,
+KHR-XD1N,2019-09-02 13:20:00,47.0333,True,,
+KHR-XD1N,2019-10-20 11:47:00,46.6,True,,mevaing: frozen
+KHR-XD1N,2021-06-06 07:38:00,54.132,True,,
+KHR-XD1N,2021-06-20 07:11:00,51.3888,True,,
+KHR-XD1N,2021-07-04 07:05:00,51.8968,True,,
+KHR-XD1N,2021-07-20 06:55:00,52.9128,True,,
+KHR-XD1N,2021-08-06 06:44:00,52.9128,True,,
+KHR-XD1N,2021-08-22 11:43:00,53.116,True,,
+KHR-XD1N,2021-09-08 07:39:00,53.116,True,dry,
+KHR-XD1N,2021-09-24 08:24:00,52.2016,True,,frost
+KHR-XD1N,2021-10-06 10:28:00,50.9367,True,,
+KHR-XD1N,2021-11-14 07:32:00,43.8704,True,,
+KHR-XD1N,2024-05-19 09:50:00,-5.555,True,overbank flow,
+KHR-XD1N,2024-06-02 07:51:00,17.805,True,saturated,creek NOT to top of bank but still flowing pretty good
+KHR-XD1N,2024-06-16 08:06:00,32.645,True,wet,
+KHR-XD1N,2024-06-30 07:15:00,40.975,True,moist,
+KHR-XD1N,2024-07-13 07:28:00,46.255,True,dry-moist,
+KHR-XD1N,2024-07-27 06:18:00,48.695,True,dry,
+KHR-XD1N,2024-08-10 07:16:00,50.115,True,dry,
+KHR-XD1N,2024-08-22 06:48:00,50.825,True,dry-moist,frost; logger not mine
+KHR-XD1N,2024-09-07 07:16:00,51.135,True,dry,logger (not mine)
+KHR-XD1N,2024-09-21 08:48:00,51.035,True,dry,logger (not mine)
+KHR-XD1N,2024-10-06 07:03:00,50.725,True,dry,
+KHR-XD1N,2024-10-21 09:20:00,50.925,True,moist,logger (not mine)
+KHR-XD1N,2024-11-09 10:57:00,49.815,True,frozen,other's logger
+KHR-XD1S,2019-07-05 08:28:00,35.0167,True,,
+KHR-XD1S,2019-09-02 13:12:00,51.35,True,,
+KHR-XD1S,2019-10-20 11:44:00,49.45,True,,
+KHR-XD1S,2021-06-06 07:08:00,51.9212,True,,
+KHR-XD1S,2021-06-20 06:30:00,52.6324,True,,
+KHR-XD1S,2021-07-04 07:50:00,53.3436,True,,
+KHR-XD1S,2021-07-20 07:39:00,54.4612,True,dry,
+KHR-XD1S,2021-08-06 07:30:00,54.766,True,,
+KHR-XD1S,2021-08-22 11:45:00,55.0708,True,,
+KHR-XD1S,2021-09-08 07:42:00,54.766,True,dry,
+KHR-XD1S,2021-09-24 08:26:00,53.5468,True,,frost
+KHR-XD1S,2021-10-06 10:29:00,51.7867,True,,
+KHR-XD1S,2021-11-14 08:18:00,44.7076,True,,
+KHR-XD1S,2024-05-19 10:42:00,,True,saturated,"water at surface, cap stuck"
+KHR-XD1S,2024-06-30 08:23:00,43.97,True,dry-moist,
+KHR-XD1S,2024-07-13 08:11:00,49.05,True,dry,
+KHR-XD1S,2024-07-27 06:53:00,51.59,True,dry,
+KHR-XD1S,2024-08-10 08:01:00,51.39,True,dry,
+KHR-XD1S,2024-08-22 07:20:00,51.59,True,dry,creek flowing on both sides
+KHR-XD1S,2024-09-07 07:48:00,51.08,True,dry,
+KHR-XD1S,2024-09-21 09:18:00,50.17,True,dry,logger (not mine)
+KHR-XD1S,2024-10-21 09:46:00,50.37,True,moist,logger (not mine)
+KHR-XD1S,2024-11-09 11:39:00,48.54,True,frozen,other's logger
+KHR-XD2N,2018-06-01 08:40:00,27.6075,True,,
+KHR-XD2N,2018-06-19 08:08:00,40.7308,True,,
+KHR-XD2N,2018-07-01 06:37:00,54.8067,True,,
+KHR-XD2N,2018-07-17 07:41:00,59.4175,True,,
+KHR-XD2N,2018-07-27 08:09:00,58.0508,True,,
+KHR-XD2N,2018-08-10 08:10:00,58.9842,True,,
+KHR-XD2N,2018-08-25 06:48:00,60.2842,True,,
+KHR-XD2N,2018-09-16 09:15:00,56.9842,True,,
+KHR-XD2N,2018-10-01 08:27:00,55.1175,True,,
+KHR-XD2N,2018-10-14 08:54:00,53.3508,True,,
+KHR-XD2N,2018-11-18 16:42:00,46.6508,True,,dot
+KHR-XD2N,2024-05-19 09:47:00,,,,blocked
+KHR-XD2N,2024-06-16 08:03:00,,,,Blocked
+KHR-XE2N,2018-06-01 09:30:00,54.7442,True,,"cap screw stuck on top, removed assembly"
+KHR-XE2N,2018-06-19 08:58:00,60.0358,True,,
+KHR-XE2N,2018-07-01 08:04:00,62.47,True,,
+KHR-XE2N,2018-07-17 08:24:00,64.69,True,,
+KHR-XE2N,2018-07-27 08:32:00,65.0567,True,,
+KHR-XE2N,2018-08-10 08:38:00,65.0567,True,,
+KHR-XE2N,2018-08-25 07:13:00,65.89,True,,
+KHR-XE2N,2018-09-16 08:47:00,65.1567,True,,
+KHR-XE2N,2018-10-01 07:51:00,65.29,True,,
+KHR-XE2N,2018-10-14 08:10:00,63.59,True,standing water,
+KHR-XE2N,2018-11-18 16:25:00,58.0567,True,,"meter not working, too cold"
+KHT-1,2021-07-20 07:11:00,62.9571,True,dry,"reading was 3.27 ft, if it's really 4.27 ft then welltop WL = 130.1496 cm and ground WL = 99 cm which seems too low compared to other readings in 2021."
+KHT-1,2021-08-06 07:03:00,89.1699,True,,
+KHT-1,2021-08-22 12:03:00,88.8651,True,,grasshoppers
+KHT-1,2021-09-08 08:00:00,85.1059,True,dry,
+KHT-1,2021-09-24 08:41:00,59.7059,True,dry,
+KHT-1,2021-10-06 10:47:00,56.8242,True,dry,
+KHT-1,2024-05-19 10:09:00,-19.7125,True,standing water,"0-1 cm of ponding, hand measured in cm"
+KHT-1,2024-06-02 08:17:00,-14.1825,True,saturated,"measured in well with measuring stick; small swale flowing with water between E4, E5S about 0.5 m wide with 2 cm deep water; within a few meters of E5S"
+KHT-1,2024-06-16 08:32:00,9.2075,True,wet,
+KHT-1,2024-06-30 07:38:00,31.8675,True,moist,dremmel
+KHT-1,2024-07-13 07:47:00,48.6275,True,moist,
+KHT-1,2024-07-27 06:35:00,55.0275,True,dry,
+KHT-1,2024-08-10 07:34:00,57.3675,True,dry-moist,
+KHT-1,2024-08-22 07:04:00,60.1075,True,dry,
+KHT-1,2024-09-07 07:33:00,58.0775,True,dry,
+KHT-1,2024-09-21 09:03:00,52.8975,True,dry,
+KHT-1,2024-10-06 07:17:00,51.8875,True,dry,
+KHT-1,2024-10-21 09:31:00,47.3075,True,moist,
+KHT-1,2024-11-09 11:12:00,39.1875,True,frozen,
+KHT-1,2025-05-29 16:57:00,2.9075,True,wet,"cord loose, moved sensor"
+KHT-1,2025-06-24 16:30:00,38.2675,True,dry-moist,
+KHT-1,2025-07-14 13:19:00,59.6075,True,dry,
+KHT-1,2025-09-20 15:02:00,50.1575,True,dry,approx time based on hydrochron notes
+KHT-1,2025-10-19 17:10:00,37.8575,True,,said 2.55 in book for second and third reading; guessing it's actually 2.45 based on first reading but the first reading could be the wrong one.
+KHT-2,2021-07-20 07:13:00,61.1119,True,dry,"readings were 3.69, 3.7, 3.7; on plot, looks about 20 cm too high; unclear when new well installed; removing this reading"
+KHT-2,2021-08-06 07:04:00,83.7687,True,,
+KHT-2,2021-08-22 12:05:00,86.5119,True,,grasshoppers
+KHT-2,2021-09-08 08:04:00,88.3407,True,dry,
+KHT-2,2021-09-24 08:45:00,63.3471,True,dry,
+KHT-2,2021-10-06 10:49:00,55.7742,True,dry,
+KHT-2,2021-11-14 07:56:00,-4.5217,True,,
+KHT-2,2024-05-19 10:12:00,-30.5625,True,standing water,"0-1 cm of ponding, hand measured in cm"
+KHT-2,2024-06-02 08:29:00,-27.3625,True,saturated,"measured in well with measuring stick, about 0.5 cm of water with boot test"
+KHT-2,2024-06-16 08:33:00,-11.1225,True,wet-saturated,
+KHT-2,2024-06-30 07:39:00,13.3575,True,wet,
+KHT-2,2024-07-13 07:48:00,34.8975,True,dry-moist,
+KHT-2,2024-07-27 06:36:00,44.1475,True,dry,frozen soil
+KHT-2,2024-08-10 07:36:00,49.3275,True,dry-moist,
+KHT-2,2024-08-22 07:05:00,54.5075,True,dry,
+KHT-2,2024-09-07 07:34:00,53.0875,True,dry,
+KHT-2,2024-09-21 09:04:00,46.9875,True,moist,
+KHT-2,2024-10-06 07:19:00,47.1975,True,dry,
+KHT-2,2024-10-21 09:33:00,39.8775,True,moist,
+KHT-2,2024-11-09 11:13:00,31.5475,True,frozen,"At Kiln-2 phenocam MH is 95% blonde, a bit of green (maybe 1-2 cm) at base of DESCES and sedges"
+KHT-2,2025-05-29 18:06:00,0.0,True,wet,at surface
+KHT-2,2025-06-24 16:32:00,16.7175,True,dry-moist,
+KHT-2,2025-07-14 13:17:00,43.2275,True,dry,
+KHT-XD6N,2018-06-01 08:32:00,27.03,True,,
+KHT-XD6N,2018-06-19 08:04:00,69.3633,True,,
+KHT-XD6N,2018-07-01 06:22:00,96.3508,True,,
+KHT-XD6N,2018-07-17 07:29:00,,False,,
+KHT-XD6N,2018-07-27 08:02:00,,False,,
+KHT-XD6N,2018-08-10 07:55:00,,False,,
+KHT-XD6N,2018-08-25 06:38:00,,False,dry,
+KHT-XD6N,2018-09-16 14:30:00,,False,,
+KHT-XD6N,2018-10-01 08:30:00,,False,,dot
+KHT-XD6N,2018-10-01 09:05:00,,False,,
+KHT-XD6N,2018-11-18 21:15:00,,False,,dot
+KHT-XD6N,2019-06-03 09:57:00,-1.9783,True,standing,ponding 1 cm
+KHT-XD6N,2019-06-17 08:51:00,7.955,True,wet,not saturated
+KHT-XD6N,2019-07-05 07:21:00,56.455,True,,
+KHT-XD6N,2019-07-26 06:54:00,95.6217,True,,
+KHT-XD6N,2019-08-04 07:58:00,,False,,
+KHT-XD6N,2019-09-21 08:12:00,,False,,
+KHT-XD6N,2021-06-06 06:28:00,85.1001,True,,
+KHT-XD6N,2021-06-20 07:14:00,76.816,True,,
+KHT-XD6N,2021-07-04 06:59:00,141.2304,True,,
+KHT-XD6N,2021-07-20 06:48:00,179.94,True,,
+KHT-XD6N,2021-08-06 07:54:00,192.5384,True,,
+KHT-XD6N,2021-08-22 11:37:00,192.8432,True,,mud at bottom
+KHT-XD6N,2021-09-08 07:29:00,193.7576,True,dry,mud at bottom
+KHT-XD6N,2021-09-24 08:16:00,194.672,True,,"mud, not at bottom"
+KHT-XD6N,2021-10-06 10:19:00,189.0367,True,,mud at bottom
+KHT-XD6N,2021-11-14 07:25:00,19.3104,True,,
+KHT-XD6N,2024-05-19 09:40:00,1.02,True,saturated,
+KHT-XD6N,2024-06-02 07:44:00,26.73,True,moist,
+KHT-XD6N,2024-06-16 07:58:00,63.3,True,moist,
+KHT-XD6N,2024-06-30 07:09:00,94.09,True,dry-moist,
+KHT-XD6N,2024-07-13 07:23:00,121.32,True,dry,
+KHT-XD6N,2024-07-27 06:12:00,146.51,True,dry,
+KHT-XD6N,2024-08-10 07:10:00,176.99,True,dry,
+KHT-XD6N,2024-08-22 06:42:00,188.58,True,dry,
+KHT-XD6N,2024-09-07 07:09:00,188.78,True,dry,"near bottom, mud on sensor"
+KHT-XD6N,2024-09-07 07:45:00,,False,dry,
+KHT-XD6N,2024-09-21 08:43:00,189.49,True,dry,near bottom
+KHT-XD6N,2024-10-06 06:57:00,188.88,True,dry,
+KHT-XD6N,2024-10-21 09:16:00,,False,dry-moist,
+KHT-XD6N,2025-05-29 16:41:00,50.2,True,dry-moist,
+KHT-XD6N,2025-06-24 16:17:00,98.36,True,dry,
+KHT-XD6N,2025-07-14 13:44:00,134.93,True,dry,
+KHT-XE4S,2018-07-01 07:40:00,47.1525,True,"no camera, but plant phenology notes in notebook",
+KHT-XE4S,2018-07-17 08:11:00,61.9042,True,,
+KHT-XE4S,2018-07-27 08:23:00,63.7042,True,,
+KHT-XE4S,2018-08-10 08:28:00,63.3125,True,,mud muck near bottom
+KHT-XE4S,2018-08-25 07:01:00,68.3375,True,,mud muck at bottom
+KHT-XE4S,2018-09-16 09:03:00,65.6375,True,,2 cm of mud at bottom
+KHT-XE4S,2018-10-01 08:09:00,64.9375,True,,dot
+KHT-XE4S,2018-10-14 08:22:00,41.9375,True,,
+KHT-XE4S,2018-11-18 16:15:00,26.3042,True,,
+KHT-XE4S,2019-06-03 11:49:00,-2.3625,True,,at edge between water flow down terrace and riparian on downslope
+KHT-XE4S,2019-06-17 08:09:00,-1.6625,True,saturated,
+KHT-XE4S,2019-07-05 07:53:00,3.0375,True,,
+KHT-XE4S,2019-07-26 06:36:00,43.7708,True,,
+KHT-XE4S,2019-08-04 08:19:00,54.8375,True,,
+KHT-XE4S,2019-08-20 06:48:00,63.7042,True,,mud at bottom
+KHT-XE4S,2019-09-02 08:37:00,62.8375,True,,MUCK!
+KHT-XE4S,2019-09-21 08:29:00,42.5708,True,,
+KHT-XE4S,2019-10-05 08:28:00,35.2042,True,,
+KHT-XE4S,2019-10-20 10:53:00,31.6375,True,,
+KHT-XE4S,2021-06-06 06:44:00,30.1063,True,,
+KHT-XE4S,2021-06-20 06:53:00,55.2015,True,,
+KHT-XE4S,2021-07-04 07:19:00,65.8695,True,,
+KHT-XE4S,2021-07-20 07:09:00,65.8695,True,dry,mud at bottom
+KHT-XE4S,2021-08-06 07:00:00,66.7839,True,,at bottom
+KHT-XE4S,2021-08-22 12:00:00,,False,,"no water, mud at bottom"
+KHT-XE4S,2021-09-08 07:58:00,67.3935,True,dry,"at bottom, clear water reading"
+KHT-XE4S,2021-09-24 08:40:00,,False,dry,no water
+KHT-XE4S,2021-10-06 10:44:00,54.4742,True,,
+KHT-XE4S,2021-11-14 07:50:00,4.5031,True,,
+KHT-XE4S,2024-05-19 10:07:00,-1.56,True,standing water,"flow, riparian?"
+KHT-XE4S,2024-06-02 08:15:00,0.67,True,saturated,1 cm of water with boot test
+KHT-XE4S,2024-06-16 08:30:00,13.27,True,wet,
+KHT-XE4S,2024-06-30 07:36:00,41.31,True,wet,
+KHT-XE4S,2024-07-13 07:46:00,65.29,True,moist,
+KHT-XE4S,2024-07-27 06:33:00,68.14,True,dry,
+KHT-XE4S,2024-08-10 07:31:00,68.64,True,dry,at bottom
+KHT-XE4S,2024-08-22 07:02:00,,False,dry,bottom at 4.67
+KHT-XE4S,2024-09-07 07:31:00,66.41,True,dry,
+KHT-XE4S,2024-09-21 09:00:00,48.12,True,dry,
+KHT-XE4S,2024-10-06 07:15:00,40.5,True,dry,
+KHT-XE4S,2024-10-21 09:30:00,36.03,True,moist-wet,
+KHT-XE4S,2024-11-09 11:10:00,33.69,True,frozen,well is slightly crooked
+KHT-XE5S,2018-06-01 09:15:00,7.7433,True,,
+KHT-XE5S,2018-06-19 08:55:00,30.18,True,,
+KHT-XE5S,2018-07-01 07:30:00,73.2542,True,,
+KHT-XE5S,2018-07-17 08:07:00,91.0758,True,,
+KHT-XE5S,2018-07-27 08:21:00,90.9758,True,,
+KHT-XE5S,2018-08-10 08:20:00,90.5092,True,,near bottom
+KHT-XE5S,2018-08-25 06:58:00,92.6092,True,,
+KHT-XE5S,2018-09-16 09:02:00,87.6758,True,,just up from bottom
+KHT-XE5S,2018-10-01 08:11:00,86.2425,True,,
+KHT-XE5S,2018-10-14 08:27:00,82.0758,True,,
+KHT-XE5S,2018-11-18 16:12:00,47.2758,True,,saw water
+KHT-XE5S,2019-06-03 11:43:00,1.5758,True,saturated,not ponded right here but around
+KHT-XE5S,2019-06-17 08:06:00,2.6092,True,wet,saturated within 0.5 m
+KHT-XE5S,2019-07-05 07:56:00,16.6758,True,,
+KHT-XE5S,2019-07-26 15:52:00,67.7092,True,,
+KHT-XE5S,2019-09-02 12:48:00,90.9092,True,,
+KHT-XE5S,2019-09-21 09:48:00,,False,,
+KHT-XE5S,2019-10-20 11:00:00,70.1425,True,,
+KHT-XE5S,2021-06-06 06:47:00,55.1073,True,,
+KHT-XE5S,2021-06-20 06:52:00,87.6193,True,,
+KHT-XE5S,2021-07-04 07:23:00,91.8865,True,,
+KHT-XE5S,2021-07-05 18:05:00,90.8705,True,,
+KHT-XE6S,2018-06-01 09:14:00,4.5567,True,,
+KHT-XE6S,2018-06-19 08:58:00,23.9242,True,,
+KHT-XE6S,2018-07-01 07:10:00,73.8775,True,,
+KHT-XE6S,2018-07-17 08:03:00,,False,,
+KHT-XE6S,2018-07-27 08:18:00,,False,,
+KHT-XE6S,2018-08-10 07:55:00,,False,,
+KHT-XE6S,2018-09-16 09:05:00,,False,,
+KHT-XE6S,2018-10-01 08:15:00,,False,,dot
+KHT-XE6S,2018-10-14 08:29:00,,False,,
+KHT-XE6S,2019-06-03 11:39:00,-1.8566,True,standing,1.5 to 3 cm deep
+KHT-XE6S,2019-06-17 08:03:00,-0.2233,True,saturated,
+KHT-XE6S,2019-07-05 07:59:00,4.5434,True,,
+KHT-XE6S,2019-07-26 06:47:00,65.9434,True,,
+KHT-XE6S,2019-08-04 08:24:00,87.4767,True,,
+KHT-XE6S,2019-08-20 06:53:00,,False,,
+KHT-XE6S,2019-09-02 08:40:00,,False,,gray board down
+KHT-XE6S,2019-09-21 08:32:00,,False,,
+KHT-XE6S,2019-10-05 08:30:00,,False,,
+KHT-XE6S,2021-06-06 06:52:00,39.7583,True,,
+KHT-XE6S,2021-06-20 06:50:00,80.0935,True,,
+KHT-XE6S,2021-07-04 07:25:00,138.8183,True,,at or near bottom
+KWF-1,2018-07-01 08:25:00,54.6792,True,,
+KWF-1,2018-07-17 08:46:00,74.1333,True,,
+KWF-1,2018-07-27 08:51:00,75.3,True,,
+KWF-1,2018-08-10 08:56:00,80.0,True,,near bottom
+KWF-1,2018-08-25 08:25:00,82.7667,True,,
+KWF-1,2018-09-16 14:00:00,78.7333,True,,well depth is 150.2
+KWF-1,2018-10-01 08:48:00,67.0,True,,
+KWF-1,2018-10-14 08:58:00,34.4667,True,,
+KWF-1,2018-11-18 15:30:00,28.3667,True,,dot
+KWF-1,2019-06-03 13:16:00,-3.0667,True,standing,flow depth 1.5 to 2 cm
+KWF-1,2019-06-17 07:02:00,-0.8333,True,,
+KWF-1,2019-07-05 08:42:00,16.2,True,,matches field notebook
+KWF-1,2019-07-26 05:59:00,35.8,True,,
+KWF-1,2019-08-04 08:00:00,56.0,True,,
+KWF-1,2019-08-20 07:15:00,70.4333,True,,
+KWF-1,2019-09-02 08:56:00,73.6,True,,
+KWF-1,2019-09-21 08:53:00,45.0333,True,,
+KWF-1,2019-10-05 08:49:00,28.2,True,,
+KWF-1,2019-10-20 12:14:00,21.8,True,,
+KWF-1,2021-06-06 07:19:00,10.9672,True,,
+KWF-1,2021-06-20 06:18:00,15.844,True,,
+KWF-1,2021-07-04 08:02:00,31.1856,True,,
+KWF-1,2021-07-20 07:53:00,75.28,True,dry,
+KWF-1,2021-08-06 07:40:00,76.296,True,,mud with sand
+KWF-1,2021-08-22 12:31:00,77.7184,True,,mud at or near bottom
+KWF-1,2021-09-08 08:24:00,76.1944,True,,
+KWF-1,2021-09-24 09:03:00,18.892,True,dry,
+KWF-1,2021-10-06 11:11:00,22.4367,True,,verified matches field notebook
+KWF-1,2021-11-14 08:33:00,1.2136,True,,"hole needs backfill, -2 cm from ground surface"
+KWF-1,2024-05-19 10:56:00,-2.435,True,overbank flow,
+KWF-1,2024-06-02 09:06:00,-0.705,True,standing water,"flow, 3-4 cm deep surrounding the pipe; pipe is loose"
+KWF-1,2024-06-16 09:04:00,0.505,True,standing water,backfill
+KWF-1,2024-06-30 08:03:00,0.205,True,standing water,willow
+KWF-1,2024-07-13 08:23:00,1.425,True,standing water,
+KWF-1,2024-07-27 07:03:00,2.035,True,standing water,
+KWF-1,2024-08-10 08:15:00,4.775,True,dry,
+KWF-1,2024-08-22 07:29:00,3.155,True,standing water,water is about 0.5cm deep; well is loose
+KWF-1,2024-09-07 07:58:00,5.385,True,saturated,soil needs to be packed down for winter
+KWF-1,2024-09-21 09:25:00,3.865,True,standing water,0.5 cm water
+KWF-1,2024-10-06 07:38:00,3.255,True,standing water,about 0.5 cm of water at the surface
+KWF-1,2024-10-21 09:55:00,3.255,True,standing water,1 cm of water
+KWF-1,2024-11-09 11:48:00,0.815,True,standing water,water may have flow to it
+KWF-2,2018-06-19 08:34:00,60.43,True,,
+KWF-2,2018-07-01 06:52:00,82.1258,True,,
+KWF-2,2018-07-17 07:55:00,,False,,
+KWF-2,2018-07-27 08:14:00,,False,,
+KWF-2,2018-08-10 07:55:00,,False,,
+KWF-2,2018-09-16 14:32:00,,False,,"dot, barometer in well"
+KWF-2,2018-10-01 08:18:00,,False,,"dot, barometer"
+KWF-2,2018-10-14 08:54:00,,False,,
+KWF-2,2019-06-03 12:10:00,0.0667,True,saturated,ponding nearby
+KWF-2,2019-06-17 07:52:00,1.7,True,saturated,cord on logger disturbed
+KWF-2,2019-07-05 08:09:00,5.1333,True,saturated,
+KWF-2,2019-07-26 15:15:00,44.3333,True,,barometer
+KWF-2,2019-08-20 17:45:00,69.3333,True,,logger removed 6:58a; jammed no water
+KWF-2,2019-09-02 12:35:00,77.3667,True,,clear
+KWF-2,2019-10-20 11:22:00,9.1333,True,,
+KWF-2,2021-06-06 06:58:00,50.7752,True,,
+KWF-2,2021-06-20 06:41:00,74.3,True,,ground to top = 6.8 cm
+KWF-2,2021-07-04 07:35:00,125.9128,True,,
+KWF-2,2021-07-05 18:00:00,131.9072,True,,
+KWF-2,2021-07-20 07:25:00,134.0408,True,dry,mud close to bottom
+KWF-2,2021-08-06 07:11:00,166.3496,True,,"logger caked in mud at bottom, move logger to KET-1"
+KWF-2,2021-08-22 12:11:00,,False,,"no water, increase height of well"
+KWF-2,2021-10-06 10:53:00,,False,,no water
+KWF-2,2021-11-14 08:07:00,19.5312,True,,barometer might have been in water
+KWF-2,2024-05-19 10:28:00,,True,standing water,"no well found, visually estimated that water is 0.5 cm above the surface"
+KWF-2,2024-06-02 08:44:00,3.61,True,saturated,measured in well with measuring stick
+KWF-2,2024-06-16 08:41:00,14.91,True,wet,measured with ruler in cm
+KWF-2,2024-06-30 07:46:00,56.42,True,moist-wet,
+KWF-2,2024-07-13 07:54:00,84.76,True,dry-moist,
+KWF-2,2024-07-27 06:43:00,109.96,True,dry-moist,check: is this actually a fan? Some very small shallow channels coming off the fan that were mapped previously
+KWF-2,2024-08-10 07:43:00,,False,dry,no water; removed logger; bottom at 4.77
+KWF-2,2024-08-22 07:10:00,139.83,True,dry,near or at bottom
+KWF-2,2024-09-07 07:39:00,140.44,True,dry,at bottom
+KWF-2,2024-09-21 09:09:00,140.14,True,dry-moist,near bottom
+KWF-2,2024-10-06 07:23:00,139.83,True,dry,at the bottom
+KWF-2,2024-10-21 09:38:00,73.08,True,moist,tiny patches of snow walking within 20 m of KWT-1 toward D6S
+KWF-2,2024-11-09 11:20:00,18.75,True,frozen,"may be a FAN or TERRACE, possibly older than the one at E5S; measured well with ruler; a lot of snow here and moisture on sides of well; distinct slope shift between KWT-1 towards the terrace, looks like the crux of the shift is just beyond the line of pines (where the camera is located); possible that KET-1 is at the distal end of the fan; should show up on the LiDAR and be measurable"
+KWF-2,2025-06-24 16:36:00,59.97,True,dry-moist,no humidity sensor here yet
+KWF-2,2025-07-14 13:12:00,96.96,True,dry,
+KWF-2,2025-09-20 15:32:00,139.22,True,dry,approx time based on hydrochron notes
+KWF-2,2025-10-19 16:46:00,,True,,groundwater near top
+KWF-XE8S,2018-06-01 09:13:00,-2.2463,True,,
+KWF-XE8S,2018-06-19 08:49:00,5.9029,True,,
+KWF-XE8S,2018-07-01 07:04:00,28.4454,True,,
+KWF-XE8S,2018-07-17 07:59:00,,False,,
+KWF-XE8S,2018-07-27 08:16:00,,False,,
+KWF-XE8S,2018-08-10 07:55:00,,False,,
+KWF-XE8S,2018-11-18 16:07:00,27.2846,True,,dot
+KWF-XE8S,2019-06-17 07:59:00,1.3512,True,saturated,
+KWF-XE8S,2019-07-05 08:05:00,15.6846,True,,
+KWF-XE8S,2019-07-26 06:20:00,44.6512,True,,
+KWF-XE8S,2019-08-04 08:30:00,,False,,
+KWF-XE8S,2019-09-21 08:37:00,,False,,
+KWF-XE8S,2021-06-06 06:55:00,44.196,True,,"well sheared at ground, needs replacement; reading from ground not top of well"
+KWF-XE8S,2021-06-20 06:45:00,84.495,True,,
+KWF-XE8S,2021-07-04 07:30:00,105.831,True,,"mud, near bottom"
+KWF-XE8S,2021-07-20 07:21:00,105.2214,True,dry,mud near bottom
+KWF-XE8S,2021-08-06 07:09:00,,False,,no water
+KWF-XE8S,2021-11-14 08:02:00,16.7278,True,,
+KWF-XE8S,2024-05-19 10:25:00,-0.745,True,standing water,
+KWF-XE8S,2024-06-02 08:35:00,1.895,True,saturated,needs backfill; small channel nearby with 4 cm depth water flow
+KWF-XE8S,2024-06-16 08:38:00,21.505,True,wet,
+KWF-XE8S,2024-06-30 07:43:00,47.815,True,wet,
+KWF-XE8S,2024-07-13 07:52:00,94.955,True,dry-moist,
+KWF-XE8S,2024-07-27 06:41:00,106.235,True,dry-moist,"at bottom; within reach of a willow branch, 1 m from edge of pine canopy"
+KWF-XE8S,2024-08-10 07:40:00,,False,dry-moist,no water; bottom at 4.6
+KWF-XE8S,2024-08-22 07:09:00,,False,dry,no water
+KWF-XE8S,2024-09-07 07:37:00,,False,dry,
+KWF-XE8S,2024-09-21 09:05:00,,False,dry-moist,
+KWF-XE8S,2024-10-06 07:22:00,,False,dry,
+KWF-XE8S,2024-10-21 09:36:00,,False,moist,
+KWF-XE8S,2024-11-09 11:16:00,105.835,True,frozen,"at bottom with a little mud, not sopping with water; def in pine canopy, also willow"
+KWR-1,2018-07-01 08:30:00,23.8242,True,,
+KWR-1,2018-07-17 08:51:00,30.4167,True,,
+KWR-1,2018-07-27 08:57:00,32.35,True,,
+KWR-1,2018-08-10 08:59:00,32.1833,True,,
+KWR-1,2018-08-25 08:20:00,33.9167,True,,
+KWR-1,2018-09-16 13:55:00,35.75,True,,stabilized with fenceposts
+KWR-1,2018-10-01 08:39:00,32.1167,True,,
+KWR-1,2018-11-18 15:26:00,36.2833,True,,L3 em at 3:22 PM
+KWR-1,2019-06-03 13:35:00,-8.7167,True,overbank,"complex flowpath through willows; streamflow depth of 7,7,7,8 cm"
+KWR-1,2019-06-17 06:55:00,-8.05,True,overbank,
+KWR-1,2019-07-05 08:48:00,5.1167,True,,matches field notebook
+KWR-1,2019-07-26 05:55:00,22.1833,True,,
+KWR-1,2019-08-04 08:51:00,24.2167,True,,
+KWR-1,2019-08-20 07:18:00,28.5833,True,,overgrown
+KWR-1,2019-09-02 09:00:00,30.25,True,,woot
+KWR-1,2019-09-21 08:58:00,29.5167,True,,
+KWR-1,2019-10-05 08:55:00,28.95,True,,
+KWR-1,2019-10-20 12:18:00,30.15,True,,
+KWR-1,2021-06-06 07:21:00,,,,cap stuck shut
+KWR-1,2021-06-20 12:56:00,34.257,True,,"ground to top = 75.7, 71.2, 70.4 cm"
+KWR-1,2021-07-04 08:05:00,34.257,True,,"ground to top is 61, 67, 72.4 (cm)"
+KWR-1,2021-07-20 07:56:00,34.257,True,dry,
+KWR-1,2021-08-06 07:43:00,35.1714,True,,
+KWR-1,2021-08-22 12:36:00,34.0538,True,,"wet mud, near bottom"
+KWR-1,2021-09-08 08:28:00,34.8666,True,dry,
+KWR-1,2021-09-24 09:07:00,34.8666,True,dry,
+KWR-1,2021-10-06 11:07:00,33.4617,True,,
+KWR-1,2021-11-14 08:38:00,16.5786,True,,
+KWR-1,2024-05-19 11:04:00,-9.995,True,overbank flow,"flow depth about 10 cm; field notebook says 3.40, 3.41, 3.41 ft but that's way too deep"
+KWR-1,2024-06-02 09:14:00,-0.635,True,standing water,flow in secondary channel; flow around well is at least 5 cm deep
+KWR-1,2024-06-16 09:09:00,13.685,True,wet-saturated,pruners
+KWR-1,2024-06-30 08:07:00,24.055,True,wet,""""""
+KWR-1,2024-07-13 08:28:00,31.165,True,moist,
+KWR-1,2024-07-27 07:07:00,34.415,True,moist,
+KWR-1,2024-08-22 07:33:00,36.545,True,dry,
+KWR-1,2024-09-07 08:01:00,36.855,True,dry,
+KWR-1,2024-09-21 09:30:00,36.245,True,dry,frost
+KWR-1,2024-10-06 07:40:00,36.245,True,dry,"secondary channel has water, appears stagnant"
+KWR-1,2024-10-21 09:56:00,35.125,True,moist-wet,tiny patches of snow around willow
+KWR-1,2024-11-09 11:51:00,34.715,True,frozen,"removed logger right after measured; flow in side channel, big snow patch leading up to willows about 1"" depth"
+KWR-1,2025-05-29 17:19:00,0.885,True,standing water,knotted sensor
+KWR-1,2025-06-24 16:57:00,27.605,True,wet,
+KWR-1,2025-07-14 11:51:00,34.105,True,moist,
+KWR-1,2025-09-20 16:20:00,36.245,True,dry-moist,approx time based on hydrochron notes
+KWR-1,2025-10-19 15:38:00,34.615,True,,
+KWR-XE1N,2018-07-01 08:00:00,41.15,True,,
+KWR-XE1N,2018-07-17 08:21:00,43.95,True,,
+KWR-XE1N,2018-07-27 08:30:00,45.4167,True,,
+KWR-XE1N,2018-08-10 08:37:00,46.0833,True,,
+KWR-XE1N,2018-08-25 07:15:00,47.85,True,,
+KWR-XE1N,2018-09-16 08:45:00,48.75,True,,stabilized with fence post
+KWR-XE1N,2018-10-01 07:55:00,49.55,True,,
+KWR-XE1N,2018-10-14 08:14:00,49.2833,True,,
+KWR-XE1N,2018-11-18 16:23:00,47.7833,True,,
+KWR-XE1N,2019-06-17 08:25:00,-6.85,True,overbank,
+KWR-XE1N,2019-07-05 07:43:00,22.1167,True,,
+KWR-XE1N,2019-07-26 06:36:00,38.0167,True,,
+KWR-XE1N,2019-08-04 08:12:00,41.5833,True,,
+KWR-XE1N,2019-08-20 06:31:00,44.8167,True,,
+KWR-XE1N,2019-09-02 08:31:00,46.05,True,,
+KWR-XE1N,2019-09-21 08:21:00,45.4833,True,,
+KWR-XE1N,2019-10-05 08:18:00,45.7167,True,,
+KWR-XE1N,2019-10-20 10:44:00,46.6167,True,,
+KWR-XE1N,2021-06-06 06:39:00,46.9892,True,,
+KWR-XE1N,2021-06-20 07:00:00,50.342,True,,
+KWR-XE1N,2021-07-04 07:14:00,50.7484,True,,
+KWR-XE1N,2021-07-20 07:04:00,51.7644,True,,
+KWR-XE1N,2021-08-06 06:53:00,51.6628,True,,
+KWR-XE1N,2021-08-22 11:51:00,52.0692,True,,"thalweg depth is 11.5 cm, between KWR-XE1N to KFR-XE1S - depth is 12-18.5 cm"
+KWR-XE1N,2021-09-08 07:49:00,51.4596,True,dry,
+KWR-XE1N,2021-09-24 08:33:00,50.4436,True,,frost
+KWR-XE1N,2021-10-06 10:37:00,48.2867,True,,max depth at creek thalweg perpendicular to cross section = 13.5 cm
+KWR-XE1N,2021-11-14 07:44:00,37.9468,True,,
+KWR-XE1N,2024-05-19 09:58:00,,True,overbank flow,"water at ground surface, could not cross creek"
+KWR-XE1N,2024-06-02 08:06:00,16.51,True,wet,"well is crooked, cannot straighten"
+KWR-XE1N,2024-06-16 08:21:00,31.34,True,moist,Crooked
+KWR-XE1N,2024-06-30 07:28:00,40.18,True,moist,will
+KWR-XE1N,2024-07-13 07:40:00,44.96,True,dry-moist,stage = 0.62
+KWR-XE1N,2024-07-27 06:28:00,47.8,True,dry-moist,
+KWR-XE1N,2024-08-10 07:25:00,48.72,True,dry-moist,
+KWR-XE1N,2024-08-22 06:57:00,49.02,True,dry,well is very crooked
+KWR-XE1N,2024-09-07 07:24:00,49.83,True,dry,crooked well
+KWR-XE1N,2024-09-21 08:56:00,49.83,True,dry,well crooked
+KWR-XE1N,2024-10-06 07:10:00,49.43,True,dry,fish with white lines under fins
+KWR-XE1N,2024-10-21 09:26:00,48.21,True,dry-moist,crooked well
+KWR-XE1N,2024-11-09 11:04:00,44.75,True,frozen,"seems like pine?; well is crooked, has fencepost and collars that need tighetning"
+KWT-2,2025-06-24 16:41:00,43.29,True,dry-moist,thunder; no humidity sensor here yet
+KWT-2,2025-07-14 13:05:00,48.27,True,moist,
+KWT-2,2025-09-20 15:41:00,50.51,True,dry-moist,approx time based on hydrochron notes
+KWT-2,2025-10-19 16:34:00,43.9,True,,
+LET-1,2019-07-07 09:00:00,32.8292,True,,
+LET-1,2019-07-26 08:50:00,54.8292,True,,
+LET-1,2019-08-05 08:24:00,67.0625,True,,
+LET-1,2019-08-20 08:14:00,81.1625,True,,
+LET-1,2019-09-03 07:53:00,89.7958,True,,
+LET-1,2019-09-21 07:29:00,64.6625,True,,
+LET-1,2019-10-05 09:39:00,52.1958,True,,
+LET-1,2019-10-19 10:13:00,43.9958,True,,
+LET-1,2021-05-20 06:54:00,32.9281,True,,
+LET-1,2021-06-06 09:20:00,45.2217,True,,
+LET-1,2021-06-20 09:06:00,61.4777,True,,
+LET-1,2021-07-04 09:05:00,78.0385,True,,
+LET-1,2021-07-20 09:27:00,108.5185,True,dry,
+LET-1,2021-08-06 09:22:00,108.5185,True,,mud at bottom
+LET-1,2021-08-22 13:32:00,110.0425,True,,wet mud near bottom
+LET-1,2021-09-08 10:10:00,110.0425,True,dry,mud near bottom
+LET-1,2021-09-24 10:28:00,110.3473,True,dry,mud near bottom
+LET-1,2021-10-06 08:03:00,110.3473,True,,mud at bottom
+LET-1,2021-11-14 08:45:00,17.8913,True,,sedges frozen to ground
+LET-1,2024-05-19 07:11:00,3.5625,True,wet-saturated,
+LET-1,2024-06-02 06:47:00,12.8125,True,wet,"almost saturated, no squishy water"
+LET-1,2024-06-16 07:08:00,34.2525,True,moist-wet,
+LET-1,2024-06-30 09:13:00,47.5625,True,wet,"car domt, poa"
+LET-1,2024-07-14 08:30:00,69.2025,True,moist,
+LET-1,2024-07-27 08:48:00,82.9125,True,moist,
+LET-1,2024-08-10 09:33:00,105.4725,True,dry-moist,0.8111
+LET-1,2024-08-22 09:43:00,107.6025,True,dry-moist,
+LET-1,2024-09-07 09:44:00,107.9125,True,dry,
+LET-1,2024-09-21 07:09:00,94.7025,True,dry,
+LET-1,2024-10-06 09:09:00,81.6925,True,dry,
+LET-1,2024-10-21 07:53:00,64.9325,True,moist,
+LHT-1,2019-07-07 08:59:00,38.7333,True,,
+LHT-1,2019-07-26 08:58:00,59.5,True,,
+LHT-1,2019-08-05 08:23:00,72.0333,True,,
+LHT-1,2019-08-20 08:11:00,84.7,True,,
+LHT-1,2019-09-03 07:51:00,89.1,True,,muddy
+LHT-1,2019-10-05 09:38:00,61.5333,True,,match field notebook
+LHT-1,2019-10-19 10:16:00,93.0333,True,,match field notebook
+LHT-1,2021-05-20 06:53:00,38.0296,True,,frost on ground and grass
+LHT-1,2021-06-06 09:19:00,51.7456,True,,mud
+LHT-1,2021-06-20 09:05:00,68.3064,True,,
+LHT-1,2021-07-04 09:03:00,84.664,True,,
+LHT-1,2021-07-20 09:25:00,93.4016,True,dry,mud
+LHT-1,2021-08-06 09:20:00,92.5888,True,,near bottom
+LHT-1,2021-08-22 13:31:00,98.0752,True,,mud at bottom
+LHT-1,2021-09-08 10:08:00,94.1128,True,dry,mud near bottom
+LHT-1,2021-09-24 10:27:00,94.4176,True,dry,mud near bottom
+LHT-1,2021-10-06 08:00:00,98.6848,True,,mud at bottom
+LHT-1,2021-11-14 08:40:00,16.592,True,,
+LHT-1,2024-05-19 07:09:00,6.8425,True,wet-saturated,
+LHT-1,2024-06-02 06:45:00,21.4725,True,moist,dew
+LHT-1,2024-06-16 07:06:00,40.8725,True,moist,
+LHT-1,2024-06-30 09:12:00,59.8725,True,moist,
+LHT-1,2024-07-14 08:30:00,81.1125,True,dry-moist,
+LHT-1,2024-07-27 08:46:00,92.7925,True,dry,fresh pile of soil
+LHT-1,2024-08-10 09:31:00,96.7525,True,dry-moist,0.8111
+LHT-1,2024-08-22 09:43:00,103.0525,True,dry,"at bottom; willows in view of camera are still fairly green with some rust, almost every leaf has a few dots; but willows to left are very yellow, leaves full of rust"
+LHT-1,2024-09-07 09:43:00,97.3625,True,dry,a lot of soil turned over recently
+LHT-1,2024-09-21 07:08:00,97.6725,True,dry,near bottom
+LHT-1,2024-10-06 09:08:00,67.4925,True,dry,at the bottom
+LHT-1,2024-10-21 07:52:00,92.2825,True,dry-moist,
+LWT-1,2019-07-07 09:02:00,28.3958,True,,
+LWT-1,2019-07-26 08:52:00,51.6625,True,,
+LWT-1,2019-08-05 08:27:00,62.5958,True,,
+LWT-1,2019-08-20 08:15:00,73.0292,True,,
+LWT-1,2019-09-03 07:55:00,78.3958,True,,
+LWT-1,2019-09-21 16:53:00,55.5292,True,,frozen in AM
+LWT-1,2019-10-05 09:41:00,48.9958,True,,
+LWT-1,2019-10-19 10:10:00,46.4292,True,,
+LWT-1,2021-05-20 06:57:00,37.6113,True,,
+LWT-1,2021-06-06 09:23:00,47.4665,True,,
+LWT-1,2021-06-20 09:07:00,60.1665,True,,
+LWT-1,2021-07-04 09:11:00,64.2305,True,,
+LWT-1,2021-07-20 09:28:00,71.1393,True,dry,
+LWT-1,2021-08-06 09:25:00,76.3209,True,,
+LWT-1,2021-08-22 13:34:00,79.9785,True,,
+LWT-1,2021-09-08 10:12:00,81.5025,True,dry,
+LWT-1,2021-09-24 10:30:00,77.8449,True,dry,
+LWT-1,2021-10-06 08:05:00,47.3649,True,,
+LWT-1,2021-11-14 08:46:00,28.1625,True,,
+LWT-1,2024-05-19 07:13:00,11.9025,True,moist,
+LWT-1,2024-06-02 06:48:00,22.2725,True,moist,
+LWT-1,2024-06-16 07:12:00,38.6225,True,moist,
+LWT-1,2024-06-30 09:15:00,48.3825,True,moist,
+LWT-1,2024-07-14 08:33:00,68.0925,True,dry,
+LWT-1,2024-07-27 08:50:00,70.5325,True,dry,
+LWT-1,2024-08-10 09:34:00,72.9725,True,dry,0.8111
+LWT-1,2024-08-22 09:46:00,73.8825,True,dry,
+LWT-1,2024-09-07 09:45:00,73.5825,True,dry,
+LWT-1,2024-09-21 07:11:00,72.0525,True,dry,
+LWT-1,2024-10-06 09:10:00,70.8325,True,dry,barometer
+LWT-1,2024-10-21 07:54:00,58.3425,True,moist,"water in cap, puddles on road"
