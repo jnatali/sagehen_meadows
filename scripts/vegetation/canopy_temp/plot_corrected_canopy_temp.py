@@ -25,7 +25,8 @@ import matplotlib.pyplot as plt
 SOURCE_DIR = os.path.join('..','..', '..', 'data', 'field_observations', 'vegetation', 'canopy_temp')
 
 # 3. Base name of the files to search for
-SOURCE_FILE_PATTERN = "TC_CORRECTED_*.csv"
+SOURCE_FILE_PATTERN = "canopy_temp_CORRECTED_*.csv"
+
 
 # --- Define OUTPUT file (where you save the new graphs TO) ---
 OUTPUT_DIR = os.path.join('..','..', '..', 'results', 'plots', 'vegetation', 'canopy_temp')
@@ -71,6 +72,8 @@ if list_of_files:
     print(f"Loading most recent source file (by name): {os.path.basename(source_file_path)}")
 
     existing_df = pd.read_csv(source_file_path)
+    
+    
     # FILTER FOR PLANTS ONLY
     if 'target_type' in existing_df.columns:
         plant_df = existing_df[existing_df['target_type'].astype(str).str.lower() == 'plant'].copy()

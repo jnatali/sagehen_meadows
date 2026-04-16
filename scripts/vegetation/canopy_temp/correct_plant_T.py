@@ -16,7 +16,7 @@ were defined, see github issue:
 
 TODO:
     - Use ground surface AND background correction. See notes in Issue #19.
-    - Validation logic? Create a function for this.
+    - Create one validation function for all validation logic
     - Calculate error
 
 """
@@ -93,7 +93,7 @@ df_plants = df_plants.sort_values(['well_id', 'Time'])
 # time difference from previous row within each well
 df_plants['time_diff'] = df_plants.groupby('well_id')['Time'].diff()
 
-# set time tresholds of interest
+# set time thresholds of interest
 threshold_1h = pd.Timedelta('1h')
 threshold_2h = pd.Timedelta('2h')
 
@@ -201,8 +201,8 @@ def solve_tc(row):
     if row['target_type_lower'] != 'plant':
         return np.nan
     print(f"calc tc for {row['well_id']} and {row['Date']}")
-    if (row['well_id'] == 'KWT-2'):
-        print("pause")
+    # if (row['well_id'] == 'KWT-2'):
+    #     print("pause")
     e_p = EMISSIVITY['plant']
     f_p = row['percent_cover'] / 100.0
     ts_k_4 = (row['Target'] + 273.15)**4
@@ -220,11 +220,6 @@ grouped_averages['Temp_canopy_C'] = grouped_averages.apply(solve_tc, axis=1)
 #df_original['Temp_canopy_corrected_diff'] = df_original['Target'] - df_original['Temp_canopy_C']
 
 
-
-
-
-
-
 # 7. # Clean up data and save the final "corrected" file
 
 # Only keep plants
@@ -234,9 +229,9 @@ plants_only = grouped_averages[
 
 # Rm rows with no Temp canopy calc
 plants_only = plants_only[plants_only['Temp_canopy_C'].notna()]
-
+plants_only = plants_only.rename(columns={'Target': 'Temp_target_RAW_c'})
 # Rm temp columns
-cols_to_drop = ['Target','percent_cover', 'f', 'Temp_K', 'energy_contrib', 
+cols_to_drop = ['percent_cover', 'f', 'Temp_K', 'energy_contrib', 
                 'target_type_lower', 'sum_noise']
 
 # Setup output file

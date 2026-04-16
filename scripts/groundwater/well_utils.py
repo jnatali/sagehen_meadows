@@ -12,7 +12,7 @@ throughout the project.
 @author: jnat
 """
 
-# --- DUNDERS ---
+# ---- DUNDERS ---
 __author__ = 'Jennifer Natali'
 __copyright__ = 'Copyright (C) 2026 Jennifer Natali'
 __license__ = 'NOT Licensed, Private Code under Development, DO NOT DISTRIBUTE'
@@ -20,13 +20,13 @@ __maintainer__ = 'Jennifer Natali'
 __email__ = 'jennifer.natali@berkeley.edu'
 __status__ = 'Development'
 
-# --- IMPORTS ---
+# ---- IMPORTS ---
 ## Basic libraries
 import pandas as pd
 from pathlib import Path
 
 
-# --- GLOBAL VARIABLES ---
+# ---- GLOBAL VARIABLES ---
 
 ## -- INITIALIZE FILE VARIABLES --
 
@@ -38,7 +38,7 @@ GW_DIR = DATA_DIR / "field_observations/groundwater"
 VALID_WELL_ID_PATH = GW_DIR / "well_unique_id.txt"
 CORRECTIONS_PATH = GW_DIR / "well_renamed_id.csv"
 
-# --- FUNCTIONS ---
+# ---- FUNCTIONS ---
 
 ## I/O Helpers
 def load_valid_well_ids(path):
