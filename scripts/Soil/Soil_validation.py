@@ -7,7 +7,7 @@ import math
 
 # Define Source File
 OUTPUT_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
-OUTPUT_FILE_PATTERN = "soil_survey_at_wells_updatecsv"
+OUTPUT_FILE_PATTERN = "soil_survey_at_wells_update_w_G.csv"
 output_path = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN)
 
 if not os.path.exists(OUTPUT_DIR):
@@ -16,7 +16,7 @@ if not os.path.exists(OUTPUT_DIR):
 
 # Define Source File
 SOURCE_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
-SOURCE_FILE_PATTERN = "soil_survey_at_wells.csv"
+SOURCE_FILE_PATTERN = "soil_survey_at_wells_update.csv"
 file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
 
 print(f"Loading data from: {file_path}")
