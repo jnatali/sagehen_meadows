@@ -6,8 +6,8 @@ import os
 import math
 
 # Define Source File
-OUTPUT_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil','Update')
-OUTPUT_FILE_PATTERN = "soil_survey_at_wells.csv"
+OUTPUT_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
+OUTPUT_FILE_PATTERN = "soil_survey_at_wells_updatecsv"
 output_path = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN)
 
 if not os.path.exists(OUTPUT_DIR):
@@ -79,7 +79,7 @@ gravel_amount_map = {
 def extract_gravel_info(subclass_str):
     # Return empty values if the row is empty (NaN)
     if pd.isna(subclass_str):
-        return pd.Series([None, None])
+        return pd.Series([None, 0])
     
     # Split by comma in case there are still multiple items 
     words = [word.strip().upper() for word in subclass_str.split(',')]
@@ -93,17 +93,6 @@ def extract_gravel_info(subclass_str):
     # Return empty if no gravel codes are found
     return pd.Series([None, 0])
 
-#Clean up any empty strings (like "") by converting them to actual NaNs so pandas can see them
-df['start depth (cm)'] = df['start depth (cm)'].replace(r'^\s*$', np.nan, regex=True)
-df['stop depth (cm)'] = df['stop depth (cm)'].replace(r'^\s*$', np.nan, regex=True)
-
-# Convert start depth inches to cm ONLY where the cm column is missing
-missing_start = df['start depth (cm)'].isna()
-df.loc[missing_start, 'start depth (cm)'] = (df.loc[missing_start, 'start depth (in)'] * 2.54).round(2)
-
-# Convert stop depth inches to cm ONLY where the cm column is missing
-missing_stop = df['stop depth (cm)'].isna()
-df.loc[missing_stop, 'stop depth (cm)'] = (df.loc[missing_stop, 'stop depth (in)'] * 2.54).round(2)
 
 # Split the 'soil texture' column at the first comma and expand into two columns
 df[['texture', 'sub-class']] = df['soil texture'].str.split(',', n=1, expand=True)
