@@ -1,0 +1,257 @@
+#,well_id,date,source,start_depth_cm,stop_depth_cm,start depth (in),stop depth (in),horizon,organic matter,soil texture,water content,roots,color,redox,notes,texture,sub-class,soil_texture_code,gravel size,gravel amount,gravel_amount_percent
+1,EER-1,5/30/2018,black spiral,0,20.32,0,8,,,"clay, HO",moist,C/F-M,dark brown,,crumbly,clay,HO,C,,0,0
+,EER-1,5/30/2018,black spiral,20.32,40.64,8,16,,,"clay, HO",moist,"C/VF, F/F-M",dark brown,,"slick, smooth",clay,HO,C,,0,0
+,EER-1,5/30/2018,black spiral,40.64,50.8,16,20,,,"clay, GS, MK",saturated,"M/M, C/VF-F",dark brown,,,clay,"GS, MK",C,,0,0
+,EER-1,5/30/2018,black spiral,50.8,60.96,20,24,,,"sandy clay, GR",saturated,C/VF-M,dark brown,,rounded GR,sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,EER-1,5/30/2018,black spiral,60.96,73.66,24,29,,,"sandy clay, GR",saturated,C/M,dark brown,,rounded F-M GR,sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+2,EHR-1,5/30/2018,black spiral,0,5.08,0,2,,,"clay, HO",moist,M/F-M,dark brown,,crumbly,clay,HO,C,,0,0
+,EHR-1,5/30/2018,black spiral,5.08,30.48,2,12,,,clay,moist,M/F-M,dark brown,,slick,clay,,C,,0,0
+,EHR-1,5/30/2018,black spiral,30.48,48.26,12,19,,,sandy clay,moist,M/F-M,dark brown,,,sandy clay,,SC,,0,0
+,EHR-1,5/30/2018,black spiral,48.26,61.595,19,24.25,,,sandy clay to silty clay,saturated,M/F-M,light brown,,,sandy clay ,,SC,,0,0
+,EHR-1,5/30/2018,black spiral,61.595,74.93,24.25,29.5,,,sandy clay to silty clay,saturated,M/F-M,light brown,,,silty clay,,SIC,,0,0
+,EHR-1,5/30/2018,black spiral,74.93,86.36,24.25,34,,fibrous,clay loam,moist,M/M-F,dark brown,,did not appear as saturated,clay loam,,CL,,0,0
+,EHR-1,5/30/2018,black spiral,86.36,95.25,34,37.5,,,clay loam to clay GR,saturated,F/M-F,med brown,,rounded GR,clay loam,,CL,,0,0
+,EHR-1,5/30/2018,black spiral,95.25,104.14,37.5,41,,,clay loam to clay GR,saturated,F/M-F,med brown,,rounded GR,clay gr,GR,C,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+3,EWR-1,5/31/2018,black spiral,0,22.86,0,9,,"grassy, fibrous","clay, HO",saturated,"M/M-F, F/C",dark brown,,,clay,HO,C,,0,0
+,EWR-1,5/31/2018,black spiral,22.86,27.94,9,11,,,"sandy clay, GR",saturated,M/F,brown,,rounded  pebbles,sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,EWR-1,5/31/2018,black spiral,27.94,40.64,11,16,,,clay,saturated,,,,,clay,,C,,0,
+,,,,,,,,,,,,,,,,,,,,,
+4,EET-1,5/31/2018,black spiral,0,10.16,0,4,,"grassy, fibrous","HO, MPT",sturated,M/VF-M,dark black brown,,,ho,MPT,,,0,0
+,EET-1,5/31/2018,black spiral,10.16,22.86,4,9,,,clay,saturated,M/VF-M,dark brown,,,clay,,C,,0,0
+,EET-1,5/31/2018,black spiral,22.86,40.64,9,16,,,"clay silt, GR",saturated,"C/F, M/VF","dark brown, grayish blue",,3mm pebbles,clay silt,GR,SIC,"(5, 20)","(0.15, 0.35)",0.35
+,EET-1,5/31/2018,black spiral,40.64,55.88,16,22,,,"sandy clay, VGR",saturated,C/F,mottled tan,,"angular gravel, 5-12 mm",sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)",0.6
+,EET-1,5/31/2018,black spiral,55.88,71.12,22,28,,,"clay loam, GR",saturated,"C/VF, F, M-F",mottled tan,,whole and decomposing gravel,clay loam,GR,CL,"(5, 20)","(0.15, 0.35)",0.35
+,EET-1,5/31/2018,black spiral,71.12,96.52,28,38,,,"clay loam, GR",saturated,F/VF-F,mottled tan,,"few fiber chunks, whole and decomposing gravel",clay loam,GR,CL,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+5,EET-1,5/31/2018,black spiral,0,10.16,0,4,,,HO,moist,M/VF-F,dark black brown,,hummic,ho,,,,0,0
+,EET-1,5/31/2018,black spiral,10.16,25.4,4,10,,,clay,moist,C/F-M,dark brown,,"small bits of broken, subangular gravel",clay,,C,,0,0
+,EET-1,5/31/2018,black spiral,25.4,45.72,10,18,,,"sandy clay, GR",saturated,F/VF-F,brown-tan,,"subangular gravel, large sand to 8 mm",sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,EET-1,5/31/2018,black spiral,45.72,64.77,18,25.5,,,"sandy clay loam, VGR",saturated,F/VF-F,brown-tan,,,sandy clay loam,VGR,SCL,"(5, 20)","(0.35, 0.6)",0.6
+,EET-1,5/31/2018,black spiral,64.77,76.2,25.5,30,,,"loam, FGR",,F/F,brown-tan,,,loam,FGR,L,"(2, 5)","(0.15, 0.35)",0.35
+,EET-1,5/31/2018,black spiral,76.2,88.9,30,35,,,"loam, GR",,C/F-M,"brown-tan, mottled",,decomposing gravel,loam,GR,L,"(5, 20)","(0.15, 0.35)",0.35
+,EET-1,5/31/2018,black spiral,88.9,95.25,35,37.5,,fibrous,sandy clay loam,,,"brown-tan, mottled",,decomposing gravel,sandy clay loam,,SCL,,0,0
+,EET-1,5/31/2018,black spiral,95.25,99.06,37.5,39,,fibrous,sandy clay loam,,C/VF,"brown-tan, mottled, colorful",,,sandy clay loam,,SCL,,0,0
+,,,,,,,,,,,,,,,,,,,,,
+6,EWT-1,5/31/2018,black spiral p8,0,5.08,0,2,,"grassy, fibrous roots","HO, no mineral sediment",moist,M/VF-F,dark brown,,,ho,no mineral sediment,,,0,0
+,EWT-1,5/31/2018,black spiral p8,5.08,10.16,2,4,,,"clay, HO",moist,M/VF-F,dark brown,,crumbly,clay,HO,C,,0,0
+,EWT-1,5/31/2018,black spiral p8,10.16,30.48,4,12,,,"clay, HO, GR",moist,"M/F, F/C",dark brown,,"subangular GR, 6-12 mm",clay,"HO, GR",C,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-1,5/31/2018,black spiral p8,30.48,45.72,12,18,,,"clay loam, GR",saturated,"M/F, C/VF","brown, reddish",,"gritty, subangular gravel, 6-20 mm",clay loam,GR,CL,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-1,5/31/2018,black spiral p8,45.72,57.785,18,22.75,,,"sandy clay to clay, GR",saturated,F/F,"brown, reddish",,"subangular gravel, 6-30 mm",sandy clay ,GR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-1,5/31/2018,black spiral p8,57.785,69.85,22.75,27.5,,,"sandy clay to clay, GR",saturated,F/F,"brown, reddish",,"subangular gravel, 6-30 mm", clay,GR,C,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-1,5/31/2018,black spiral p8,69.85,80.01,27.5,31.5,,,"clay loam, GR",saturated,"C/M, F/C",brown,,,clay loam,GR,CL,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-1,5/31/2018,black spiral p8,80.01,83.82,31.5,33,,,clay,saturated,F/F,brown,,,clay,,C,,0,0
+,EWT-1,5/31/2018,black spiral p8,83.82,91.44,33,36,,,clay,saturated,F/VF,light brown,,"some grit, red-orange oxide",clay,,C,,0,0
+,EWT-1,5/31/2018,black spiral p8,91.44,97.79,36,38.5,,,clay loam,saturated,F/F,"light brown, mottled",,"white-red mottling, red-orange oxide",clay loam,,CL,,0,0
+,EWT-1,5/31/2018,black spiral p8,97.79,109,38.5,43,,,clay loam,saturated,,light brown,,"backfill with sand to 39"" depth",clay loam,,CL,,0,0
+29,EWT-1,7/15/2021,yellow p77,109,120,,,,,sandy clay,moist,F/VF-F,"10 YR, 5/4; orange mottled",,"coarse sand, mottled",sandy clay,,SC,,0,0
+,EWT-1,7/15/2021,yellow p77,120,148,,,,,sandy clay,moist,F/VF,"10 YR, 5/4; orange mottled",,"finer sand, mottled",sandy clay,,SC,,0,0
+,EWT-1,7/15/2021,yellow p77,148,151,,,,,sandy clay,saturated,F/VF,"10 YR, 5/3",,,sandy clay,,SC,,0,0
+,EWT-1,7/15/2021,yellow p77,151,152,,,,,GR,,,,,"hit rock, could not auger beyond it",gr,,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,
+8,KER-1,6/18/2018,black spiral p14,0,5.08,0,2,,HO,silty clay,very moist,"M/VF-F, C/C",dark brown,,,silty clay,,SIC,,0,0
+,KER-1,6/18/2018,black spiral p14,5.08,35.56,2,14,,HPM,clay,moist,M/C,dark brown,,"at 14"" found charcoal",clay,,C,,0,0
+,KER-1,6/18/2018,black spiral p14,35.56,52.07,14,20.5,,,clay loam,saturated,"C/C, C/F-M/VF",dark brown,,,clay loam,,CL,,0,0
+,KER-1,6/18/2018,black spiral p14,52.07,63.5,20.5,25,,fibers,clay loam,saturated,"F/C, C/F-VF",dark brown,,"interlayered with sandy clay loam, charcoal ",clay loam,,CL,,0,0
+,KER-1,6/18/2018,black spiral p14,63.5,71.12,25,28,,,"clay, VGR",saturated,VF/F-VF,brown,,coarse sand; pebbles to 12 mm rounded,clay,VGR,C,"(5, 20)","(0.35, 0.6)",0.6
+,KER-1,6/18/2018,black spiral p14,71.12,81.28,28,32,,fibers midway,"sandy loam, GR",saturated,"C/F, C/C",brown gray,,"roots especialy midway; pebbles to 22 mm, rounded",sandy loam,GR,SL,"(5, 20)","(0.15, 0.35)",0.35
+,KER-1,6/18/2018,black spiral p14,81.28,83.82,32,33,,,GR,saturated,"C/C, C/F-M/VF",brown gray,,"bottom of hole, pebbles and gravel",gr,,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+9,KWT-1,6/20/2018,black spiral p14,0,12.7,0,5,,fibrous,"hummus, clay, HO",moist,M/C-F,dark brown,,,hummus,HO,C,,0,0
+,KWT-1,6/20/2018,black spiral p14,12.7,19.05,5,7.5,,,XST,,,,,extracted big rock,xst,,XST,,0,0
+,KWT-1,6/20/2018,black spiral p14,19.05,30.48,7.5,12,,,clay,moist,"M/C-VC, C/F",dark brown,,,clay,,C,,0,0
+,KWT-1,6/20/2018,black spiral p14,30.48,44.45,12,17.5,,,silty clay,wet,"C/C, F/F",brown,,,silty clay,,SIC,,0,0
+,KWT-1,6/20/2018,black spiral p14,44.45,71.12,17.5,28,,,sandy clay loam,wet-saturated,F/F-VF,tan brown,,"mottled at bottom, decomposed pebbles",sandy clay loam,,SCL,,0,0
+,KWT-1,6/20/2018,black spiral p14,71.12,91.44,28,36,,,"sandy clay loam, VGR",saturated,"F/C, F/F",tan pink,,decomposed rock was pink; pebbles to 30 mm,sandy clay loam,VGR,SCL,"(5, 20)","(0.35, 0.6)",0.6
+,KWT-1,6/20/2018,black spiral p14,91.44,104.14,36,41,,,GR,saturated,F/F-VF,"tan, mottled",,"decomposed rock was red,orange and gray",gr,,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+11,E1N,6/20/2018,black spiral p16,0,5.08,0,2,,fibrous,HO,dry-moist,M/C-F,dark brown,,,ho,,O,,0,0
+,E1N,6/20/2018,black spiral p16,5.08,15.24,2,6,,,sandy clay,moist,M/C-F,dark brown,,,sandy clay,,SC,,0,0
+,E1N,6/20/2018,black spiral p16,15.24,33.02,6,13,,grassy,sandy clay,moist,M/C-F,dark brown,,,sandy clay,,SC,,0,0
+,E1N,6/20/2018,black spiral p16,33.02,58.42,13,23,,,"sandy clay loam, VGR",saturated,"C/F-VF, F/C",dark brown,,,sandy clay loam,VGR,SCL,"(5, 20)","(0.35, 0.6)",0.6
+,E1N,6/20/2018,black spiral p16,58.42,60.96,23,24,,"fibrous, HO, HPM",silty clay,saturated,M/F-VF,dark brown,,,silty clay,,SIC,,0,0
+,E1N,6/20/2018,black spiral p16,60.96,63.5,24,25,,,GR,,,,,22 mm gravels,gr,,,"(5, 20)","(0.15, 0.35)",0.35
+,E1N,6/20/2018,black spiral p16,63.5,73.66,25,29,,,GR,,,,,"60 mm gravels, rounded to sub-angular",gr,,,"(5, 20)","(0.35, 0.6)",0.6
+,,,,,,,,,,,,,,,,,,,,,
+12,KWR-1,6/20/2018,black spiral p17,0,10.16,0,4,,fibrous,clay loam,wet,"M/F-VF, C/C",dark brown,,,clay loam,,CL,,0,0
+,KWR-1,6/20/2018,black spiral p17,10.16,25.4,4,10,,,clay loam,wet,"M/C, M/F-F/F",dark brown,,,clay loam,,CL,,0,0
+,KWR-1,6/20/2018,black spiral p17,25.4,63.5,10,25,,,clay loam,saturated,"C/C, F/VC",brown,,,clay loam,,CL,,0,0
+,KWR-1,6/20/2018,black spiral p17,63.5,81.28,25,32,,,"sandy clay loam, GR",saturated,C/F-VF,brown,,"mostly pebbles, a few gravels > 11 mm",sandy clay loam,GR,SCL,"(5, 20)","(0.15, 0.35)",0.35
+,KWR-1,6/20/2018,black spiral p17,81.28,83.82,32,33,,,GR,saturated,,,,bottom of well,gr,,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+14,KHF-1,6/30/2018,black spiral p19,0,5.08,0,2,,HO,HO,dry,"M/M-VF, F/C",brown,,crumbly,ho,,O,,0,0
+,KHF-1,6/30/2018,black spiral p19,5.08,15.24,2,6,,,"silty clay, FGR",dry,C/M-VF,brown,,,silty clay,FGR,SIC,"(2, 5)","(0.15, 0.35)",0.35
+,KHF-1,6/30/2018,black spiral p19,15.24,35.56,6,14,,,clay,moist,F/M-F,light brown,,,clay,,C,,0,0
+,KHF-1,6/30/2018,black spiral p19,35.56,57.15,14,22.5,,,"clay loam, FGR, MGR",wet,C/F-VF,tan,,,clay loam,"FGR, MGR",CL,"(2, 5)","(0.15, 0.35)",0.35
+,KHF-1,6/30/2018,black spiral p19,57.15,71.12,22.5,28,,,"sandy clay, FGR",moist,F/C,tan and orange,,,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,KHF-1,6/30/2018,black spiral p19,71.12,84,28,34,,,sandy clay,saturated,"F/VF, F/fibrous",tan and orange,,some chunks of soil dry inside,sandy clay,,SC,,0,0
+27,KHF-1,6/29/2021,yellow p55,84,100,,,,,"sandy clay, FGR",wet non-satiated,F/VF,7.5 YR 3/3,,"gravel sub-rounded; deepened well, prior depth 84 cm",sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,KHF-1,6/29/2021,yellow p55,100,111,,,,,"sandy clay, VFGR",wet non-satiated,,7.5 YR 3/3,,gravel sub-rounded,sandy clay,VFGR,SC,"(2, 5)","(.35,.6)",0.6
+,KHF-1,6/29/2021,yellow p55,111,140,,,,,"sandy clay, VFGR",wet non-satiated,F/VF-F,"7.5 YR, 3/4",,gravel subangular,sandy clay,VFGR,SC,"(2, 5)","(.35,.6)",0.6
+,KHF-1,6/29/2021,yellow p55,140,149,,,,,"clay, XCGR",wet non-satiated,F/VF,"7.5 YR, 3/4",,gravel subangular,clay,XCGR,C,"(20,76)","(.35,.6)",0.6
+,KHF-1,6/29/2021,yellow p55,149,167,,,,,"clay, XCGR",saturated,F/VF,"10 YR, 3/6",,"a few 50-60 mm gravels, subangular",clay,XCGR,C,"(20,76)","(.35,.6)",0.6
+,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,0,0
+15,KEF-1,6/30/2018,black spiral p19,0,5.08,0,2,,"HO, grassy, fibrous",HO,moist,M/C-F,dark brown,,,ho,,O,,0,0
+,KEF-1,6/30/2018,black spiral p19,5.08,27.94,2,11,,,clay,saturated,C/C-F,dark brown,,,clay,,C,,0,0
+,KEF-1,6/30/2018,black spiral p19,27.94,38.1,11,15,,fibrous,"clay, ST",saturated,"F/C, C/F-VF",gray brown,,hit two large stones (ST),clay,ST,C,,0,0
+,KEF-1,6/30/2018,black spiral p19,38.1,66.04,15,26,,fibrous,"sandy clay, FGR",saturated,M/F-VF,dark gray,,gravels subangular,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,KEF-1,6/30/2018,black spiral p19,66.04,81.28,26,32,,,"sandy clay loam, FGR, CGR",saturated,"F/VF, F/fibrous","gray and tan, mottled orange",,gravels subangular,sandy clay loam,"FGR, CGR",SCL,"(2, 5)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+16,KWF-1,6/30/2018,black spiral p19,0,20.32,0,8,,"HO, grassy",clay,moist,M/C-F,dark brown,,,clay,,C,,0,0
+,KWF-1,6/30/2018,black spiral p19,20.32,38.1,8,15,,,"sandy clay, FGR",wet,"C/C-F, M/VF",dark brown,,,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,KWF-1,6/30/2018,black spiral p19,38.1,67.31,15,26.5,,,"sandy clay loam, FGR, CGR",wet-saturated,C/F-VF,red brown,,,sandy clay loam,"FGR, CGR",SCL,"(2, 5)","(0.15, 0.35)",0.35
+,KWF-1,6/30/2018,black spiral p19,67.31,83.82,26.5,33,,,"sandy clay, FGR",saturated,,tan,,,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,KWF-1,6/30/2018,black spiral p19,83.82,88.9,33,35,,,"sandy clay, VGR (M-F)",,,tan,,,sandy clay,VGR (M-F),SC,"(5, 20)","(0.35, 0.6)",0.6
+,KWF-1,6/30/2018,black spiral p19,88.9,91.44,35,36,,,GR,,,,,"loose gravel; bottom of well at 35""",gr,,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+17,KHR-1,7/4/2019,orange p70,0,4,,,,HO,HO,moist,"C/VF, F/M, M/F","7.5 YR, 2.5/1; mottled yellow",,,ho,,O,,0,0
+,KHR-1,7/4/2019,orange p70,4,32,,,,,silty clay,moist,"C/VF, M/F, VF/C","7.5 YR, 2.5/1; mottled yellow",,,silty clay,,SIC,,0,0
+,KHR-1,7/4/2019,orange p70,32,42,,,,,sandy clay,moist,"VF/M-C, F/C, M/F","7.5 YR, 3/2; mottled red-orange",,,sandy clay,,SC,,0,0
+,KHR-1,7/4/2019,orange p70,42,50,,,,,silty clay,saturated,"VF/F, F/F","7.5 YR, 3/2; mottled red-orange",,,silty clay,,SIC,,0,0
+,KHR-1,7/4/2019,orange p70,50,74,,,,,sandy clay,saturated,"VF/F, F/F","10 YR, 4/2; mottled yellow",,,sandy clay,,SC,,0,0
+,KHR-1,7/4/2019,orange p70,74,95,,,,,sandy clay,saturated,M/VF,"10 YR, 4/3; mottled orange",,FGR < 15%,sandy clay,,SC,,0,0
+,KHR-1,7/4/2019,orange p70,95,102,,,,"fibrous, mycelium?","sandy clay, GR",wet,"VF/M, F/C","10 YR, 4/4; gley, mottled",,"subangular gravels, photo of possible mycelium",sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,KHR-1,7/4/2019,orange p70,102,103,,,,,FGR,saturated,VF/F,"10 YR, 4/4",,subangular gravels with coarse sand,fgr,FGR,FGR,"(2, 5)","(0.15, 0.35)",0.35
+,KHR-1,7/4/2019,orange p70,103,104,,,,,CGR,saturated,VF/F,"10 YR, 4/4",,subangular gravels with coarse sand,CGR,CGR,CGR,"(20, 76)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,0,0
+18,KET-1,7/5/2019,orange p70,0,12,,,O,,,saturated,"M/C, VF-F/M","5 YR, 2.5/1",,,,,,,0,0
+,KET-1,7/5/2019,orange p70,12,20,,,A,,silty clay,saturated,"M/F, VF-F/M","7.5 YR, 2.5/1",,gradual transition to A,silty clay,,SIC,,0,0
+,KET-1,7/5/2019,orange p70,20,42,,,,"fibers with redox, 1 mm buffer","sandy clay, FGR",saturated,VF/M,"7.5 YR, 3/2",,,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,KET-1,7/5/2019,orange p70,42,59,,,,,sandy clay,saturated,"F/C, VF-F/M","7.5 YR, 4/1",,,sandy clay,,SC,,0,0
+,KET-1,7/5/2019,orange p70,59,80,,,,fibers with redox,"sandy clay, FGR",wet,F-VF/M,"10 YR, 4/2",,,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,KET-1,7/5/2019,orange p70,80,84,,,,,GR,wet,,,,"subangular gravels, medium to coarse",gr,GR,GR,"(5, 20)","(0.15, 0.35)",0.35
+,KET-1,7/5/2019,orange p70,84,110,,,,,"sandy clay, VGR",wet,F/F-VF,"7.5 YR, 4/3",,,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)",0.6
+,,,,,,,,,,,,,,,,,,,,0,0
+19,EET-2,7/5/2019,orange p71,0,4,,,O,,,moist,"F-VF/M, M/F","10 YR, 2.5/1",,color darker,,,O,,0,0
+,EET-2,7/5/2019,orange p71,4,10,,,,fibrous,silty clay,moist,"F/VF, M/C","2.5 YR, 2.5/1",,,silty clay,,SIC,,0,0
+,EET-2,7/5/2019,orange p71,10,45,,,,,"silty clay, FGR",moist,"F/M, C/F","5 YR, 2/3",,pebbles 1-3 mm,silty clay,FGR,SIC,"(2, 5)","(0.15, 0.35)",0.35
+,EET-2,7/5/2019,orange p71,45,70,,,,,"silty clay, FGR",moist,"F/M, F/F","7.5 YR, 3/2",,,silty clay,FGR,SIC,"(2, 5)","(0.15, 0.35)",0.35
+,EET-2,7/5/2019,orange p71,70,89,,,,,"silty clay, FGR",saturated,"F/F, F/M","7.5 YR, 3/4",,,silty clay,FGR,SIC,"(2, 5)","(0.15, 0.35)",0.35
+,EET-2,7/5/2019,orange p71,89,106,,,,fibrous,silty clay,saturated,F/M,"7.5 YR, 3/2",,"redox, mottled",silty clay,,SIC,,0,0
+,EET-2,7/5/2019,orange p71,106,115,,,,,silty clay,saturated,F/F,"10 YR, 4/2",,"redox, mottled, gleying",silty clay,,SIC,,0,0
+30,EET-2,7/15/2021,yellow p77,115,128,,,,,sandy clay,moist,C/VF-F,"2.5 Y, 6/2; yellow-orange-green mottled",,,sandy clay,,SC,,0,0
+,EET-2,7/15/2021,yellow p77,128,130,,,,,GR,moist,,,,thin layer of coarse gravel 28-40 mm,gr,GR,GR,"(5, 20)","(0.15, 0.35)",0.35
+,EET-2,7/15/2021,yellow p77,130,135,,,,fibrous,sandy clay,moist,C/M,"2.5 Y, 5/2",,coarse sand,sandy clay,,SC,,0,0
+,EET-2,7/15/2021,yellow p77,135,136,,,,,GR,,,,,"hit rock(s), cannot auger beyond",gr,GR,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+20,LHT-1,7/6/2019,orange p71,0,10,,,O,"peat, fibrous, crumbly",,moist,"F-VF/M, M/C","5 YR, 2.5/1",,"peat, fibrous, crumbly",,,O,,0,0
+,LHT-1,7/6/2019,orange p71,10,31,,,A,,silty clay,moist,"VF/C, F/F","5 YR, 2.5/1",,,silty clay,,SIC,,0,0
+,LHT-1,7/6/2019,orange p71,31,48,,,A,,clay,moist,"F/F, F/VF, F/M","5 Y, 2.5/1; mottled red",,fine mottling,clay,,C,,0,0
+,LHT-1,7/6/2019,orange p71,48,54,,,A,,silty clay,saturated,F/F,"7.5 YR, 2.5/2",,,silty clay,,SIC,,0,0
+,LHT-1,7/6/2019,orange p71,54,76,,,E,,"clay, FGR, sticky",saturated,F/F,"10 YR, 4/2; mottled orange",,,clay,"FGR, sticky",C,"(2, 5)","(0.15, 0.35)",0.35
+,LHT-1,7/6/2019,orange p71,76,95,,,,,"sandy clay, FGR, GR, sticky",saturated,F/F,"10 YR, 4/3; red-orange sand",,red-orange sand appeared to be breakdown of gravel,sandy clay,"FGR, GR, sticky",SC,"(2, 5)","(0.15, 0.35)",0.35
+,LHT-1,7/6/2019,orange p71,95,109,,,,,sandy clay,saturated,F/F,"2.5 Y, 3/3; gley, mottled",,mottled color 5Y 4/1 and 5Y 4/N,sandy clay,,SC,,0,0
+,LHT-1,7/6/2019,orange p71,109,115,,,,fibrous,"sandy clay, GR",saturated,F/F,"5 Y 4/1, gley 1 N/3",,,sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+21,LET-1,7/6/2019,orange p73,0,7.5,,,O,crumbly humus,,moist,"M/V-VF, F/M","5 YR, 2.5/1",,,,,O,,0,0
+,LET-1,7/6/2019,orange p73,7.5,30,,,,,clay,moist,"C/F-VF, F/M","5 YR, 2.5/1",,,clay,,C,,0,0
+,LET-1,7/6/2019,orange p73,30,48,,,,,silty clay,moist,"F/M, F/F","5 YR, 2.5/1; fine red-orange mottle",,,silty clay,,SIC,,0,0
+,LET-1,7/6/2019,orange p73,48,58,,,,bits of charcoal at 58 cm,silty clay,moist,"F/C, F/M, VF/F","5 YR, 2.5/1; fine red-orange mottle",,,silty clay,,SIC,,0,0
+,LET-1,7/6/2019,orange p73,58,67,,,,,silty clay,moist,"F/C, F/M, VF/F","5 YR, 2.5/1; fine red-orange mottle",,,silty clay,,SIC,,0,0
+,LET-1,7/6/2019,orange p73,67,93,,,,layer of charcoal at 93 cm,silty clay,saturated,"F/C, M/F","7.5 YR, 2.5/1; mottle",,,silty clay,,SIC,,0,0
+,LET-1,7/6/2019,orange p73,93,100,,,,,silty clay,saturated,"F/C, M/F","7.5 YR, 2.5/1; mottle",,,silty clay,,SIC,,0,0
+,LET-1,7/6/2019,orange p73,100,110,,,,fibrous,silty clay,saturated,"F/C, M/F","7.5 YR, 3/1; bright red-orange mottle",,,silty clay,,SIC,,0,0
+,LET-1,7/6/2019,orange p73,110,116,,,,"fibrous, charcoal bits at 116",sandy clay,saturated,"M/F, VF/C","10 YR, 2/2",,,sandy clay,,SC,,0,0
+,LET-1,7/6/2019,orange p73,116,120,,,,fibrous,sandy clay,saturated,"M/F, VF/C","10 YR, 2/2",,,sandy clay,,SC,,0,0
+,,,,,,,,,,,,,,,,,,,,,
+22,LWT-1,7/6/2019,orange p73,0,13,,,O,"earthworm, crumbly humus",,moist,M/VF-F,"5 YR, 2.5/1",,,,,O,,0,0
+,LWT-1,7/6/2019,orange p73,13,29,,,,,clay,moist,"C/F-VF, F/M ","5 YR, 2.5/1",,,clay,,C,,0,0
+,LWT-1,7/6/2019,orange p73,29,55,,,,,silty clay,moist,C/F-VF,"2.5 YR, 3/1; fine mottled",,,silty clay,,SIC,,0,0
+,LWT-1,7/6/2019,orange p73,55,82,,,,fibrous,clay,saturated,F/F-VF,"5 YR, 3/1; fine red-orange mottle, black streaks",,,clay,,C,,0,0
+,LWT-1,7/6/2019,orange p73,82,100,,,,fibrous,sandy clay,saturated,C/VF-F,"7.5 YR, 2.5/1",,,sandy clay,,SC,,0,0
+,LWT-1,7/6/2019,orange p73,100,108,,,,"fibrous, charcoal",sandy clay,saturated,VF/F-M,"10 YR, 2/1",,,sandy clay,,SC,,0,0
+,,,,,,,,,,,,,,,,,,,,0,0
+23,B3S,8/12/2019,orange p106,0,6,,,O,fibrous,,dry,"M/VF-M, F/C",,,"soil survey only, 1.5 m downstream of well, no well install",,,O,,0,0
+,B3S,8/12/2019,orange p106,6,12,,,A,HO,clay,dry-moist,"F/M, M/VF-F",,,,clay,,C,,0,0
+,B3S,8/12/2019,orange p106,12,21,,,A,HO,clay,moist,"F/M, M/VF-F",,,,clay,,C,,0,0
+,B3S,8/12/2019,orange p106,21,36,,,A,HO,clay,moist,"C/VF, F/M, F/F",,,,clay,,C,,0,0
+,B3S,8/12/2019,orange p106,36,52,,,,"HO, chunks of dry rhyzomes",clay,saturated,"C/VF, F/M, F/F",,,,clay,,C,,0,0
+,B3S,8/12/2019,orange p106,52,79,,,,"HO, chunks of dry rhyzomes",clay,saturated,"C/VF, F/M, F/F",more organic material than mineral,,,clay,,C,,0,0
+,B3S,8/12/2019,orange p106,79,100,,,,"HO, woody chunks, roots > 2.5 cm",clay,saturated,"C/C, M/VF-M",,,,clay,,C,,0,0
+,B3S,8/12/2019,orange p106,100,112,,,,,"sandy clay, XFGR",saturated,"F/M, C/VF-F",,,,sandy clay,XFGR,SC,"(2,5)","(.6, .9)",0.9
+,,,,,,,,,,,,,,,,,,,,,
+24,E8S,6/6/2021,yellow p49,0,12,,,O,"HO, peat, grassy",,wet non-satiated,"M/VF-F, F/M, VF/C","10 YR, 2/1",,well replacement,,,O,,0,0
+,E8S,6/6/2021,yellow p49,12,25,,,A,HO,clay,wet,"M/VF-F, F/M","5 YR, 2.5/1",,,clay,,C,,0,0
+,E8S,6/6/2021,yellow p49,25,41,,,A,,"clay, FGR",wet,"C/VF-F, F/M","7.5 YR, 2.5/1",,,clay,FGR,C,"(2, 5)","(0.15, 0.35)",0.35
+,E8S,6/6/2021,yellow p49,41,55,,,B,,"clay, VFGR",saturated,"F/F, F/M","7.5 YR, 3/1",,,clay,VFGR,C,"(2, 5)","(.35,.6)",0.6
+,E8S,6/6/2021,yellow p49,55,66,,,C,,"clay, VFGR",saturated,F/F,"10 YR, 5/3",,,clay,VFGR,C,"(2, 5)","(.35,.6)",0.6
+,E8S,6/6/2021,yellow p49,66,80,,,C,,"sandy clay, XGR",saturated,VF/F,"10 YR, 5/3",,,sandy clay,XGR,SC,"(5, 20)","(0.6, 0.9)",0.9
+,E8S,6/6/2021,yellow p49,80,90,,,C,,"sand, XGR",saturated,VF/F,"10 YR, 5/3",,,sand,XGR,S,"(5, 20)","(0.6, 0.9)",0.9
+,E8S,6/6/2021,yellow p49,90,100,,,C,,"sandy clay, FGR",saturated,VF/VF,"10 YR, 4/3",,,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,E8S,6/6/2021,yellow p49,100,115,,,C,,"sandy clay, VGR",saturated,,"7.5 YR, 4/3",,,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)",0.6
+,E8S,6/6/2021,yellow p49,115,121,,,,,"sand, XGR",saturated,,"7.5 YR, 4/6",,,sand,XGR,S,"(5, 20)","(0.6, 0.9)",0.9
+,,,,,,,,,,,,,,,,,,,,0,
+28,EHT-XA5S,7/15/2021,yellow p74,0,12,,,O,fibrous,,dry,M/VF-C,,,augured completely new well hole; previous well depth was 114.5 cm; this was deepest of 4 trial holes,,,O,,0,0
+,EHT-XA5S,7/15/2021,yellow p74,12,32,,,,,silty clay,dry,"M/VF-F, F/M","7.5 YR, 3/1",,,silty clay,,SIC,,0,0
+,EHT-XA5S,7/15/2021,yellow p74,32,42,,,,,silty clay,dry,"M/VF-F, F/M","7.5 YR, 4/1",,,silty clay,,SIC,,0,0
+,EHT-XA5S,7/15/2021,yellow p74,42,63,,,,,silty clay,dry,"C/VF-F, F/M","7.5 YR, 4/1",,,silty clay,,SIC,,0,0
+,EHT-XA5S,7/15/2021,yellow p74,63,74,,,,,sandy clay,dry,F/VF-M,"7.5 YR, 4/1",,,sandy clay,,SC,,0,0
+,EHT-XA5S,7/15/2021,yellow p74,74,85,,,,,sandy clay,moist,VF/VF,"10 YR, 4/1; orange mottled",,,sandy clay,,SC,,0,0
+,EHT-XA5S,7/15/2021,yellow p74,85,103,,,,,sandy clay,moist,"VF/M, C/VF-F","10 YR, 3/1; orange mottled",,,sandy clay,,SC,,0,0
+,EHT-XA5S,7/15/2021,yellow p74,103,130,,,,fibrous,clay,moist,F/VF,"10 YR, 5/2; orange mottled",,coarse gravel <15%,clay,,C,,0,0
+,EHT-XA5S,7/15/2021,yellow p74,130,131,,,,,GR,,,,,unable to auger past rock and gravel,gr,,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+29,EWT-1,7/15/2021,yellow p77,109,120,,,,,sandy clay,moist,F/VF-F,"10 YR, 5/4; orange mottled",,"coarse sand, mottled",sandy clay,,SC,,0,0
+,EWT-1,7/15/2021,yellow p77,120,148,,,,,sandy clay,moist,F/VF,"10 YR, 5/4; orange mottled",,"finer sand, mottled",sandy clay,,SC,,0,0
+,EWT-1,7/15/2021,yellow p77,148,151,,,,,sandy clay,saturated,F/VF,"10 YR, 5/3",,,sandy clay,,SC,,0,0
+,EWT-1,7/15/2021,yellow p77,151,152,,,,,GR,,,,,"hit rock, could not auger beyond it",gr,,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+32,A2S,7/16/2021,yellow p77,0,17,,,O,,,dry,M/VF-C,,,"could not deepen existing well, tried to auger new well",,,O,,0,0
+,A2S,7/16/2021,yellow p77,17,25,,,A,,"clay, VFGR",dry,M/VF-C,"7.5 YR, 2.5/1",,coarse sand to fine gravel; also slightly mucky,clay,VFGR,C,"(2, 5)","(.35,.6)",0.6
+,A2S,7/16/2021,yellow p77,25,45,,,,,"clay, XGR",dry,M/VF-C,,,"hit rocks, could not auger deeper; unclear if abandoned this hole, the previous one was likely deeper",clay,XGR,C,"(5, 20)","(0.6, 0.9)",0.9
+,,,,,,,,,,,,,,,,,,,,,
+33,E6S,7/16/2021,yellow p78,0,13,,,O,humus,,dry,M/VF-M,"5 YR, 3/2",,deepened original,,,O,,,
+,E6S,7/16/2021,yellow p78,13,32,,,,HO,"clay loam, FGR",dry-moist,"M/VF-F, C/M","5 YR, 2.5/1",,,clay loam,FGR,CL,"(2, 5)","(0.15, 0.35)",0.35
+,E6S,7/16/2021,yellow p78,32,38,,,,,clay loam,dry,"C/VF, F/F","7.5 YR, 3/2",,fine gravel < 35%,clay loam,,CL,,0,0
+,E6S,7/16/2021,yellow p78,38,46,,,,,silty clay,dry,F/VF,"7.5 YR, 3/3",,fine gravel < 35%,silty clay,,SIC,,0,0
+,E6S,7/16/2021,yellow p78,46,60,,,,,"silty clay, FGR",dry,F/VF-F,"7.5 YR, 4/2",,gravel sub-rounded,silty clay,FGR,SIC,"(2, 5)","(0.15, 0.35)",0.35
+,E6S,7/16/2021,yellow p78,60,68,,,,,"sandy clay, VFGR",dry-moist,F/VF-F,"7.5 YR, 5/3",,,sandy clay,VFGR,SC,"(2, 5)","(.35,.6)",0.6
+,E6S,7/16/2021,yellow p78,68,80,,,,,"sandy clay, VFGR",moist,F/VF-F,"7.5 YR, 5/3",,,sandy clay,VFGR,SC,"(2, 5)","(.35,.6)",0.6
+,E6S,7/16/2021,yellow p78,80,91,,,,,sandy clay,moist,F/VF-F,"7.5 YR, 5/4; orange mottled",,,sandy clay,,SC,,0,
+,E6S,7/16/2021,yellow p78,91,116,,,C,,"clay, FGR",moist,F/VF-F,"7.5 YR, 5/4; orange mottled, purple fragments",,,clay,FGR,C,"(2, 5)","(0.15, 0.35)",0.35
+,E6S,7/16/2021,yellow p78,116,128,,,C,,"clay, VFGR",moist,F/VF-F,"7.5 YR 4/3; red-orange, purple, gray fragments",,,clay,VFGR,C,"(2, 5)","(.35,.6)",0.6
+,E6S,7/16/2021,yellow p78,128,131,,,C,,"clay, VFGR",moist,F/VF-F,"10 YR 4/2; red, red-orange, purple, gray fragments",,,clay,VFGR,C,"(2, 5)","(.35,.6)",0.6
+,E6S,7/16/2021,yellow p78,131,147,,,C,fibrous,"clay, VFGR",moist,VF/VF,"10 YR 4/2; red, red-orange, purple, gray fragments",,"a few gravels, 30-40 mm",clay,VFGR,C,"(2, 5)","(.35,.6)",0.6
+,E6S,7/16/2021,yellow p78,147,154,,,C,fibrous,"sandy clay, XGR",moist,VF/VF,10 YR 4/2; strong orange mottle direct from fragments,,,sandy clay,XGR,SC,"(5, 20)","(0.6, 0.9)",0.9
+,E6S,7/16/2021,yellow p78,154,161,,,,,"sandy clay, VGR",wet,,"7.5 YR, 4/3",,gravel subangular to 40 mm,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)",0.6
+,E6S,7/16/2021,yellow p78,161,173,,,,,"sandy clay, VGR",wet,VF/VF,"7.5 YR, 4/4",,gravel subangular to 40 mm,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)",0.6
+,E6S,7/16/2021,yellow p78,173,182,,,,,"clay, XFGR",saturated,,10 YR 3/6,,iron-stained water,clay,XFGR,C,"(2,5)","(.6,.9)",0.9
+,E6S,7/16/2021,yellow p78,182,183,,,,,GR,saturated,,,,"hit rock(s), could not auger beyond them.",gr,,GR,"(5, 20)","(0.15, 0.35)",0.35
+,,,,,,,,,,,,,,,,,,,,,
+35,KWF-2,6/11/2025,2015-25 Or V3 p60,0,7,,,O,,,moist,"M/VF, C/F","2.5 YR, 2.5/1",,"augered at Kiln3 camera, but abandoned due to cobbles at 66 cm, which didn't seem deep enough to support a viable well",,,O,,0,0
+,KWF-2,6/11/2025,2015-25 Or V3 p60,7,14,,,Oa,,silty clay,moist,"M/VF, F/F, VF/C","10 YR, 2/1",,"loose, spongy",silty clay,,SIC,,0,0
+,KWF-2,6/11/2025,2015-25 Or V3 p60,14,27,,,A,,clay,moist,"M/VF, C/F, F/M, VF/C","10 YR, 2/2",,cohesive,clay,,C,,0,0
+,KWF-2,6/11/2025,2015-25 Or V3 p60,27,40,,,A,,clay,moist,"M/VF, C/F","2.5 YR, 2.5/1","concentrations common, 2-5 mm",cohesive,clay,,C,,0,0
+,KWF-2,6/11/2025,2015-25 Or V3 p60,40,51,,,A/B,,"clay, MGR",wet,"M/VF, C/F","2.5 YR, 3/1","concentrations many, 2-5 mm",gravel subangular,clay,MGR,C,"(5, 20)","(0.15, 0.35)",0.35
+,KWF-2,6/11/2025,2015-25 Or V3 p60,51,63,,,A/Bg,,"sandy clay, CB",saturated,"M/VF, C/F","2.5 YR, 4/1; gray mottle GLEY1 4/N + 2.5/N",,cobble subangular,sandy clay,CB,SC,,0,0
+,KWF-2,6/11/2025,2015-25 Or V3 p60,63,66,,,,,VCB,saturated,,,,cobble subangular,vcb,,,,0,0
+,,,,,,,,,,,,,,,,,,,,0,0
+36,KWT-2,6/14/2025,2015-25 Or V3 p62,0,6,,,Oi,,thatch,,,,,,thatch,,O,,0,0
+,KWT-2,6/14/2025,2015-25 Or V3 p62,6,10,,,Oa,,loam,moist,"F/M-C, M/VF-F","5 YR, 2.5/1",,crumbly,loam,,L,,0,0
+,KWT-2,6/14/2025,2015-25 Or V3 p62,10,38,,,A,,clay,moist,"M/VF-F, C/M","5 YR, 2.5/1",,,clay,,C,,0,0
+,KWT-2,6/14/2025,2015-25 Or V3 p62,38,60,,,A,fibrous,"sandy clay, VMGR",saturated,C/VF-F,"5 YR, 2.5/1",,gravel subangular,sandy clay,VMGR,SC,"(5, 20)","(0.35, 0.6)",0.6
+,KWT-2,6/14/2025,2015-25 Or V3 p62,60,75,,,A,many fibrous clumps,"clay, VMGR",saturated,"M/F, C/VF","5 YR, 2.5/1",,gravel sub-rounded,clay,VMGR,C,"(5, 20)","(0.35, 0.6)",0.6
+,KWT-2,6/14/2025,2015-25 Or V3 p62,75,91,,,A,many fibrous clumps,clay,saturated,M/VF-F,"5 YR, 2.5/1",,,clay,,C,,0,0
+,KWT-2,6/14/2025,2015-25 Or V3 p62,91,92,,,,,VCB,,,,,"hit rock, installed well on top",vcb,,VCB,,0,0
+,,,,,,,,,,,,,,,,,,,,0,0
+37,EWT-2,6/12/2025,2015-25 Or V3 p64,0,2.5,,,O,thatch,,dry,,,,"bunchgrass at top, mislabeled as EWF-1 in field book but name changed to EWT-2",,,O,,0,0
+,EWT-2,6/12/2025,2015-25 Or V3 p64,2.5,8,,,Oi,fibrous,,moist,"M/VF-F, VF/M","5 YR, 3/1",,,,,O,,0,0
+,EWT-2,6/12/2025,2015-25 Or V3 p64,8,16,,,Oe,fibrous,,moist,"M/VF-F, VF/M","5 YR, 3/1",,,,,O,,0,0
+,EWT-2,6/12/2025,2015-25 Or V3 p64,16,27,,,A,,"sandy clay, MGR",moist,"M/VF-F, F/M","10 YR, 2/1",,gravel subangular,sandy clay,MGR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-2,6/12/2025,2015-25 Or V3 p64,27,38,,,A/B,,"sandy clay, MGR",moist,C/VF-F,"7.5 YR, 2/1",,"few coarse gravel, subangular",sandy clay,MGR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-2,6/12/2025,2015-25 Or V3 p64,38,48,,,A/B,,"sandy clay, MGR",moist,C/VF-F,"7.5 YR, 4/1",,"some fine gravel, subangular",sandy clay,MGR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-2,6/12/2025,2015-25 Or V3 p64,48,69,,,A/B,,"sandy clay, MGR",moist,C/VF-F,"7.5 YR, 4/2",,"gravel sub-rounded, more sand",sandy clay,MGR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-2,6/12/2025,2015-25 Or V3 p64,69,80,,,B,,"sandy clay, VMGR",wet,C/VF-F,"10 YR, 5/3","concentrations common, 2-5 mm, 10 YR 4/4",gravel sub-rounded,sandy clay,VMGR,SC,"(5, 20)","(0.35, 0.6)",0.6
+,EWT-2,6/12/2025,2015-25 Or V3 p64,80,98,,,B,,"sandy clay, VFGR, MGR",wet,C/VF-F,"10 YR, 5/3","concentrations common, 2-5 mm, 10 YR 4/4 with some very light, broken down rock","one coarse gravel, all sub-rounded",sandy clay,"VFGR, MGR",SC,"(5, 20)","(0.15, 0.35)",0.35
+,EWT-2,6/12/2025,2015-25 Or V3 p64,98,107,,,B,,"sandy clay, FGR",wet,"M/VF, F/F","10 YR, 4/3","concentrations common, 2-20 mm, 7.5 YR 4/4","very coarse sand to FGR, a few MGR",sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)",0.35
+,EWT-2,6/12/2025,2015-25 Or V3 p64,107,123,,,,,"sandy clay, XFGR",saturated,F/VF-F,"10 YR, 4/4; mottled 10 YR 7/6",,"MGR and CGR present, subangular to sub-rounded",sandy clay,XFGR,SC,,0,0
+,,,,,,,,,,,,,,,,,,,,0,0
+38,KER-2,6/15/2025,2015-25 Or V3 p66,0,3,,,Oi,thatch,,,,,,"augered 5 holes in same area, hit rounded gravel at 65 in all cases, deepest augered to 80 cm where well installed",,,O,,0,0
+,KER-2,6/15/2025,2015-25 Or V3 p66,3,15,,,Oea,,sandy clay,moist,"M/VF, C/F","5 YR, 3/1",,,sandy clay,,SC,,0,0
+,KER-2,6/15/2025,2015-25 Or V3 p66,15,42,,,A,,sandy clay,moist,"M/VF-F, C/M","5 YR, 2.5/2",,,sandy clay,,SC,,0,0
+,KER-2,6/15/2025,2015-25 Or V3 p66,42,55,,,A,,silty clay,wet,M/VF-F,"5 YR, 2.5/2",,,silty clay,,SIC,,0,0
+,KER-2,6/15/2025,2015-25 Or V3 p66,55,64,,,A,,"sandy clay, MGR",saturated,"M/VF, C/F","7.5 YR, 4/1",,"gravel rounded, hit CGR or larger at 65 cm",sandy clay,MGR,SC,"(5, 20)","(0.15, 0.35)",0.35
+,KER-2,6/15/2025,2015-25 Or V3 p66,64,80,,,,,MGR,saturated,"M/VF-F, C/M",,,"10-20% coarse gravel, all enmeshed with coarse roots, interstices filled with fine gravel and coarse sand, all rounded",mgr,MGR,MGR,"(5, 20)","(0.15, 0.35)",0.35
