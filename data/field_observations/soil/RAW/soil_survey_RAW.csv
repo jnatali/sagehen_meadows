@@ -1,9 +1,10 @@
 ﻿#,well_id,date,source,start depth (cm),stop depth (cm),start depth (in),stop depth (in),horizon,organic matter,soil texture,water content,roots,color,redox,notes
-1,EER-1,5/30/18,black spiral,,,0,8,,,"clay, HO",moist,C/F-M,dark brown,,crumbly
-,EER-1,5/30/18,black spiral,,,8,16,,,"clay, HO",moist,"C/VF, F/F-M",dark brown,,"slick, smooth"
-,EER-1,5/30/18,black spiral,,,16,20,,,"clay, GS, MK",saturated,"M/M, C/VF-F",dark brown,,
-,EER-1,5/30/18,black spiral,,,20,24,,,"sandy clay, GR",saturated,C/VF-M,dark brown,,rounded GR
-,EER-1,5/30/18,black spiral,,,24,29,,,"sandy clay, GR",saturated,C/M,dark brown,,rounded F-M GR
+1,EER-1,5/30/18,black spiral,0,10,,,,,"clay, HO",moist,C/F-M,dark brown,,crumbly
+,EER-1,5/30/18,black spiral,20,41,,,,,"clay, HO",moist,"C/VF, F/F-M",dark brown,,"slick, smooth"
+,EER-1,5/30/18,black spiral,41,51,,,,,"clay, GS, MK",saturated,"M/M, C/VF-F",dark brown,,
+,EER-1,5/30/18,black spiral,51,61,,,,,"sandy clay, GR",saturated,C/VF-M,dark brown,,rounded GR
+,EER-1,5/30/18,black spiral,61,73,,,,,"sandy clay, GR",saturated,C/M,dark brown,,rounded F-M GR
+,EER-1,6/5/24,yellow p137,73,74,,,,,"clay, GR",,,,,"transition from clay to rounded gravels; replaced well, seemed to be frost-heaved, unable to deepen"
 ,,,,,,,,,,,,,,,
 2,EHR-1,5/30/18,black spiral,,,0,2,,,"clay, HO",moist,M/F-M,dark brown,,crumbly
 ,EHR-1,5/30/18,black spiral,,,2,12,,,clay,moist,M/F-M,dark brown,,slick
@@ -56,13 +57,20 @@
 ,KER-1,6/18/18,black spiral p14,,,28,32,,fibers midway,"sandy loam, GR",saturated,"C/F, C/C",brown gray,,"roots especialy midway; pebbles to 22 mm, rounded"
 ,KER-1,6/18/18,black spiral p14,,,32,33,,,GR,saturated,"C/C, C/F-M/VF",brown gray,,"bottom of hole, pebbles and gravel"
 ,,,,,,,,,,,,,,,
-9,KWT-1,6/20/18,black spiral p14,,,0,5,,fibrous,"hummus, clay, HO",moist,M/C-F,dark brown,,
-,KWT-1,6/20/18,black spiral p14,,,5,7.5,,,XST,,,,,extracted big rock
-,KWT-1,6/20/18,black spiral p14,,,7.5,12,,,clay,moist,"M/C-VC, C/F",dark brown,,
-,KWT-1,6/20/18,black spiral p14,,,12,17.5,,,silty clay,wet,"C/C, F/F",brown,,
-,KWT-1,6/20/18,black spiral p14,,,17.5,28,,,sandy clay loam,wet-saturated,F/F-VF,tan brown,,"mottled at bottom, decomposed pebbles"
-,KWT-1,6/20/18,black spiral p14,,,28,36,,,"sandy clay loam, VGR",saturated,"F/C, F/F",tan pink,,decomposed rock was pink; pebbles to 30 mm
-,KWT-1,6/20/18,black spiral p14,,,36,41,,,GR,saturated,F/F-VF,"tan, mottled",,"decomposed rock was red,orange and gray"
+9,KWT-1,6/20/18,black spiral p14,0,13,0,5,,fibrous,"hummus, clay, HO",moist,M/C-F,dark brown,,
+,KWT-1,6/20/18,black spiral p14,13,19,5,7.5,,,XST,,,,,extracted big rock
+,KWT-1,6/20/18,black spiral p14,19,30,7.5,12,,,clay,moist,"M/C-VC, C/F",dark brown,,
+,KWT-1,6/20/18,black spiral p14,30,44,12,17.5,,,silty clay,wet,"C/C, F/F",brown,,
+,KWT-1,6/20/18,black spiral p14,44,71,17.5,28,,,sandy clay loam,wet-saturated,F/F-VF,tan brown,,"mottled at bottom, decomposed pebbles"
+,KWT-1,6/20/18,black spiral p14,71,91,28,36,,,"sandy clay loam, VGR",saturated,"F/C, F/F",tan pink,,decomposed rock was pink; pebbles to 30 mm
+,KWT-1,6/20/18,black spiral p14,91,104,36,41,,,GR,saturated,F/F-VF,"tan, mottled",,"decomposed rock was red,orange and gray"
+,"KWT-1, skip",6/29/21,yellow p55,78,98,,,,,loamy sand,wet,,,,"deepened well, prior depth of well = 78 cm"
+,KWT-1,6/29/21,yellow p55,104,113,,,,,loam,wet non-satiated,,"7.5 YR, 3/3",,
+,KWT-1,6/29/21,yellow p55,113,121,,,,,sandy clay loam,wet non-satiated,,"7.5 YR, 3/4",,
+,KWT-1,6/29/21,yellow p55,121,125,,,,,sandy clay loam,wet non-satiated,,"7.5 YR, 3/4; rose and orange-red mottled pebbles, 2-4 mm",,
+,KWT-1,6/29/21,yellow p55,125,131,,,,,sandy clay loam,wet non-satiated,,"10 YR 3/4; rose and orange-red mottled pebbles, 2-8 mm",,
+,KWT-1,6/29/21,yellow p55,131,136,,,,,sandy clay loam,wet,,"10 YR 3/4; rose, red-orange and blue mottled pebbles",,rock 4.5 cm
+,KWT-1,6/29/21,yellow p55,136,147,,,,,"sandy clay, VGR",wet,,"10 YR 4/4; rose, red-orange and blue mottled pebbles",,"rock 5 cm, subangular"
 ,,,,,,,,,,,,,,,
 10,E4S,6/20/18,black spiral p16,,,0,2,,HO,silty clay,moist,M/C-F,dark brown,,
 ,E4S,6/20/18,black spiral p16,,,2,4,,,silty clay,moist,M/F,dark brown,,
@@ -87,17 +95,22 @@
 ,KWR-1,6/20/18,black spiral p17,,,25,32,,,"sandy clay loam, GR",saturated,C/F-VF,brown,,"mostly pebbles, a few gravels > 11 mm"
 ,KWR-1,6/20/18,black spiral p17,,,32,33,,,GR,saturated,,,,bottom of well
 ,,,,,,,,,,,,,,,
-13,KHF-1,6/30/18,black spiral p17,,,0,5,,"HO, grassy, HPM",clay,moist,"M/C-VF, fibrous",dark brown,,fibrous roots throughout
-,KHF-1,6/30/18,black spiral p17,,,5,9.5,,,clay,moist,"M/F-VF, F/C-M",dark brown,,
-,KHF-1,6/30/18,black spiral p17,,,9.5,15,,,clay,moist,"C/F-VF, F/C-M",brown,,"hit rock > 120 mm; failed attempt, not the ultimate well location"
+13,"KHF-1, skip",6/30/18,black spiral p17,,,0,5,,"HO, grassy, HPM",clay,moist,"M/C-VF, fibrous",dark brown,,fibrous roots throughout
+,"KHF-1, skip",6/30/18,black spiral p17,,,5,9.5,,,clay,moist,"M/F-VF, F/C-M",dark brown,,
+,"KHF-1, skip",6/30/18,black spiral p17,,,9.5,15,,,clay,moist,"C/F-VF, F/C-M",brown,,"hit rock > 120 mm; failed attempt, not the ultimate well location"
 ,,,,,,,,,,,,,,,
-14,KHF-1,6/30/18,black spiral p19,,,0,2,,HO,HO,dry,"M/M-VF, F/C",brown,,crumbly
-,KHF-1,6/30/18,black spiral p19,,,2,6,,,"silty clay, FGR",dry,C/M-VF,brown,,
-,KHF-1,6/30/18,black spiral p19,,,6,14,,,clay,moist,F/M-F,light brown,,
-,KHF-1,6/30/18,black spiral p19,,,14,22.5,,,"clay loam, FGR, MGR",wet,C/F-VF,tan,,
-,KHF-1,6/30/18,black spiral p19,,,22.5,28,,,"sandy clay, FGR",moist,F/C,tan and orange,,
-,KHF-1,6/30/18,black spiral p19,,,28,34,,,sandy clay,saturated,"F/VF, F/fibrous",tan and orange,,some chunks of soil dry inside
-,KHF-1,6/30/18,black spiral p19,,,34,35,,,GR,,,,,hit big rock at bottom > 120 mm
+14,KHF-1,6/30/18,black spiral p19,0,5,0,2,,HO,HO,dry,"M/M-VF, F/C",brown,,crumbly
+,KHF-1,6/30/18,black spiral p19,5,15,2,6,,,"silty clay, FGR",dry,C/M-VF,brown,,
+,KHF-1,6/30/18,black spiral p19,15,36,6,14,,,clay,moist,F/M-F,light brown,,
+,KHF-1,6/30/18,black spiral p19,36,57,14,22.5,,,"clay loam, FGR, MGR",wet,C/F-VF,tan,,
+,KHF-1,6/30/18,black spiral p19,57,71,22.5,28,,,"sandy clay, FGR",moist,F/C,tan and orange,,
+,KHF-1,6/30/18,black spiral p19,71,86,28,34,,,sandy clay,saturated,"F/VF, F/fibrous",tan and orange,,some chunks of soil dry inside
+,KHF-1,6/30/18,black spiral p19,86,89,34,35,,,GR,,,,,hit big rock at bottom > 120 mm
+,KHF-1,6/29/21,yellow p55,89,100,,,,,"sandy clay, FGR",wet non-satiated,F/VF,7.5 YR 3/3,,"gravel sub-rounded; deepened well, prior depth 84 cm"
+,KHF-1,6/29/21,yellow p55,100,111,,,,,"sandy clay, VFGR",wet non-satiated,,7.5 YR 3/3,,gravel sub-rounded
+,KHF-1,6/29/21,yellow p55,111,140,,,,,"sandy clay, VFGR",wet non-satiated,F/VF-F,"7.5 YR, 3/4",,gravel subangular
+,KHF-1,6/29/21,yellow p55,140,149,,,,,"clay, XCGR",wet non-satiated,F/VF,"7.5 YR, 3/4",,gravel subangular
+,KHF-1,6/29/21,yellow p55,149,167,,,,,"clay, XCGR",saturated,F/VF,"10 YR, 3/6",,"a few 50-60 mm gravels, subangular"
 ,,,,,,,,,,,,,,,
 15,KEF-1,6/30/18,black spiral p19,,,0,2,,"HO, grassy, fibrous",HO,moist,M/C-F,dark brown,,
 ,KEF-1,6/30/18,black spiral p19,,,2,11,,,clay,saturated,C/C-F,dark brown,,
@@ -184,14 +197,6 @@
 ,E8S,6/6/21,yellow p49,100,115,,,C,,"sandy clay, VGR",saturated,,"7.5 YR, 4/3",,
 ,E8S,6/6/21,yellow p49,115,121,,,,,"sand, XGR",saturated,,"7.5 YR, 4/6",,
 ,,,,,,,,,,,,,,,
-25,KWT-1,6/29/21,yellow p55,78,98,,,,,loamy sand,wet,,,,"deepened well, prior depth of well = 78 cm"
-,KWT-1,6/29/21,yellow p55,98,113,,,,,loam,wet non-satiated,,"7.5 YR, 3/3",,
-,KWT-1,6/29/21,yellow p55,113,121,,,,,sandy clay loam,wet non-satiated,,"7.5 YR, 3/4",,
-,KWT-1,6/29/21,yellow p55,121,125,,,,,sandy clay loam,wet non-satiated,,"7.5 YR, 3/4; rose and orange-red mottled pebbles, 2-4 mm",,
-,KWT-1,6/29/21,yellow p55,125,131,,,,,sandy clay loam,wet non-satiated,,"10 YR 3/4; rose and orange-red mottled pebbles, 2-8 mm",,
-,KWT-1,6/29/21,yellow p55,131,136,,,,,sandy clay loam,wet,,"10 YR 3/4; rose, red-orange and blue mottled pebbles",,rock 4.5 cm
-,KWT-1,6/29/21,yellow p55,136,147,,,,,"sandy clay, VGR",wet,,"10 YR 4/4; rose, red-orange and blue mottled pebbles",,"rock 5 cm, subangular"
-,,,,,,,,,,,,,,,
 26,D6N,6/29/21,yellow p55,99,116,,,,,silty clay,moist,"M/VF-F, C/M","7.5 YR, 2.5/3",,deepened well from 99 cm
 ,D6N,6/29/21,yellow p55,116,136,,,,,"sandy clay, FGR",wet non-satiated,C/VF-F,"7.5 YR, 4/2",,
 ,D6N,6/29/21,yellow p55,136,155,,,,,"clay, FGR",saturated,F/VF-C,"mottled rocks 5 Y, 5/1 + 10 YR 4/6 + 2.5 Y 6/8 (olive yellow)",,groundwater level measured at 3.73 ft from ground
@@ -199,12 +204,6 @@
 ,D6N,6/29/21,yellow p55,161,177,,,,live root fibers,"sandy clay, VGR",saturated,"F/C, C/VF-F","10 YR, 5/1 (grayer); white, rose and orange mottled",,"subangular gravel, mottled"
 ,D6N,6/29/21,yellow p55,177,188,,,,,"sandy clay, VGR",saturated,C/VF-F,"7.5 YR, 5/1;  white, rose and orange mottled",,large sand and subangular gravel
 ,D6N,6/29/21,yellow p55,188,196,,,,live root fibers,"sandy clay, VFGR",saturated,C/VF-F,"7.5 YR, 5/1;  white, rose and orange mottled",,fine gravels and pebbles
-,,,,,,,,,,,,,,,
-27,KHF-1,6/29/21,yellow p55,84,100,,,,,"sandy clay, FGR",wet non-satiated,F/VF,7.5 YR 3/3,,"gravel sub-rounded; deepened well, prior depth 84 cm"
-,KHF-1,6/29/21,yellow p55,100,111,,,,,"sandy clay, VFGR",wet non-satiated,,7.5 YR 3/3,,gravel sub-rounded
-,KHF-1,6/29/21,yellow p55,111,140,,,,,"sandy clay, VFGR",wet non-satiated,F/VF-F,"7.5 YR, 3/4",,gravel subangular
-,KHF-1,6/29/21,yellow p55,140,149,,,,,"clay, XCGR",wet non-satiated,F/VF,"7.5 YR, 3/4",,gravel subangular
-,KHF-1,6/29/21,yellow p55,149,167,,,,,"clay, XCGR",saturated,F/VF,"10 YR, 3/6",,"a few 50-60 mm gravels, subangular"
 ,,,,,,,,,,,,,,,
 28,EHT-XA5S,7/15/21,yellow p74,0,12,,,O,fibrous,,dry,M/VF-C,,,augured completely new well hole; previous well depth was 114.5 cm; this was deepest of 4 trial holes
 ,EHT-XA5S,7/15/21,yellow p74,12,32,,,,,silty clay,dry,"M/VF-F, F/M","7.5 YR, 3/1",,
@@ -265,8 +264,6 @@
 ,E5S,7/16/21,yellow p77,138,150,,,,,"sandy clay, XFGR",saturated,F/VF-F,"10 YR, 4/4",,finer gravel
 ,E5S,7/16/21,yellow p77,150,165,,,,,"sandy clay, XGR",saturated,,"10 YR, 3/6",,"gravel sub-angular, larger to 45 mm"
 ,E5S,7/16/21,yellow p77,165,179,,,,,FGR,saturated,,,,"gravel rounded, mostly 2-4 mm, a few to 16 mm"
-,,,,,,,,,,,,,,,
-34,EER-1,6/5/24,yellow p137,70,74,,,,,"clay, GR",,,,,"transition from clay to rounded gravels; replaced well, seemed to be frost-heaved, unable to deepen"
 ,,,,,,,,,,,,,,,
 35,KWF-2,6/11/25,2015-25 Or V3 p60,0,7,,,O,,,moist,"M/VF, C/F","2.5 YR, 2.5/1",,"augered at Kiln3 camera, but abandoned due to cobbles at 66 cm, which didn't seem deep enough to support a viable well"
 ,KWF-2,6/11/25,2015-25 Or V3 p60,7,14,,,Oa,,silty clay,moist,"M/VF, F/F, VF/C","10 YR, 2/1",,"loose, spongy"

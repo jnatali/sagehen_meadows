@@ -54,12 +54,12 @@ from scripts.groundwater.well_utils import process_well_ids
 
 # Define Source File
 OUTPUT_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
-OUTPUT_FILE_PATTERN = "soil_survey_at_wells_update_w_G.csv"
+OUTPUT_FILE_PATTERN = "soil_survey_VALIDATED.csv"
 
 # Define Source File
 SOURCE_DIR = os.path.join( '..','..', 'data', 'field_observations', 
                           'soil', 'RAW')
-SOURCE_FILE_PATTERN = "soil_survey_at_wells.csv"
+SOURCE_FILE_PATTERN = "soil_survey_RAW.csv"
 
 word_to_code_mapping = {
     'coarse sand': 'COS',

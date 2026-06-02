@@ -1,9 +1,10 @@
 #,well_id,date,source,start depth (cm),stop depth (cm),start depth (in),stop depth (in),horizon,organic matter,soil texture,water content,roots,color,redox,notes,field_well_id,meadow_id,plant_type,hydrogeo_zone,texture,sub-class,soil texture code,gravel size,gravel amount
-1.0,EER-1,5/30/18,black spiral,,,0.0,8.0,,,"clay, HO",moist,C/F-M,dark brown,,crumbly,EER-1,East,Sedge,Riparian,clay,HO,C,,0.0
-,EER-1,5/30/18,black spiral,,,8.0,16.0,,,"clay, HO",moist,"C/VF, F/F-M",dark brown,,"slick, smooth",EER-1,East,Sedge,Riparian,clay,HO,C,,0.0
-,EER-1,5/30/18,black spiral,,,16.0,20.0,,,"clay, GS, MK",saturated,"M/M, C/VF-F",dark brown,,,EER-1,East,Sedge,Riparian,clay,"GS, MK",C,,0.0
-,EER-1,5/30/18,black spiral,,,20.0,24.0,,,"sandy clay, GR",saturated,C/VF-M,dark brown,,rounded GR,EER-1,East,Sedge,Riparian,sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)"
-,EER-1,5/30/18,black spiral,,,24.0,29.0,,,"sandy clay, GR",saturated,C/M,dark brown,,rounded F-M GR,EER-1,East,Sedge,Riparian,sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)"
+1.0,EER-1,5/30/18,black spiral,0.0,10.0,,,,,"clay, HO",moist,C/F-M,dark brown,,crumbly,EER-1,East,Sedge,Riparian,clay,HO,C,,0.0
+,EER-1,5/30/18,black spiral,20.0,41.0,,,,,"clay, HO",moist,"C/VF, F/F-M",dark brown,,"slick, smooth",EER-1,East,Sedge,Riparian,clay,HO,C,,0.0
+,EER-1,5/30/18,black spiral,41.0,51.0,,,,,"clay, GS, MK",saturated,"M/M, C/VF-F",dark brown,,,EER-1,East,Sedge,Riparian,clay,"GS, MK",C,,0.0
+,EER-1,5/30/18,black spiral,51.0,61.0,,,,,"sandy clay, GR",saturated,C/VF-M,dark brown,,rounded GR,EER-1,East,Sedge,Riparian,sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)"
+,EER-1,5/30/18,black spiral,61.0,73.0,,,,,"sandy clay, GR",saturated,C/M,dark brown,,rounded F-M GR,EER-1,East,Sedge,Riparian,sandy clay,GR,SC,"(5, 20)","(0.15, 0.35)"
+,EER-1,6/5/24,yellow p137,73.0,74.0,,,,,"clay, GR",,,,,"transition from clay to rounded gravels; replaced well, seemed to be frost-heaved, unable to deepen",EER-1,East,Sedge,Riparian,clay,GR,C,"(5, 20)","(0.15, 0.35)"
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
 2.0,EHR-1,5/30/18,black spiral,,,0.0,2.0,,,"clay, HO",moist,M/F-M,dark brown,,crumbly,EHR-1,East,Mixed Herbaceous,Riparian,clay,HO,C,,0.0
 ,EHR-1,5/30/18,black spiral,,,2.0,12.0,,,clay,moist,M/F-M,dark brown,,slick,EHR-1,East,Mixed Herbaceous,Riparian,clay,,C,,0.0
@@ -56,13 +57,20 @@
 ,KER-1,6/18/18,black spiral p14,,,28.0,32.0,,fibers midway,"sandy loam, GR",saturated,"C/F, C/C",brown gray,,"roots especialy midway; pebbles to 22 mm, rounded",KER-1,Kiln,Sedge,Riparian,sandy loam,GR,SL,"(5, 20)","(0.15, 0.35)"
 ,KER-1,6/18/18,black spiral p14,,,32.0,33.0,,,GR,saturated,"C/C, C/F-M/VF",brown gray,,"bottom of hole, pebbles and gravel",KER-1,Kiln,Sedge,Riparian,gr,,,,0.0
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
-9.0,KWF-2,6/20/18,black spiral p14,,,0.0,5.0,,fibrous,"hummus, clay, HO",moist,M/C-F,dark brown,,,KWT-1,Kiln,Willow,Fan,hummus,"clay, HO",,,0.0
-,KWF-2,6/20/18,black spiral p14,,,5.0,7.5,,,XST,,,,,extracted big rock,KWT-1,Kiln,Willow,Fan,xst,,,,0.0
-,KWF-2,6/20/18,black spiral p14,,,7.5,12.0,,,clay,moist,"M/C-VC, C/F",dark brown,,,KWT-1,Kiln,Willow,Fan,clay,,C,,0.0
-,KWF-2,6/20/18,black spiral p14,,,12.0,17.5,,,silty clay,wet,"C/C, F/F",brown,,,KWT-1,Kiln,Willow,Fan,silty clay,,SIC,,0.0
-,KWF-2,6/20/18,black spiral p14,,,17.5,28.0,,,sandy clay loam,wet-saturated,F/F-VF,tan brown,,"mottled at bottom, decomposed pebbles",KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
-,KWF-2,6/20/18,black spiral p14,,,28.0,36.0,,,"sandy clay loam, VGR",saturated,"F/C, F/F",tan pink,,decomposed rock was pink; pebbles to 30 mm,KWT-1,Kiln,Willow,Fan,sandy clay loam,VGR,SCL,"(5, 20)","(0.35, 0.6)"
-,KWF-2,6/20/18,black spiral p14,,,36.0,41.0,,,GR,saturated,F/F-VF,"tan, mottled",,"decomposed rock was red,orange and gray",KWT-1,Kiln,Willow,Fan,gr,,,,0.0
+9.0,KWF-2,6/20/18,black spiral p14,0.0,13.0,0.0,5.0,,fibrous,"hummus, clay, HO",moist,M/C-F,dark brown,,,KWT-1,Kiln,Willow,Fan,hummus,"clay, HO",,,0.0
+,KWF-2,6/20/18,black spiral p14,13.0,19.0,5.0,7.5,,,XST,,,,,extracted big rock,KWT-1,Kiln,Willow,Fan,xst,,,,0.0
+,KWF-2,6/20/18,black spiral p14,19.0,30.0,7.5,12.0,,,clay,moist,"M/C-VC, C/F",dark brown,,,KWT-1,Kiln,Willow,Fan,clay,,C,,0.0
+,KWF-2,6/20/18,black spiral p14,30.0,44.0,12.0,17.5,,,silty clay,wet,"C/C, F/F",brown,,,KWT-1,Kiln,Willow,Fan,silty clay,,SIC,,0.0
+,KWF-2,6/20/18,black spiral p14,44.0,71.0,17.5,28.0,,,sandy clay loam,wet-saturated,F/F-VF,tan brown,,"mottled at bottom, decomposed pebbles",KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
+,KWF-2,6/20/18,black spiral p14,71.0,91.0,28.0,36.0,,,"sandy clay loam, VGR",saturated,"F/C, F/F",tan pink,,decomposed rock was pink; pebbles to 30 mm,KWT-1,Kiln,Willow,Fan,sandy clay loam,VGR,SCL,"(5, 20)","(0.35, 0.6)"
+,KWF-2,6/20/18,black spiral p14,91.0,104.0,36.0,41.0,,,GR,saturated,F/F-VF,"tan, mottled",,"decomposed rock was red,orange and gray",KWT-1,Kiln,Willow,Fan,gr,,,,0.0
+,"KWT-1, skip",6/29/21,yellow p55,78.0,98.0,,,,,loamy sand,wet,,,,"deepened well, prior depth of well = 78 cm","KWT-1, skip",Kiln,Willow,Terrace,loamy sand,,LS,,0.0
+,KWF-2,6/29/21,yellow p55,104.0,113.0,,,,,loam,wet non-satiated,,"7.5 YR, 3/3",,,KWT-1,Kiln,Willow,Fan,loam,,L,,0.0
+,KWF-2,6/29/21,yellow p55,113.0,121.0,,,,,sandy clay loam,wet non-satiated,,"7.5 YR, 3/4",,,KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
+,KWF-2,6/29/21,yellow p55,121.0,125.0,,,,,sandy clay loam,wet non-satiated,,"7.5 YR, 3/4; rose and orange-red mottled pebbles, 2-4 mm",,,KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
+,KWF-2,6/29/21,yellow p55,125.0,131.0,,,,,sandy clay loam,wet non-satiated,,"10 YR 3/4; rose and orange-red mottled pebbles, 2-8 mm",,,KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
+,KWF-2,6/29/21,yellow p55,131.0,136.0,,,,,sandy clay loam,wet,,"10 YR 3/4; rose, red-orange and blue mottled pebbles",,rock 4.5 cm,KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
+,KWF-2,6/29/21,yellow p55,136.0,147.0,,,,,"sandy clay, VGR",wet,,"10 YR 4/4; rose, red-orange and blue mottled pebbles",,"rock 5 cm, subangular",KWT-1,Kiln,Willow,Fan,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)"
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
 10.0,KHT-XE4S,6/20/18,black spiral p16,,,0.0,2.0,,HO,silty clay,moist,M/C-F,dark brown,,,E4S,Kiln,Mixed Herbaceous,Terrace,silty clay,,SIC,,0.0
 ,KHT-XE4S,6/20/18,black spiral p16,,,2.0,4.0,,,silty clay,moist,M/F,dark brown,,,E4S,Kiln,Mixed Herbaceous,Terrace,silty clay,,SIC,,0.0
@@ -87,17 +95,22 @@
 ,KWR-1,6/20/18,black spiral p17,,,25.0,32.0,,,"sandy clay loam, GR",saturated,C/F-VF,brown,,"mostly pebbles, a few gravels > 11 mm",KWR-1,Kiln,Willow,Riparian,sandy clay loam,GR,SCL,"(5, 20)","(0.15, 0.35)"
 ,KWR-1,6/20/18,black spiral p17,,,32.0,33.0,,,GR,saturated,,,,bottom of well,KWR-1,Kiln,Willow,Riparian,gr,,,,0.0
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
-13.0,KHF-1,6/30/18,black spiral p17,,,0.0,5.0,,"HO, grassy, HPM",clay,moist,"M/C-VF, fibrous",dark brown,,fibrous roots throughout,KHF-1,Kiln,Mixed Herbaceous,Fan,clay,,C,,0.0
-,KHF-1,6/30/18,black spiral p17,,,5.0,9.5,,,clay,moist,"M/F-VF, F/C-M",dark brown,,,KHF-1,Kiln,Mixed Herbaceous,Fan,clay,,C,,0.0
-,KHF-1,6/30/18,black spiral p17,,,9.5,15.0,,,clay,moist,"C/F-VF, F/C-M",brown,,"hit rock > 120 mm; failed attempt, not the ultimate well location",KHF-1,Kiln,Mixed Herbaceous,Fan,clay,,C,,0.0
+13.0,"KHF-1, skip",6/30/18,black spiral p17,,,0.0,5.0,,"HO, grassy, HPM",clay,moist,"M/C-VF, fibrous",dark brown,,fibrous roots throughout,"KHF-1, skip",Kiln,Mixed Herbaceous,Fan,clay,,C,,0.0
+,"KHF-1, skip",6/30/18,black spiral p17,,,5.0,9.5,,,clay,moist,"M/F-VF, F/C-M",dark brown,,,"KHF-1, skip",Kiln,Mixed Herbaceous,Fan,clay,,C,,0.0
+,"KHF-1, skip",6/30/18,black spiral p17,,,9.5,15.0,,,clay,moist,"C/F-VF, F/C-M",brown,,"hit rock > 120 mm; failed attempt, not the ultimate well location","KHF-1, skip",Kiln,Mixed Herbaceous,Fan,clay,,C,,0.0
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
-14.0,KHF-1,6/30/18,black spiral p19,,,0.0,2.0,,HO,HO,dry,"M/M-VF, F/C",brown,,crumbly,KHF-1,Kiln,Mixed Herbaceous,Fan,ho,,,,0.0
-,KHF-1,6/30/18,black spiral p19,,,2.0,6.0,,,"silty clay, FGR",dry,C/M-VF,brown,,,KHF-1,Kiln,Mixed Herbaceous,Fan,silty clay,FGR,SIC,"(2, 5)","(0.15, 0.35)"
-,KHF-1,6/30/18,black spiral p19,,,6.0,14.0,,,clay,moist,F/M-F,light brown,,,KHF-1,Kiln,Mixed Herbaceous,Fan,clay,,C,,0.0
-,KHF-1,6/30/18,black spiral p19,,,14.0,22.5,,,"clay loam, FGR, MGR",wet,C/F-VF,tan,,,KHF-1,Kiln,Mixed Herbaceous,Fan,clay loam,"FGR, MGR",CL,"(2, 5)","(0.15, 0.35)"
-,KHF-1,6/30/18,black spiral p19,,,22.5,28.0,,,"sandy clay, FGR",moist,F/C,tan and orange,,,KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)"
-,KHF-1,6/30/18,black spiral p19,,,28.0,34.0,,,sandy clay,saturated,"F/VF, F/fibrous",tan and orange,,some chunks of soil dry inside,KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,,SC,,0.0
-,KHF-1,6/30/18,black spiral p19,,,34.0,35.0,,,GR,,,,,hit big rock at bottom > 120 mm,KHF-1,Kiln,Mixed Herbaceous,Fan,gr,,,,0.0
+14.0,KHF-1,6/30/18,black spiral p19,0.0,5.0,0.0,2.0,,HO,HO,dry,"M/M-VF, F/C",brown,,crumbly,KHF-1,Kiln,Mixed Herbaceous,Fan,ho,,,,0.0
+,KHF-1,6/30/18,black spiral p19,5.0,15.0,2.0,6.0,,,"silty clay, FGR",dry,C/M-VF,brown,,,KHF-1,Kiln,Mixed Herbaceous,Fan,silty clay,FGR,SIC,"(2, 5)","(0.15, 0.35)"
+,KHF-1,6/30/18,black spiral p19,15.0,36.0,6.0,14.0,,,clay,moist,F/M-F,light brown,,,KHF-1,Kiln,Mixed Herbaceous,Fan,clay,,C,,0.0
+,KHF-1,6/30/18,black spiral p19,36.0,57.0,14.0,22.5,,,"clay loam, FGR, MGR",wet,C/F-VF,tan,,,KHF-1,Kiln,Mixed Herbaceous,Fan,clay loam,"FGR, MGR",CL,"(2, 5)","(0.15, 0.35)"
+,KHF-1,6/30/18,black spiral p19,57.0,71.0,22.5,28.0,,,"sandy clay, FGR",moist,F/C,tan and orange,,,KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)"
+,KHF-1,6/30/18,black spiral p19,71.0,86.0,28.0,34.0,,,sandy clay,saturated,"F/VF, F/fibrous",tan and orange,,some chunks of soil dry inside,KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,,SC,,0.0
+,KHF-1,6/30/18,black spiral p19,86.0,89.0,34.0,35.0,,,GR,,,,,hit big rock at bottom > 120 mm,KHF-1,Kiln,Mixed Herbaceous,Fan,gr,,,,0.0
+,KHF-1,6/29/21,yellow p55,89.0,100.0,,,,,"sandy clay, FGR",wet non-satiated,F/VF,7.5 YR 3/3,,"gravel sub-rounded; deepened well, prior depth 84 cm",KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)"
+,KHF-1,6/29/21,yellow p55,100.0,111.0,,,,,"sandy clay, VFGR",wet non-satiated,,7.5 YR 3/3,,gravel sub-rounded,KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,VFGR,SC,,0.0
+,KHF-1,6/29/21,yellow p55,111.0,140.0,,,,,"sandy clay, VFGR",wet non-satiated,F/VF-F,"7.5 YR, 3/4",,gravel subangular,KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,VFGR,SC,,0.0
+,KHF-1,6/29/21,yellow p55,140.0,149.0,,,,,"clay, XCGR",wet non-satiated,F/VF,"7.5 YR, 3/4",,gravel subangular,KHF-1,Kiln,Mixed Herbaceous,Fan,clay,XCGR,C,,0.0
+,KHF-1,6/29/21,yellow p55,149.0,167.0,,,,,"clay, XCGR",saturated,F/VF,"10 YR, 3/6",,"a few 50-60 mm gravels, subangular",KHF-1,Kiln,Mixed Herbaceous,Fan,clay,XCGR,C,,0.0
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
 15.0,KEF-1,6/30/18,black spiral p19,,,0.0,2.0,,"HO, grassy, fibrous",HO,moist,M/C-F,dark brown,,,KEF-1,Kiln,Sedge,Fan,ho,,,,0.0
 ,KEF-1,6/30/18,black spiral p19,,,2.0,11.0,,,clay,saturated,C/C-F,dark brown,,,KEF-1,Kiln,Sedge,Fan,clay,,C,,0.0
@@ -184,14 +197,6 @@
 ,KWF-XE8S,6/6/21,yellow p49,100.0,115.0,,,C,,"sandy clay, VGR",saturated,,"7.5 YR, 4/3",,,E8S,Kiln,Willow,Fan,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)"
 ,KWF-XE8S,6/6/21,yellow p49,115.0,121.0,,,,,"sand, XGR",saturated,,"7.5 YR, 4/6",,,E8S,Kiln,Willow,Fan,sand,XGR,S,"(5, 20)","(0.6, 0.9)"
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
-25.0,KWF-2,6/29/21,yellow p55,78.0,98.0,,,,,loamy sand,wet,,,,"deepened well, prior depth of well = 78 cm",KWT-1,Kiln,Willow,Fan,loamy sand,,LS,,0.0
-,KWF-2,6/29/21,yellow p55,98.0,113.0,,,,,loam,wet non-satiated,,"7.5 YR, 3/3",,,KWT-1,Kiln,Willow,Fan,loam,,L,,0.0
-,KWF-2,6/29/21,yellow p55,113.0,121.0,,,,,sandy clay loam,wet non-satiated,,"7.5 YR, 3/4",,,KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
-,KWF-2,6/29/21,yellow p55,121.0,125.0,,,,,sandy clay loam,wet non-satiated,,"7.5 YR, 3/4; rose and orange-red mottled pebbles, 2-4 mm",,,KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
-,KWF-2,6/29/21,yellow p55,125.0,131.0,,,,,sandy clay loam,wet non-satiated,,"10 YR 3/4; rose and orange-red mottled pebbles, 2-8 mm",,,KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
-,KWF-2,6/29/21,yellow p55,131.0,136.0,,,,,sandy clay loam,wet,,"10 YR 3/4; rose, red-orange and blue mottled pebbles",,rock 4.5 cm,KWT-1,Kiln,Willow,Fan,sandy clay loam,,SCL,,0.0
-,KWF-2,6/29/21,yellow p55,136.0,147.0,,,,,"sandy clay, VGR",wet,,"10 YR 4/4; rose, red-orange and blue mottled pebbles",,"rock 5 cm, subangular",KWT-1,Kiln,Willow,Fan,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)"
-,,,,,,,,,,,,,,,,,,,,,,,,0.0
 26.0,KHT-XD6N,6/29/21,yellow p55,99.0,116.0,,,,,silty clay,moist,"M/VF-F, C/M","7.5 YR, 2.5/3",,deepened well from 99 cm,D6N,Kiln,Mixed Herbaceous,Terrace,silty clay,,SIC,,0.0
 ,KHT-XD6N,6/29/21,yellow p55,116.0,136.0,,,,,"sandy clay, FGR",wet non-satiated,C/VF-F,"7.5 YR, 4/2",,,D6N,Kiln,Mixed Herbaceous,Terrace,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)"
 ,KHT-XD6N,6/29/21,yellow p55,136.0,155.0,,,,,"clay, FGR",saturated,F/VF-C,"mottled rocks 5 Y, 5/1 + 10 YR 4/6 + 2.5 Y 6/8 (olive yellow)",,groundwater level measured at 3.73 ft from ground,D6N,Kiln,Mixed Herbaceous,Terrace,clay,FGR,C,"(2, 5)","(0.15, 0.35)"
@@ -199,12 +204,6 @@
 ,KHT-XD6N,6/29/21,yellow p55,161.0,177.0,,,,live root fibers,"sandy clay, VGR",saturated,"F/C, C/VF-F","10 YR, 5/1 (grayer); white, rose and orange mottled",,"subangular gravel, mottled",D6N,Kiln,Mixed Herbaceous,Terrace,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)"
 ,KHT-XD6N,6/29/21,yellow p55,177.0,188.0,,,,,"sandy clay, VGR",saturated,C/VF-F,"7.5 YR, 5/1;  white, rose and orange mottled",,large sand and subangular gravel,D6N,Kiln,Mixed Herbaceous,Terrace,sandy clay,VGR,SC,"(5, 20)","(0.35, 0.6)"
 ,KHT-XD6N,6/29/21,yellow p55,188.0,196.0,,,,live root fibers,"sandy clay, VFGR",saturated,C/VF-F,"7.5 YR, 5/1;  white, rose and orange mottled",,fine gravels and pebbles,D6N,Kiln,Mixed Herbaceous,Terrace,sandy clay,VFGR,SC,,0.0
-,,,,,,,,,,,,,,,,,,,,,,,,0.0
-27.0,KHF-1,6/29/21,yellow p55,84.0,100.0,,,,,"sandy clay, FGR",wet non-satiated,F/VF,7.5 YR 3/3,,"gravel sub-rounded; deepened well, prior depth 84 cm",KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,FGR,SC,"(2, 5)","(0.15, 0.35)"
-,KHF-1,6/29/21,yellow p55,100.0,111.0,,,,,"sandy clay, VFGR",wet non-satiated,,7.5 YR 3/3,,gravel sub-rounded,KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,VFGR,SC,,0.0
-,KHF-1,6/29/21,yellow p55,111.0,140.0,,,,,"sandy clay, VFGR",wet non-satiated,F/VF-F,"7.5 YR, 3/4",,gravel subangular,KHF-1,Kiln,Mixed Herbaceous,Fan,sandy clay,VFGR,SC,,0.0
-,KHF-1,6/29/21,yellow p55,140.0,149.0,,,,,"clay, XCGR",wet non-satiated,F/VF,"7.5 YR, 3/4",,gravel subangular,KHF-1,Kiln,Mixed Herbaceous,Fan,clay,XCGR,C,,0.0
-,KHF-1,6/29/21,yellow p55,149.0,167.0,,,,,"clay, XCGR",saturated,F/VF,"10 YR, 3/6",,"a few 50-60 mm gravels, subangular",KHF-1,Kiln,Mixed Herbaceous,Fan,clay,XCGR,C,,0.0
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
 28.0,EHF-XA5S,7/15/21,yellow p74,0.0,12.0,,,O,fibrous,,dry,M/VF-C,,,augured completely new well hole; previous well depth was 114.5 cm; this was deepest of 4 trial holes,EHT-XA5S,East,Mixed Herbaceous,Fan,,,,,0.0
 ,EHF-XA5S,7/15/21,yellow p74,12.0,32.0,,,,,silty clay,dry,"M/VF-F, F/M","7.5 YR, 3/1",,,EHT-XA5S,East,Mixed Herbaceous,Fan,silty clay,,SIC,,0.0
@@ -265,8 +264,6 @@
 ,KHT-XE5S,7/16/21,yellow p77,138.0,150.0,,,,,"sandy clay, XFGR",saturated,F/VF-F,"10 YR, 4/4",,finer gravel,E5S,Kiln,Mixed Herbaceous,Terrace,sandy clay,XFGR,SC,,0.0
 ,KHT-XE5S,7/16/21,yellow p77,150.0,165.0,,,,,"sandy clay, XGR",saturated,,"10 YR, 3/6",,"gravel sub-angular, larger to 45 mm",E5S,Kiln,Mixed Herbaceous,Terrace,sandy clay,XGR,SC,"(5, 20)","(0.6, 0.9)"
 ,KHT-XE5S,7/16/21,yellow p77,165.0,179.0,,,,,FGR,saturated,,,,"gravel rounded, mostly 2-4 mm, a few to 16 mm",E5S,Kiln,Mixed Herbaceous,Terrace,fgr,,,,0.0
-,,,,,,,,,,,,,,,,,,,,,,,,0.0
-34.0,EER-1,6/5/24,yellow p137,70.0,74.0,,,,,"clay, GR",,,,,"transition from clay to rounded gravels; replaced well, seemed to be frost-heaved, unable to deepen",EER-1,East,Sedge,Riparian,clay,GR,C,"(5, 20)","(0.15, 0.35)"
 ,,,,,,,,,,,,,,,,,,,,,,,,0.0
 35.0,KWF-2,6/11/25,2015-25 Or V3 p60,0.0,7.0,,,O,,,moist,"M/VF, C/F","2.5 YR, 2.5/1",,"augered at Kiln3 camera, but abandoned due to cobbles at 66 cm, which didn't seem deep enough to support a viable well",KWF-2,Kiln,Willow,Fan,,,,,0.0
 ,KWF-2,6/11/25,2015-25 Or V3 p60,7.0,14.0,,,Oa,,silty clay,moist,"M/VF, F/F, VF/C","10 YR, 2/1",,"loose, spongy",KWF-2,Kiln,Willow,Fan,silty clay,,SIC,,0.0
