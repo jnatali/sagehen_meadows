@@ -39,7 +39,7 @@ RECENT UPDATES:
 
 # --- DUNDERS ---
 __author__ = 'Jennifer Natali'
-__copyright__ = 'Copyright (C) 2024 Jennifer Natali'
+__copyright__ = 'Copyright (C) 2026 Riverlab, UC Berkeley'
 __license__ = 'NOT Licensed, Private Code under Development, DO NOT DISTRIBUTE'
 __maintainer__ = 'Jennifer Natali'
 __email__ = 'jennifer.natali@berkeley.edu'

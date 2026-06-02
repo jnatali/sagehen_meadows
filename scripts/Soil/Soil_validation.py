@@ -1,26 +1,65 @@
+"""
+Created in 2026
+
+##########  FIELD SOIL SURVEY DATA PROCESSING SCRIPT  ##########  
+
+This module is a first step to processing soil profile data for groundwater
+wells in Sagehen meadows.
+
+This code is under development and follows basic procedural programming,
+leverages Pandas DataFrames and csv files with well-defined column names.
+
+What it does:
+
+NOTE: Assumes that if 'G' is in 'sub-class' column value,
+      the content is about gravels. 
+
+Requires X data files:
+1. RAW soil profile data
+
+TODOs documented in github repo issue tracking.
+- Can we safely change check for 'G' to 'GR' to be more specific?
+
+RECENT UPDATES:
+    06/01/2026 JN added comments and documentation;
+               JN added import from well_utils 
+                to leverage process_well_ids() function;
+
+"""
+# --- DUNDERS ---
+__author__ = 'Kara-Leah Smittle, Jennifer Natali'
+__copyright__ = 'Copyright (C) 2026 Riverlab, UC Berkeley'
+__license__ = 'NOT Licensed, Private Code under Development, DO NOT DISTRIBUTE'
+__maintainer__ = 'Jennifer Natali'
+__email__ = 'jennifer.natali@berkeley.edu'
+__status__ = 'Development'
+
+# ---- INITIALIZE PROJECT ROOT
+
+
+# ---- IMPORTS ---
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
+#import matplotlib.pyplot as plt
+#import seaborn as sns
+#import numpy as np
 import os
-import math
+#import math
+from pathlib import Path
+import sys
+
+# ---- INITIALIZE FILE VARIABLES ---
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+from scripts.groundwater.well_utils import process_well_ids
 
 # Define Source File
 OUTPUT_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
 OUTPUT_FILE_PATTERN = "soil_survey_at_wells_update_w_G.csv"
-output_path = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN)
-
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
-    print(f"Created directory: {OUTPUT_DIR}")
 
 # Define Source File
-SOURCE_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
-SOURCE_FILE_PATTERN = "soil_survey_at_wells_update.csv"
-file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
-
-print(f"Loading data from: {file_path}")
-df = pd.read_csv(file_path)
+SOURCE_DIR = os.path.join( '..','..', 'data', 'field_observations', 
+                          'soil', 'RAW')
+SOURCE_FILE_PATTERN = "soil_survey_at_wells.csv"
 
 word_to_code_mapping = {
     'coarse sand': 'COS',
@@ -63,10 +102,11 @@ gravel_size_map = {
 }
 
 gravel_amount_map = {
-    #These are all right end exclusive
+    # These are all right end exclusive
     # Standard Gravelly (15->35%)
     'GR': (0.15, 0.35), 'FGR': (0.15, 0.35), 'MGR': (0.15, 0.35), 
-    'CGR': (0.15, 0.35), 'GRF': (0.15, 0.35), 'GRM': (0.15, 0.35), 'GRC': (0.15, 0.35),
+    'CGR': (0.15, 0.35), 'GRF': (0.15, 0.35), 'GRM': (0.15, 0.35), 
+    'GRC': (0.15, 0.35),
     
     # Very Gravelly (35->60%)
     'VGR': (0.35, 0.60), 'GRV': (0.35, 0.60),
@@ -75,8 +115,16 @@ gravel_amount_map = {
     'XGR': (0.60, 0.90), 'GRX': (0.60, 0.90)
 }
 
-#Function to check for 'G' and extract the info
+# ---- FUNCTIONS ---
+
 def extract_gravel_info(subclass_str):
+    """
+    Checks for 'G' and extracts info about gravel size categories
+
+    Parameters: 
+    
+    Returns:
+    """    
     # Return empty values if the row is empty (NaN)
     if pd.isna(subclass_str):
         return pd.Series([None, 0])
@@ -94,14 +142,31 @@ def extract_gravel_info(subclass_str):
     return pd.Series([None, 0])
 
 
+# ---- MAIN PROCEDURES---
+
+# Load files
+file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
+print(f"Loading data from: {file_path}")
+df = pd.read_csv(file_path)
+
+output_path = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN)
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
+    print(f"Created directory: {OUTPUT_DIR}")
+
+# Validate and correct well_ids (well names)
+df = process_well_ids(df)
+print('Processed well_ids')
+
 # Split the 'soil texture' column at the first comma and expand into two columns
-df[['texture', 'sub-class']] = df['soil texture'].str.split(',', n=1, expand=True)
+df[['texture', 'sub-class']] = df['soil texture'].str.split(
+                                                        ',', n=1, expand=True)
 
 #strip any leftover whitespace 
 df['texture'] = df['texture'].str.strip().str.lower()
 df['sub-class'] = df['sub-class'].str.strip()
 
-#takes the full words in 'soil texture' and creates a new column with the short codes
+# takes the full words in 'soil texture', creates new column with short codes
 df['soil texture code'] = df['texture'].map(word_to_code_mapping)
 
 #Apply the function to create the two new columns
