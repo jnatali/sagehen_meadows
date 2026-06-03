@@ -56,7 +56,7 @@ def load_well_id_corrections(path):
     return pd.read_csv(path)
 
 
-## Validation
+## Validation 
 def validate_well_ids(df, id_col):
     """
     Assert that all well IDs in df[id_col] are in valid_ids.
@@ -65,7 +65,7 @@ def validate_well_ids(df, id_col):
     
     - Removes rows with missing well_id and no other populated fields.
     - Warns about rows with missing well_id but other populated fields.
-    - Warns about invalid well IDs.
+    - Warns about invalid well IDs, then drops them.
     """
     
     
@@ -115,6 +115,8 @@ def validate_well_ids(df, id_col):
         # raise ValueError(
         #     f"Invalid well_id(s) found: {(invalid)}"
         # )
+    
+    return df
 
 ## Renaming / Correction
 def apply_well_id_corrections(
@@ -193,7 +195,7 @@ def process_well_ids(
       3. assign categories
     """
     df = apply_well_id_corrections(df)
-    validate_well_ids(df, id_col=id_col)
+    df = validate_well_ids(df, id_col=id_col)
     df = get_well_categories(df)
 
     return df
