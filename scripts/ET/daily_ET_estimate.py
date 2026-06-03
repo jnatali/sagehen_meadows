@@ -17,7 +17,8 @@ import pandas as pd
 #import os
 #import datetime
 import matplotlib.pyplot as plt
-#import numpy as np
+# import well_utils to process well_ids for Sy data
+import ..groundwater.well_utils
 
 # ---- INITIALIZE GLOBAL VARIABLES ---
 
@@ -34,6 +35,8 @@ weather_subdaily_filepath = weather_data_dir + 'Weather_2010_2025_10min_SagehenT
 
 ET_calc_data_dir = '../../data/ET_calculations/'
 ET_calc_filepath = ET_calc_data_dir + 'ET_daily_2025_White_constantSy.csv'
+
+# TODO: add data_dir and filepath for Sy stuff
 
 # ---- FUNCTIONS ---
 
@@ -251,9 +254,11 @@ def estimate_ET_White_wavg_Sy(daily_df) -> pd.DataFrame:
     # df["Sy_star"] = SY_STAR
 
     # note that df is one row per well_id per doy (for now it's only 2025, but we may extend to multi years)
-    # Step 1: For all unique well_ids in df, get the weighted avg Sy from a file: create a "dictionary" (well_id, Sy_wavg)
-    # Step 2: Use the "dictionary" to update Sy_star in the df for any given well_id
-    # Step 3: Continue to next line and calculate the daily ET....
+    # Step 1: Make function to do this??
+    #  Read in the weighted avg Sy file and correct the well_ids using well_utils.py
+    #  For all unique well_ids in df, get the weighted avg Sy from a file: create a "dictionary" (well_id, Sy_wavg)
+    #  Use the "dictionary" to update Sy_star in the df for any given well_id
+    # Step 2: Continue to next line and calculate the daily ET....
 
     # Calculate daily ET
     df["ET_gw_cm"] = df["Sy_star"] * (df["R_cm"] + df["S_cm"])
