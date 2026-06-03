@@ -1,0 +1,29 @@
+﻿STC,Description,Frequency,Sy,,,well_id,average_Sy
+C,Clay,38,0,,,A2S,0.105777778
+SC,Sandy Clay,49,0.04,,,B3S,0.019285714
+SIC,Silty Clay,21,0,,,E1N,0.117241379
+CL,Clay Loam,9,0.03,,,E6S,0.037978142
+HO,Highly Organic,3,0,,,E8S,0.080330579
+SCL,Sandy Clay Loam,8,0.1,,,EEF-1,0.018947368
+L,Loam,2,0.08,,,EER-1,0.012413793
+GR,Gravel,13,0.28,,,EET-1,0.057179487
+SL,Sandy Loam,1,0.18,,,EET-2,0.019705882
+XST,Extremely Stony,1,0.28,,,EHR-1,0.017804878
+O,Organic,18,0,,,EHT-XA5S,0.04
+FGR,Fine Gravelly,1,0.3,,,EWR-1,0.005
+CGR,Coarse Gravelly,1,0.28,,,EWT-1,0.029186667
+S,Sand,2,0.3,,,EWT-2,0.071219512
+VCB,Very Cobbly,2,0.28,,,KEF-1,0.05
+MGR,Medium Gravelly,1,0.28,,,KER-1,0.04030303
+,,,,,,KER-2,0.0905
+,,,,,,KET-1,0.072
+,,,,,,KHF-1,0.03224012
+,,,,,,KHR-1,0.040192308
+,,,,,,KWF-1,0.056944444
+,,,,,,KWF-2,0.04969697
+,,,,,,KWR-1,0.052424242
+,,,,,,KWT-1,0.096341463
+,,,,,,KWT-2,0.034347826
+,,,,,,LET-1,0.020833333
+,,,,,,LHT-1,0.037913043
+,,,,,,LWT-1,0.043333333
