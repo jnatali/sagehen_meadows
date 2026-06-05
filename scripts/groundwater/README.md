@@ -1,5 +1,24 @@
 # Sagehen Groundwater Scripts
 
+## Well Utility Script
+### well_utils.py
+
+Exposes the following functions:
+- load_valid_well_ids() -> list
+- load_well_id_corrections() -> pd.DataFrame
+- validate_well_ids()
+- correct_well_ids(df) -> pd.DataFrame
+- get_well_categories(df) -> pd.DataFrame
+- process_well_ids() -> pd.DataFrame
+
+Code to import well_utils API
+```
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+from well_utils import process_well_ids
+```
+
 ## Sagehen Bi-Weekly Groundwater Scripts
 ### Ground_to_Water.py
 In this directory, Ground_to_Water.py processes groundwater well readings to determine the groundwater

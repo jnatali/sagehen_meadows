@@ -29,34 +29,23 @@ library(MARSS)
 library(lubridate)
 library(dplyr)
 library(tidyr)
+library(here)
 
 
 # ------ INITIALIZE GLOBAL VARIABLES ------
-#### Info about the data
-# TODO: set as model param
-year_range <- c(2018,2019,2021,2024)
-# seemed to be working with 2021 + 2024 only
-#year_range <- c(2018, 2019, 2021, 2024)
-#year_range <- c(2018)
 
-# time limit for filtering groundwater observations
-time_limit <- 12 # only include gw well measurements prior to this time (i.e. noon)
-
-# completeness limit for % of entries NA values per row
-completeness_limit <- 0.88 # default, can be overridden by model params
+# TODO: pass config instead of globals at the top
+config <- list(
+  year_range = c(2018,2019,2021,2024,2025),
+  time_limit = 12, # only include measurements prior to this time (i.e. noon)
+  completeness_limit = 0.88, # limit for % of entries NA values per row
+  trim_first_two_weeks = FALSE, # keep or trim 1st 2 wks?
+  fill_full_year_gaps = FALSE, # fill gaps for entire year (vs. between weeks)?
+  number_iterations = 10000 # default max iterations
+)
 # NOTE: at 0.85 13 wells removed, 0.8800->8 wells, 0.90->5 wells, at 0.95->2
-
-# default max iterations
-number_iterations <- 10000
-
-# flag (binary) to keep or trim the first two weeks
 # TODO: update code to trim first/last NA columns of the series
-# TODO: set as model param
-trim_first_two_weeks = FALSE
-
-# flag (binary) to fill gaps for entire year (vs. between weeks during summer)
-# TODO: set as model param
-fill_full_year_gaps = FALSE
+# TODO: set trim/fill as model param
 
 # today's date for running models from model parameter file listed for today
 today <- Sys.Date()
@@ -67,32 +56,77 @@ formatted_date <- format(today, "%Y_%m%d")
 Z_grouping_id_list <- NULL
 
 # Setup directories and filepaths
-home_dir='/Volumes/SANDISK_SSD_G40/GoogleDrive/GitHub/'
 repository_name = 'sagehen_meadows'
-repository_dir = paste(home_dir, repository_name, '/', sep='')
+repository_dir <- here()
+#repository_dir = paste(home_dir, repository_name, '/', sep='')
 
-groundwater_matrix_filename = 'groundwater_weekly_matrix.csv'
-groundwater_data_dir = 'data/field_observations/groundwater/biweekly_manual/'
+groundwater_matrix_filename = 'groundwater_bin_13d_matrix.csv'
+#groundwater_matrix_filename = 'groundwater_weekly_matrix.csv'
+
+groundwater_data_dir = 'data/field_observations/groundwater/time_series/'
 marss_script_dir = 'scripts/groundwater/MARSS/'
-marss_results_dir = paste(home_dir, repository_name, '/results/MARSS/', sep='')
+marss_results_dir = paste(repository_dir, '/results/MARSS/', sep='')
 
-groundwater_rawdata_filepath = paste(repository_dir, groundwater_data_dir,
-                                     'groundwater_daily_FULL_COMBINED.csv',
+groundwater_rawdata_filepath = paste(repository_dir, '/', groundwater_data_dir,
+                                     'groundwater_daily.csv',
                                      sep='')
-groundwater_weekly_matrix_filepath = paste(repository_dir, groundwater_data_dir,
+groundwater_matrix_filepath = paste(repository_dir, '/', groundwater_data_dir,
                                            groundwater_matrix_filename,
                                            sep='')
-model_parameter_filepath = paste(repository_dir, marss_script_dir,
+model_parameter_filepath = paste(repository_dir, '/', marss_script_dir,
                                  'MARSS_groundwater_parameters.csv',
                                  sep='')
 
 # ------ DEFINE FUNCTIONS ------
+# helper functions: timestep ----
+make_timestep <- function(year, doy) {
+  sprintf("%04d_%03d", year, doy)
+}
 
-#### PREPARE GROUNDWATER DATA
+parse_timestep <- function(ts) {
+  tibble(
+    year = as.integer(substr(ts, 1, 4)),
+    doy  = as.integer(substr(ts, 6, 8))
+  )
+}
+
+# helper: completeness filter ----
+#### FILTER INCOMPLETE WELLS
+filter_incomplete_wells <- function(groundwater_matrix, limit){
+  
+  if (missing(limit)) limit <- config[["completeness_limit"]]
+  # NOTE: completeness_limit defined as global variable at top of file
+  
+  # ensure groundwater_matrix is a dataframe
+  groundwater_df <- as.data.frame(groundwater_matrix)
+  
+  # filter out relatively incomplete wells (across the entire multi-yr series)
+  total_rows <- nrow(groundwater_df)
+  total_columns <- ncol(groundwater_df)
+  # calculate % of NA values per row
+  na_sums <- rowSums(is.na(groundwater_df))
+  na_percent <- rowSums(is.na(groundwater_df)) / total_columns
+  # remove rows based on completeness relative to pre-defined limit
+  new_groundwater_df <- groundwater_df[na_percent <= limit, ]
+  
+  # print removal alert
+  print(paste0('ALERT: # of rows removed after completeness check: ',
+               total_rows - nrow(new_groundwater_df)))
+  removed_wells <- setdiff(groundwater_df$well_id, 
+                           new_groundwater_df$well_id)
+  print('removed wells')
+  print(removed_wells)
+  
+  return(as.matrix(new_groundwater_df))
+}
+
+# data loading and preparation -----
+#### PREPARE GROUNDWATER DATA (WEEKLY)
 # by: JNatali
 # on: 18 Nov 2024
-# purpose: opens biweekly groundwater data 
-#          (manually measured then transformed relative to ground), 
+# purpose: opens groundwater data 
+#          (orig: weekly, manually measured then transformed relative to ground) 
+#          (as of 02/16/2026: daily with all manual at anytime, all logger at 8am only)
 #          manipulates into matrix form, saves it.
 # returns: groundwater_weekly_matrix, evenly-spaced weekly matrix of groundwater
 #          well readings for all years.
@@ -101,7 +135,7 @@ model_parameter_filepath = paste(repository_dir, marss_script_dir,
 # ---TODO: Consider adding data from Kirchner 2006-2008 B+D xect
 # ---TODO: Get data from other (not my) transducers for 2018-2024?
 # ---TODO: summary and analysis of data in MARSS_Sagehen_Groundwater.Rmd
-prepare_groundwater_data <- function(){
+prepare_groundwater_data <- function(config){
   
   # Load groundwater data
   groundwater <- read.csv(groundwater_rawdata_filepath)
@@ -122,17 +156,17 @@ prepare_groundwater_data <- function(){
   ## ORGANIZE BY AN EVEN TIMESTEP
   # filter measurements, only before threshold time
   groundwater <- groundwater %>%
-    filter(hour(timestamp) <= time_limit) # time_limit defined in global vars
+    filter(hour(timestamp) <= config[["time_limit"]]) # defined in config
   
   # get ranges of isoweeks (min to max) depending on flag (global variable)
-  if (fill_full_year_gaps == FALSE) {
+  if (!config[["fill_full_year_gaps"]]) {
     isoweek_range <- min(groundwater$isoweek):max(groundwater$isoweek)
   } else {
     isoweek_range <- 1:52
   }
   
   # setup column names, e.g. 202401 where the last two digits are the isoweek
-  year_week_range <- as.character(unlist(lapply(year_range, function(year) {
+  year_week_range <- as.character(unlist(lapply(config[["year_range"]], function(year) {
     paste0(year, sprintf("%02d", isoweek_range))
   })))
   
@@ -150,6 +184,8 @@ prepare_groundwater_data <- function(){
       .groups = "drop"
     )
 
+  # TODO 02/16/2026: output this to csv now? use for plotting? report on completion?
+  
   # create a complete grid of all well_id and year_week values
   groundwater_full_grid <- expand_grid(
     well_id = unique(groundwater$well_id),
@@ -178,12 +214,12 @@ prepare_groundwater_data <- function(){
     )
 
   # remove first two weeks (first two columns) if flagged at top of file
-  if (trim_first_two_weeks) { 
+  if (config[["trim_first_two_weeks"]]) { 
     groundwater_weekly_matrix <- groundwater_weekly_matrix[, -c(2,3)]
   }
   #print(names(groundwater_weekly_matrix[1]))
   
-  write.csv(groundwater_weekly_matrix, groundwater_weekly_matrix_filepath, 
+  write.csv(groundwater_weekly_matrix, groundwater_matrix_filepath, 
             row.names = FALSE)
   return(groundwater_weekly_matrix)
 }
@@ -198,7 +234,7 @@ prepare_groundwater_data <- function(){
 # returns: groundwater_weekly_stacked_matrix, evenly-spaced weekly matrix of 
 #          groundwater measurements by well_id + year
 #          
-stack_groundwater_data <- function(groundwater_data){
+stack_groundwater_data_week <- function(groundwater_data){
   
   # RESTRUCTURE the groundwater dataframe
   # restructure df to long format and extract year, week from YYYYww columns
@@ -242,33 +278,48 @@ stack_groundwater_data <- function(groundwater_data){
   return(groundwater_stack_matrix)
 }
 
-#### FILTER INCOMPLETE WELLS
-filter_incomplete_wells <- function(groundwater_matrix, limit){
+stack_groundwater_data_doy <- function(groundwater_data){
   
-  if (missing(limit)) limit <- completeness_limit
-  # NOTE: completeness_limit defined as global variable at top of file
+  # RESTRUCTURE the groundwater dataframe
+  # restructure df to long format and extract year, week from YYYYww columns
+  groundwater_stack <- as.data.frame(groundwater_data) %>%
+    pivot_longer(cols = -well_id,
+                 names_to = 'year_doy',
+                 values_to = 'value') %>%
+    mutate(
+      year = substr(year_doy, 1, 4),
+      doy = substr(year_doy, 5, 7)
+    ) %>%
+    select(-year_doy)
   
-  # ensure groundwater_matrix is a dataframe
-  groundwater_df <- as.data.frame(groundwater_matrix)
+  # rename identifying column
+  groundwater_stack <- groundwater_stack %>%
+    mutate(
+      well_id = paste(well_id, year, sep='-')
+    ) %>%
+    select(-year)
   
-  # filter out relatively incomplete wells (across the entire multi-yr series)
-  total_rows <- nrow(groundwater_df)
-  total_columns <- ncol(groundwater_df)
-  # calculate % of NA values per row
-  na_sums <- rowSums(is.na(groundwater_df))
-  na_percent <- rowSums(is.na(groundwater_df)) / total_columns
-  # remove rows based on completeness relative to pre-defined limit
-  new_groundwater_df <- groundwater_df[na_percent <= limit, ]
+  # restructure to wide format with one row per well_id + year
+  groundwater_stack_matrix <- groundwater_stack %>%
+    pivot_wider(
+      names_from = doy,
+      values_from = value
+    )
   
-  # print removal alert
-  print(paste0('ALERT: # of rows removed after completeness check: ',
-               total_rows - nrow(new_groundwater_df)))
-  removed_wells <- setdiff(groundwater_df$well_id, 
-                           new_groundwater_df$well_id)
-  print('removed wells')
-  print(removed_wells)
-  
-  return(as.matrix(new_groundwater_df))
+  ## REMOVE the first sequential NA columns
+  # identify all NA columns, exclude 'well_id' first column
+  na_cols <- sapply(groundwater_stack_matrix[, -1], function(col) all(is.na(col)))
+  # get index of first and last non-NA column
+  first_non_na <- which(!na_cols)[[1]]
+  # remove initial sequential columns, if any
+  if (!is.na(first_non_na)) {
+    groundwater_stack_matrix <- groundwater_stack_matrix[, c(1, (first_non_na+1):ncol(groundwater_stack_matrix))]
+  } 
+  na_cols <- sapply(groundwater_stack_matrix[, -1], function(col) all(is.na(col)))
+  last_non_na <- max(which(!na_cols))
+  # only keep columns to last_non_na  
+  groundwater_stack_matrix <- groundwater_stack_matrix[, 1:(last_non_na-1)]
+  return(groundwater_stack_matrix)
 }
 
 #### LOAD AND VALIDATE RESPONSE DATA
@@ -276,27 +327,27 @@ filter_incomplete_wells <- function(groundwater_matrix, limit){
 # on: 17 Nov 2024
 # returns: response_data, a dataframe
 # 
-load_response_data <- function(weekly_matrix) {
+load_response_data <- function(bin_matrix) {
   
   # if no params pass, load response data: weekly groundwater measurements
-  if (missing(weekly_matrix)) { 
-      weekly_matrix <- read.csv(groundwater_weekly_matrix_filepath,
+  if (missing(bin_matrix)) { 
+      bin_matrix <- read.csv(groundwater_matrix_filepath,
                                   header=TRUE, check.names=FALSE)
       }
   
   # Remove any "X" prefix, if it's present
-  colnames(weekly_matrix) <- gsub("^X","",colnames(weekly_matrix))
+  colnames(bin_matrix) <- gsub("^X","",colnames(bin_matrix))
   
   # Convert to a matrix
-  weekly_matrix <- as.matrix(weekly_matrix)
+  bin_matrix <- as.matrix(bin_matrix)
   
   # Check matrix dimensions
-  dim(weekly_matrix)
+  dim(bin_matrix)
   
   # Is it a 'matrix' object? check using the function 'class()'
-  class(weekly_matrix)
+  class(bin_matrix)
   
-  return(weekly_matrix)
+  return(bin_matrix)
 }
 
 #### LOAD COVARIATE DATA
@@ -700,6 +751,7 @@ get_model_parameters <- function(start_number, end_number) {
   return(params)
 }
 
+# model processing -----
 #### PROCESS MODEL RESULTS
 # by: JNatali
 # on: 20 Nov 2024
@@ -761,15 +813,24 @@ run_single_model <- function(response_matrix, param_list, model_id){
   #model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations), fit=FALSE)
   
   # Fit the model
-  model <- MARSS(response_matrix, model=param_list, control=list(maxit=number_iterations))
+  model <- MARSS(response_matrix, model=param_list, control=list(maxit=config[["number_iterations"]], trace=1))
   
   # Track runtime
   end_time <- Sys.time()
   execution_minutes <- as.numeric(difftime(end_time, start_time, units = "mins"))
-  
-  # get model summary (for this model output csv)
+ 
+  # 0227 Try this first, commented out through 0505 below
   model_summary <- tidy(model)
   
+  # 0505 UPDATE Run 62: Skip MARSSparamCIs() 
+  #model_summary <- tidy(model, method = "none")
+  
+  # # 0505 UPDATE Run 63: Call MARSSparamCIs() with fewer bootstraps and in parallel
+  # model_CIs <- MARSSparamCIs(model, method = "parametric", nboot = 100, parallel = TRUE)
+  # 
+  # # 0505 UPDATE Run 63: Use the above step to get model summary (for this model output csv)
+  # model_summary <- tidy(model_CIs)
+
   # append well_id info to summary
   model_summary <- bind_rows(model_summary, well_index_dataframe)
   
@@ -818,7 +879,7 @@ run_single_model <- function(response_matrix, param_list, model_id){
 # purpose: run through all the models in the parameter setup csv,
 #          generate and save results
 # returns: model_dataframe
-run_all_models <- function(response_matrix) {
+run_all_models <- function(response_matrix, config) {
   
    ### SETUP THE MODEL RUNS ###
    # setup the results dataframe
@@ -836,12 +897,12 @@ run_all_models <- function(response_matrix) {
      
      ## SET "number_iterations" for maxit param
      if (!is.na(model_param_dataframe$maxit[i])) {
-      number_iterations <<- model_param_dataframe$maxit[i]
+      number_iterations <- model_param_dataframe$maxit[i]
      }
      
      # check if need to restructure response data
-     if (timespan_param == 'stacked') {
-       response_matrix <- stack_groundwater_data(response_matrix)
+     if (timespan_param == 'stacked'){
+       response_matrix <- stack_groundwater_data_doy(response_matrix)
      }
      
      # GET MARSS model parameters and name them appropriately
@@ -863,7 +924,7 @@ run_all_models <- function(response_matrix) {
      
      # If 'each year', run for each year in year_range (global variable)
      if (timespan_param == 'each year'){
-       for (year in year_range) {
+       for (year in config[["year_range"]]) {
          
          # print info for watching progress
          print(paste('PROCESSING year',year))
@@ -882,9 +943,7 @@ run_all_models <- function(response_matrix) {
          year_result_dataframe <- tryCatch({
            
            # run the model for this year
-          run_single_model(year_response_matrix, 
-                                                     param_list, 
-                                                     model_ID_year)
+          run_single_model(year_response_matrix, param_list, model_ID_year)
          }, error = function(e) {
            
            # print message and return NULL
@@ -1000,8 +1059,8 @@ run_all_models <- function(response_matrix) {
 # NOT YET DEFINED
 
 # ------ MAIN PROCEDURAL SCRIPT ------
-# Create matrix from data in groundwater_daily_FULL_COMBINED.csv
-groundwater_data <- prepare_groundwater_data()
+# Create matrix from data in groundwater_daily.csv
+groundwater_data <- read.csv(groundwater_matrix_filepath)
 response_matrix <- load_response_data(groundwater_data)
-results_dataframe <- run_all_models(response_matrix)
+results_dataframe <- run_all_models(response_matrix, config)
 print("MODEL RUNS COMPLETE!!")

@@ -12,7 +12,7 @@ throughout the project.
 @author: jnat
 """
 
-# --- DUNDERS ---
+# ---- DUNDERS ---
 __author__ = 'Jennifer Natali'
 __copyright__ = 'Copyright (C) 2026 Jennifer Natali'
 __license__ = 'NOT Licensed, Private Code under Development, DO NOT DISTRIBUTE'
@@ -20,13 +20,13 @@ __maintainer__ = 'Jennifer Natali'
 __email__ = 'jennifer.natali@berkeley.edu'
 __status__ = 'Development'
 
-# --- IMPORTS ---
+# ---- IMPORTS ---
 ## Basic libraries
 import pandas as pd
 from pathlib import Path
 import warnings
 
-# --- GLOBAL VARIABLES ---
+# ---- GLOBAL VARIABLES ---
 
 ## -- INITIALIZE FILE VARIABLES --
 
@@ -38,7 +38,7 @@ GW_DIR = DATA_DIR / "field_observations/groundwater"
 VALID_WELL_ID_PATH = GW_DIR / "well_unique_id.txt"
 CORRECTIONS_PATH = GW_DIR / "well_renamed_id.csv"
 
-# --- FUNCTIONS ---
+# ---- FUNCTIONS ---
 
 ## I/O Helpers
 def load_valid_well_ids(path):
@@ -118,10 +118,8 @@ def validate_well_ids(df, id_col):
     
     return df
 
-## Renaming / Correction
-def apply_well_id_corrections(
-    df
-):
+## Rename well_id / Correction
+def correct_well_ids(df) -> pd.DataFrame:
     """
     Add a corrected well ID column using a lookup table.
     Original ID is preserved as field_well_id
@@ -143,6 +141,54 @@ def apply_well_id_corrections(
 
     return df
 
+## Rename well_id / Correction
+def correct_well_ids(df, datetime_name: str) -> pd.DataFrame:
+    """
+    Add a corrected well ID column using a lookup table.
+    Original ID is preserved as field_well_id
+    """
+    df = df.copy()
+    
+    # Ensure datetime column is datetime
+    if not pd.api.types.is_datetime64_any_dtype(df[datetime_name]):
+        df[datetime_name] = pd.to_datetime(df[datetime_name])
+    
+    # get corrections datafram from load_well_id_corrections(path)
+    corrections_df = load_well_id_corrections(CORRECTIONS_PATH)
+    
+    # Ensure effective_date is datetime
+    if not pd.api.types.is_datetime64_any_dtype(corrections_df["effective_date"]):
+        corrections_df["effective_date"] = pd.to_datetime(
+            corrections_df["effective_date"], format='mixed')
+    
+    # Preserve original ID
+    df["field_well_id"] = df["well_id"]
+    
+    # Merge corrections
+    merged = df.merge(
+        corrections_df,
+        left_on="well_id",
+        right_on="well_field_id",
+        how="left",
+        suffixes=("", "_corr")
+    )
+    
+    # Apply conditional correction
+    mask = (
+        merged["well_id_corr"].notna() &
+        (merged[datetime_name] >= merged["effective_date"])
+    )
+    
+    merged.loc[mask, "well_id"] = merged.loc[mask, "well_id_corr"]
+    
+    # Drop correction helper columns
+    merged = merged.drop(columns=[
+        "well_id_corr",
+        "effective_date"
+    ])
+
+    return merged
+
 ## Categorization of site, HGMZ, and PFT
 def get_well_categories(
     df,
@@ -161,8 +207,8 @@ def get_well_categories(
     meadow_map = {
     "E": "East",
     "K": "Kiln",
-    "L": "Lower",
-    "U": "Upper",
+    "L": "Low",
+    "U": "Up",
     }
 
     zone_map = {
@@ -187,6 +233,7 @@ def get_well_categories(
 def process_well_ids(
     df,
     id_col="well_id",
+    datetime_col="datetime"
 ):
     """
     End-to-end well ID processing:
@@ -194,8 +241,8 @@ def process_well_ids(
       2. apply corrections
       3. assign categories
     """
-    df = apply_well_id_corrections(df)
-    df = validate_well_ids(df, id_col=id_col)
+    validate_well_ids(df, id_col=id_col)
+    df = correct_well_ids(df,datetime_col)
     df = get_well_categories(df)
 
     return df
