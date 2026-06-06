@@ -47,3 +47,8 @@ data/field_observations/groundwater/loggers/WORKING/cut/levelogger_cut_compiled.
 data/field_observations/groundwater/loggers/WORKING/raw_levelogger_compiled.csv
 data/field_observations/groundwater/loggers/WORKING/cut/_archive/levelogger_cut_compiled.csv
 .Rproj.user
+scripts/groundwater/.DS_Store
+scripts/groundwater/__pycache__/well_utils.cpython-310.pyc
+scripts/groundwater/.DS_Store
+scripts/groundwater/__pycache__/well_utils.cpython-310.pyc
+scripts/groundwater/.DS_Store
