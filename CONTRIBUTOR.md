@@ -15,7 +15,7 @@ See the "For Newbies" section below.
 - For reminders on how to use git, see on **Git Workflow Steps** section below.
 - Work on your assigned *issue* and associated *branch* (which should start with the issue # and be linked/visible in the issue itself)
 - When naming files, use file naming conventions (defined in sections below).
-- RAW data should never be modified by scripts. Scripts should transform RAW data into derived products (e.g. a new .csv). Treat RAW data as strictly read-only.
+- Treat RAW data as strictly read-only. RAW data should never be modified by scripts. Scripts should transform RAW data into derived products that are saved as separate files (e.g. a new .csv). 
 - When possible, results should be reproducible by re-running scripts rather than manually editing files. This supports reproducible science!
 - At the start of each work session, use git to Pull or "*Fetch Origin*". This will make sure you're capturing any updates from others working on the same branch.
 - Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not alerted or paying attention.
