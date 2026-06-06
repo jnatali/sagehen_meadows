@@ -58,7 +58,7 @@ from scripts.groundwater.well_utils import process_well_ids
 
 # Define Source File
 OUTPUT_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
-OUTPUT_FILE_PATTERN_VALIDATED = "soil_survey_VALIDATED.csv"
+OUTPUT_FILE_PATTERN_RENAMED = os.path.join('RAW', 'soil_survey_RENAMED.csv')
 OUTPUT_FILE_PATTERN_CLEANED = "soil_survey_PROCESSED.csv"
 
 # Define Source File
@@ -321,7 +321,7 @@ file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
 print(f"Loading data from: {file_path}")
 df_raw = pd.read_csv(file_path)
 
-output_path_validated = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN_VALIDATED)
+output_path_validated = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN_RENAMED)
 output_path_cleaned = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN_CLEANED)
 
 if not os.path.exists(OUTPUT_DIR):
@@ -366,7 +366,7 @@ if len(unmatched) > 0:
 df[['gravel size', 'gravel amount']] = df['sub-class'].apply(extract_gravel_info)
 
 df.to_csv(output_path_validated, index=False)
-print(f"\nSaved validated data to: {output_path_validated}\n")
+print(f"\nSaved renamed RAW data to: {output_path_validated}\n")
 
 # Clean and save data
 df_clean = clean_for_plotting(df)
