@@ -24,7 +24,7 @@ __status__ = 'Development'
 ## Basic libraries
 import pandas as pd
 from pathlib import Path
-
+import warnings
 
 # ---- GLOBAL VARIABLES ---
 
@@ -56,20 +56,74 @@ def load_well_id_corrections(path):
     return pd.read_csv(path)
 
 
-## Validation
+## Validation 
 def validate_well_ids(df, id_col):
     """
     Assert that all well IDs in df[id_col] are in valid_ids.
-    Checks the name of the FIELD well_ids,
-    NOT the renamed, recategorized well ids used in analysis.
+    Checks the name of  well_ids (not field ids) if id_col = "well_id"
+    so best if called after apply_well_id_corrections
+    
+    - Removes rows with missing well_id and no other populated fields.
+    - Warns about rows with missing well_id but other populated fields.
+    - Warns about invalid well IDs, then drops them.
     """
+    
+    df = df.copy()
+    
+    # Handle missing well_ids
+    missing_mask = df[id_col].isna()
+
+    if missing_mask.any():
+    
+        rows_to_drop = []
+    
+        for idx, row in df.loc[missing_mask].iterrows():
+    
+            # Ignore the well_id column itself
+            other_fields = row.drop(labels=[id_col])
+    
+            # Treat NaN, None, and empty strings as missing
+            populated = other_fields[
+                other_fields.notna()
+                & (other_fields.astype(str).str.strip() != "")
+            ]
+    
+            if len(populated) == 0:
+                rows_to_drop.append(idx)
+            else:
+                warnings.warn(
+                    f"\n\nMISSING {id_col} in ROW {idx} contains data: "
+                    f"{populated.to_dict()}\n\n",
+                    UserWarning,
+                    stacklevel=2,
+                )
+    
+        if rows_to_drop:
+            df = df.drop(index=rows_to_drop)
+    
+    # Validate non-missing well_ids
     valid_ids = load_valid_well_ids(VALID_WELL_ID_PATH)
     
-    invalid = set(df[id_col].unique()) - valid_ids
-    if invalid:
-        raise ValueError(
-            f"Invalid well_id(s) found: {sorted(invalid)}"
+    invalid_mask = (
+        df[id_col].notna()
+        & ~df[id_col].isin(valid_ids)
         )
+    
+    if invalid_mask.any():
+        invalid_counts = (
+            df.loc[invalid_mask, id_col]
+              .value_counts()
+              .to_dict()
+        )
+
+        warnings.warn(
+            f"\n\nDROPPING ROWS with invalid well_id(s): {invalid_counts}",
+            UserWarning,
+            stacklevel=2)
+
+        df = df.loc[~invalid_mask].copy()
+    
+    return df
 
 ## Rename well_id / Correction
 def correct_well_ids(df) -> pd.DataFrame:
@@ -194,8 +248,8 @@ def process_well_ids(
       2. apply corrections
       3. assign categories
     """
-    validate_well_ids(df, id_col=id_col)
     df = correct_well_ids(df,datetime_col)
+    df = validate_well_ids(df, id_col=id_col)
     df = get_well_categories(df)
 
     return df

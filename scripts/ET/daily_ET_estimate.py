@@ -17,7 +17,8 @@ import pandas as pd
 #import os
 #import datetime
 import matplotlib.pyplot as plt
-#import numpy as np
+# import well_utils to process well_ids for Sy data
+import ..groundwater.well_utils
 
 # ---- INITIALIZE GLOBAL VARIABLES ---
 
@@ -34,6 +35,8 @@ weather_subdaily_filepath = weather_data_dir + 'Weather_2010_2025_10min_SagehenT
 
 ET_calc_data_dir = '../../data/ET_calculations/'
 ET_calc_filepath = ET_calc_data_dir + 'ET_daily_2025_White_constantSy.csv'
+
+# TODO: add data_dir and filepath for Sy stuff
 
 # ---- FUNCTIONS ---
 
@@ -198,7 +201,6 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     # Calculate R, overnight recharge rate in cm/day
     df["R_cm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
     
-    
     # Calculate s, daily storage change (cm)
     df["S_cm"] = df["gw_00"] - df["gw_24"]
     
@@ -223,6 +225,58 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
         ]
     ].dropna()
 
+def estimate_ET_White_wavg_Sy(daily_df) -> pd.DataFrame:
+    """
+    Calculate ET in cm/day for each well in subdaily groundwater logger data
+    using White (1932) method and a specific yield for each well that's a weighted
+    average based on soil profile field data and Sy* estimates from 
+    Loheide et al (2008) <to verify> and <who else?>
+
+    Parameters: daily groundwater dataframe with gw levels at key times
+    
+    Returns:
+    populated "ET estimate" dataframe
+    """
+    METHOD_ID = "White_wavgSy"
+    
+    df = daily_df.copy()
+    
+    # Calculate R, overnight recharge rate in cm/day
+    df["R_cm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
+    
+    # Calculate s, daily storage change (cm)
+    df["S_cm"] = df["gw_00"] - df["gw_24"]
+    
+    # Set constants for this method
+    df["method_id"] = METHOD_ID
+
+    # TODO: Update with weighted average based on soil profile
+    # df["Sy_star"] = SY_STAR
+
+    # note that df is one row per well_id per doy (for now it's only 2025, but we may extend to multi years)
+    # Step 1: Make function to do this??
+    #  Read in the weighted avg Sy file and correct the well_ids using well_utils.py
+    #  For all unique well_ids in df, get the weighted avg Sy from a file: create a "dictionary" (well_id, Sy_wavg)
+    #  Use the "dictionary" to update Sy_star in the df for any given well_id
+    # Step 2: Continue to next line and calculate the daily ET....
+
+    # Calculate daily ET
+    df["ET_gw_cm"] = df["Sy_star"] * (df["R_cm"] + df["S_cm"])
+    
+    return df[
+        [
+            "date",
+            "doy",
+            "year",
+            "well_id",
+            "ET_gw_cm",
+            "R_cm",
+            "S_cm",
+            "Sy_star",
+            "method_id",
+        ]
+    ].dropna()
+  
 def plot_ET(
         ET_df,
         method_id,
@@ -263,6 +317,8 @@ def plot_ET(
 
         fig, ax1 = plt.subplots(figsize=(8, 4))
         fig.suptitle(f"Daily ET via {method_id} for {well_id}")
+        
+        # TODO: check. why call this 2x?
         ax1.plot(
             well_df["date"],
             well_df["ET_gw_cm"],
@@ -316,31 +372,31 @@ def main():
     subdaily_gw_df = pd.read_csv(groundwater_subdaily_filepath,
                                  parse_dates=["DateTime"]
                                  ).rename(columns={"DateTime": "datetime"})   
+    # Plot daily ET with precip
+    precip_df = load_precip_for_years(weather_subdaily_filepath, 2025)
+    daily_precip_df = daily_cumulative_precip(precip_df)
     
     # pre-process gw from subdaily into key daily values
     daily_gw_df = get_daily_gw_levels(subdaily_gw_df)
     print("got gw levels")
     
-    # Calculate daily ET
+    # Calculate daily ET using different methods and Plot
+    ## Start with White using same Sy for all wells
     daily_ET_df = estimate_ET_White_constant_Sy(daily_gw_df)
     daily_ET_df.to_csv(ET_calc_filepath, index=False)
     print("calculated and saved ET")
     
-    # Plot daily ET
-    # plot_ET(daily_ET_df, "White_constantSy", 2025, save_dir=None)
-    # print("plain ET plotted")
-    
-    # Plot daily ET with precip
-    precip_df = load_precip_for_years(weather_subdaily_filepath, 2025)
-    daily_precip_df = daily_cumulative_precip(precip_df)
     plot_ET(daily_ET_df, 
             "White_constantSy", 
             2025, 
             precip_df=daily_precip_df, 
             save_dir=None)
-    print("PRECIP + ET plotted")
-    
-    
+    print("PRECIP + ET plotted for White constant Sy")
+
+    ## Add White using weight average Sy for each well
+    daily_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df)
+    # Save to csv? Do we want a new one or write over the one from above?
+    # Then plot this new estimate, use an appropriate name, check if the 2nd param affects filename and not just the title
     print("COMPLETE!!")
 
 
