@@ -4,6 +4,30 @@ Welcome! This repository is a place where we store all our data, scripts and out
 
 This repository uses a **branch-based workflow** to keep our `main` branch stable.
 
+### New to Git?
+See the "For Newbies" section below.
+
+### Guidelines for using Git issues, branches and check-ins
+- Work on your assigned "issue" and associated branch (should be linked/visible in the issue itself)
+- Pull or "Fetch Origin" for your branch at the start of each work session. This will make sure you're capturing any updates from others working on the same branch.
+- Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not alerted or paying attention.
+- Write short, clear commit messages.
+- A PULL REQUEST (PR) into the main branch can happen at any time. You can use the Pull Request to help track changes against the 'main' branch. Once your task is completed, rename your Pull Request as "Ready to Review". We'll review together, merge the code, then close the issue and the sub-branch. We'll do this when the work is complete or needs to be shared, which should happen within 1-4 weeks. We'll try to keep issues focused and reviews frequent.
+
+### File Naming Conventions
+- Use all lower case in filenames. One exception: when using names to mark the status of data files (see keyword status markers below, under data file naming conventions)
+- Never use spaces in filenames, use underscore to separate words; e.g. soil_survey.csv
+- The first word should indicate the main content or action, the second word a distinguishing characteristic; e.g. well_dimensions.csv is a list of wells and their dimensions, process_raw_logger.py processes raw logger data.
+- When in doubt, look at other files in the directory and try to follow the pattern that's already there.
+
+#### Data Filename Status Markers
+* _RAW = data straight from the field (notebook or recording); also stash these files in a "RAW" directory
+* _WORK = data that's being processed (in progress), not yet tested
+* _FULL = data that's been fully aggregated, processed and tested, but NOT yet completely stable or finalized
+* _STABLE = data that's been processed and validated, appears stable but may be some minor changes; waiting for final release of the project (i.e. when paper, data and scripts published)
+* _FINAL = data that's been processed and validated, no more changes expected in this release of the research project
+
+## For Newbies: Getting Started with Git and Github
 Please follow these steps when working on your assigned "issue" or task. You can find all issues on the  menu above, and eash one should have an assigned branch. 
 
 Tools Needed
@@ -15,7 +39,6 @@ Key Points
 - Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not paying attention.
 - Write short, clear commit messages.
 - A PULL REQUEST (PR) into the main branch can happen at any time. You can use the Pull Request to help track changes against the 'main' branch. Once your task is completed, rename your Pull Request as "Ready to Review". We'll review together, merge the code, then close the issue and the sub-branch. We'll do this when the work is complete or needs to be shared, which should happen within a 1-4 weeks. We'll try to keep issues focused and reviews frequent.
-
 
 ### Workflow Steps
 #### 1. *First time only:* Clone the repository ####  
