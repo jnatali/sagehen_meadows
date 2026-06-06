@@ -86,8 +86,17 @@ word_to_code_mapping = {
     'clay loam': 'CL',
     'silty clay loam': 'SICL',
     'sandy clay': 'SC',
+    'sandy clay to silty clay': 'SC',
     'silty clay': 'SIC',
-    'clay': 'C'
+    'clay silt': 'SIC',
+    'clay': 'C',
+    'ho': 'HO',
+    'gr': 'GR',
+    'fgr': 'GR',
+    'vcb': 'GR',
+    'mgr': 'GR',
+    'xgr': 'GR',
+    'xst': 'GR',
 }
 
 gravel_size_map = {
@@ -186,7 +195,7 @@ def parse_gravel_amount(x):
 
 def extract_gravel_info(subclass_str):
     """
-    Checks for 'G' and extracts info about gravel size categories
+    Checks for 'GR' and extracts info about gravel size categories
 
     Parameters: 
     
@@ -201,18 +210,77 @@ def extract_gravel_info(subclass_str):
     
     # Check each word to see if it contains 'G' and exists in our mapping
     for word in words:
-        if 'G' in word and word in gravel_size_map:
+        if 'GR' in word and word in gravel_size_map:
             # If found, return both the size and the amount
             return pd.Series([gravel_size_map[word], gravel_amount_map[word]])
             
     # Return empty if no gravel codes are found
     return pd.Series([None, 0])
 
+def merge_identical_rows(df_clean):
+    """
+    - Given a df with columns for well_id, date, start_depth_cm, stop_depth_cm,
+      and any other characterisics (as column names), 
+      checks if the soil characteristic values are 
+      the same for adjacent layers for given well_id and date (of the 
+      measured soil profile), then merges
+      them and resets the start and stop depth appropriately.
+      
+      e.g. row1 for a well_id and date has a stop_depth_cm of 70,
+           and row 2 (same well_id and date) has a start_depth_cm of 70
+           and otherwise identical values for other columns, then
+           assign row1's stop_depth_cm to the value of row2's stop_depth_cm. 
+    
+    Parameters: df with columns for well_id, date, start_depth_cm, 
+        stop_depth_cm,
+        and any other characterisics (columns)
+    
+    Returns: "clean" soil df, ready for plotting with profile layers merged
+
+    """    
+    characteristic_cols = [
+        col for col in df_clean.columns
+        if col not in ("well_id", "date", "start_depth_cm", "stop_depth_cm")
+        ]
+
+    group_keys = ["well_id", "date"]
+    
+    df_sorted = df_clean.sort_values(
+        group_keys + ["start_depth_cm"]
+        ).reset_index(drop=True)
+    
+    merged_rows = []
+
+    for _, group in df_sorted.groupby(group_keys, sort=False):
+        rows = group.to_dict("records")
+        current = rows[0].copy()
+
+        for next_row in rows[1:]:
+            depths_adjacent = current["stop_depth_cm"] == next_row[
+                                                            "start_depth_cm"]
+            
+            chars_identical = all(
+                (current[col] == next_row[col])
+                or (pd.isna(current[col]) and pd.isna(next_row[col]))
+                for col in characteristic_cols)
+
+            if depths_adjacent and chars_identical:
+                current["stop_depth_cm"] = next_row["stop_depth_cm"]
+            else:
+                merged_rows.append(current)
+                current = next_row.copy()
+
+        merged_rows.append(current)
+
+    return pd.DataFrame(merged_rows, 
+                        columns=df_clean.columns).reset_index(drop=True)
+
 def clean_for_plotting(df_valid):
     """
     - Filters and renames required columns for plotting: start and stop depth, 
         texture, gravel amount in percent
     - Standardizes values for soil texture and gravel %age
+    - Merges identical rows
     
     Parameters: full pandas dataframe of raw soils data
     
@@ -242,6 +310,8 @@ def clean_for_plotting(df_valid):
     
     df = df[[col for col in desired_cols if col in df.columns]]
     
+    df = merge_identical_rows(df)
+    
     return df
     
 # ---- MAIN PROCEDURES---
@@ -249,7 +319,7 @@ def clean_for_plotting(df_valid):
 # Load files
 file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
 print(f"Loading data from: {file_path}")
-df = pd.read_csv(file_path)
+df_raw = pd.read_csv(file_path)
 
 output_path_validated = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN_VALIDATED)
 output_path_cleaned = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN_CLEANED)
@@ -259,7 +329,7 @@ if not os.path.exists(OUTPUT_DIR):
     print(f"Created directory: {OUTPUT_DIR}")
 
 # Validate and correct well_ids (well names), also drops invalid well_ids
-df = process_well_ids(df,datetime_col="date")
+df = process_well_ids(df_raw, datetime_col="date")
 print('\nProcessed well_ids\n')
 
 # Make sure the start and stop depths are all converted to cm
@@ -274,6 +344,23 @@ df['sub-class'] = df['sub-class'].str.strip()
 
 # takes the full words in 'soil texture', creates new column with short codes
 df['soil texture code'] = df['texture'].map(word_to_code_mapping)
+
+# Use warning to print out unmatched soil textures
+unmatched = (
+    df.loc[
+        df['texture'].notna() &
+        df['soil texture code'].isna(),
+        'texture'
+    ]
+    .unique()
+)
+
+if len(unmatched) > 0:
+    warnings.warn(
+        f"\nUnmatched soil texture values: {sorted(unmatched)}\n",
+        UserWarning,
+        stacklevel=2,
+    )
 
 #Apply the function to create the two new columns
 df[['gravel size', 'gravel amount']] = df['sub-class'].apply(extract_gravel_info)

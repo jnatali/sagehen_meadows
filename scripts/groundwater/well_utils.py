@@ -68,7 +68,6 @@ def validate_well_ids(df, id_col):
     - Warns about invalid well IDs, then drops them.
     """
     
-    
     df = df.copy()
     
     # Handle missing well_ids
@@ -105,16 +104,24 @@ def validate_well_ids(df, id_col):
     # Validate non-missing well_ids
     valid_ids = load_valid_well_ids(VALID_WELL_ID_PATH)
     
-    invalid = set(df[id_col].unique()) - valid_ids
+    invalid_mask = (
+        df[id_col].notna()
+        & ~df[id_col].isin(valid_ids)
+        )
     
-    if invalid:
+    if invalid_mask.any():
+        invalid_counts = (
+            df.loc[invalid_mask, id_col]
+              .value_counts()
+              .to_dict()
+        )
+
         warnings.warn(
-            f"\n\nINVALID well_ids FOUND!: {(invalid)}\n\n",
+            f"\n\nDROPPING ROWS with invalid well_id(s): {invalid_counts}",
             UserWarning,
             stacklevel=2)
-        # raise ValueError(
-        #     f"Invalid well_id(s) found: {(invalid)}"
-        # )
+
+        df = df.loc[~invalid_mask].copy()
     
     return df
 
@@ -242,7 +249,7 @@ def process_well_ids(
       3. assign categories
     """
     df = correct_well_ids(df,datetime_col)
-    validate_well_ids(df, id_col=id_col)
+    df = validate_well_ids(df, id_col=id_col)
     df = get_well_categories(df)
 
     return df
