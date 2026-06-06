@@ -241,8 +241,8 @@ def process_well_ids(
       2. apply corrections
       3. assign categories
     """
-    validate_well_ids(df, id_col=id_col)
     df = correct_well_ids(df,datetime_col)
+    validate_well_ids(df, id_col=id_col)
     df = get_well_categories(df)
 
     return df

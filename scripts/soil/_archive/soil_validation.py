@@ -1,6 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-Created in 2026
-
 ##########  FIELD SOIL SURVEY DATA PROCESSING SCRIPT  ##########  
 
 This module is a first step to processing soil profile data for groundwater

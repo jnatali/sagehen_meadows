@@ -1,6 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-Created in 2026
-
 ##########  FIELD SOIL SURVEY DATA PROCESSING SCRIPT  ##########  
 
 This module validates and processes soil profile data for groundwater
@@ -35,7 +35,6 @@ __maintainer__ = 'Jennifer Natali'
 __email__ = 'jennifer.natali@berkeley.edu'
 __status__ = 'Development'
 
-# ---- INITIALIZE PROJECT ROOT
 
 
 # ---- IMPORTS ---
@@ -50,16 +49,17 @@ import sys
 import re
 import warnings
 
-# ---- INITIALIZE FILE VARIABLES ---
+# Initialize PROJECT_ROOT to allow local project module import
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 from scripts.groundwater.well_utils import process_well_ids
+
+# ---- INITIALIZE FILE VARIABLES ---
 
 # Define Source File
 OUTPUT_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
 OUTPUT_FILE_PATTERN_VALIDATED = "soil_survey_VALIDATED.csv"
 OUTPUT_FILE_PATTERN_CLEANED = "soil_survey_PROCESSED.csv"
-
 
 # Define Source File
 SOURCE_DIR = os.path.join( '..','..', 'data', 'field_observations', 
@@ -259,8 +259,8 @@ if not os.path.exists(OUTPUT_DIR):
     print(f"Created directory: {OUTPUT_DIR}")
 
 # Validate and correct well_ids (well names), also drops invalid well_ids
-df = process_well_ids(df)
-print('Processed well_ids')
+df = process_well_ids(df,datetime_col="date")
+print('\nProcessed well_ids\n')
 
 # Make sure the start and stop depths are all converted to cm
 df = populate_depths_cm(df)
@@ -279,12 +279,12 @@ df['soil texture code'] = df['texture'].map(word_to_code_mapping)
 df[['gravel size', 'gravel amount']] = df['sub-class'].apply(extract_gravel_info)
 
 df.to_csv(output_path_validated, index=False)
-print(f"Saved validated data to: {output_path_validated}")
+print(f"\nSaved validated data to: {output_path_validated}\n")
 
 # Clean and save data
 df_clean = clean_for_plotting(df)
 df_clean.to_csv(output_path_cleaned, index=False)
-print(f"Saved cleaned data for plotting: {output_path_cleaned}")
+print(f"\nSaved cleaned data for plotting: {output_path_cleaned}\n")
 
 
 
