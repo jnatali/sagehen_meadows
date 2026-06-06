@@ -8,16 +8,18 @@ This repository uses a **branch-based workflow** to keep our `main` branch stabl
 See the "For Newbies" section below.
 
 ### Guidelines for using Git issues, branches and check-ins
-- Work on your assigned "issue" and associated branch (should be linked/visible in the issue itself)
-- Pull or "Fetch Origin" for your branch at the start of each work session. This will make sure you're capturing any updates from others working on the same branch.
+- Work on your assigned *issue* and associated *branch* (which should be linked/visible in the issue itself)
+- Pull or "*Fetch Origin*" for your branch at the start of each work session. This will make sure you're capturing any updates from others working on the same branch.
 - Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not alerted or paying attention.
 - Write short, clear commit messages.
 - A PULL REQUEST (PR) into the main branch can happen at any time. You can use the Pull Request to help track changes against the 'main' branch. Once your task is completed, rename your Pull Request as "Ready to Review". We'll review together, merge the code, then close the issue and the sub-branch. We'll do this when the work is complete or needs to be shared, which should happen within 1-4 weeks. We'll try to keep issues focused and reviews frequent.
+- For reminders, see on **Git Workflow Steps** section below
+- Our python code should follow [PEP 8](https://peps.python.org/pep-0008/) guidelines
 
 ### File Naming Conventions
 - Use all lower case in filenames. One exception: when using names to mark the status of data files (see keyword status markers below, under data file naming conventions)
-- Never use spaces in filenames, use underscore to separate words; e.g. soil_survey.csv
-- The first word should indicate the main content or action, the second word a distinguishing characteristic; e.g. well_dimensions.csv is a list of wells and their dimensions, process_raw_logger.py processes raw logger data.
+- Never use spaces in filenames, use underscore to separate words; e.g. `soil_survey.csv`
+- The first word should indicate the main content or action, the second word a distinguishing characteristic; e.g. `well_dimensions.csv` is a list of wells and their dimensions, `process_raw_logger.py` processes raw logger data.
 - When in doubt, look at other files in the directory and try to follow the pattern that's already there.
 
 #### Data Filename Status Markers
@@ -30,17 +32,17 @@ See the "For Newbies" section below.
 ## For Newbies: Getting Started with Git and Github
 Please follow these steps when working on your assigned "issue" or task. You can find all issues on the  menu above, and eash one should have an assigned branch. 
 
-Tools Needed
+#### Tools Needed
 - You can use [Github Desktop](https://github.com/apps/desktop) application to manage this workflow, it's easy to learn and has everything you need. Download it here --> https://desktop.github.com/download/
 - Alternatively, you can use git via the command line in a terminal window. That's more advanced, but can be quick and powerful. You can invest in installing and learning this if you want. I provide commands below, but can't offer much help beyond that.
 
-Key Points
+#### Key Points
 - Work in *your issue's branch*. It's your safe space to make changes with confidence. If you're not sure what branch to use, please ask. I don't mind, I want your code and results to be backed up.
 - Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not paying attention.
 - Write short, clear commit messages.
 - A PULL REQUEST (PR) into the main branch can happen at any time. You can use the Pull Request to help track changes against the 'main' branch. Once your task is completed, rename your Pull Request as "Ready to Review". We'll review together, merge the code, then close the issue and the sub-branch. We'll do this when the work is complete or needs to be shared, which should happen within a 1-4 weeks. We'll try to keep issues focused and reviews frequent.
 
-### Workflow Steps
+### Git Workflow Steps
 #### 1. *First time only:* Clone the repository ####  
 
 On Github Desktop, goto **File -> Clone Repository** and enter the repository URL, then select your local directory for the project.  
