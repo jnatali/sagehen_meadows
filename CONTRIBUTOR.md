@@ -35,7 +35,7 @@ Update canopy temperature documentation
 
 ### File Naming Conventions
 - Use all lower case in filenames. One exception: when using names to mark the status of data files (see keyword status markers below, under data file naming conventions)
-- Never use spaces in filenames, use underscore to separate words; e.g. `soil_survey.csv`
+- Never use spaces or non-alphabetic characters in filenames. Use underscore to separate words; e.g. use `soil_survey.csv` and not `soil:survey for JN@.csv`
 - The first word should indicate the main content or action, the second word a distinguishing characteristic; e.g. `well_dimensions.csv` is a list of wells and their dimensions, `process_raw_logger.py` processes raw logger data.
 - When in doubt, look at other files in the directory and try to follow the pattern that's already there.
 
