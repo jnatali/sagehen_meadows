@@ -418,7 +418,7 @@ def main():
             "White_wavg", 
             2025, 
             precip_df=daily_precip_df, 
-            save_dir=None)
+            save_dir=save_dir)
     print("PRECIP + ET plotted for White constant Sy")
 
    
