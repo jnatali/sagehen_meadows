@@ -18,8 +18,14 @@ import pandas as pd
 #import datetime
 import matplotlib.pyplot as plt
 # import well_utils to process well_ids for Sy data
-import ..groundwater.well_utils
 
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.append(str(PROJECT_ROOT))
+
+import scripts.groundwater as well_utils
 # ---- INITIALIZE GLOBAL VARIABLES ---
 
 SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
@@ -27,14 +33,19 @@ SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
 ## Directory and Filenames based on structure in github
 # TODO: update source file
 # TODO: where is 2025-only processed logger data or filter for 2025 only or get ET for ALL years?
-groundwater_data_dir = '../../data/field_observations/groundwater/subdaily_loggers/FULL/'
-groundwater_subdaily_filepath = groundwater_data_dir + 'groundwater_subdaily_2025_FULL.csv'
+groundwater_data_dir = PROJECT_ROOT / 'data/field_observations/groundwater/loggers/PROCESSED/'
+groundwater_subdaily_filepath = groundwater_data_dir / 'groundwater_subdaily.csv'
 
-weather_data_dir = '../../data/station_instrumentation/climate/'
-weather_subdaily_filepath = weather_data_dir + 'Weather_2010_2025_10min_SagehenTower1.csv'
+weather_data_dir = PROJECT_ROOT / 'data/station_instrumentation/climate/'
+weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenTower1.csv'
 
-ET_calc_data_dir = '../../data/ET_calculations/'
-ET_calc_filepath = ET_calc_data_dir + 'ET_daily_2025_White_constantSy.csv'
+ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
+ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
+
+Sy_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
+Sy_data_filepath = Sy_data_dir / 'Sy_wa.csv'
+
+save_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
 
 # TODO: add data_dir and filepath for Sy stuff
 
@@ -225,7 +236,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
         ]
     ].dropna()
 
-def estimate_ET_White_wavg_Sy(daily_df) -> pd.DataFrame:
+def estimate_ET_White_wavg_Sy(daily_df, filepath: str) -> pd.DataFrame:
     """
     Calculate ET in cm/day for each well in subdaily groundwater logger data
     using White (1932) method and a specific yield for each well that's a weighted
@@ -237,7 +248,7 @@ def estimate_ET_White_wavg_Sy(daily_df) -> pd.DataFrame:
     Returns:
     populated "ET estimate" dataframe
     """
-    METHOD_ID = "White_wavgSy"
+    METHOD_ID = "White_wavg"
     
     df = daily_df.copy()
     
@@ -250,8 +261,23 @@ def estimate_ET_White_wavg_Sy(daily_df) -> pd.DataFrame:
     # Set constants for this method
     df["method_id"] = METHOD_ID
 
+    #Load Sy data
+    sy_df = pd.read_csv(filepath)
+
+    # Correct the well_ids using the STATIC function 
+    sy_df = well_utils.correct_well_ids_static(sy_df)
+    
+    # Validate the well_ids to ensure no bad data slipped through
+    sy_df = well_utils.validate_well_ids(sy_df, id_col="well_id")
+    
+    # Create the dictionary from the corrected dataframe
+    sy_lookup = sy_df.set_index('well_id')['average_Sy'].to_dict()
+
+    # Map the dictionary to the main daily dataframe
+    df["Sy_star"] = df['well_id'].map(sy_lookup)
+
     # TODO: Update with weighted average based on soil profile
-    # df["Sy_star"] = SY_STAR
+    #df["Sy_star"] = SY_STAR
 
     # note that df is one row per well_id per doy (for now it's only 2025, but we may extend to multi years)
     # Step 1: Make function to do this??
@@ -382,19 +408,20 @@ def main():
     
     # Calculate daily ET using different methods and Plot
     ## Start with White using same Sy for all wells
-    daily_ET_df = estimate_ET_White_constant_Sy(daily_gw_df)
-    daily_ET_df.to_csv(ET_calc_filepath, index=False)
-    print("calculated and saved ET")
+    #daily_ET_df = estimate_ET_White_constant_Sy(daily_gw_df)
+    #daily_ET_df.to_csv(ET_calc_filepath, index=False)
+    #print("calculated and saved ET")
     
+    ## Add White using weight average Sy for each well
+    daily_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, Sy_data_filepath)
     plot_ET(daily_ET_df, 
-            "White_constantSy", 
+            "White_wavg", 
             2025, 
             precip_df=daily_precip_df, 
             save_dir=None)
     print("PRECIP + ET plotted for White constant Sy")
 
-    ## Add White using weight average Sy for each well
-    daily_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df)
+   
     # Save to csv? Do we want a new one or write over the one from above?
     # Then plot this new estimate, use an appropriate name, check if the 2nd param affects filename and not just the title
     print("COMPLETE!!")

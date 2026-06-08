@@ -126,7 +126,7 @@ def validate_well_ids(df, id_col):
     return df
 
 ## Rename well_id / Correction
-def correct_well_ids(df) -> pd.DataFrame:
+def correct_well_ids_static(df) -> pd.DataFrame:
     """
     Add a corrected well ID column using a lookup table.
     Original ID is preserved as field_well_id
