@@ -45,9 +45,7 @@ ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
 Sy_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
 Sy_data_filepath = Sy_data_dir / 'Sy_wa.csv'
 
-#save_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
-save_dir = PROJECT_ROOT / 'data/field_observations/soil/'
-load_dir = PROJECT_ROOT / 'data/field_observations/soil/Cleaned_wells_complete.csv'
+save_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
 
 # TODO: add data_dir and filepath for Sy stuff
 
@@ -402,10 +400,7 @@ def update_wells_no_dt(filepath: str) -> pd.DataFrame:
 
 def main():
    
-   new_df = update_wells_no_dt(load_dir)
-   new_df.to_csv(save_dir / "cleaned_wells_COMPLETE.csv", index=False)
-   print("WELL IDS CORRECTED AND VALIDATED, SAVED TO CSV")
-"""
+
     # I/O: load subdaily groundwater input (source data) file
     subdaily_gw_df = pd.read_csv(groundwater_subdaily_filepath,
                                  parse_dates=["DateTime"]
@@ -437,7 +432,7 @@ def main():
     # Save to csv? Do we want a new one or write over the one from above?
     # Then plot this new estimate, use an appropriate name, check if the 2nd param affects filename and not just the title
     print("COMPLETE!!")
-    """
+   
 
 # --- END FUNCTIONS
 
