@@ -45,7 +45,9 @@ ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
 Sy_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
 Sy_data_filepath = Sy_data_dir / 'Sy_wa.csv'
 
-save_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
+#save_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
+save_dir = PROJECT_ROOT / 'data/field_observations/soil/'
+load_dir = PROJECT_ROOT / 'data/field_observations/soil/Cleaned_wells_complete.csv'
 
 # TODO: add data_dir and filepath for Sy stuff
 
@@ -262,29 +264,13 @@ def estimate_ET_White_wavg_Sy(daily_df, filepath: str) -> pd.DataFrame:
     df["method_id"] = METHOD_ID
 
     #Load Sy data
-    sy_df = pd.read_csv(filepath)
+    sy_df = update_wells_no_dt(filepath)
 
-    # Correct the well_ids using the STATIC function 
-    sy_df = well_utils.correct_well_ids_static(sy_df)
-    
-    # Validate the well_ids to ensure no bad data slipped through
-    sy_df = well_utils.validate_well_ids(sy_df, id_col="well_id")
-    
     # Create the dictionary from the corrected dataframe
     sy_lookup = sy_df.set_index('well_id')['average_Sy'].to_dict()
 
     # Map the dictionary to the main daily dataframe
     df["Sy_star"] = df['well_id'].map(sy_lookup)
-
-    # TODO: Update with weighted average based on soil profile
-    #df["Sy_star"] = SY_STAR
-
-    # note that df is one row per well_id per doy (for now it's only 2025, but we may extend to multi years)
-    # Step 1: Make function to do this??
-    #  Read in the weighted avg Sy file and correct the well_ids using well_utils.py
-    #  For all unique well_ids in df, get the weighted avg Sy from a file: create a "dictionary" (well_id, Sy_wavg)
-    #  Use the "dictionary" to update Sy_star in the df for any given well_id
-    # Step 2: Continue to next line and calculate the daily ET....
 
     # Calculate daily ET
     df["ET_gw_cm"] = df["Sy_star"] * (df["R_cm"] + df["S_cm"])
@@ -391,9 +377,35 @@ def plot_gw_ET_overlay(gw_df, et_df, year):
     
     return
 
+def update_wells_no_dt(filepath: str) -> pd.DataFrame:
+    """
+    Validates files with well_ids and NO datetime info 
+    Returns a valided dataframe with corrected well_ids.
+
+    Parameters
+    ----------
+    filepath : str
+        Path to CSV file with well_ids and no datetime info
+    """
+    # Validate the well_ids to ensure no bad data slipped through
+    #Load Sy data
+    sy_df = pd.read_csv(filepath)
+
+    # Correct the well_ids using the STATIC function 
+    sy_df = well_utils.correct_well_ids_static(sy_df)
+    
+    # Validate the well_ids to ensure no bad data slipped through
+    sy_df = well_utils.validate_well_ids(sy_df, id_col="well_id")
+    return  sy_df 
+
 # ---- MAIN PROCEDURES ---
 
 def main():
+   
+   new_df = update_wells_no_dt(load_dir)
+   new_df.to_csv(save_dir / "cleaned_wells_COMPLETE.csv", index=False)
+   print("WELL IDS CORRECTED AND VALIDATED, SAVED TO CSV")
+"""
     # I/O: load subdaily groundwater input (source data) file
     subdaily_gw_df = pd.read_csv(groundwater_subdaily_filepath,
                                  parse_dates=["DateTime"]
@@ -425,7 +437,7 @@ def main():
     # Save to csv? Do we want a new one or write over the one from above?
     # Then plot this new estimate, use an appropriate name, check if the 2nd param affects filename and not just the title
     print("COMPLETE!!")
-
+    """
 
 # --- END FUNCTIONS
 
