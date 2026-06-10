@@ -37,7 +37,7 @@ plotSPC(east_meadow_df,
         name = 'soil_texture_code', 
         color = 'soil_texture_code', 
         hz.depths = TRUE,
-        label = 'well_id')
+        )
 
 addVolumeFraction(east_meadow_df, 
                   colname = 'gravel_amount_percent_hundred', 
