@@ -6,12 +6,13 @@ library(aqp)
 library(dplyr)
 library(stringr)
 
+setwd("/home/smittlek/JenProject/sagehen_meadows/")
 # Setup 
 # Make sure this path points exactly to where well_utils.R is saved
 source("scripts/groundwater/well_utils.R")
 
 # Load data
-df <- read.csv("data/field_observation/soil/Cleaned_wells_complete.csv")
+df <- read.csv("data/field_observations/soil/soil_survey_COMPLETE.csv")
 
 # Add categories 
 df <- get_well_categories(df)
@@ -27,14 +28,15 @@ depths(east_meadow_df) <- well_id ~ start_depth_cm + stop_depth_cm
 east_meadow_df$gravel_amount_percent_hundred <- east_meadow_df$gravel_amount_percent * 100
 
 # Plot and Save
-png(filename = "results/plots/groundwater/soils/wells_Fan_HydroZone.png", 
+png(filename = "results/plots/groundwater/soils/wells_Fan_HydroZone_TEST.png", 
     width = 1600, height = 1200, res = 150)
 
 
 
 plotSPC(east_meadow_df, 
         name = 'soil_texture_code', 
-        color = 'gravel_amount_percent', 
+        color = 'soil_texture_code', 
+        hz.depths = TRUE,
         label = 'well_id')
 
 addVolumeFraction(east_meadow_df, 
