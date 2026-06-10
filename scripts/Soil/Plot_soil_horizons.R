@@ -34,9 +34,11 @@ png(filename = "results/plots/groundwater/soils/wells_Fan_HydroZone_TEST.png",
 
 
 plotSPC(east_meadow_df, 
-        name = 'soil_texture_code', 
+        name = 'soil_texture_code',
+        style = 'center',
         color = 'soil_texture_code', 
         hz.depths = TRUE,
+        fixLabelCollisions = TRUE
         )
 
 addVolumeFraction(east_meadow_df, 
