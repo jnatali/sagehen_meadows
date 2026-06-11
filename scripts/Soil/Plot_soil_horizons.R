@@ -1,4 +1,3 @@
-
 # install.packages("dplyr")
 # install.packages("stringr")
 
@@ -8,7 +7,6 @@ library(stringr)
 
 setwd("/home/smittlek/JenProject/sagehen_meadows/")
 # Setup 
-# Make sure this path points exactly to where well_utils.R is saved
 source("scripts/groundwater/well_utils.R")
 
 # Load data
@@ -20,35 +18,48 @@ df <- get_well_categories(df)
 df$start_depth_cm <- round(df$start_depth_cm)
 df$stop_depth_cm <- round(df$stop_depth_cm)
 
-#  Filter a specific category
-east_meadow_df <- df %>%
-  filter(meadow_id == "East")
-
-
-# Convert the filtered data to a SoilProfileCollection
-depths(east_meadow_df) <- well_id ~ start_depth_cm + stop_depth_cm
+# Filter a specific category
+df <- df %>%
+  filter(plant_type == "Lodgepole Pine")
 
 # Add the gravel calculation for the plot bubbles
-east_meadow_df$gravel_amount_percent_hundred <- east_meadow_df$gravel_amount_percent * 100
+df$gravel_amount_percent_hundred <- df$gravel_amount_percent * 100
+
+# Add the space padding
+df$plot_label <- paste0("    ", df$well_id)
+
+# Convert the filtered data to a SoilProfileCollection
+depths(df) <- well_id ~ start_depth_cm + stop_depth_cm
+
+# Promote label to site data
+site(df) <- ~ plot_label
 
 # Plot and Save
-png(filename = "results/plots/groundwater/soils/wells_East_Meadow.png", 
+png(filename = "results/plots/groundwater/soils/wells_Lodgepole_Pine_PlantType.png", 
     width = 1800, height = 2000, res = 150)
 
+par(mar = c(0, 0, 8, 1)) 
 
-par(mar = c(0, 0, 1, 1))
-plotSPC(east_meadow_df, 
-        cex.name = 1,
+plotSPC(df, 
+        label = 'plot_label', # FIXED: Tells aqp to use the custom column
+        id.style = 'top',     # FORCE aqp to center labels above the column
+        cex.names = 1,        
+        cex.id = 0.85,        
+        srt.id = 90,  
+        offset.id = 1.5,        
         name.style = 'center-center',
         width = 0.3,
         depth.axis = FALSE,
         color = 'soil_texture_code', 
         hz.depths = TRUE,
         fixLabelCollisions = TRUE,
-       depths.offset = 0.08
+        depths.offset = 0.08,
+        y.offset = 10,        # NEW: Pushes the profiles down by 40 units
+        #max.depth = 250,       # NEW: Extends canvas so shifted wells aren't cut off
         )
 
-addVolumeFraction(east_meadow_df, 
+# FIXED: Changed east_meadow_df to df
+addVolumeFraction(df, 
                   colname = 'gravel_amount_percent_hundred', 
                   res = 10, cex.min = 0.1, cex.max = 0.5, 
                   pch = 1, col = "white")
