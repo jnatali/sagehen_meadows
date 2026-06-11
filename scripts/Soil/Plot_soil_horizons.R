@@ -12,7 +12,7 @@ setwd("/home/smittlek/JenProject/sagehen_meadows/")
 source("scripts/groundwater/well_utils.R")
 
 # Load data
-df <- read.csv("data/field_observations/soil/soil_survey_COMPLETE.csv")
+df <- read.csv("data/field_observations/soil/soil_survey_PROCESSED.csv")
 
 # Add categories 
 df <- get_well_categories(df)
@@ -22,7 +22,7 @@ df$stop_depth_cm <- round(df$stop_depth_cm)
 
 #  Filter a specific category
 east_meadow_df <- df %>%
-  filter(hydrogeo_zone == "Fan")
+  filter(meadow_id == "East")
 
 
 # Convert the filtered data to a SoilProfileCollection
@@ -32,7 +32,7 @@ depths(east_meadow_df) <- well_id ~ start_depth_cm + stop_depth_cm
 east_meadow_df$gravel_amount_percent_hundred <- east_meadow_df$gravel_amount_percent * 100
 
 # Plot and Save
-png(filename = "results/plots/groundwater/soils/wells_Fan_HydroZone_TEST.png", 
+png(filename = "results/plots/groundwater/soils/wells_East_Meadow.png", 
     width = 1800, height = 2000, res = 150)
 
 
