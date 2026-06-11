@@ -54,11 +54,10 @@ plotSPC(df,
         hz.depths = TRUE,
         fixLabelCollisions = TRUE,
         depths.offset = 0.08,
-        y.offset = 10,        # NEW: Pushes the profiles down by 40 units
-        #max.depth = 250,       # NEW: Extends canvas so shifted wells aren't cut off
+        y.offset = 10,        # Pushes the profiles down by 10 units
+        max.depth = 250,       # Extends canvas so shifted wells aren't cut off
         )
 
-# FIXED: Changed east_meadow_df to df
 addVolumeFraction(df, 
                   colname = 'gravel_amount_percent_hundred', 
                   res = 10, cex.min = 0.1, cex.max = 0.5, 
