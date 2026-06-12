@@ -42,8 +42,11 @@ weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenT
 ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
 ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
 
-Sy_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
-Sy_data_filepath = Sy_data_dir / 'Sy_wa.csv'
+sy_data_dir = PROJECT_ROOT / 'scripts/ET/'
+sy_data_filepath = sy_data_dir / 'sy_lookup.csv' 
+
+well_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
+well_data_filepath = well_data_dir / 'soil_survey_PROCESSED.csv'
 
 save_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
 
@@ -156,7 +159,7 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     """
     df = gw_df.copy()
 
-    assert "ground_to_water_m" in gw_df.columns
+    assert "ground_to_water_m" in gw_df.columns, 'field_observations'
     df["ground_to_water_cm"] = df["ground_to_water_m"] * 100
     
     df["date"] = df["datetime"].dt.floor("D")
@@ -236,14 +239,16 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
         ]
     ].dropna()
 
-def estimate_ET_White_wavg_Sy(daily_df, filepath: str) -> pd.DataFrame:
+def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate ET in cm/day for each well in subdaily groundwater logger data
     using White (1932) method and a specific yield for each well that's a weighted
     average based on soil profile field data and Sy* estimates from 
     Loheide et al (2008) <to verify> and <who else?>
 
-    Parameters: daily groundwater dataframe with gw levels at key times
+    Parameters:
+    daily_df: daily groundwater dataframe with gw levels at key times
+    sy_df: A dataframe with specific yield information for each soil texture
     
     Returns:
     populated "ET estimate" dataframe
@@ -260,9 +265,6 @@ def estimate_ET_White_wavg_Sy(daily_df, filepath: str) -> pd.DataFrame:
     
     # Set constants for this method
     df["method_id"] = METHOD_ID
-
-    #Load Sy data
-    sy_df = update_wells_no_dt(filepath)
 
     # Create the dictionary from the corrected dataframe
     sy_lookup = sy_df.set_index('well_id')['average_Sy'].to_dict()
@@ -286,6 +288,26 @@ def estimate_ET_White_wavg_Sy(daily_df, filepath: str) -> pd.DataFrame:
             "method_id",
         ]
     ].dropna()
+
+def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
+
+    # Set the key column as the index, select the value column, and convert to dict
+    soil_sy_dict = df_sy.set_index('soil_texture')['Sy'].to_dict()
+
+    #  Data Cleaning
+    df_wells = df_wells.dropna(subset=['well_id']).copy()
+
+    #  Math and Calculations
+    df_wells['Sy'] = df_wells['soil_texture_code'].map(soil_sy_dict)
+    df_wells['thickness'] = df_wells['stop_depth_cm'] - df_wells['start_depth_cm']
+    df_wells['Sy_weighted'] = df_wells['Sy'] * df_wells['thickness']
+
+    #  Grouping and Averaging
+    well_summary = df_wells.groupby('well_id')[['Sy_weighted', 'thickness']].sum()
+    well_summary['average_Sy'] = well_summary['Sy_weighted'] / well_summary['thickness']
+
+
+    return well_summary[['average_Sy']].reset_index()
   
 def plot_ET(
         ET_df,
@@ -364,7 +386,7 @@ def plot_ET(
         fig.autofmt_xdate()
         
         if save_dir is not None:
-            fname = f"ET_{method_id}_{well_id}_{'_'.join(map(str, years))}.eps"
+            fname = f"ET_{method_id}_{well_id}_{'_'.join(map(str, years))}2.eps"
             fig.savefig(save_dir / fname, format="eps", bbox_inches="tight")
             plt.close(fig)
         else:
@@ -375,15 +397,15 @@ def plot_gw_ET_overlay(gw_df, et_df, year):
     
     return
 
-def update_wells_no_dt(filepath: str) -> pd.DataFrame:
+def update_wells(filepath: str) -> pd.DataFrame:
     """
-    Validates files with well_ids and NO datetime info 
+    Validates files with well_ids
     Returns a valided dataframe with corrected well_ids.
 
     Parameters
     ----------
     filepath : str
-        Path to CSV file with well_ids and no datetime info
+        Path to CSV file with well_ids 
     """
     # Validate the well_ids to ensure no bad data slipped through
     #Load Sy data
@@ -396,7 +418,8 @@ def update_wells_no_dt(filepath: str) -> pd.DataFrame:
     sy_df = well_utils.validate_well_ids(sy_df, id_col="well_id")
     return  sy_df 
 
-# ---- MAIN PROCEDURES ---
+
+    # ---- MAIN PROCEDURES ---
 
 def main():
    
@@ -413,6 +436,11 @@ def main():
     daily_gw_df = get_daily_gw_levels(subdaily_gw_df)
     print("got gw levels")
     
+    #calculate average Sy for each well
+    df_soil_sy = pd.read_csv(sy_data_filepath)
+    df_well_logs = pd.read_csv(well_data_filepath)
+    calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
+
     # Calculate daily ET using different methods and Plot
     ## Start with White using same Sy for all wells
     #daily_ET_df = estimate_ET_White_constant_Sy(daily_gw_df)
@@ -420,7 +448,8 @@ def main():
     #print("calculated and saved ET")
     
     ## Add White using weight average Sy for each well
-    daily_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, Sy_data_filepath)
+    daily_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df )
+
     plot_ET(daily_ET_df, 
             "White_wavg", 
             2025, 
