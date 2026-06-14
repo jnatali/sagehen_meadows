@@ -239,7 +239,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
         ]
     ].dropna()
 
-def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd.DataFrame:
+def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame,) -> pd.DataFrame:
     """
     Calculate ET in cm/day for each well in subdaily groundwater logger data
     using White (1932) method and a specific yield for each well that's a weighted
@@ -256,13 +256,12 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
     METHOD_ID = "White_wavg"
     
     df = daily_df.copy()
-    
+
+    #   ---- ET CALCULATIONS ----
     # Calculate R, overnight recharge rate in cm/day
     df["R_cm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
-    
     # Calculate s, daily storage change (cm)
     df["S_cm"] = df["gw_00"] - df["gw_24"]
-    
     # Set constants for this method
     df["method_id"] = METHOD_ID
 
@@ -274,7 +273,7 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
 
     # Calculate daily ET
     df["ET_gw_cm"] = df["Sy_star"] * (df["R_cm"] + df["S_cm"])
-    
+
     return df[
         [
             "date",
@@ -289,7 +288,117 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
         ]
     ].dropna()
 
+def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_mm: float = 8.0, recovery_days: int = 3) -> pd.DataFrame:
+    """
+    Filters out ET estimates on days with heavy precipitation and subsequent recovery days.
+
+    Parameters:
+    et_df: populated ET estimate dataframe to filter
+    precip_df: dataframe with columns: date, precip_mm_day
+    threshold_mm: precipitation threshold to filter by in mm
+    recovery_days: number of days to exclude after a heavy precipitation event
+    
+    Returns:
+    filtered ET estimate dataframe
+    """
+    # ---- 1. CREATE THE MASK ----
+    
+    # Make a copy to protect the original data, sort chronologically so the rolling window 
+    # looks backward in time correctly, and reset the index to prevent alignment errors.
+    p_df = precip_df.copy().sort_values("date").reset_index(drop=True)
+    
+    # Create a boolean series (True/False) flagging days where rain met or exceeded the threshold.
+    high_precip = p_df["precip_mm_day"] >= threshold_mm
+    
+    # Calculate the total window size (the rain event day itself + the number of recovery days).
+    window_size = recovery_days + 1
+    
+    # Apply a rolling window that looks backward. If any day in that window was a 
+    # "high_precip" day (True), .max() evaluates to True for the current day, 
+    # effectively dragging the exclusion flag forward through the recovery period.
+    p_df["exclude_ET"] = high_precip.rolling(window=window_size, min_periods=1).max().astype(bool)
+    
+    
+    # ---- 2. APPLY THE MASK ----
+    
+    # Merge the True/False mask into the calculated ET dataframe, matching exactly by date.
+    # A 'left' merge ensures we don't accidentally drop ET dates just because they are missing from weather data.
+    filtered_df = et_df.merge(p_df[["date", "exclude_ET"]], on="date", how="left")
+    
+    # If any dates in the ET data didn't have weather data, assume it didn't rain (False).
+    filtered_df["exclude_ET"] = filtered_df["exclude_ET"].fillna(False)
+    
+    # Use the bitwise NOT operator (~) to keep ONLY the rows where exclude_ET is False.
+    # Then, immediately drop the temporary "exclude_ET" column to keep the dataframe clean.
+    filtered_df = filtered_df[~filtered_df["exclude_ET"]].drop(columns=["exclude_ET"])
+    
+    return filtered_df
+
+def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: pd.DataFrame, buffer_cm: float = 5.0) -> pd.DataFrame:
+    """
+    Filters out ET estimates for days when the groundwater level drops 
+    below the total depth of the well, minus a safety buffer.
+
+    Parameters:
+    et_df: populated ET estimate dataframe to filter
+    gw_df: daily groundwater dataframe with start-of-day gw levels (gw_00)
+    well_df: dataframe with soil survey data including stop_depth_cm to calculate total well depth
+    buffer_cm: safety buffer in cm to exclude data before the well goes completely dry (default is 5.0)
+    
+    Returns:
+    filtered ET estimate dataframe
+    """
+    # ---- FIND TOTAL WELL DEPTHS 
+    # Group the soil survey by well_id and find the maximum stop_depth_cm 
+    max_depths = well_df.groupby("well_id")["stop_depth_cm"].max().reset_index()
+    max_depths = max_depths.rename(columns={"stop_depth_cm": "total_well_depth_cm"})
+    
+    # ---- GET DAILY GROUNDWATER LEVELS -
+    # Extract just the identifiers and the start-of-day groundwater depth (gw_00)
+    gw_levels = gw_df[["well_id", "date", "gw_00"]].copy()
+    
+    # ---- CREATE THE EXCLUSION MASK 
+    mask_df = gw_levels.merge(max_depths, on="well_id", how="left")
+    
+    # Flag days where the water depth (gw_00) is deeper than the well bottom minus the buffer.
+    # Example: If well is 100cm deep and buffer is 5cm, flag if gw_00 >= 95cm.
+    mask_df["is_dry"] = mask_df["gw_00"] >= (mask_df["total_well_depth_cm"] - buffer_cm)
+    
+    # ----  PRINT DROPPED DAYS SUMMARY 
+    dry_records = mask_df[mask_df["is_dry"]]
+    if not dry_records.empty:
+        print(f"\n--- Dropping {len(dry_records)} ET records due to dry well conditions (buffer = {buffer_cm} cm) ---")
+        for well, group in dry_records.groupby("well_id"):
+            dates = group["date"].dt.strftime("%Y-%m-%d").tolist()
+            # This prints the well ID, the total count of dropped days, and the exact dates
+            print(f"{well}: Dropped {len(dates)} days -> {dates}")
+        print("----------------------------------------------------------------------------------\n")
+    else:
+        print(f"\n--- No ET records dropped due to dry well conditions (buffer = {buffer_cm} cm) ---\n") 
+
+    # ---- APPLY THE MASK TO ET DATA 
+    # Merge the mask into your ET dataframe using both well_id and date
+    filtered_et = et_df.merge(mask_df[["well_id", "date", "is_dry"]], on=["well_id", "date"], how="left")
+    
+    # Fill any missing mask values with False (assume it's not dry if we lack data)
+    filtered_et["is_dry"] = filtered_et["is_dry"].fillna(False)
+    
+    # Keep only the rows where the well is NOT dry, then drop the temporary column
+    filtered_et = filtered_et[~filtered_et["is_dry"]].drop(columns=["is_dry"])
+    
+    return filtered_et
+
 def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculates the average specific yield for each well based on soil texture and thickness.
+
+    Parameters:
+    df_sy: a dataframe with specific yield information for each soil texture
+    df_wells: a data frame with well information including soil texture and depth
+    
+    Returns:
+    a dataframe with the average specific yield for each well
+    """
 
     # Set the key column as the index, select the value column, and convert to dict
     soil_sy_dict = df_sy.set_index('soil_texture')['Sy'].to_dict()
@@ -350,21 +459,43 @@ def plot_ET(
         fig, ax1 = plt.subplots(figsize=(8, 4))
         fig.suptitle(f"Daily ET via {method_id} for {well_id}")
         
-        # TODO: check. why call this 2x?
-        ax1.plot(
+# ---- ET line (Dominant Foreground) ----
+        l1 = ax1.plot(
             well_df["date"],
             well_df["ET_gw_cm"],
+            linewidth=2,        # Thicker line makes it dominant
+            color="black",        # High contrast color
+            zorder=3,             # Forces ET to be drawn on top of everything
+            label="ET"
         )
-    
-       # ---- ET line ----
-        ax1.plot(
-            well_df["date"],
-            well_df["ET_gw_cm"],
-            linewidth=1.0
-        )
-        ax1.set_ylabel("ET (cm)")
+        
+        # Set primary axis labels
+        ax1.set_ylabel("ET (cm/day)")
         ax1.set_xlabel("Date")
-
+        
+        # ---- Create Secondary Y-Axis ----
+        ax2 = ax1.twinx()
+# ---- Storage line (Secondary Y-Axis) ----
+        l2 = ax2.plot(
+            well_df["date"],
+            well_df["S_cm"],
+            linewidth=0.8,
+            color="lightgreen",   # Lighter green
+            zorder=2,             # Draws this line above Recharge
+            label="Storage (S)"
+        )
+        
+    
+# ---- Recharge line  ----
+        l3 = ax2.plot(
+            well_df["date"],
+            well_df["R_cm"],
+            linewidth=0.8,
+            color="lightcoral",   # Lighter red, bypasses the need for alpha
+            zorder=1,             # Draws this line first (at the bottom)
+            label="Recharge (R)"
+        )
+        """
         # ---- Optional precipitation ----
         if precip_df is not None:
             merged = well_df.merge(
@@ -381,12 +512,28 @@ def plot_ET(
                 alpha=0.3
             )
             ax2.set_ylabel("Precipitation (mm)")
+        """
+
+        # Set secondary axis label
+        ax2.set_ylabel("Recharge & Storage (cm/day)")
+
+        # ---- Force Primary Axis on Top ----
+        # twinx() draws ax2 on top of ax1 by default. This forces ax1 back to the top
+        # and makes its background transparent so ax2 is visible underneath.
+        ax1.set_zorder(ax2.get_zorder() + 1)
+        ax1.patch.set_visible(False)
+
+        # ---- Combine Legends ----
+        # Because we have two axes, calling .legend() normally creates two separate boxes.
+        # This combines the labels from both axes into a single legend.
+        lines = l1 + l2 + l3
+        labels = [l.get_label() for l in lines]
+        ax1.legend(lines, labels, loc="upper right")
         
-        #ax1.axhline(0, linewidth=0.8)
         fig.autofmt_xdate()
         
         if save_dir is not None:
-            fname = f"ET_{method_id}_{well_id}_{'_'.join(map(str, years))}2.eps"
+            fname = f"ET_{method_id}_{well_id}_{'_'.join(map(str, years))}8.eps"
             fig.savefig(save_dir / fname, format="eps", bbox_inches="tight")
             plt.close(fig)
         else:
@@ -447,15 +594,21 @@ def main():
     #daily_ET_df.to_csv(ET_calc_filepath, index=False)
     #print("calculated and saved ET")
     
-    ## Add White using weight average Sy for each well
-    daily_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df )
+# 1. Calculate raw ET for ALL days
+    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
+
+    # 2. Filter out the storm events
+    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
+
+    # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
+    daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_cm=5.0)
 
     plot_ET(daily_ET_df, 
             "White_wavg", 
             2025, 
             precip_df=daily_precip_df, 
             save_dir=save_dir)
-    print("PRECIP + ET plotted for White constant Sy")
+    print("ET plotted for White constant Sy")
 
    
     # Save to csv? Do we want a new one or write over the one from above?
