@@ -463,7 +463,7 @@ def plot_ET(
         l1 = ax1.plot(
             well_df["date"],
             well_df["ET_gw_cm"],
-            linewidth=2,        # Thicker line makes it dominant
+            linewidth=1.5,        # Thicker line makes it dominant
             color="black",        # High contrast color
             zorder=3,             # Forces ET to be drawn on top of everything
             label="ET"
@@ -528,12 +528,13 @@ def plot_ET(
         # This combines the labels from both axes into a single legend.
         lines = l1 + l2 + l3
         labels = [l.get_label() for l in lines]
-        ax1.legend(lines, labels, loc="upper right")
+        # Move legend below the plot, centered, with items in 3 columns
+        ax1.legend(lines, labels, loc="upper center", bbox_to_anchor=(0.5, -0.35), ncol=3)
         
         fig.autofmt_xdate()
         
         if save_dir is not None:
-            fname = f"ET_{method_id}_{well_id}_{'_'.join(map(str, years))}8.eps"
+            fname = f"ET_{method_id}_{well_id}_{'_'.join(map(str, years))}_filtered.eps"
             fig.savefig(save_dir / fname, format="eps", bbox_inches="tight")
             plt.close(fig)
         else:
