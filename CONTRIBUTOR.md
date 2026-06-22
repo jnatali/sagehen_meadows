@@ -17,8 +17,12 @@ See the "For Newbies" section below.
 - When naming files, use file naming conventions (defined in sections below).
 - Treat RAW data as strictly read-only. RAW data should never be modified by scripts. Scripts should transform RAW data into derived products that are saved as separate files (e.g. a new .csv). 
 - When possible, results should be reproducible by re-running scripts rather than manually editing files. This supports reproducible science!
-- At the start of each work session, use git to Pull or "*Fetch Origin*". This will make sure you're capturing any updates from others working on the same branch.
-- Commit to your branch often and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not alerted or paying attention.
+
+#### Starting a work session
+At the start of each work session, use git to Pull or "*Fetch Origin*". This will make sure you're capturing any updates from others working on the same branch.
+
+#### Committing your work
+- Commit to your branch *often* and push to github; these two steps backup your work. Do it every work session! Don't worry about how often or not, I'm not alerted or paying attention.
 - Write short, clear commit messages. Explain what changed and why. Don't just write "update".
 
 Good examples:
@@ -29,12 +33,58 @@ Fix date parsing for logger files
 Update canopy temperature documentation
 ```
 
+#### Pull Requests
 - A PULL REQUEST (PR) into the main branch can happen at any time. You can use the Pull Request to help track changes against the 'main' branch. Once your task is completed, rename your Pull Request as "Ready to Review". See the "What 'Ready for Review' Means" section below for details.
 - Once you submit a PR, we'll review together, merge the code into the `main` branch, then close the issue and the sub-branch. We'll do this when the work is complete or needs to be shared, which should happen within 1-4 weeks. We'll try to keep issues focused and reviews frequent. Reviews are a standard software dev practice and should help us all become more familiar with code, solve problems and smooth collaboration.
+
+A pull request is ready for review when:
+- The code runs successfully on representative data.
+- Any known bugs or limitations have been documented in the Pull Request description.
+- New functions include comments or docstrings explaining their purpose, inputs, and outputs.
+- The contributor has reviewed their own changes before requesting review.
+- Temporary debugging code, test files, and commented-out code have been removed or clearly identified.
+
+Code does not need to be perfect before review. Reviews are expected to identify improvements and catch issues. However, code should be functional and understandable before requesting review.
+
+## Python and R coding conventions
 - Our python code should follow [PEP 8](https://peps.python.org/pep-0008/) guidelines. Highlights are listed in "PEP-8 Highlights" section below. Other .py files written by Jen can be templates for how we structure files and use comments/documentation. Ask if an example would help.
 
+#### Avoid hard-coding your local working directory to set the github repository path.
+- In Python, use `Path`. See code snippet below, assumes you're running the python script from the repository's `script` directory.
+
+```
+from pathlib import Path
+
+repo = Path(__file__).resolve().parents[2]   # example
+
+groundwater_data_dir = (
+    repo
+    / "data"
+    / "field_observations"
+    / "groundwater"
+    / "time_series"
+)
+
+groundwater_file = groundwater_data_dir / "groundwater_daily.csv"
+```
+
+- In R, use  `library(here)` to set the relative repository directory. To try, you can first enter `library(here)` in your RStudio console. It should return the full path for your GitHub/sagehen_meadows repository. If this works, then you can use `here()` in any R script in the repository. The `here` library should work because I created a .Rproj file in our base github directory. If not, let Jen know. 
+
+```
+# Setup directories and filepaths
+library(here)
+
+groundwater_rawdata_filepath <- here(
+  "data",
+  "field_observations",
+  "groundwater",
+  "time_series",
+  "groundwater_daily.csv"
+)
+```
+
 ### File Naming Conventions
-- Use all lower case in filenames. One exception: when using names to mark the status of data files (see keyword status markers below, under data file naming conventions)
+- Use **all lower case** in filenames. One exception: when using names to mark the status of data files (see keyword status markers below, under data file naming conventions). Another exception: when using an abbreviation that we tend to capitalize, e.g. `ET`
 - Never use spaces or non-alphabetic characters in filenames. Use underscore to separate words; e.g. use `soil_survey.csv` and not `soil:survey for JN@.csv`
 - The first word should indicate the main content or action, the second word a distinguishing characteristic; e.g. `well_dimensions.csv` is a list of wells and their dimensions, `process_raw_logger.py` processes raw logger data.
 - When in doubt, look at other files in the directory and try to follow the pattern that's already there.
@@ -46,15 +96,6 @@ Update canopy temperature documentation
 * _STABLE = data that's been processed and validated, appears stable but may be some minor changes; waiting for final release of the project (i.e. when paper, data and scripts published)
 * _FINAL = data that's been processed and validated, no more changes expected in this release of the research project
 
-### Pull Requests: What "Ready for Review" Means
-A pull request is ready for review when:
-- The code runs successfully on representative data.
-- Any known bugs or limitations have been documented in the Pull Request description.
-- New functions include comments or docstrings explaining their purpose, inputs, and outputs.
-- The contributor has reviewed their own changes before requesting review.
-- Temporary debugging code, test files, and commented-out code have been removed or clearly identified.
-
-Code does not need to be perfect before review. Reviews are expected to identify improvements and catch issues. However, code should be functional and understandable before requesting review.
 
 ### PEP-8 Python Style Guide Highlights
 
