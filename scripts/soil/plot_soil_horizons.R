@@ -4,13 +4,14 @@
 library(aqp)
 library(dplyr)
 library(stringr)
+library(here)
 
-setwd("/home/smittlek/JenProject/sagehen_meadows/")
+
 # Setup 
-source("scripts/groundwater/well_utils.R")
+source(here("scripts", "groundwater", "well_utils.R"))
 
 # Load data
-df <- read.csv("data/field_observations/soil/soil_survey_PROCESSED.csv")
+df <- read.csv(here("data", "field_observations", "soil", "soil_survey_PROCESSED.csv"))
 
 # Add categories 
 df <- get_well_categories(df)
@@ -18,9 +19,12 @@ df <- get_well_categories(df)
 df$start_depth_cm <- round(df$start_depth_cm)
 df$stop_depth_cm <- round(df$stop_depth_cm)
 
+# specify category of interedt
+categ <- "Lodgepole Pine"
+
 # Filter a specific category
 df <- df %>%
-  filter(plant_type == "Lodgepole Pine")
+  filter(plant_type == categ)
 
 # Add the gravel calculation for the plot bubbles
 df$gravel_amount_percent_hundred <- df$gravel_amount_percent * 100
@@ -34,8 +38,15 @@ depths(df) <- well_id ~ start_depth_cm + stop_depth_cm
 # Promote label to site data
 site(df) <- ~ plot_label
 
+# Format the category string for the file name 
+# Converts to lowercase and replaces all spaces with underscores
+formatted_categ <- gsub(" ", "_", tolower(categ))
+
+# Create the final file name string (e.g., "wells_lodgepole_pine.png")
+file_name <- paste0("wells_", formatted_categ, ".png")
+
 # Plot and Save
-png(filename = "results/plots/groundwater/soils/wells_Lodgepole_Pine_PlantType.png", 
+png(filename = here("results", "plots", "groundwater", "soils", file_name), 
     width = 1800, height = 2000, res = 150)
 
 par(mar = c(0, 0, 8, 1)) 
