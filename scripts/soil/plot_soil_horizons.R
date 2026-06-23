@@ -41,7 +41,7 @@ png(filename = "results/plots/groundwater/soils/wells_Lodgepole_Pine_PlantType.p
 par(mar = c(0, 0, 8, 1)) 
 
 plotSPC(df, 
-        label = 'plot_label', # FIXED: Tells aqp to use the custom column
+        label = 'plot_label', # Tells aqp to use the custom column
         id.style = 'top',     # FORCE aqp to center labels above the column
         cex.names = 1,        
         cex.id = 0.85,        
