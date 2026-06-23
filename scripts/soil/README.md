@@ -5,7 +5,7 @@ The following scripts plot soil profile data at named wells across Sagehen meado
 
 ## Script Descriptions
 ### soil_validation.py
-- Checks and renames well_id with ..groundwater.well_utils module
+- Checks and renames well_id with `..groundwater.well_utils` module
 - Standardizes gravel sub-class entries and soil texture naming
   
 Requires  data files:
@@ -14,6 +14,7 @@ Requires  data files:
 
 Outputs resulting processed data to:
 `data/field_observations/soil/soil_survey_VALIDATED.csv`
+
 NOTE that the output was formerly:
 `data/field_observations/soil/soil_survey_at_wells_update_w_G.csv`
 
