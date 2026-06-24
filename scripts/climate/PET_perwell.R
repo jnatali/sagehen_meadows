@@ -254,7 +254,7 @@ pet_by_well <- pet_by_well %>%
 # =========================================================
 # EXPORT DATA FOR PYTHON
 # =========================================================
-write_csv(pet_by_well, here("data", "field_observations", "pet_by_well_results.csv"))
+write_csv(pet_by_well, here("data", "et", "pet_by_well_results.csv"))
 
 cat("Export complete! Saved to Desktop/pet_by_well_results.csv\n")
 # # =========================================================
