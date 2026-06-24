@@ -628,27 +628,28 @@ def plot_Storage_Recharge_bar(ET_df, method_id, year, save_dir=None):
         else:
             plt.show()
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from pathlib import Path
-
 def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
     """
     Plots proportional Net ET bars and PET line on the left axis, 
     and daily average temperature (Fahrenheit) on a secondary right axis.
     Saves the figures as .eps files or displays them.
     """
-    # Filter down to the specific year and method
+    # 1. Filter down to the specific year and method safely
     ET_df = ET_df[(ET_df['year'] == year) & (ET_df['method_id'] == method_id)].copy()
     ET_df['clean_date'] = pd.to_datetime(ET_df['date']).dt.strftime('%m-%d')
     
     PET_df = PET_df.copy()
     PET_df['clean_date'] = pd.to_datetime(PET_df['Date']).dt.strftime('%m-%d')
 
-    # Combine with PET_df and weather_df using left joins
+    # 2.Filter weather data by the target year to avoid multi-year duplication cross-joins
+    if 'year' in weather_df.columns:
+        weather_filtered = weather_df[weather_df['year'] == year].copy()
+    else:
+        weather_filtered = weather_df.copy()
+
+    # Combine dataframes using left joins
     filtered_df = ET_df.merge(PET_df, how='left', on=['well_id', 'clean_date'])
-    filtered_df = filtered_df.merge(weather_df, how='left', on='clean_date')
+    filtered_df = filtered_df.merge(weather_filtered, how='left', on='clean_date')
 
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, ax1 = plt.subplots(figsize=(6, 6))
@@ -672,7 +673,7 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         ax1.bar(dates, s_bar_heights, width=1.0, color='teal', label='Storage')
         ax1.bar(dates, r_bar_heights, bottom=s_bar_heights, width=1.0, color='cornflowerblue', label='Recharge')
 
-        # 2. Overlay PET Line (Converted mm -> cm to keep on the same scale)
+        # 2. Overlay PET Line
         if 'PET_mm_day' in well_df.columns:
             pet_cm = well_df['PET_mm_day'] / 10.0
             ax1.plot(dates, pet_cm, color='crimson', linewidth=2, label='PET (cm)')
@@ -680,23 +681,29 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         # Add zero-line to clearly anchor positive/negative days
         ax1.axhline(0, color='black', linewidth=0.5)
 
-        # Formatting Left Axis (
+        # Formatting Left Axis
         ax1.set(xlabel='Date', ylabel='Net ET / PET (cm)')
         
-        # 3. Right Axis (ax2): Temperature
+        # 3. Right Axis (ax2): Temperature context (Celsius)
         ax2 = ax1.twinx() 
-        if 'temp_25ft_F' in well_df.columns:
-            # Pushed to background using alpha=0.5 and thinner linewidth=1.25
-            ax2.plot(dates, well_df['temp_25ft_F'], color='darkorange', linestyle='--', linewidth=1.25, alpha=0.5, label='Temp 25ft (°F)')
+        if 'temp_25ft_C' in well_df.columns:
+            ax2.plot(dates, well_df['temp_25ft_C'], color='darkorange', linestyle='--', linewidth=1.25, alpha=0.5, label='Temp 25ft (°C)')
         
+        ax2.set_ylabel('Air Temperature (°C)')
+        
+        # ---- NEW: CALCULATE PERFECT ZERO ALIGNMENT ----
+        ax1_min, ax1_max = ax1.get_ylim()
+        ax2_max = 40.0
+        
+        # Scale the lower temp bound exactly proportional to the left axis lower bound
+        ax2_min = ax1_min * (ax2_max / ax1_max)
+        
+        # Apply the balanced limits
+        ax2.set_ylim(ax2_min, ax2_max)
 
-        ax2.set_ylabel(f'Air Temperature (°F)')
-
-        # ---- X-Axis Ticks Formatting ----
-        ticks = ax1.get_xticks()
-        labels = [item.get_text() for item in ax1.get_xticklabels()]
-        ax1.set_xticks(ticks[::20])
-        ax1.set_xticklabels(labels[::20])
+        # Using string array indices avoids the empty string layout engine bug
+        ax1.set_xticks(range(0, len(dates), 20))
+        ax1.set_xticklabels(dates[::20])
         ax1.tick_params(axis='x', rotation=0)
 
         # ---- COMBINED LEGEND ----
@@ -704,8 +711,9 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         lines_2, labels_2 = ax2.get_legend_handles_labels()
         ax1.legend(lines_1 + lines_2, labels_1 + labels_2, bbox_to_anchor=(1.15, 1), loc='upper left')
 
-        # Using ax1.set_title cleanly maps a single title string without duplicate layer generation
+        # Unified single title assignment
         ax1.set_title(f'{method_id}_temperature_and_pet_{well_id}', fontsize=12, fontweight='bold')
+
 
         # ---- SAVING LOGIC ----
         if save_dir is not None:
