@@ -256,7 +256,7 @@ pet_by_well <- pet_by_well %>%
 # =========================================================
 write_csv(pet_by_well, here("data", "et", "pet_by_well_results.csv"))
 
-cat("Export complete! Saved to Desktop/pet_by_well_results.csv\n")
+cat("Export complete!\n")
 # # =========================================================
 # # STEP 9: SUMMARIES
 # # =========================================================

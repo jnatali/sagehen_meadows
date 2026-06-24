@@ -49,6 +49,9 @@ sy_data_filepath = sy_data_dir / 'sy_lookup.csv'
 well_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
 well_data_filepath = well_data_dir / 'soil_survey_PROCESSED.csv'
 
+pet_data_dir = PROJECT_ROOT / 'data/et'
+pet_data_filepath = pet_data_dir / 'pet_by_well_results.csv'
+
 save_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
 
 # TODO: add data_dir and filepath for Sy stuff
@@ -198,7 +201,34 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     daily["year"] = daily["date"].dt.year
 
     return daily
+
+def get_daily_temperature(weather_subdaily_filepath: str) -> pd.DataFrame:
+    """
+    Loads massive sub-daily weather data, extracts the 25ft air temp, 
+    calculates the daily average, and converts it to Fahrenheit.
+    """
+    # 1. Load only the necessary columns to save memory
+    cols_to_load = ['time', 'air-temp-25-ft-avg-degc']
+    weather_df = pd.read_csv(weather_subdaily_filepath, usecols=cols_to_load)
     
+    # 2. Convert to datetime
+    weather_df['time'] = pd.to_datetime(weather_df['time'])
+    
+    # 3. Resample to daily average
+    daily_weather = weather_df.resample('D', on='time').mean().reset_index()
+    
+    # 4. Create merge-friendly columns 
+    daily_weather['year'] = daily_weather['time'].dt.year
+    daily_weather['clean_date'] = daily_weather['time'].dt.strftime('%m-%d')
+    
+    # 5. Rename the Celsius column for clarity
+    daily_weather = daily_weather.rename(columns={'air-temp-25-ft-avg-degc': 'temp_25ft_C'})
+    
+    # 6. Convert Celsius to Fahrenheit
+    daily_weather['temp_25ft_F'] = (daily_weather['temp_25ft_C'] * 9/5) + 32
+    
+    # Return the dataframe with the new Fahrenheit column included
+    return daily_weather[['year', 'clean_date', 'temp_25ft_C', 'temp_25ft_F']]
 
 def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     """
@@ -598,25 +628,36 @@ def plot_Storage_Recharge_bar(ET_df, method_id, year, save_dir=None):
         else:
             plt.show()
 
-def plot_ET_prop_bar(ET_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
     """
-    Plots proportional Net ET bars for each well, broken down by Storage and Recharge.
+    Plots proportional Net ET bars and PET line on the left axis, 
+    and daily average temperature (Fahrenheit) on a secondary right axis.
     Saves the figures as .eps files or displays them.
     """
     # Filter down to the specific year and method
-    filtered_df = ET_df[(ET_df['year'] == year) & (ET_df['method_id'] == method_id)].copy()
+    ET_df = ET_df[(ET_df['year'] == year) & (ET_df['method_id'] == method_id)].copy()
+    ET_df['clean_date'] = pd.to_datetime(ET_df['date']).dt.strftime('%m-%d')
+    
+    PET_df = PET_df.copy()
+    PET_df['clean_date'] = pd.to_datetime(PET_df['Date']).dt.strftime('%m-%d')
+
+    # Combine with PET_df and weather_df using left joins
+    filtered_df = ET_df.merge(PET_df, how='left', on=['well_id', 'clean_date'])
+    filtered_df = filtered_df.merge(weather_df, how='left', on='clean_date')
 
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, ax1 = plt.subplots(figsize=(6, 6))
         
-        # Format the dates for the x-axis
-        well_df['clean_date'] = pd.to_datetime(well_df['date']).dt.strftime('%m-%d')
         dates = well_df['clean_date'].tolist()
 
         # Calculate Net ET and absolute totals
         ET_net = well_df['S_cm_proportion'] + well_df['R_cm_proportion']
         total_abs = well_df['S_cm_proportion'].abs() + well_df['R_cm_proportion'].abs()
-
 
         # Calculate proportions safely (avoiding zero-division)
         s_prop = np.where(total_abs == 0, 0, well_df['S_cm_proportion'].abs() / total_abs)
@@ -626,37 +667,51 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, method_id: str, year: int, save_dir=No
         s_bar_heights = ET_net * s_prop
         r_bar_heights = ET_net * r_prop
 
-        # ---- PLOTTING ----
-        # Use ax.bar instead of Pandas .plot() to handle the proportional stacking correctly
+        # ---- PLOTTING 
+        # 1. Left Axis (ax1): Stacking Bars
         ax1.bar(dates, s_bar_heights, width=1.0, color='teal', label='Storage')
         ax1.bar(dates, r_bar_heights, bottom=s_bar_heights, width=1.0, color='cornflowerblue', label='Recharge')
 
+        # 2. Overlay PET Line (Converted mm -> cm to keep on the same scale)
+        if 'PET_mm_day' in well_df.columns:
+            pet_cm = well_df['PET_mm_day'] / 10.0
+            ax1.plot(dates, pet_cm, color='crimson', linewidth=2, label='PET (cm)')
+            
         # Add zero-line to clearly anchor positive/negative days
         ax1.axhline(0, color='black', linewidth=0.5)
 
-        # Formatting
-        ax1.set(xlabel='Date', 
-                ylabel='Net ET (cm)', 
-                title=f'{method_id}_{well_id}')
+        # Formatting Left Axis (
+        ax1.set(xlabel='Date', ylabel='Net ET / PET (cm)')
         
-        # Legend outside the plot area
-        ax1.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        # 3. Right Axis (ax2): Temperature
+        ax2 = ax1.twinx() 
+        if 'temp_25ft_F' in well_df.columns:
+            # Pushed to background using alpha=0.5 and thinner linewidth=1.25
+            ax2.plot(dates, well_df['temp_25ft_F'], color='darkorange', linestyle='--', linewidth=1.25, alpha=0.5, label='Temp 25ft (°F)')
+        
 
-        # Grab all the current tick locations and their text labels
+        ax2.set_ylabel(f'Air Temperature (°F)')
+
+        # ---- X-Axis Ticks Formatting ----
         ticks = ax1.get_xticks()
         labels = [item.get_text() for item in ax1.get_xticklabels()]
-        
-        # Overwrite the axis to ONLY include every 15th tick and label
         ax1.set_xticks(ticks[::20])
         ax1.set_xticklabels(labels[::20])
-
-        # Rotate the ones that are visible so they read perfectly flat
         ax1.tick_params(axis='x', rotation=0)
+
+        # ---- COMBINED LEGEND ----
+        lines_1, labels_1 = ax1.get_legend_handles_labels()
+        lines_2, labels_2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines_1 + lines_2, labels_1 + labels_2, bbox_to_anchor=(1.15, 1), loc='upper left')
+
+        # Using ax1.set_title cleanly maps a single title string without duplicate layer generation
+        ax1.set_title(f'{method_id}_temperature_and_pet_{well_id}', fontsize=12, fontweight='bold')
 
         # ---- SAVING LOGIC ----
         if save_dir is not None:
+            save_path = Path(save_dir)
             fname = f"ET_proportional_{method_id}_{well_id}_{year}_BAR.eps"
-            fig.savefig(save_dir / fname, format="eps", bbox_inches="tight")
+            fig.savefig(save_path / fname, format="eps", bbox_inches="tight")
             plt.close(fig)
         else:
             plt.show()
@@ -710,7 +765,7 @@ def main():
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
 
-# 1. Calculate raw ET for ALL days
+    # 1. Calculate raw ET for ALL days
     raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
 
     # 2. Filter out the storm events
@@ -719,7 +774,12 @@ def main():
     # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
     daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_cm=5.0)
 
+    PET_df = update_wells(pet_data_filepath)
+    weather_df = get_daily_temperature(weather_subdaily_filepath)
+
     plot_ET_prop_bar(daily_ET_df, 
+            PET_df,
+            weather_df,
             "White_wavg", 
             2025,  
             save_dir=save_dir)
