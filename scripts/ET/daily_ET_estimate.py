@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 
 import sys
 from pathlib import Path
+import numpy as np
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
@@ -273,7 +274,8 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame,) -> p
 
     # Calculate daily ET
     df["ET_gw_cm"] = df["Sy_star"] * (df["R_cm"] + df["S_cm"])
-
+    df['S_cm_proportion'] = df['Sy_star']*df['S_cm'] 
+    df['R_cm_proportion'] = df['Sy_star']*df['R_cm']
     return df[
         [
             "date",
@@ -285,12 +287,14 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame,) -> p
             "S_cm",
             "Sy_star",
             "method_id",
+            "S_cm_proportion",
+            "R_cm_proportion"
         ]
     ].dropna()
 
 def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_mm: float = 8.0, recovery_days: int = 3) -> pd.DataFrame:
     """
-    Filters out ET estimates on days with heavy precipitation and subsequent recovery days.
+    Filters out storage and recharge terms on days with heavy precipitation and subsequent recovery days.
 
     Parameters:
     et_df: populated ET estimate dataframe to filter
@@ -328,15 +332,30 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
     # If any dates in the ET data didn't have weather data, assume it didn't rain (False).
     filtered_df["exclude_ET"] = filtered_df["exclude_ET"].fillna(False)
     
-    # Use the bitwise NOT operator (~) to keep ONLY the rows where exclude_ET is False.
-    # Then, immediately drop the temporary "exclude_ET" column to keep the dataframe clean.
-    filtered_df = filtered_df[~filtered_df["exclude_ET"]].drop(columns=["exclude_ET"])
+    # ----  PRINT DROPPED DAYS SUMMARY ----
+    # Isolate the records that are flagged for exclusion
+    dropped_records = filtered_df[filtered_df["exclude_ET"]]
+    
+    if not dropped_records.empty:
+        print(f"\n--- Dropping {len(dropped_records)} ET records due to precip >= {threshold_mm} mm + {recovery_days} recovery days ---")
+        dates = dropped_records["date"].dt.strftime("%Y-%m-%d").tolist()
+        print(f"Zeroing records for {len(dates)} days -> {dates}")
+            
+        print("--------------------------------------------------------------------------------------------------\n")
+    else:
+        print(f"\n--- No ET records dropped due to precipitation (threshold = {threshold_mm} mm) ---\n")
+    
+    # Set 'R_cm' and 'S_cm' to 0 for the flagged rows using .loc
+    filtered_df.loc[filtered_df["exclude_ET"], ["R_cm_proportion", "S_cm_proportion", "ET_gw_cm"]] = 0.0
+    
+    # Drop the temporary "exclude_ET" column to keep the dataframe clean.
+    filtered_df = filtered_df.drop(columns=["exclude_ET"])
     
     return filtered_df
 
 def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: pd.DataFrame, buffer_cm: float = 5.0) -> pd.DataFrame:
     """
-    Filters out ET estimates for days when the groundwater level drops 
+    Filters out storage and recharge terms for days when the groundwater level drops 
     below the total depth of the well, minus a safety buffer.
 
     Parameters:
@@ -367,7 +386,7 @@ def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: p
     # ----  PRINT DROPPED DAYS SUMMARY 
     dry_records = mask_df[mask_df["is_dry"]]
     if not dry_records.empty:
-        print(f"\n--- Dropping {len(dry_records)} ET records due to dry well conditions (buffer = {buffer_cm} cm) ---")
+        print(f"\n--- Zeroing {len(dry_records)} records due to dry well conditions (buffer = {buffer_cm} cm) ---")
         for well, group in dry_records.groupby("well_id"):
             dates = group["date"].dt.strftime("%Y-%m-%d").tolist()
             # This prints the well ID, the total count of dropped days, and the exact dates
@@ -380,12 +399,12 @@ def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: p
     # Merge the mask into your ET dataframe using both well_id and date
     filtered_et = et_df.merge(mask_df[["well_id", "date", "is_dry"]], on=["well_id", "date"], how="left")
     
-    # Fill any missing mask values with False (assume it's not dry if we lack data)
-    filtered_et["is_dry"] = filtered_et["is_dry"].fillna(False)
+    # Set 'R_cm' and 'S_cm' to 0 for the flagged rows using .loc
+    filtered_et.loc[filtered_et["is_dry"], ["R_cm_proportion", "S_cm_proportion","ET_gw_cm"]] = 0.0
     
-    # Keep only the rows where the well is NOT dry, then drop the temporary column
-    filtered_et = filtered_et[~filtered_et["is_dry"]].drop(columns=["is_dry"])
-    
+    # Drop the temporary column
+    filtered_et = filtered_et.drop(columns=["is_dry"])
+
     return filtered_et
 
 def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
@@ -411,20 +430,21 @@ def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
     df_wells['thickness'] = df_wells['stop_depth_cm'] - df_wells['start_depth_cm']
     df_wells['Sy_weighted'] = df_wells['Sy'] * df_wells['thickness']
 
-    #  Grouping and Averaging
+    #  Grouping and Averagingpass
     well_summary = df_wells.groupby('well_id')[['Sy_weighted', 'thickness']].sum()
     well_summary['average_Sy'] = well_summary['Sy_weighted'] / well_summary['thickness']
 
 
     return well_summary[['average_Sy']].reset_index()
   
-def plot_ET(
+def plot_ET_line(
         ET_df,
         method_id,
         years=None,
         precip_df: pd.DataFrame | None = None,
         save_dir=None):
     """
+    
     Plot ET in cm/day for each well as a line; one plot per well.
 
     Parameters
@@ -539,7 +559,108 @@ def plot_ET(
             plt.close(fig)
         else:
             plt.show()
-    
+
+def plot_Storage_Recharge_bar(ET_df, method_id, year, save_dir=None):
+    index = ['method_id','S_cm_proportion','R_cm_proportion','year','well_id','date']
+    df = ET_df[index]
+    filtered_df = df[(df['year'] == year) & (df['method_id'] == method_id)]
+
+    for well_id, well_df in filtered_df.groupby('well_id'):
+        fig, ax1 = plt.subplots(figsize=(6, 6))
+        well_df['clean_date'] = pd.to_datetime(well_df['date']).dt.strftime('%m-%d')
+        plot_df = well_df.set_index('clean_date')[['S_cm_proportion', 'R_cm_proportion']]
+        plot_df.plot(
+            kind='bar',
+            stacked=True, 
+            color=['teal','cornflowerblue'],
+            ax = ax1,
+            width = 1.0)
+        ax1.set(xlabel='Date', 
+                ylabel='GW Levels (cm)', 
+                title=f'{method_id}_{well_id}')
+        ax1.legend(['Storage', 'Recharge'], bbox_to_anchor=(1.05, 1), loc='upper left')
+
+        # 1. Grab all the current tick locations and their text labels
+        ticks = ax1.get_xticks()
+        labels = [item.get_text() for item in ax1.get_xticklabels()]
+        
+        # 2. Overwrite the axis to ONLY include every 14th tick and label
+        # The [::14] tells Python to slice the list, taking every 14th item
+        ax1.set_xticks(ticks[::15])
+        ax1.set_xticklabels(labels[::15])
+
+        # Optional: rotate the ones that are visible so they read perfectly flat
+        ax1.tick_params(axis='x', rotation=0)
+        if save_dir is not None:
+            fname = f"Storage_and_Recharge_{method_id}_{well_id}_{year}_BAR.eps"
+            fig.savefig(save_dir / fname, format="eps", bbox_inches="tight")
+            plt.close(fig)
+        else:
+            plt.show()
+
+def plot_ET_prop_bar(ET_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
+    """
+    Plots proportional Net ET bars for each well, broken down by Storage and Recharge.
+    Saves the figures as .eps files or displays them.
+    """
+    # Filter down to the specific year and method
+    filtered_df = ET_df[(ET_df['year'] == year) & (ET_df['method_id'] == method_id)].copy()
+
+    for well_id, well_df in filtered_df.groupby('well_id'):
+        fig, ax1 = plt.subplots(figsize=(6, 6))
+        
+        # Format the dates for the x-axis
+        well_df['clean_date'] = pd.to_datetime(well_df['date']).dt.strftime('%m-%d')
+        dates = well_df['clean_date'].tolist()
+
+        # Calculate Net ET and absolute totals
+        ET_net = well_df['S_cm_proportion'] + well_df['R_cm_proportion']
+        total_abs = well_df['S_cm_proportion'].abs() + well_df['R_cm_proportion'].abs()
+
+
+        # Calculate proportions safely (avoiding zero-division)
+        s_prop = np.where(total_abs == 0, 0, well_df['S_cm_proportion'].abs() / total_abs)
+        r_prop = np.where(total_abs == 0, 0, well_df['R_cm_proportion'].abs() / total_abs)
+
+        # Scale proportions to the Net ET bar height
+        s_bar_heights = ET_net * s_prop
+        r_bar_heights = ET_net * r_prop
+
+        # ---- PLOTTING ----
+        # Use ax.bar instead of Pandas .plot() to handle the proportional stacking correctly
+        ax1.bar(dates, s_bar_heights, width=1.0, color='teal', label='Storage')
+        ax1.bar(dates, r_bar_heights, bottom=s_bar_heights, width=1.0, color='cornflowerblue', label='Recharge')
+
+        # Add zero-line to clearly anchor positive/negative days
+        ax1.axhline(0, color='black', linewidth=0.5)
+
+        # Formatting
+        ax1.set(xlabel='Date', 
+                ylabel='Net ET (cm)', 
+                title=f'{method_id}_{well_id}')
+        
+        # Legend outside the plot area
+        ax1.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+        # Grab all the current tick locations and their text labels
+        ticks = ax1.get_xticks()
+        labels = [item.get_text() for item in ax1.get_xticklabels()]
+        
+        # Overwrite the axis to ONLY include every 15th tick and label
+        ax1.set_xticks(ticks[::20])
+        ax1.set_xticklabels(labels[::20])
+
+        # Rotate the ones that are visible so they read perfectly flat
+        ax1.tick_params(axis='x', rotation=0)
+
+        # ---- SAVING LOGIC ----
+        if save_dir is not None:
+            fname = f"ET_proportional_{method_id}_{well_id}_{year}_BAR.eps"
+            fig.savefig(save_dir / fname, format="eps", bbox_inches="tight")
+            plt.close(fig)
+        else:
+            plt.show()
+
 def plot_gw_ET_overlay(gw_df, et_df, year):
     # See DRAFT in chatgpt here: https://chatgpt.com/s/t_6988e9118c34819181d813da8c21634b
     
@@ -589,12 +710,6 @@ def main():
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
 
-    # Calculate daily ET using different methods and Plot
-    ## Start with White using same Sy for all wells
-    #daily_ET_df = estimate_ET_White_constant_Sy(daily_gw_df)
-    #daily_ET_df.to_csv(ET_calc_filepath, index=False)
-    #print("calculated and saved ET")
-    
 # 1. Calculate raw ET for ALL days
     raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
 
@@ -604,12 +719,11 @@ def main():
     # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
     daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_cm=5.0)
 
-    plot_ET(daily_ET_df, 
+    plot_ET_prop_bar(daily_ET_df, 
             "White_wavg", 
-            2025, 
-            precip_df=daily_precip_df, 
+            2025,  
             save_dir=save_dir)
-    print("ET plotted for White constant Sy")
+    print("ET plotted for White average Sy")
 
    
     # Save to csv? Do we want a new one or write over the one from above?
