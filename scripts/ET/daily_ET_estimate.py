@@ -718,8 +718,8 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         # ---- SAVING LOGIC ----
         if save_dir is not None:
             save_path = Path(save_dir)
-            fname = f"ET_proportional_{method_id}_{well_id}_{year}_BAR.eps"
-            fig.savefig(save_path / fname, format="eps", bbox_inches="tight")
+            fname = f"ET_proportional_{method_id}_{well_id}_{year}_BAR.png"
+            fig.savefig(save_path / fname, format="png", bbox_inches="tight")
             plt.close(fig)
         else:
             plt.show()
