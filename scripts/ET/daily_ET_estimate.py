@@ -224,11 +224,28 @@ def get_daily_temperature(weather_subdaily_filepath: str) -> pd.DataFrame:
     # 5. Rename the Celsius column for clarity
     daily_weather = daily_weather.rename(columns={'air-temp-25-ft-avg-degc': 'temp_25ft_C'})
     
-    # 6. Convert Celsius to Fahrenheit
-    daily_weather['temp_25ft_F'] = (daily_weather['temp_25ft_C'] * 9/5) + 32
-    
     # Return the dataframe with the new Fahrenheit column included
-    return daily_weather[['year', 'clean_date', 'temp_25ft_C', 'temp_25ft_F']]
+    return daily_weather[['year', 'clean_date', 'temp_25ft_C']]
+
+def calculate_storage_recharge(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate storage and recharge terms for ET calculations.
+
+    Parameters:
+    df: daily groundwater dataframe with gw levels at key times
+
+    Returns:
+    DataFrame with additional columns for storage and recharge
+    """
+    df = df.copy()
+    
+    # Calculate R, overnight recharge rate in cm/day
+    df["R_cm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
+    
+    # Calculate s, daily storage change (cm)
+    df["S_cm"] = df["gw_24"] - df["gw_00"] 
+    
+    return df
 
 def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     """
@@ -243,11 +260,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     
     df = daily_df.copy()
     
-    # Calculate R, overnight recharge rate in cm/day
-    df["R_cm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
-    
-    # Calculate s, daily storage change (cm)
-    df["S_cm"] = df["gw_00"] - df["gw_24"]
+    df = calculate_storage_recharge(df)
     
     # Set constants for this method
     df["Sy_star"] = SY_STAR
@@ -289,10 +302,7 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame,) -> p
     df = daily_df.copy()
 
     #   ---- ET CALCULATIONS ----
-    # Calculate R, overnight recharge rate in cm/day
-    df["R_cm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
-    # Calculate s, daily storage change (cm)
-    df["S_cm"] = df["gw_00"] - df["gw_24"]
+    df = calculate_storage_recharge(df)
     # Set constants for this method
     df["method_id"] = METHOD_ID
 
@@ -304,8 +314,7 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame,) -> p
 
     # Calculate daily ET
     df["ET_gw_cm"] = df["Sy_star"] * (df["R_cm"] + df["S_cm"])
-    df['S_cm_proportion'] = df['Sy_star']*df['S_cm'] 
-    df['R_cm_proportion'] = df['Sy_star']*df['R_cm']
+
     return df[
         [
             "date",
@@ -316,9 +325,7 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame,) -> p
             "R_cm",
             "S_cm",
             "Sy_star",
-            "method_id",
-            "S_cm_proportion",
-            "R_cm_proportion"
+            "method_id"
         ]
     ].dropna()
 
@@ -368,10 +375,12 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
     
     if not dropped_records.empty:
         print(f"\n--- Dropping {len(dropped_records)} ET records due to precip >= {threshold_mm} mm + {recovery_days} recovery days ---")
-        dates = dropped_records["date"].dt.strftime("%Y-%m-%d").tolist()
-        print(f"Zeroing records for {len(dates)} days -> {dates}")
-            
-        print("--------------------------------------------------------------------------------------------------\n")
+        
+        # Use .unique() before .tolist() to get only the unique dates
+        dates = dropped_records["date"].dt.strftime("%Y-%m-%d").unique().tolist()
+        
+        print(f"Zeroing records for {len(dates)} days -> {dates} \n"
+        "--------------------------------------------------------------------------------------------------\n")
     else:
         print(f"\n--- No ET records dropped due to precipitation (threshold = {threshold_mm} mm) ---\n")
     
@@ -433,7 +442,7 @@ def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: p
     filtered_et.loc[filtered_et["is_dry"], ["R_cm_proportion", "S_cm_proportion","ET_gw_cm"]] = 0.0
     
     # Drop the temporary column
-    filtered_et = filtered_et.drop(columns=["is_dry"])
+    filtered_et = filtered_et.drop(columns=["is_dry"]) 
 
     return filtered_et
 
@@ -591,7 +600,7 @@ def plot_ET_line(
             plt.show()
 
 def plot_Storage_Recharge_bar(ET_df, method_id, year, save_dir=None):
-    index = ['method_id','S_cm_proportion','R_cm_proportion','year','well_id','date']
+    index = ['method_id','S_cm','R_cm','year','well_id','date']
     df = ET_df[index]
     filtered_df = df[(df['year'] == year) & (df['method_id'] == method_id)]
 
@@ -637,6 +646,9 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
     # 1. Filter down to the specific year and method safely
     ET_df = ET_df[(ET_df['year'] == year) & (ET_df['method_id'] == method_id)].copy()
     ET_df['clean_date'] = pd.to_datetime(ET_df['date']).dt.strftime('%m-%d')
+
+    ET_df['S_cm_proportion'] = ET_df['Sy_star']*ET_df['S_cm'] 
+    ET_df['R_cm_proportion'] = ET_df['Sy_star']*ET_df['R_cm']
     
     PET_df = PET_df.copy()
     PET_df['clean_date'] = pd.to_datetime(PET_df['Date']).dt.strftime('%m-%d')
