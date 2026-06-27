@@ -52,7 +52,8 @@ well_data_filepath = well_data_dir / 'soil_survey_PROCESSED.csv'
 pet_data_dir = PROJECT_ROOT / 'data/et'
 pet_data_filepath = pet_data_dir / 'pet_by_well_results.csv'
 
-save_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
+save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy1.csv'
 
 # TODO: add data_dir and filepath for Sy stuff
 
@@ -384,8 +385,8 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
     else:
         print(f"\n--- No ET records dropped due to precipitation (threshold = {threshold_mm} mm) ---\n")
     
-    # Set 'R_cm' and 'S_cm' to 0 for the flagged rows using .loc
-    filtered_df.loc[filtered_df["exclude_ET"], ["R_cm_proportion", "S_cm_proportion", "ET_gw_cm"]] = 0.0
+    # Set 'ET_gw_cm' to 0 for the flagged rows using .loc
+    filtered_df.loc[filtered_df["exclude_ET"], ["ET_gw_cm"]] = 0.0
     
     # Drop the temporary "exclude_ET" column to keep the dataframe clean.
     filtered_df = filtered_df.drop(columns=["exclude_ET"])
@@ -438,8 +439,8 @@ def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: p
     # Merge the mask into your ET dataframe using both well_id and date
     filtered_et = et_df.merge(mask_df[["well_id", "date", "is_dry"]], on=["well_id", "date"], how="left")
     
-    # Set 'R_cm' and 'S_cm' to 0 for the flagged rows using .loc
-    filtered_et.loc[filtered_et["is_dry"], ["R_cm_proportion", "S_cm_proportion","ET_gw_cm"]] = 0.0
+    # Set 'ET_gw_cm' to 0 for the flagged rows using .loc
+    filtered_et.loc[filtered_et["is_dry"], ["ET_gw_cm"]] = 0.0
     
     # Drop the temporary column
     filtered_et = filtered_et.drop(columns=["is_dry"]) 
@@ -730,8 +731,8 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         # ---- SAVING LOGIC ----
         if save_dir is not None:
             save_path = Path(save_dir)
-            fname = f"ET_proportional_{method_id}_{well_id}_{year}_BAR.png"
-            fig.savefig(save_path / fname, format="png", bbox_inches="tight")
+            fname = f"ET_proportional_{method_id}_{well_id}_{year}_BAR.eps"
+            fig.savefig(save_path / fname, format="eps", bbox_inches="tight")
             plt.close(fig)
         else:
             plt.show()
@@ -779,14 +780,14 @@ def main():
     # pre-process gw from subdaily into key daily values
     daily_gw_df = get_daily_gw_levels(subdaily_gw_df)
     print("got gw levels")
-    
+  
     #calculate average Sy for each well
     df_soil_sy = pd.read_csv(sy_data_filepath)
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
 
     # 1. Calculate raw ET for ALL days
-    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
+    raw_ET_df = estimate_ET_White_constant_Sy(daily_gw_df)
 
     # 2. Filter out the storm events
     ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
@@ -794,15 +795,17 @@ def main():
     # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
     daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_cm=5.0)
 
+    daily_ET_df.to_csv(save_csv_dir, index=False)
+
     PET_df = update_wells(pet_data_filepath)
     weather_df = get_daily_temperature(weather_subdaily_filepath)
 
     plot_ET_prop_bar(daily_ET_df, 
             PET_df,
             weather_df,
-            "White_wavg", 
+            "White_constantSy", 
             2025,  
-            save_dir=save_dir)
+            save_dir=save_plots_dir)
     print("ET plotted for White average Sy")
 
    
