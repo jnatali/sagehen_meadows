@@ -52,8 +52,8 @@ well_data_filepath = well_data_dir / 'soil_survey_PROCESSED.csv'
 pet_data_dir = PROJECT_ROOT / 'data/et'
 pet_data_filepath = pet_data_dir / 'pet_by_well_results.csv'
 
-save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_avg'
-save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy1.csv'
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_avg/'
+save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
 
 # TODO: add data_dir and filepath for Sy stuff
 
@@ -284,7 +284,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
         ]
     ].dropna()
 
-def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame,) -> pd.DataFrame:
+def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate ET in cm/day for each well in subdaily groundwater logger data
     using White (1932) method and a specific yield for each well that's a weighted
@@ -681,7 +681,7 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         s_bar_heights = ET_net * s_prop
         r_bar_heights = ET_net * r_prop
 
-        # ---- PLOTTING 
+        # ---- PLOTTING ----
         # 1. Left Axis (ax1): Stacking Bars
         ax1.bar(dates, s_bar_heights, width=1.0, color='teal', label='Storage')
         ax1.bar(dates, r_bar_heights, bottom=s_bar_heights, width=1.0, color='cornflowerblue', label='Recharge')
@@ -725,14 +725,20 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         ax1.legend(lines_1 + lines_2, labels_1 + labels_2, bbox_to_anchor=(1.15, 1), loc='upper left')
 
         # Unified single title assignment
-        ax1.set_title(f'{method_id}_temperature_and_pet_{well_id}', fontsize=12, fontweight='bold')
+        ax1.set_title(f'Daily ET {method_id} {well_id}', fontsize=12, fontweight='bold')
 
-
-        # ---- SAVING LOGIC ----
+        # ---- SAVING LOGIC (Only occurs once, at the very end!) ----
         if save_dir is not None:
             save_path = Path(save_dir)
-            fname = f"ET_proportional_{method_id}_{well_id}_{year}_BAR.eps"
-            fig.savefig(save_path / fname, format="eps", bbox_inches="tight")
+            
+            # save eps
+            fname_eps = f"ET_bar_{method_id}_{well_id}_{year}.eps"
+            fig.savefig(save_path / fname_eps, format="eps", bbox_inches="tight")
+            
+            # save png
+            fname_png = f"ET_bar_{method_id}_{well_id}_{year}.png"
+            fig.savefig(save_path / fname_png, format="png", bbox_inches="tight", dpi=300)
+            
             plt.close(fig)
         else:
             plt.show()
@@ -787,15 +793,15 @@ def main():
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
 
     # 1. Calculate raw ET for ALL days
-    raw_ET_df = estimate_ET_White_constant_Sy(daily_gw_df)
+    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
 
     # 2. Filter out the storm events
     ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
 
     # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_cm=5.0)
+    daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_cm=3.0)
 
-    daily_ET_df.to_csv(save_csv_dir, index=False)
+    #daily_ET_df.to_csv(save_csv_dir, index=False)
 
     PET_df = update_wells(pet_data_filepath)
     weather_df = get_daily_temperature(weather_subdaily_filepath)
@@ -803,7 +809,7 @@ def main():
     plot_ET_prop_bar(daily_ET_df, 
             PET_df,
             weather_df,
-            "White_constantSy", 
+            "White_wavg", 
             2025,  
             save_dir=save_plots_dir)
     print("ET plotted for White average Sy")
