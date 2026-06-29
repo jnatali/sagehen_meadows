@@ -17,6 +17,7 @@ import pandas as pd
 #import os
 #import datetime
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 # import well_utils to process well_ids for Sy data
 
 import sys
@@ -638,22 +639,26 @@ def plot_Storage_Recharge_bar(ET_df, method_id, year, save_dir=None):
         else:
             plt.show()
 
-def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
+def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.DataFrame, gw_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
     """
     Plots proportional Net ET bars and PET line on the left axis, 
     and daily average temperature (Fahrenheit) on a secondary right axis.
     Saves the figures as .eps files or displays them.
     """
-    # 1. Filter down to the specific year and method safely
+    # 1. Filter down to the specific year 
     ET_df = ET_df[(ET_df['year'] == year) & (ET_df['method_id'] == method_id)].copy()
-    ET_df['clean_date'] = pd.to_datetime(ET_df['date']).dt.strftime('%m-%d')
+    #ET_df['clean_date'] = pd.to_datetime(ET_df['date']).dt.strftime('%m-%d')
+    ET_df['date_dt'] = pd.to_datetime(ET_df['date'])
+    gw_df['datetime_dt'] = pd.to_datetime(gw_df['DateTime'])
+    gw_df = gw_df[gw_df["datetime_dt"].dt.year == year].copy()  
+    PET_df = PET_df.copy()
+    PET_df['date_dt'] = pd.to_datetime(PET_df['Date'])
+    PET_df = PET_df[PET_df['date_dt'].dt.year == year].copy()
 
+    #calculate proportion storage and recharge
     ET_df['S_cm_proportion'] = ET_df['Sy_star']*ET_df['S_cm'] 
     ET_df['R_cm_proportion'] = ET_df['Sy_star']*ET_df['R_cm']
     
-    PET_df = PET_df.copy()
-    PET_df['clean_date'] = pd.to_datetime(PET_df['Date']).dt.strftime('%m-%d')
-
     # 2.Filter weather data by the target year to avoid multi-year duplication cross-joins
     if 'year' in weather_df.columns:
         weather_filtered = weather_df[weather_df['year'] == year].copy()
@@ -665,7 +670,10 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
     filtered_df = filtered_df.merge(weather_filtered, how='left', on='clean_date')
 
     for well_id, well_df in filtered_df.groupby('well_id'):
-        fig, ax1 = plt.subplots(figsize=(6, 6))
+        fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
+
+        #isolate the groundwater data for the current well_id
+        well_gw = gw_df[gw_df['well_id'] == well_id].sort_values('datetime_dt')
         
         dates = well_df['clean_date'].tolist()
 
