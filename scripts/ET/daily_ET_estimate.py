@@ -221,13 +221,16 @@ def get_daily_temperature(weather_subdaily_filepath: str) -> pd.DataFrame:
     
     # 4. Create merge-friendly columns 
     daily_weather['year'] = daily_weather['time'].dt.year
-    daily_weather['clean_date'] = daily_weather['time'].dt.strftime('%m-%d')
+    # (Deleted clean_date since we no longer use it)
     
-    # 5. Rename the Celsius column for clarity
-    daily_weather = daily_weather.rename(columns={'air-temp-25-ft-avg-degc': 'temp_25ft_C'})
+    # 5. Rename the columns for clarity, turning 'time' into 'date'
+    daily_weather = daily_weather.rename(columns={
+        'air-temp-25-ft-avg-degc': 'temp_25ft_C',
+        'time': 'date'
+    })
     
-    # Return the dataframe with the new Fahrenheit column included
-    return daily_weather[['year', 'clean_date', 'temp_25ft_C']]
+    # Return the dataframe 
+    return daily_weather[['year', 'date', 'temp_25ft_C']]
 
 def calculate_storage_recharge(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -645,40 +648,36 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
     and daily average temperature (Fahrenheit) on a secondary right axis.
     Saves the figures as .eps files or displays them.
     """
-    # 1. Filter down to the specific year 
+    # Ensure all date column are datetime format and filter down to the specific year 
     ET_df = ET_df[(ET_df['year'] == year) & (ET_df['method_id'] == method_id)].copy()
-    #ET_df['clean_date'] = pd.to_datetime(ET_df['date']).dt.strftime('%m-%d')
+
     ET_df['date_dt'] = pd.to_datetime(ET_df['date'])
-    gw_df['datetime_dt'] = pd.to_datetime(gw_df['DateTime'])
-    gw_df = gw_df[gw_df["datetime_dt"].dt.year == year].copy()  
-    PET_df = PET_df.copy()
+    gw_df['date_dt'] = pd.to_datetime(gw_df['datetime'])
     PET_df['date_dt'] = pd.to_datetime(PET_df['Date'])
+    weather_df['date_dt'] = pd.to_datetime(weather_df['date'])
+
+    gw_df = gw_df[gw_df["date_dt"].dt.year == year].copy()  
     PET_df = PET_df[PET_df['date_dt'].dt.year == year].copy()
+    weather_df = weather_df[weather_df['year'] == year].copy()
 
     #calculate proportion storage and recharge
     ET_df['S_cm_proportion'] = ET_df['Sy_star']*ET_df['S_cm'] 
     ET_df['R_cm_proportion'] = ET_df['Sy_star']*ET_df['R_cm']
-    
-    # 2.Filter weather data by the target year to avoid multi-year duplication cross-joins
-    if 'year' in weather_df.columns:
-        weather_filtered = weather_df[weather_df['year'] == year].copy()
-    else:
-        weather_filtered = weather_df.copy()
 
-    # Combine dataframes using left joins
-    filtered_df = ET_df.merge(PET_df, how='left', on=['well_id', 'clean_date'])
-    filtered_df = filtered_df.merge(weather_filtered, how='left', on='clean_date')
+    # Combine dataframes using left joins on the true datetime
+    filtered_df = ET_df.merge(PET_df, how='left', on=['well_id', 'date_dt'])
+    filtered_df = filtered_df.merge(weather_df, how='left', on='date_dt')
 
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
 
         #isolate the groundwater data for the current well_id
-        well_gw = gw_df[gw_df['well_id'] == well_id].sort_values('datetime_dt')
+        well_gw = gw_df[gw_df['well_id'] == well_id].sort_values('date_dt')
         
-        dates = well_df['clean_date'].tolist()
+        dates = well_df['date_dt'].tolist()
 
         # Calculate Net ET and absolute totals
-        ET_net = well_df['S_cm_proportion'] + well_df['R_cm_proportion']
+        ET_net = well_df['ET_gw_cm']
         total_abs = well_df['S_cm_proportion'].abs() + well_df['R_cm_proportion'].abs()
 
         # Calculate proportions safely (avoiding zero-division)
@@ -703,7 +702,7 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         ax1.axhline(0, color='black', linewidth=0.5)
 
         # Formatting Left Axis
-        ax1.set(xlabel='Date', ylabel='Net ET / PET (cm)')
+        ax1.set(ylabel='Net ET / PET (cm)')
         
         # 3. Right Axis (ax2): Temperature context (Celsius)
         ax2 = ax1.twinx() 
@@ -712,7 +711,7 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         
         ax2.set_ylabel('Air Temperature (°C)')
         
-        # ---- NEW: CALCULATE PERFECT ZERO ALIGNMENT ----
+        # CALCULATE PERFECT ZERO ALIGNMENT
         ax1_min, ax1_max = ax1.get_ylim()
         ax2_max = 40.0
         
@@ -722,10 +721,21 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         # Apply the balanced limits
         ax2.set_ylim(ax2_min, ax2_max)
 
-        # Using string array indices avoids the empty string layout engine bug
-        ax1.set_xticks(range(0, len(dates), 20))
-        ax1.set_xticklabels(dates[::20])
-        ax1.tick_params(axis='x', rotation=0)
+        # ---- PLOTTING GROUNDWATER (ax3) ----
+        if not well_gw.empty:
+            ax3.plot(well_gw['date_dt'], well_gw['ground_to_water_m'], color='navy', linewidth=1.2, label='10-Min Water Level')
+            ax3.invert_yaxis()
+            
+        ax3.set_ylabel('Depth to Water (m)')
+        ax3.set_xlabel('Date')
+        ax3.grid(True, linestyle=':', alpha=0.6)
+        
+        # Apply automatic datetime spacing and formatting
+        auto_locator = mdates.AutoDateLocator(minticks=4, maxticks=10)
+        auto_formatter = mdates.AutoDateFormatter(auto_locator)
+        ax3.xaxis.set_major_locator(auto_locator)
+        ax3.xaxis.set_major_formatter(auto_formatter)
+        plt.setp(ax3.get_xticklabels(), rotation=0, ha='center')
 
         # ---- COMBINED LEGEND ----
         lines_1, labels_1 = ax1.get_legend_handles_labels()
@@ -735,16 +745,18 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         # Unified single title assignment
         ax1.set_title(f'Daily ET {method_id} {well_id}', fontsize=12, fontweight='bold')
 
-        # ---- SAVING LOGIC (Only occurs once, at the very end!) ----
+        plt.tight_layout() # Added to prevent the new bottom labels from overlapping the top graph
+
+        # SAVING LOGIC 
         if save_dir is not None:
             save_path = Path(save_dir)
             
             # save eps
-            fname_eps = f"ET_bar_{method_id}_{well_id}_{year}.eps"
+            fname_eps = f"ET_bar_{method_id}_{well_id}_{year}_GW.eps"
             fig.savefig(save_path / fname_eps, format="eps", bbox_inches="tight")
             
             # save png
-            fname_png = f"ET_bar_{method_id}_{well_id}_{year}.png"
+            fname_png = f"ET_bar_{method_id}_{well_id}_{year}_GW.png"
             fig.savefig(save_path / fname_png, format="png", bbox_inches="tight", dpi=300)
             
             plt.close(fig)
@@ -817,6 +829,7 @@ def main():
     plot_ET_prop_bar(daily_ET_df, 
             PET_df,
             weather_df,
+            subdaily_gw_df,
             "White_wavg", 
             2025,  
             save_dir=save_plots_dir)
