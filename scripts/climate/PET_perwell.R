@@ -23,13 +23,30 @@ data <- read_csv(here("data", "field_observations", "hygrochron", "hygrochron_20
     datetime = mdy_hms(datetime),
     Date = as.Date(datetime)
   )
+# ---------------------------
+# STEP 2: READ WRCC DATA (
+# ---------------------------
+wrcc_data <- read_csv(
+  here("data",  "station_instrumentation", "climate", "Weather_2010_2025_10min_SagehenTower1.csv"),
+  na = "-999",
+  show_col_types = FALSE
+) %>%
+  mutate(
+    # Parse the 'time' column directly from CSV
+    datetime = mdy_hm(time),
+    Date = as.Date(datetime),
+    
+    # Map CSV column names
+    Tmax_C    = as.numeric(`air-temp-max-degc`),
+    Tmin_C    = as.numeric(`air-temp-min-degc`),
+    RHmax_pct = as.numeric(`relative-humidity-max-pct`),
+    RHmin_pct = as.numeric(`relative-humidity-min-pct`),
+    Solar_MJ  = as.numeric(`total-solar-radiation-daily-tot-mjm-2`),
+    Precip_mm = as.numeric(`precipitation-geonor-mm`)
+  )
 
-# ---------------------------
-# STEP 2: READ WRCC DATA
-# ---------------------------
-library(readr)
-library(dplyr)
-library(lubridate)
+head(wrcc_data)
+tail(wrcc_data)
 
 # wrcc_data <- read_csv(
 #   here("data", "station_instrumentation", "climate", "Weather_2010_2025_10min_SagehenTower1.csv"),
@@ -53,31 +70,31 @@ library(lubridate)
 # head(wrcc_data)
 # tail(wrcc_data)
 
-wrcc_data <- read_csv(
-  here("data",  "station_instrumentation", "climate", "Weather_2010_2025_10min_SagehenTower1.csv"),
-  skip = 3,
-  na = "-999",
-  col_names = c(
-    "datetime_raw",  # <-- Replaced "Date" and "Time" with this single column
-    "Tavg_C", "Tmax_C", "Tmin_C",
-    "RH_pct", "RHmax_pct", "RHmin_pct",
-    "Pressure_mbar", "Solar_Wm2",
-    "Precip_mm", "AccumPcpn_mm",
-    "SnowMaxDep_mm", "SnowMinDep_mm", "SnowDepth_mm"
-  ),
-  show_col_types = FALSE
-) %>%
-  mutate(
-    # Parse the single column directly. 
-    # Your image shows M/D/YY H:MM, so mdy_hm() is the perfect function!
-    datetime = mdy_hm(datetime_raw),
-    Date = as.Date(datetime),
-    # Moving your Solar parsing here just in case it still needs it
-    Solar_Wm2 = as.numeric(Solar_Wm2) 
-  )
+# wrcc_data <- read_csv(
+#   here("data",  "station_instrumentation", "climate", "Weather_2010_2025_10min_SagehenTower1.csv"),
+#   skip = 3,
+#   na = "-999",
+#   col_names = c(
+#     "datetime_raw",  # <-- Replaced "Date" and "Time" with this single column
+#     "Tavg_C", "Tmax_C", "Tmin_C",
+#     "RH_pct", "RHmax_pct", "RHmin_pct",
+#     "Pressure_mbar", "Solar_Wm2",
+#     "Precip_mm", "AccumPcpn_mm",
+#     "SnowMaxDep_mm", "SnowMinDep_mm", "SnowDepth_mm"
+#   ),
+#   show_col_types = FALSE
+# ) %>%
+#   mutate(
+#     # Parse the single column directly. 
+#     # Your image shows M/D/YY H:MM, so mdy_hm() is the perfect function!
+#     datetime = mdy_hm(datetime_raw),
+#     Date = as.Date(datetime),
+#     # Moving your Solar parsing here just in case it still needs it
+#     Solar_Wm2 = as.numeric(Solar_Wm2) 
+#   )
 
-head(wrcc_data)
-tail(wrcc_data)
+# head(wrcc_data)
+# tail(wrcc_data)
 # ---------------------------
 # STEP 3: DAILY SUMMARY PER WELL
 # ---------------------------
@@ -92,26 +109,31 @@ daily_hygro <- data %>%
   )
 
 # ---------------------------
-# STEP 4: DAILY SOLAR
+# STEP 4: DAILY WEATHER STATION DATA 
 # ---------------------------
 daily_wrcc <- wrcc_data %>%
-  mutate(
-    #Solar_Wm2 = readr::parse_number(Solar_Wm2),
-    Rs_interval_MJ = Solar_Wm2 * 600 / 1e6   # 600 sec = 10 min
-  ) %>%
   group_by(Date) %>%
   summarise(
-    Rs = sum(Rs_interval_MJ, na.rm = TRUE),
+    # Sum pre-calculated MJ intervals to get total daily solar energy (Rs)
+    Rs = sum(Solar_MJ, na.rm = TRUE),
     Precip_mm = sum(Precip_mm, na.rm = TRUE),
+    # Gather station specific configurations for standalone station PET calculation
+    Tmax_station  = max(Tmax_C, na.rm = TRUE),
+    Tmin_station  = min(Tmin_C, na.rm = TRUE),
+    RHmax_station = max(RHmax_pct, na.rm = TRUE),
+    RHmin_station = min(RHmin_pct, na.rm = TRUE),
     .groups = "drop"
-  )
-head(daily_wrcc)
+  ) %>%
+  # Filter out rows where station data is entirely missing to avoid -Inf errors
+  filter(!is.infinite(Tmax_station) & !is.infinite(RHmax_station))
 
+head(daily_wrcc)
 # ---------------------------
-# STEP 5: MERGE
+# STEP 5: MERGE 
 # ---------------------------
 daily_clean <- daily_hygro %>%
-  left_join(daily_wrcc, by = "Date") %>%
+  # Only pull Rs and Precip_mm to keep well data isolated
+  left_join(daily_wrcc %>% select(Date, Rs, Precip_mm), by = "Date") %>%
   arrange(well_id, Date) %>%
   group_by(well_id, Date) %>%
   summarise(
@@ -128,6 +150,7 @@ daily_clean <- daily_hygro %>%
     Month = month(Date),
     Day   = day(Date)
   )
+
 head(daily_clean)
 
 # =========================================================
@@ -257,6 +280,75 @@ pet_by_well <- pet_by_well %>%
 write_csv(pet_by_well, here("data", "et", "pet_by_well_results.csv"))
 
 cat("Export complete!\n")
+
+# =========================================================
+# REGIONAL (STATION-ONLY) PET CALCULATION
+# =========================================================
+cat("Running station-only PET...\n")
+
+# 1. Map aggregated station data to standard ET package names
+daily_station <- daily_wrcc %>%
+  select(
+    Date, 
+    Tmax = Tmax_station, 
+    Tmin = Tmin_station, 
+    RHmax = RHmax_station, 
+    RHmin = RHmin_station, 
+    Rs
+  ) %>%
+  # Filter out any faulty or missing data before running PET
+  filter(
+    !is.na(Tmin) & !is.na(Tmax) & !is.na(RHmin) & !is.na(RHmax) & !is.na(Rs),
+    Tmin <= Tmax,     # Temp min cannot be higher than Temp max
+    RHmin >= 0,       # RH cannot be negative
+    RHmin <= RHmax,   # RH min cannot be higher than RH max
+    Rs >= 0           # Solar radiation cannot be negative
+  ) %>%
+  # Cap RH at 100% 
+  mutate(
+    RHmax = ifelse(RHmax > 100, 100, RHmax),
+    RHmin = ifelse(RHmin > 100, 100, RHmin)
+  ) %>%
+  # -----------------------------------------------------------------
+  mutate(
+    Year  = year(Date),
+    Month = month(Date),
+    Day   = day(Date)
+  ) %>%
+  arrange(Date) %>%
+  slice(3:(n() - 2))
+
+# 2. Format inputs for the Evapotranspiration package
+station_formatted <- ReadInputs(
+  varnames = c("Tmax", "Tmin", "RHmax", "RHmin", "Rs"),
+  climatedata = daily_station,
+  constants = constants, 
+  stopmissing = c(10, 10, 10),
+  timestep = "daily"
+)
+
+# 3. Calculate PET
+res_station <- ET.PriestleyTaylor(
+  data = station_formatted,
+  constants = constants,
+  ts = "daily",
+  solar = "data",
+  alpha = 0.23,
+  message = "yes"
+)
+
+# 4. Format into a clean dataframe
+pet_station_results <- data.frame(
+  Date = daily_station$Date,
+  Site = "SagehenTower1",
+  PET_mm_day = res_station$ET.Daily
+)
+
+# 5. Export to a separate CSV
+write_csv(pet_station_results, here("data", "et", "pet_station_results.csv"))
+
+cat("Station PET calculation and export complete!\n")
+
 # # =========================================================
 # # STEP 9: SUMMARIES
 # # =========================================================

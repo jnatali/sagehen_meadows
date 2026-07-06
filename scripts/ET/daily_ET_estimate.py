@@ -5,7 +5,7 @@ DAILY ET CALCULATION SCRIPT
 Created on  Sat 7 Feb 11:37 AM
 @author: jnatali
 
-Calculates daily ET (from groundwater, in cm) according to different methods, 
+Calculates daily ET (from groundwater, in mm) according to different methods, 
 starting with simplest (White 1932 with constant Sy* with best guess 
                         from Loheide et al 2005 Fig 10).
 
@@ -50,8 +50,11 @@ sy_data_filepath = sy_data_dir / 'sy_lookup.csv'
 well_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
 well_data_filepath = well_data_dir / 'soil_survey_PROCESSED.csv'
 
-pet_data_dir = PROJECT_ROOT / 'data/et'
-pet_data_filepath = pet_data_dir / 'pet_by_well_results.csv'
+pet_well_data_dir = PROJECT_ROOT / 'data/et'
+pet_well_data_filepath = pet_well_data_dir / 'pet_by_well_results.csv'
+
+pet_station_data_dir = PROJECT_ROOT / 'data/et'
+pet_station_data_filepath = pet_station_data_dir / 'pet_station_results.csv'
 
 save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_avg/'
 save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
@@ -166,7 +169,7 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     df = gw_df.copy()
 
     assert "ground_to_water_m" in gw_df.columns, 'field_observations'
-    df["ground_to_water_cm"] = df["ground_to_water_m"] * 100
+    df["ground_to_water_mm"] = df["ground_to_water_m"] * 1000
     
     df["date"] = df["datetime"].dt.floor("D")
     df["time"] = df["datetime"].dt.strftime("%H:%M")
@@ -180,7 +183,7 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
         .pivot_table(
             index = ["well_id", "date"],
             columns="time",
-            values="ground_to_water_cm",
+            values="ground_to_water_mm",
             )
         .rename(columns={"00:00":"gw_00", "04:00": "gw_04"})
         .reset_index()
@@ -244,17 +247,17 @@ def calculate_storage_recharge(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = df.copy()
     
-    # Calculate R, overnight recharge rate in cm/day
-    df["R_cm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
+    # Calculate R, overnight recharge rate in mm/day
+    df["R_mm"] = 24.0 * (df["gw_00"] - df["gw_04"]) / 4.0
     
-    # Calculate s, daily storage change (cm)
-    df["S_cm"] = df["gw_24"] - df["gw_00"] 
+    # Calculate s, daily storage change (mm)
+    df["S_mm"] = df["gw_24"] - df["gw_00"] 
     
     return df
 
 def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     """
-    Calculate ET in cm/day for each well in subdaily groundwater logger data.
+    Calculate ET in mm/day for each well in subdaily groundwater logger data.
 
     Parameters: daily groundwater dataframe with gw levels at key times
     
@@ -272,7 +275,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     df["method_id"] = METHOD_ID
     
     # Calculate daily ET
-    df["ET_gw_cm"] = df["Sy_star"] * (df["R_cm"] + df["S_cm"])
+    df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
     
     return df[
         [
@@ -280,9 +283,9 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
             "doy",
             "year",
             "well_id",
-            "ET_gw_cm",
-            "R_cm",
-            "S_cm",
+            "ET_gw_mm",
+            "R_mm",
+            "S_mm",
             "Sy_star",
             "method_id",
         ]
@@ -290,7 +293,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
 
 def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculate ET in cm/day for each well in subdaily groundwater logger data
+    Calculate ET in mm/day for each well in subdaily groundwater logger data
     using White (1932) method and a specific yield for each well that's a weighted
     average based on soil profile field data and Sy* estimates from 
     Loheide et al (2008) <to verify> and <who else?>
@@ -318,7 +321,7 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
     df["Sy_star"] = df['well_id'].map(sy_lookup)
 
     # Calculate daily ET
-    df["ET_gw_cm"] = df["Sy_star"] * (df["R_cm"] + df["S_cm"])
+    df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
 
     return df[
         [
@@ -326,9 +329,9 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
             "doy",
             "year",
             "well_id",
-            "ET_gw_cm",
-            "R_cm",
-            "S_cm",
+            "ET_gw_mm",
+            "R_mm",
+            "S_mm",
             "Sy_star",
             "method_id"
         ]
@@ -389,62 +392,58 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
     else:
         print(f"\n--- No ET records dropped due to precipitation (threshold = {threshold_mm} mm) ---\n")
     
-    # Set 'ET_gw_cm' to 0 for the flagged rows using .loc
-    filtered_df.loc[filtered_df["exclude_ET"], ["ET_gw_cm"]] = 0.0
+    # Set 'ET_gw_mm' to 0 for the flagged rows using .loc
+    filtered_df.loc[filtered_df["exclude_ET"], ["ET_gw_mm"]] = 0.0
     
     # Drop the temporary "exclude_ET" column to keep the dataframe clean.
     filtered_df = filtered_df.drop(columns=["exclude_ET"])
     
     return filtered_df
 
-def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: pd.DataFrame, buffer_cm: float = 5.0) -> pd.DataFrame:
+def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: pd.DataFrame, buffer_mm: float = 50.0) -> pd.DataFrame:
     """
     Filters out storage and recharge terms for days when the groundwater level drops 
     below the total depth of the well, minus a safety buffer.
 
     Parameters:
     et_df: populated ET estimate dataframe to filter
-    gw_df: daily groundwater dataframe with start-of-day gw levels (gw_00)
+    gw_df: daily groundwater dataframe with start-of-day gw levels (gw_00, now in mm)
     well_df: dataframe with soil survey data including stop_depth_cm to calculate total well depth
-    buffer_cm: safety buffer in cm to exclude data before the well goes completely dry (default is 5.0)
+    buffer_mm: safety buffer in mm to exclude data before the well goes completely dry (default is 50.0 mm / 5 cm)
     
     Returns:
     filtered ET estimate dataframe
     """
-    # ---- FIND TOTAL WELL DEPTHS 
-    # Group the soil survey by well_id and find the maximum stop_depth_cm 
+    # ---- 1. FIND TOTAL WELL DEPTHS (Convert cm to mm) ----
     max_depths = well_df.groupby("well_id")["stop_depth_cm"].max().reset_index()
-    max_depths = max_depths.rename(columns={"stop_depth_cm": "total_well_depth_cm"})
+    max_depths["total_well_depth_mm"] = max_depths["stop_depth_cm"] * 10.0
     
-    # ---- GET DAILY GROUNDWATER LEVELS -
-    # Extract just the identifiers and the start-of-day groundwater depth (gw_00)
+    # ---- 2. GET DAILY GROUNDWATER LEVELS ----
+    # Extract just the identifiers and the start-of-day groundwater depth (gw_00 is in mm)
     gw_levels = gw_df[["well_id", "date", "gw_00"]].copy()
     
-    # ---- CREATE THE EXCLUSION MASK 
-    mask_df = gw_levels.merge(max_depths, on="well_id", how="left")
+    # ---- 3. CREATE THE EXCLUSION MASK ----
+    mask_df = gw_levels.merge(max_depths[["well_id", "total_well_depth_mm"]], on="well_id", how="left")
     
-    # Flag days where the water depth (gw_00) is deeper than the well bottom minus the buffer.
-    # Example: If well is 100cm deep and buffer is 5cm, flag if gw_00 >= 95cm.
-    mask_df["is_dry"] = mask_df["gw_00"] >= (mask_df["total_well_depth_cm"] - buffer_cm)
+    # Flag days where the water depth is deeper than the well bottom minus the buffer (all units in mm)
+    mask_df["is_dry"] = mask_df["gw_00"] >= (mask_df["total_well_depth_mm"] - buffer_mm)
     
-    # ----  PRINT DROPPED DAYS SUMMARY 
+    # ---- 4. PRINT DROPPED DAYS SUMMARY ----
     dry_records = mask_df[mask_df["is_dry"]]
     if not dry_records.empty:
-        print(f"\n--- Zeroing {len(dry_records)} records due to dry well conditions (buffer = {buffer_cm} cm) ---")
+        print(f"\n--- Zeroing {len(dry_records)} records due to dry well conditions (buffer = {buffer_mm} mm) ---")
         for well, group in dry_records.groupby("well_id"):
             dates = group["date"].dt.strftime("%Y-%m-%d").tolist()
-            # This prints the well ID, the total count of dropped days, and the exact dates
             print(f"{well}: Dropped {len(dates)} days -> {dates}")
         print("----------------------------------------------------------------------------------\n")
     else:
-        print(f"\n--- No ET records dropped due to dry well conditions (buffer = {buffer_cm} cm) ---\n") 
+        print(f"\n--- No ET records dropped due to dry well conditions (buffer = {buffer_mm} mm) ---\n") 
 
-    # ---- APPLY THE MASK TO ET DATA 
-    # Merge the mask into your ET dataframe using both well_id and date
+    # ---- 5. APPLY THE MASK TO ET DATA ----
     filtered_et = et_df.merge(mask_df[["well_id", "date", "is_dry"]], on=["well_id", "date"], how="left")
     
-    # Set 'ET_gw_cm' to 0 for the flagged rows using .loc
-    filtered_et.loc[filtered_et["is_dry"], ["ET_gw_cm"]] = 0.0
+    # Set ET to 0 for flagged rows
+    filtered_et.loc[filtered_et["is_dry"], ["ET_gw_mm" ]] = 0.0
     
     # Drop the temporary column
     filtered_et = filtered_et.drop(columns=["is_dry"]) 
@@ -526,7 +525,7 @@ def plot_ET_line(
 # ---- ET line (Dominant Foreground) ----
         l1 = ax1.plot(
             well_df["date"],
-            well_df["ET_gw_cm"],
+            well_df["ET_gw_mm"],
             linewidth=1.5,        # Thicker line makes it dominant
             color="black",        # High contrast color
             zorder=3,             # Forces ET to be drawn on top of everything
@@ -534,7 +533,7 @@ def plot_ET_line(
         )
         
         # Set primary axis labels
-        ax1.set_ylabel("ET (cm/day)")
+        ax1.set_ylabel("ET (mm/day)")
         ax1.set_xlabel("Date")
         
         # ---- Create Secondary Y-Axis ----
@@ -542,7 +541,7 @@ def plot_ET_line(
 # ---- Storage line (Secondary Y-Axis) ----
         l2 = ax2.plot(
             well_df["date"],
-            well_df["S_cm"],
+            well_df["S_mm"],
             linewidth=0.8,
             color="lightgreen",   # Lighter green
             zorder=2,             # Draws this line above Recharge
@@ -553,7 +552,7 @@ def plot_ET_line(
 # ---- Recharge line  ----
         l3 = ax2.plot(
             well_df["date"],
-            well_df["R_cm"],
+            well_df["R_mm"],
             linewidth=0.8,
             color="lightcoral",   # Lighter red, bypasses the need for alpha
             zorder=1,             # Draws this line first (at the bottom)
@@ -579,7 +578,7 @@ def plot_ET_line(
         """
 
         # Set secondary axis label
-        ax2.set_ylabel("Recharge & Storage (cm/day)")
+        ax2.set_ylabel("Recharge & Storage (mm/day)")
 
         # ---- Force Primary Axis on Top ----
         # twinx() draws ax2 on top of ax1 by default. This forces ax1 back to the top
@@ -605,14 +604,14 @@ def plot_ET_line(
             plt.show()
 
 def plot_Storage_Recharge_bar(ET_df, method_id, year, save_dir=None):
-    index = ['method_id','S_cm','R_cm','year','well_id','date']
+    index = ['method_id','S_mm','R_mm','year','well_id','date']
     df = ET_df[index]
     filtered_df = df[(df['year'] == year) & (df['method_id'] == method_id)]
 
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, ax1 = plt.subplots(figsize=(6, 6))
         well_df['clean_date'] = pd.to_datetime(well_df['date']).dt.strftime('%m-%d')
-        plot_df = well_df.set_index('clean_date')[['S_cm_proportion', 'R_cm_proportion']]
+        plot_df = well_df.set_index('clean_date')[['S_mm_proportion', 'R_mm_proportion']]
         plot_df.plot(
             kind='bar',
             stacked=True, 
@@ -620,7 +619,7 @@ def plot_Storage_Recharge_bar(ET_df, method_id, year, save_dir=None):
             ax = ax1,
             width = 1.0)
         ax1.set(xlabel='Date', 
-                ylabel='GW Levels (cm)', 
+                ylabel='GW Levels (mm)', 
                 title=f'{method_id}_{well_id}')
         ax1.legend(['Storage', 'Recharge'], bbox_to_anchor=(1.05, 1), loc='upper left')
 
@@ -642,31 +641,37 @@ def plot_Storage_Recharge_bar(ET_df, method_id, year, save_dir=None):
         else:
             plt.show()
 
-def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.DataFrame, gw_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
+def process_date_and_year(df, raw_date_col, year):
+        df_clean = df.copy()
+        df_clean['date_dt'] = pd.to_datetime(df_clean[raw_date_col])
+        return df_clean[df_clean['date_dt'].dt.year == year]
+
+def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame, pet_station_df: pd.DataFrame, weather_df: pd.DataFrame, gw_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
     """
     Plots proportional Net ET bars and PET line on the left axis, 
     and daily average temperature (Fahrenheit) on a secondary right axis.
     Saves the figures as .eps files or displays them.
     """
-    # Ensure all date column are datetime format and filter down to the specific year 
-    ET_df = ET_df[(ET_df['year'] == year) & (ET_df['method_id'] == method_id)].copy()
+    # Process ET_df and apply its unique method_id filter
+    ET_df = process_date_and_year(ET_df, 'date', year)
+    ET_df = ET_df[ET_df['method_id'] == method_id]
 
-    ET_df['date_dt'] = pd.to_datetime(ET_df['date'])
-    gw_df['date_dt'] = pd.to_datetime(gw_df['datetime'])
-    PET_df['date_dt'] = pd.to_datetime(PET_df['Date'])
-    weather_df['date_dt'] = pd.to_datetime(weather_df['date'])
-
-    gw_df = gw_df[gw_df["date_dt"].dt.year == year].copy()  
-    PET_df = PET_df[PET_df['date_dt'].dt.year == year].copy()
-    weather_df = weather_df[weather_df['year'] == year].copy()
+    gw_df = process_date_and_year(gw_df, 'datetime', year)
+    PET_well_df = process_date_and_year(PET_well_df, 'Date', year)
+    weather_df = process_date_and_year(weather_df, 'date', year)
+    pet_station_df = process_date_and_year(pet_station_df, 'Date', year)
 
     #calculate proportion storage and recharge
-    ET_df['S_cm_proportion'] = ET_df['Sy_star']*ET_df['S_cm'] 
-    ET_df['R_cm_proportion'] = ET_df['Sy_star']*ET_df['R_cm']
+    ET_df['S_mm_proportion'] = ET_df['Sy_star']*ET_df['S_mm'] 
+    ET_df['R_mm_proportion'] = ET_df['Sy_star']*ET_df['R_mm']
 
     # Combine dataframes using left joins on the true datetime
-    filtered_df = ET_df.merge(PET_df, how='left', on=['well_id', 'date_dt'])
+    filtered_df = ET_df.merge(PET_well_df, how='left', on=['well_id', 'date_dt'])
     filtered_df = filtered_df.merge(weather_df, how='left', on='date_dt')
+    
+    # Merge Station PET safely by date only 
+    station_subset = pet_station_df[['date_dt', 'PET_mm_day']].rename(columns={'PET_mm_day': 'PET_station_mm_day'})
+    filtered_df = filtered_df.merge(station_subset, how='left', on='date_dt')
 
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
@@ -677,12 +682,12 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
         dates = well_df['date_dt'].tolist()
 
         # Calculate Net ET and absolute totals
-        ET_net = well_df['ET_gw_cm']
-        total_abs = well_df['S_cm_proportion'].abs() + well_df['R_cm_proportion'].abs()
+        ET_net = well_df['ET_gw_mm']
+        total_abs = well_df['S_mm_proportion'].abs() + well_df['R_mm_proportion'].abs()
 
         # Calculate proportions safely (avoiding zero-division)
-        s_prop = np.where(total_abs == 0, 0, well_df['S_cm_proportion'].abs() / total_abs)
-        r_prop = np.where(total_abs == 0, 0, well_df['R_cm_proportion'].abs() / total_abs)
+        s_prop = np.where(total_abs == 0, 0, well_df['S_mm_proportion'].abs() / total_abs)
+        r_prop = np.where(total_abs == 0, 0, well_df['R_mm_proportion'].abs() / total_abs)
 
         # Scale proportions to the Net ET bar height
         s_bar_heights = ET_net * s_prop
@@ -695,14 +700,19 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_df: pd.DataFrame, weather_df: pd.D
 
         # 2. Overlay PET Line
         if 'PET_mm_day' in well_df.columns:
-            pet_cm = well_df['PET_mm_day'] / 10.0
-            ax1.plot(dates, pet_cm, color='crimson', linewidth=2, label='PET (cm)')
-            
+            pet_mm = well_df['PET_mm_day'] 
+            ax1.plot(dates, pet_mm, color='crimson', linewidth=2, label='PET (mm)')
+
+        # -Overlay Station PET Line (Dotted)  
+        if 'PET_station_mm_day' in well_df.columns:
+            pet_station_mm = well_df['PET_station_mm_day']
+            ax1.plot(dates, pet_station_mm, color='darkred', linestyle=':', linewidth=2, label='Station PET (mm)')   
+
         # Add zero-line to clearly anchor positive/negative days
         ax1.axhline(0, color='black', linewidth=0.5)
 
         # Formatting Left Axis
-        ax1.set(ylabel='Net ET / PET (cm)')
+        ax1.set(ylabel='Net ET / PET (mm)')
         
         # 3. Right Axis (ax2): Temperature context (Celsius)
         ax2 = ax1.twinx() 
@@ -819,15 +829,17 @@ def main():
     ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
 
     # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_cm=3.0)
+    daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_mm=50.0)
 
     #daily_ET_df.to_csv(save_csv_dir, index=False)
 
-    PET_df = update_wells(pet_data_filepath)
+    PET_df = update_wells(pet_well_data_filepath)
+    pet_station_df = pd.read_csv(pet_station_data_filepath)
     weather_df = get_daily_temperature(weather_subdaily_filepath)
 
     plot_ET_prop_bar(daily_ET_df, 
             PET_df,
+            pet_station_df,
             weather_df,
             subdaily_gw_df,
             "White_wavg", 
