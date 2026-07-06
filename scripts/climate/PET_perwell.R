@@ -145,6 +145,17 @@ daily_clean <- daily_hygro %>%
     Precip_mm = mean(Precip_mm, na.rm = TRUE),
     .groups = "drop"
   ) %>%
+  filter(
+    !is.na(Tmin) & !is.na(Tmax) & !is.na(RHmin) & !is.na(RHmax) & !is.na(Rs),
+    Tmin <= Tmax,     
+    RHmin >= 0,       
+    RHmin <= RHmax,   
+    Rs >= 0           
+  ) %>%
+  mutate(
+    RHmax = ifelse(RHmax > 100, 100, RHmax),
+    RHmin = ifelse(RHmin > 100, 100, RHmin)
+  ) %>%
   mutate(
     Year  = year(Date),
     Month = month(Date),
