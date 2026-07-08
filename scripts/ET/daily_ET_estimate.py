@@ -44,7 +44,7 @@ weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenT
 ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
 ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
 
-sy_data_dir = PROJECT_ROOT / 'scripts/ET/'
+sy_data_dir = PROJECT_ROOT / 'data/et/'
 sy_data_filepath = sy_data_dir / 'sy_lookup.csv' 
 
 well_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
@@ -821,7 +821,7 @@ def main():
     df_soil_sy = pd.read_csv(sy_data_filepath)
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
-
+   
     # 1. Calculate raw ET for ALL days
     raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
 
