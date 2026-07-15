@@ -12,7 +12,9 @@ library(here)
 source(here("scripts", "groundwater", "well_utils.R"))
 
 # Load data
-df <- read.csv(here("data", "field_observations", "soil", "soil_survey_PROCESSED.csv"))
+df <- read.csv(
+  here("data", "field_observations", "soil", "soil_survey_PROCESSED.csv")
+)
 
 # Add categories 
 df <- get_well_categories(df)
@@ -21,16 +23,64 @@ df$start_depth_cm <- round(df$start_depth_cm)
 df$stop_depth_cm <- round(df$stop_depth_cm)
 
 # specify category of interest
-categ <- "Sedge"
+categ <- "Fan"
 
 # Filter a specific category
 df <- df %>%
-  filter(plant_type == categ)
+  filter(hydrogeo_zone == categ)
+
+# -------------------------------------------------------------------------
+# NEW: COLOR MAPPING & ORDERED CATEGORICAL LEGEND
+# -------------------------------------------------------------------------
+
+# 1. Standardize texture codes (uppercase, no trailing/leading spaces)
+df$soil_texture_code <- toupper(trimws(df$soil_texture_code))
+
+# 2. Define our custom brown gradient (ordered from lowest to highest clay)
+texture_colors <- c(
+  # Sands (Tier 1: Lightest sand/beige) ~10% max clay
+  "COS"  = "#f5ecd5", "S"   = "#f5ecd5", "FS"   = "#f5ecd5", "VFS"  = "#f5ecd5",
+  # Silt (Tier 2: Warm light silt) ~12% max clay
+  "SI"   = "#decaae",
+  # Loamy Sands (Tier 3: Rich sandy tan) ~15% max clay
+  "LCOS" = "#c7a886", "LS"  = "#c7a886", "LFS"  = "#c7a886", "LVFS" = "#c7a886",
+  # Sandy Loams (Tier 4: Warm sandy loam brown) ~20% max clay
+  "COSL" = "#b0875f", "SL"  = "#b0875f", "FSL"  = "#b0875f", "VFSL" = "#b0875f",
+  # Loams & Silt Loams (Tier 5: Classic loam brown) ~27% max clay
+  "L"    = "#996538", "SIL" = "#996538",
+  # Sandy Clay Loam (Tier 6: Medium warm clay-brown) ~35% max clay
+  "SCL"  = "#82542b",
+  # Clay Loams (Tier 7: Rich clay-loam brown) ~40% max clay
+  "CL"   = "#6b421e", "SICL" = "#6b421e",
+  # Sandy & Silty Clays (Tier 8: Dark clay brown) ~55-60% max clay
+  "SC"   = "#47280e", "SIC" = "#47280e",
+  # Clay (Tier 9: Deepest chocolate brown) ~100% max clay
+  "C"    = "#000000",
+  # Organic / Histosols (HO: Dark organic peat)
+  "HO"   = "#808080",
+  # Gravel / Coarse Fragment codes (GR: White horizon)
+  "GR"   = "#FFFFFF"
+)
+
+# 3. Create an ordered factor of ONLY the codes present in your filtered dataset.
+# This keeps the legend clean (no empty slots) while sorting them logically by clay!
+present_codes <- unique(df$soil_texture_code)
+ordered_levels <- names(texture_colors)[names(texture_colors) %in% present_codes]
+
+# Handle any unexpected texture codes that aren't in our palette
+unmapped_codes <- setdiff(present_codes, names(texture_colors))
+ordered_levels <- c(ordered_levels, unmapped_codes)
+
+df$soil_texture_code <- factor(df$soil_texture_code, levels = ordered_levels)
+
+# 4. Generate the final color vector aligned exactly with our factor levels
+active_colors <- texture_colors[ordered_levels]
+active_colors[is.na(active_colors)] <- "#EAEAEA" # Fallback color if something is unmapped
+
+# -------------------------------------------------------------------------
 
 # Add the gravel calculation for the plot bubbles
 df$gravel_amount_percent_hundred <- df$gravel_amount_percent * 100
-# FIX: Cap the max percentage at 95% so the aqp rendering algorithm doesn't fail
-df$gravel_amount_percent_hundred <- ifelse(df$gravel_amount_percent_hundred > 95, 90, df$gravel_amount_percent_hundred)
 
 # Add the space padding
 df$plot_label <- paste0("    ", df$well_id)
@@ -64,12 +114,15 @@ plotSPC(df,
         name.style = 'center-center',
         width = 0.3,
         depth.axis = FALSE,
-        color = 'soil_texture_code', 
+        color = 'soil_texture_code', # Tells plotSPC to categorize using texture codes
+        col.palette = active_colors, # Maps our custom clay-content colors to those categories
+        col.label = "Soil Texture",
         hz.depths = TRUE,
         fixLabelCollisions = TRUE,
         depths.offset = 0.08,
         y.offset = 10,        # Pushes the profiles down by 10 units
         max.depth = 250,       # Extends canvas so shifted wells aren't cut off
+        show.legend = TRUE    # Displays the clean, logically sorted legend!
         )
 
 addVolumeFraction(df, 

@@ -57,7 +57,7 @@ from scripts.groundwater.well_utils import process_well_ids
 # ---- INITIALIZE FILE VARIABLES ---
 
 # Define Source File
-OUTPUT_DIR = PROJECT_ROOT /  'data/field_observations/soil/RAW'
+OUTPUT_DIR = PROJECT_ROOT /  'data/field_observations/soil'
 OUTPUT_FILE_PATTERN_RENAMED = OUTPUT_DIR / 'soil_survey_RENAMED.csv'
 OUTPUT_FILE_PATTERN_CLEANED = OUTPUT_DIR / 'soil_survey_PROCESSED.csv'
 
