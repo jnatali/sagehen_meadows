@@ -51,20 +51,19 @@ import warnings
 
 # Initialize PROJECT_ROOT to allow local project module import
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.append(str(PROJECT_ROOT))
 from scripts.groundwater.well_utils import process_well_ids
 
 # ---- INITIALIZE FILE VARIABLES ---
 
 # Define Source File
-OUTPUT_DIR = os.path.join( '..','..', 'data', 'field_observations', 'soil')
-OUTPUT_FILE_PATTERN_RENAMED = os.path.join('RAW', 'soil_survey_RENAMED.csv')
-OUTPUT_FILE_PATTERN_CLEANED = "soil_survey_PROCESSED.csv"
+OUTPUT_DIR = PROJECT_ROOT /  'data/field_observations/soil/RAW'
+OUTPUT_FILE_PATTERN_RENAMED = OUTPUT_DIR / 'soil_survey_RENAMED.csv'
+OUTPUT_FILE_PATTERN_CLEANED = OUTPUT_DIR / 'soil_survey_PROCESSED.csv'
 
 # Define Source File
-SOURCE_DIR = os.path.join( '..','..', 'data', 'field_observations', 
-                          'soil', 'RAW')
-SOURCE_FILE_PATTERN = "soil_survey_RAW.csv"
+SOURCE_DIR = PROJECT_ROOT / 'data/field_observations/soil/RAW'
+SOURCE_FILE_PATTERN = SOURCE_DIR / 'soil_survey_RAW.csv'
 
 word_to_code_mapping = {
     'coarse sand': 'COS',
@@ -193,6 +192,7 @@ def parse_gravel_amount(x):
     except ValueError:
         return x  # leave unexpected values unchanged
 
+#Fill in 
 def extract_gravel_info(subclass_str):
     """
     Checks for 'GR' and extracts info about gravel size categories
@@ -292,7 +292,13 @@ def clean_for_plotting(df_valid):
     df = df_valid.copy()
     
     df["gravel_amount_percent"] = df["gravel amount"].apply(parse_gravel_amount)
-    
+
+    #create a mask that check is soil_texture column contains gravel
+    has_gravel_mask = df['soil texture code'].str.contains('GR', case=False, na=False)
+
+    #input 1 for gravel percentage if soil texture contains gravel
+    df.loc[has_gravel_mask, "gravel_amount_percent"] = 1
+
     df = df.rename(columns={
         "start depth (cm)": "start_depth_cm",
         "stop depth (cm)": "stop_depth_cm",
@@ -317,16 +323,13 @@ def clean_for_plotting(df_valid):
 # ---- MAIN PROCEDURES---
 
 # Load files
-file_path = os.path.join(SOURCE_DIR, SOURCE_FILE_PATTERN)
+file_path = SOURCE_FILE_PATTERN
 print(f"Loading data from: {file_path}")
 df_raw = pd.read_csv(file_path)
 
-output_path_validated = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN_RENAMED)
-output_path_cleaned = os.path.join(OUTPUT_DIR, OUTPUT_FILE_PATTERN_CLEANED)
+output_path_validated = OUTPUT_FILE_PATTERN_RENAMED
+output_path_cleaned = OUTPUT_FILE_PATTERN_CLEANED
 
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
-    print(f"Created directory: {OUTPUT_DIR}")
 
 # Validate and correct well_ids (well names), also drops invalid well_ids
 df = process_well_ids(df_raw, datetime_col="date")

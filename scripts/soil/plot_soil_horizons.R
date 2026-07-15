@@ -19,7 +19,7 @@ df <- get_well_categories(df)
 df$start_depth_cm <- round(df$start_depth_cm)
 df$stop_depth_cm <- round(df$stop_depth_cm)
 
-# specify category of interedt
+# specify category of interest
 categ <- "Lodgepole Pine"
 
 # Filter a specific category
