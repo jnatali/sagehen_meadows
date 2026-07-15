@@ -47,6 +47,8 @@ ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
 sy_data_dir = PROJECT_ROOT / 'data/et/'
 sy_data_filepath = sy_data_dir / 'sy_lookup.csv' 
 
+sy_save_filepath = sy_data_dir / 'sy_by_well.csv'
+
 well_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
 well_data_filepath = well_data_dir / 'soil_survey_PROCESSED.csv'
 
@@ -467,16 +469,17 @@ def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
 
     #  Data Cleaning
     df_wells = df_wells.dropna(subset=['well_id']).copy()
+    df_wells = update_wells(df_wells)
 
     #  Math and Calculations
     df_wells['Sy'] = df_wells['soil_texture_code'].map(soil_sy_dict)
     df_wells['thickness'] = df_wells['stop_depth_cm'] - df_wells['start_depth_cm']
     df_wells['Sy_weighted'] = df_wells['Sy'] * df_wells['thickness']
 
+
     #  Grouping and Averagingpass
     well_summary = df_wells.groupby('well_id')[['Sy_weighted', 'thickness']].sum()
     well_summary['average_Sy'] = well_summary['Sy_weighted'] / well_summary['thickness']
-
 
     return well_summary[['average_Sy']].reset_index()
   
@@ -646,7 +649,9 @@ def process_date_and_year(df, raw_date_col, year):
         df_clean['date_dt'] = pd.to_datetime(df_clean[raw_date_col])
         return df_clean[df_clean['date_dt'].dt.year == year]
 
-def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame, pet_station_df: pd.DataFrame, weather_df: pd.DataFrame, gw_df: pd.DataFrame, method_id: str, year: int, save_dir=None):
+def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame, 
+                     pet_station_df: pd.DataFrame, weather_df: pd.DataFrame, gw_df: pd.DataFrame, 
+                     method_id: str, year: int, save_dir=None):
     """
     Plots proportional Net ET bars and PET line on the left axis, 
     and daily average temperature (Fahrenheit) on a secondary right axis.
@@ -672,6 +677,9 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame, pet_station
     # Merge Station PET safely by date only 
     station_subset = pet_station_df[['date_dt', 'PET_mm_day']].rename(columns={'PET_mm_day': 'PET_station_mm_day'})
     filtered_df = filtered_df.merge(station_subset, how='left', on='date_dt')
+
+    #ensure wells are correctly names
+    filtered_df = update_wells(filtered_df)
 
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
@@ -778,26 +786,25 @@ def plot_gw_ET_overlay(gw_df, et_df, year):
     
     return
 
-def update_wells(filepath: str) -> pd.DataFrame:
+def update_wells(df: pd.DataFrame) -> pd.DataFrame:
     """
     Validates files with well_ids
     Returns a valided dataframe with corrected well_ids.
 
     Parameters
     ----------
-    filepath : str
-        Path to CSV file with well_ids 
+    df : pd.DataFrame
+        DataFrame with well_ids 
     """
     # Validate the well_ids to ensure no bad data slipped through
     #Load Sy data
-    sy_df = pd.read_csv(filepath)
 
     # Correct the well_ids using the STATIC function 
-    sy_df = well_utils.correct_well_ids_static(sy_df)
+    df = well_utils.correct_well_ids_static(df)
     
     # Validate the well_ids to ensure no bad data slipped through
-    sy_df = well_utils.validate_well_ids(sy_df, id_col="well_id")
-    return  sy_df 
+    df = well_utils.validate_well_ids(df, id_col="well_id")
+    return  df 
 
 
     # ---- MAIN PROCEDURES ---
@@ -821,7 +828,10 @@ def main():
     df_soil_sy = pd.read_csv(sy_data_filepath)
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
-   
+
+    #save average Sy values for each well 
+    calculated_sy_df.to_csv(sy_save_filepath, index=False)
+
     # 1. Calculate raw ET for ALL days
     raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
 
@@ -831,9 +841,7 @@ def main():
     # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
     daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_mm=50.0)
 
-    #daily_ET_df.to_csv(save_csv_dir, index=False)
-
-    PET_df = update_wells(pet_well_data_filepath)
+    PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
     weather_df = get_daily_temperature(weather_subdaily_filepath)
 
