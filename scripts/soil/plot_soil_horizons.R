@@ -1,6 +1,7 @@
 # install.packages("dplyr")
 # install.packages("stringr")
 
+
 library(aqp)
 library(dplyr)
 library(stringr)
@@ -20,7 +21,7 @@ df$start_depth_cm <- round(df$start_depth_cm)
 df$stop_depth_cm <- round(df$stop_depth_cm)
 
 # specify category of interest
-categ <- "Lodgepole Pine"
+categ <- "Sedge"
 
 # Filter a specific category
 df <- df %>%
@@ -28,6 +29,8 @@ df <- df %>%
 
 # Add the gravel calculation for the plot bubbles
 df$gravel_amount_percent_hundred <- df$gravel_amount_percent * 100
+# FIX: Cap the max percentage at 95% so the aqp rendering algorithm doesn't fail
+df$gravel_amount_percent_hundred <- ifelse(df$gravel_amount_percent_hundred > 95, 90, df$gravel_amount_percent_hundred)
 
 # Add the space padding
 df$plot_label <- paste0("    ", df$well_id)
@@ -42,8 +45,8 @@ site(df) <- ~ plot_label
 # Converts to lowercase and replaces all spaces with underscores
 formatted_categ <- gsub(" ", "_", tolower(categ))
 
-# Create the final file name string (e.g., "wells_lodgepole_pine.png")
-file_name <- paste0("wells_", formatted_categ, ".png")
+# Create the final file name string (e.g., "wells_1_sedge.png")
+file_name <- paste0("wells_1_", formatted_categ, ".png")
 
 # Plot and Save
 png(filename = here("results", "plots", "groundwater", "soils", file_name), 
