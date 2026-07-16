@@ -483,7 +483,7 @@ def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
 
     return well_summary[['average_Sy']].reset_index()
   
-def plot_ET_line(
+def plot_ET_bywell(
         ET_df,
         method_id,
         years=None,
@@ -781,6 +781,208 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame,
         else:
             plt.show()
 
+def plot_ET_cat(
+    ET_df: pd.DataFrame, 
+    precip_df: pd.DataFrame = None, 
+    pet_df: pd.DataFrame = None,
+    year: int = None, 
+    end_date: str = None,
+    save_dir=None
+):
+    """
+    Creates a separate plot (figure) for each category: meadow_id, plant_type, and hydrogeo_zone.
+    Within each figure, generates a vertically stacked subplot for each designation showing 
+    the daily mean ET as a line, with a shaded infill for the daily min/max range. 
+    Plots PET as a dashed line and Precipitation as bars.
+    Places the designation name as the title of each individual subplot.
+    """
+    categories = {
+        "meadow_id": "Meadow ID",
+        "plant_type": "Plant Type",
+        "hydrogeo_zone": "Hydrogeological Zone"
+    }
+
+    # Ensure datetime format for plotting
+    if not pd.api.types.is_datetime64_any_dtype(ET_df["date"]):
+        ET_df["date"] = pd.to_datetime(ET_df["date"])
+
+    # --- Filter ET dataframe by year ---
+    if year is not None:
+        ET_df = ET_df[ET_df["date"].dt.year == year].copy()
+    
+    # Filter out everything after the highlighted cutoff
+    if end_date is not None:
+        ET_df = ET_df[ET_df["date"] <= pd.to_datetime(end_date)].copy()
+
+    if ET_df.empty:
+        print(f"No ET data available for the year {year}.")
+        return
+        
+    valid_et_dates = ET_df["date"].unique()
+
+    # --- Process & filter precipitation dataframe ---
+    p_data = None
+    if precip_df is not None:
+        precip_df = precip_df.copy()
+        if not pd.api.types.is_datetime64_any_dtype(precip_df["date"]):
+            precip_df["date"] = pd.to_datetime(precip_df["date"])
+        
+        if year is not None:
+            precip_df = precip_df[precip_df["date"].dt.year == year]
+        
+        # Keep ONLY dates that exist in the ET_df to avoid empty gaps
+        precip_df = precip_df[precip_df["date"].isin(valid_et_dates)]
+        p_data = precip_df.sort_values('date')
+
+    # --- Process & filter PET dataframe ---
+    pet_data = None
+    if pet_df is not None:
+        pet_df = pet_df.copy()
+        
+        # Handle capital 'Date' column if present
+        if 'Date' in pet_df.columns and 'date' not in pet_df.columns:
+            pet_df = pet_df.rename(columns={'Date': 'date'})
+            
+        if not pd.api.types.is_datetime64_any_dtype(pet_df["date"]):
+            pet_df["date"] = pd.to_datetime(pet_df["date"])
+            
+        if year is not None:
+            pet_df = pet_df[pet_df["date"].dt.year == year]
+            
+        # Keep ONLY dates that exist in the ET_df to avoid empty gaps
+        pet_df = pet_df[pet_df["date"].isin(valid_et_dates)]
+        pet_data = pet_df.sort_values('date')
+
+    # Loop through each category to create a separate figure
+    for col, title in categories.items():
+        
+        designations = ET_df[col].dropna().unique()
+        n_desig = len(designations)
+        
+        if n_desig == 0:
+            continue
+            
+        # Create a figure with vertically stacked subplots, sharing BOTH X and Y axes
+        fig, axes = plt.subplots(
+            nrows=n_desig, 
+            ncols=1, 
+            figsize=(11, 2.5 * n_desig), 
+            sharex=True, 
+            sharey=True
+        )
+        
+        title_suffix = f" ({year})" if year is not None else ""
+        # Push the suptitle a bit higher to make room for the legend and subplot title
+        fig.suptitle(f"Daily ET for {title}{title_suffix}", fontsize=15, fontweight='bold', y=1.06)
+        
+        if n_desig == 1:
+            axes = [axes]
+            
+        for ax, designation in zip(axes, designations):
+            
+            desig_data = ET_df[ET_df[col] == designation]
+            agg_data = desig_data.groupby('date')['ET_gw_mm'].agg(['mean', 'min', 'max']).reset_index()
+            agg_data = agg_data.sort_values('date')
+            
+            if agg_data.empty:
+                continue
+            
+            # # 1. Plot the range infill (Min/Max range)
+            # ax.fill_between(
+            #     agg_data['date'], 
+            #     agg_data['min'], 
+            #     agg_data['max'], 
+            #     color='tab:orange', 
+            #     alpha=0.3, 
+            #     label='Min/Max Range'
+            # )
+            
+            # 2. Plot the Mean ET line on top
+            ax.plot(
+                agg_data['date'], 
+                agg_data['mean'], 
+                color='tab:orange', 
+                linewidth=1.5, 
+                label='Mean ET'
+            )
+            
+            # 3. Plot Station PET
+            if pet_data is not None and not pet_data.empty:
+                pet_col = 'PET_mm_day' if 'PET_mm_day' in pet_data.columns else pet_data.columns[-1]
+                ax.plot(
+                    pet_data['date'], 
+                    pet_data[pet_col], 
+                    color='crimson', 
+                    linestyle='--', 
+                    linewidth=1.5, 
+                    label='Station PET'
+                )
+            
+            ax.set_ylabel("ET & PET (mm)")
+            
+            # --- SET DESIGNATION AS SUBPLOT TITLE ---
+            # loc='left' keeps it neatly aligned with the y-axis
+            ax.set_title(f"{designation}", fontsize=12, fontweight='bold', loc='left')
+            
+            # 4. Secondary Y-axis (Precipitation Bars)
+            if p_data is not None and not p_data.empty:
+                ax2 = ax.twinx()
+                ax2.bar(
+                    p_data['date'], 
+                    p_data['precip_mm_day'], 
+                    alpha=0.3, 
+                    width=1.0, 
+                    color='tab:blue',
+                    label='Precipitation'
+                )
+                ax2.set_ylabel("Precip (mm)")
+                ax2.set_ylim(bottom=0)
+                
+                # Combine legends from both axes, only on the FIRST subplot to avoid repeating
+                if ax == axes[0]:
+                    lines_1, labels_1 = ax.get_legend_handles_labels()
+                    lines_2, labels_2 = ax2.get_legend_handles_labels()
+                    # Place a single legend above the first plot, pushed up to clear the new title
+                    ax.legend(
+                        lines_1 + lines_2, labels_1 + labels_2, 
+                        loc='lower center', 
+                        bbox_to_anchor=(0.5, 1.25), 
+                        ncol=4, 
+                        frameon=False
+                    )
+                
+                # Force the ET lines/ranges to draw on top of the precip bars
+                ax.set_zorder(ax2.get_zorder() + 1)
+                ax.patch.set_visible(False)
+                
+            else:
+                # If no precip data, just add the legend for ET/PET on the first plot
+                if ax == axes[0]:
+                    ax.legend(
+                        loc='lower center', 
+                        bbox_to_anchor=(0.5, 1.25), 
+                        ncol=3, 
+                        frameon=False
+                    )
+        
+        # Format the shared bottom X-axis
+        axes[-1].set_xlabel("Date")
+        fig.autofmt_xdate()
+        
+        # Adjust vertical space to make room for subplot titles
+        plt.subplots_adjust(hspace=0.25)
+        
+        # Save or show the category figure
+        if save_dir is not None:
+            save_path = Path(save_dir)
+            year_str = f"_{year}" if year is not None else ""
+            fname = f"ET_Subplots_omit_Oct{col}{year_str}.png"
+            fig.savefig(save_path / fname, format="png", bbox_inches="tight", dpi=300)
+            plt.close(fig)
+        else:
+            plt.show()
+
+
 def plot_gw_ET_overlay(gw_df, et_df, year):
     # See DRAFT in chatgpt here: https://chatgpt.com/s/t_6988e9118c34819181d813da8c21634b
     
@@ -816,7 +1018,7 @@ def main():
     subdaily_gw_df = pd.read_csv(groundwater_subdaily_filepath,
                                  parse_dates=["DateTime"]
                                  ).rename(columns={"DateTime": "datetime"})   
-    # Plot daily ET with precip
+    # Load precipitation data
     precip_df = load_precip_for_years(weather_subdaily_filepath, 2025)
     daily_precip_df = daily_cumulative_precip(precip_df)
     
@@ -829,31 +1031,44 @@ def main():
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
 
-    #save average Sy values for each well 
-    calculated_sy_df.to_csv(sy_save_filepath, index=False)
+    # #save average Sy values for each well 
+    # calculated_sy_df.to_csv(sy_save_filepath, index=False)
 
     # 1. Calculate raw ET for ALL days
     raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
 
-    # 2. Filter out the storm events
-    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
+    # # 2. Filter out the storm events
+    # ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
 
     # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(ET_no_rain, daily_gw_df, df_well_logs, buffer_mm=50.0)
+    daily_ET_df = filter_ET_by_well_depth(raw_ET_df , daily_gw_df, df_well_logs, buffer_mm=50.0)
 
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
     weather_df = get_daily_temperature(weather_subdaily_filepath)
+    
+    daily_ET_df = well_utils.get_well_categories(daily_ET_df)
 
-    plot_ET_prop_bar(daily_ET_df, 
-            PET_df,
-            pet_station_df,
-            weather_df,
-            subdaily_gw_df,
-            "White_wavg", 
-            2025,  
-            save_dir=save_plots_dir)
-    print("ET plotted for White average Sy")
+    # Plot
+    plot_ET_cat(
+        ET_df=daily_ET_df, 
+        precip_df=daily_precip_df, 
+        pet_df=pet_station_df,  
+        year=2025, 
+        end_date="2025-10-01",
+        save_dir=save_plots_dir
+    )
+    print("ET category plots with PET generated successfully!")
+
+    # plot_ET_prop_bar(daily_ET_df, 
+    #         PET_df,
+    #         pet_station_df,
+    #         weather_df,
+    #         subdaily_gw_df,
+    #         "White_wavg", 
+    #         2025,  
+    #         save_dir=save_plots_dir)
+    # print("ET plotted for White average Sy")
 
    
     # Save to csv? Do we want a new one or write over the one from above?
