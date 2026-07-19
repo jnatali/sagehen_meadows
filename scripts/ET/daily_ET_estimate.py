@@ -770,11 +770,11 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
                     
                     for _, row in well_soil.iterrows():
                         depth_m = row['stop_depth_cm'] / 100.0
-                        texture = str(row['soil_texture_code'])
+                        texture = str(row['soil_texture_code']) + ' ' + str(row['gravel_amount_percent'])
                         
                         # If this line is within 0.06m of the last one, shift text right
                         if abs(depth_m - last_depth) < 0.06:
-                            x_pos += 0.035 
+                            x_pos += 0.09 
                         else:
                             x_pos = 0.01  # Reset to far left if there's plenty of space
                         
