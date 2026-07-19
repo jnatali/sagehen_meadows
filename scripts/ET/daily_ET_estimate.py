@@ -655,10 +655,15 @@ def process_date_and_year(df, raw_date_col, year):
         df_clean['date_dt'] = pd.to_datetime(df_clean[raw_date_col])
         return df_clean[df_clean['date_dt'].dt.year == year]
 
-def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame, 
+def plot_ET_prop_bar(ET_df: pd.DataFrame, 
+                     PET_well_df: pd.DataFrame, 
                      pet_station_df: pd.DataFrame, 
-                     gw_df: pd.DataFrame, method_id: str, year: int, 
-                     weather_df: pd.DataFrame = None, save_dir=None):
+                     gw_df: pd.DataFrame, 
+                     method_id: str, 
+                     year: int, 
+                     soil_df: pd.DataFrame = None,
+                     weather_df: pd.DataFrame = None, 
+                     save_dir=None):
     """
     Plots proportional Net ET bars and PET line on the left axis, 
     and daily average temperature (Fahrenheit) on a secondary right axis.
@@ -748,10 +753,45 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame,
         # Apply the balanced limits
         ax2.set_ylim(ax2_min, ax2_max)
 
-        # ---- PLOTTING GROUNDWATER (ax3) ----
+# ---- PLOTTING GROUNDWATER (ax3) ----
         if not well_gw.empty:
-            ax3.plot(well_gw['date_dt'], well_gw['ground_to_water_m'], color='navy', linewidth=1.2, label='10-Min Water Level')
+            ax3.plot(well_gw['date_dt'], well_gw['ground_to_water_m'], color='navy', linewidth=1.2, label='10-Min Water Level', zorder=2)
+            
+            # --- NEW: Plot Soil Horizon Boundaries & Staggered Labels ---
+            if soil_df is not None:
+                well_soil = soil_df[soil_df['well_id'] == well_id].copy()
+                
+                if not well_soil.empty:
+                    # Sort by depth just in case the CSV is out of order
+                    well_soil = well_soil.sort_values('stop_depth_cm')
+                    
+                    last_depth = -999  # Dummy variable to track the previous depth
+                    x_pos = 0.01       # Starting X position (far left)
+                    
+                    for _, row in well_soil.iterrows():
+                        depth_m = row['stop_depth_cm'] / 100.0
+                        texture = str(row['soil_texture_code'])
+                        
+                        # If this line is within 0.06m of the last one, shift text right
+                        if abs(depth_m - last_depth) < 0.06:
+                            x_pos += 0.035 
+                        else:
+                            x_pos = 0.01  # Reset to far left if there's plenty of space
+                        
+                        # Plot the red horizontal line
+                        ax3.axhline(depth_m, color='red', linestyle='--', linewidth=1.0, zorder=3)
+                        
+                        # Add the text label using the dynamic x_pos
+                        ax3.text(x_pos, depth_m, texture, 
+                                 transform=ax3.get_yaxis_transform(), 
+                                 color='red', fontsize=8, fontweight='bold', 
+                                 va='bottom', ha='left', zorder=4)
+                        
+                        last_depth = depth_m  # Update last_depth for the next loop iteration
+
             ax3.invert_yaxis()
+            
+        ax3.set_ylabel('Depth to Water (m)')
             
         ax3.set_ylabel('Depth to Water (m)')
         ax3.set_xlabel('Date')
@@ -779,11 +819,11 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame,
             save_path = Path(save_dir)
             
             # save eps
-            fname_eps = f"ET_bar_{method_id}_{well_id}_{year}_GW.eps"
+            fname_eps = f"ET_bar_horizon{method_id}_{well_id}_{year}_GW.eps"
             fig.savefig(save_path / fname_eps, format="eps", bbox_inches="tight")
             
             # save png
-            fname_png = f"ET_bar_{method_id}_{well_id}_{year}_GW.png"
+            fname_png = f"ET_bar_horizon{method_id}_{well_id}_{year}_GW.png"
             fig.savefig(save_path / fname_png, format="png", bbox_inches="tight", dpi=300)
             
             plt.close(fig)
@@ -1051,7 +1091,7 @@ def main():
     ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
 
     # 3. Filter out days where the well went dry (dropping data when water is within 7cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=150.0)
+    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=50.0)
 
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
@@ -1066,7 +1106,7 @@ def main():
     #     end_date="2025-10-01",
     #     save_dir=save_plots_dir
     # )
-    print("ET category plots with PET generated successfully!")
+    # print("ET category plots with PET generated successfully!")
 
     plot_ET_prop_bar(daily_ET_df, 
             PET_df,
@@ -1074,6 +1114,7 @@ def main():
             subdaily_gw_df,
             "White_wavg", 
             2025,  
+            df_well_logs, 
             save_dir=save_plots_dir)
     print("ET plotted for White average Sy")
 
