@@ -20,7 +20,7 @@ library(here)
 # ---------------------------
 data <- read_csv(here("data", "field_observations", "hygrochron", "hygrochron_2025_10min_per_well.csv")) %>%
   mutate(
-    datetime = mdy_hms(datetime),
+    #datetime = mdy_hms(datetime),
     Date = as.Date(datetime)
   )
 # ---------------------------

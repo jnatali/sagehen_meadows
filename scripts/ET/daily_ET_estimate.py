@@ -206,6 +206,8 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     
     daily["doy"] = daily["date"].dt.dayofyear
     daily["year"] = daily["date"].dt.year
+    
+    daily = update_wells(daily)
 
     return daily
 
@@ -279,6 +281,8 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
     
+    df = update_wells(df)
+
     return df[
         [
             "date",
@@ -324,6 +328,8 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
 
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
+    
+    df = update_wells(df)
 
     return df[
         [
@@ -368,7 +374,6 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
     # "high_precip" day (True), .max() evaluates to True for the current day, 
     # effectively dragging the exclusion flag forward through the recovery period.
     p_df["exclude_ET"] = high_precip.rolling(window=window_size, min_periods=1).max().astype(bool)
-    
     
     # ---- 2. APPLY THE MASK ----
     
@@ -469,6 +474,7 @@ def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
 
     #  Data Cleaning
     df_wells = df_wells.dropna(subset=['well_id']).copy()
+    
     df_wells = update_wells(df_wells)
 
     #  Math and Calculations
@@ -477,7 +483,7 @@ def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
     df_wells['Sy_weighted'] = df_wells['Sy'] * df_wells['thickness']
 
 
-    #  Grouping and Averagingpass
+    #  Grouping and Averaging
     well_summary = df_wells.groupby('well_id')[['Sy_weighted', 'thickness']].sum()
     well_summary['average_Sy'] = well_summary['Sy_weighted'] / well_summary['thickness']
 
@@ -650,8 +656,9 @@ def process_date_and_year(df, raw_date_col, year):
         return df_clean[df_clean['date_dt'].dt.year == year]
 
 def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame, 
-                     pet_station_df: pd.DataFrame, weather_df: pd.DataFrame, gw_df: pd.DataFrame, 
-                     method_id: str, year: int, save_dir=None):
+                     pet_station_df: pd.DataFrame, 
+                     gw_df: pd.DataFrame, method_id: str, year: int, 
+                     weather_df: pd.DataFrame = None, save_dir=None):
     """
     Plots proportional Net ET bars and PET line on the left axis, 
     and daily average temperature (Fahrenheit) on a secondary right axis.
@@ -661,9 +668,9 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame,
     ET_df = process_date_and_year(ET_df, 'date', year)
     ET_df = ET_df[ET_df['method_id'] == method_id]
 
+    #filter the other dataframes to the same year for consistency
     gw_df = process_date_and_year(gw_df, 'datetime', year)
     PET_well_df = process_date_and_year(PET_well_df, 'Date', year)
-    weather_df = process_date_and_year(weather_df, 'date', year)
     pet_station_df = process_date_and_year(pet_station_df, 'Date', year)
 
     #calculate proportion storage and recharge
@@ -672,14 +679,16 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame, PET_well_df: pd.DataFrame,
 
     # Combine dataframes using left joins on the true datetime
     filtered_df = ET_df.merge(PET_well_df, how='left', on=['well_id', 'date_dt'])
-    filtered_df = filtered_df.merge(weather_df, how='left', on='date_dt')
+    
+    if weather_df is None or weather_df.empty:
+        print(f"Weather data for year {year} is empty. Temperature data will not be plotted.")
+    else:
+        weather_df = process_date_and_year(weather_df, 'date', year)
+        filtered_df = filtered_df.merge(weather_df, how='left', on='date_dt')
     
     # Merge Station PET safely by date only 
     station_subset = pet_station_df[['date_dt', 'PET_mm_day']].rename(columns={'PET_mm_day': 'PET_station_mm_day'})
     filtered_df = filtered_df.merge(station_subset, how='left', on='date_dt')
-
-    #ensure wells are correctly names
-    filtered_df = update_wells(filtered_df)
 
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
@@ -801,6 +810,7 @@ def plot_ET_cat(
         "plant_type": "Plant Type",
         "hydrogeo_zone": "Hydrogeological Zone"
     }
+    ET_df = well_utils.get_well_categories(ET_df)
 
     # Ensure datetime format for plotting
     if not pd.api.types.is_datetime64_any_dtype(ET_df["date"]):
@@ -1038,37 +1048,34 @@ def main():
     raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
 
     # # 2. Filter out the storm events
-    # ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
+    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
 
-    # 3. Filter out days where the well went dry (dropping data when water is within 5cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(raw_ET_df , daily_gw_df, df_well_logs, buffer_mm=50.0)
+    # 3. Filter out days where the well went dry (dropping data when water is within 7cm of bottom)
+    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=150.0)
 
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
-    weather_df = get_daily_temperature(weather_subdaily_filepath)
-    
-    daily_ET_df = well_utils.get_well_categories(daily_ET_df)
+    #weather_df = get_daily_temperature(weather_subdaily_filepath)
 
-    # Plot
-    plot_ET_cat(
-        ET_df=daily_ET_df, 
-        precip_df=daily_precip_df, 
-        pet_df=pet_station_df,  
-        year=2025, 
-        end_date="2025-10-01",
-        save_dir=save_plots_dir
-    )
+    # # Plot
+    # plot_ET_cat(
+    #     ET_df=daily_ET_df, 
+    #     precip_df=daily_precip_df, 
+    #     pet_df=pet_station_df,  
+    #     year=2025, 
+    #     end_date="2025-10-01",
+    #     save_dir=save_plots_dir
+    # )
     print("ET category plots with PET generated successfully!")
 
-    # plot_ET_prop_bar(daily_ET_df, 
-    #         PET_df,
-    #         pet_station_df,
-    #         weather_df,
-    #         subdaily_gw_df,
-    #         "White_wavg", 
-    #         2025,  
-    #         save_dir=save_plots_dir)
-    # print("ET plotted for White average Sy")
+    plot_ET_prop_bar(daily_ET_df, 
+            PET_df,
+            pet_station_df,
+            subdaily_gw_df,
+            "White_wavg", 
+            2025,  
+            save_dir=save_plots_dir)
+    print("ET plotted for White average Sy")
 
    
     # Save to csv? Do we want a new one or write over the one from above?

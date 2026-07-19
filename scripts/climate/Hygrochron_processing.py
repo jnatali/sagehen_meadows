@@ -22,20 +22,25 @@ from pathlib import Path
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
+import sys
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.append(str(PROJECT_ROOT))
+
+import scripts.groundwater.well_utils as well_utils
 
 ## --- INITIALIZE VARIABLES ---
 
 # Define SOURCE data directory (where you read existing data FROM) ---
-RAW_DATA_DIR = Path(os.path.join('..', '..', 'data', 'field_observations',
-                                 'hygrochron', 'RAW'))
+RAW_DATA_DIR =PROJECT_ROOT / 'data/field_observations/hygrochron/RAW' 
+# Path(os.path.join('..', '..', 'data', 'field_observations',
+#                                  'hygrochron', 'RAW'))
 
 # Input (source data) filenames
 SOURCE_FILE_PATTERN = "*.csv"
 
 # Define OUTPUT data filename
-OUT_DATA_DIR = os.path.join('..', '..', 'data', 'field_observations',
-                                 'hygrochron')
-HYGRO_DATA_FILENAME = OUT_DATA_DIR + '/hygrochron_2025_10min_per_well.csv'
+OUT_DATA_DIR = PROJECT_ROOT / 'data/field_observations/hygrochron'
+HYGRO_DATA_FILENAME = OUT_DATA_DIR / 'hygrochron_2025_10min_per_well.csv'
 
 
 # Final date time format for all files
@@ -170,6 +175,8 @@ if not missing.empty:
         f"{len(missing)} rows are missing RH or temperature values"
     )
 
+# Validate well_ids
+joined = well_utils.process_well_ids(joined, "well_id")
 # 4. Save final "joined" dataframe as csv
 joined.to_csv(HYGRO_DATA_FILENAME, index=False)
-print("SUCCESS!! FILE SAVED TO: " + HYGRO_DATA_FILENAME)
+print("SUCCESS!! FILE SAVED TO: " + str(HYGRO_DATA_FILENAME))
