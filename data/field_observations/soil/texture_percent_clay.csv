@@ -1,13 +1,9 @@
-﻿soil_texture,percent_clay
-silty clay,50
-clay,70
-sandy clay,45
-clay loam,33.5
-sandy clay loam,27.5
-silty clay loam,33.5
-loam,17
-silt loam,13.5
-silt,6
-sandy loam,17.5
-loamy sand,12.5
-sand,5
+﻿soil_texture,percent_clay,code,Sy
+silty clay,50,SIC,0
+clay,70,C,0
+sandy clay,45,SC,0.04
+clay loam,33.5,CL,0.03
+sandy clay loam,27.5,SCL,0.1
+loam,17,L,0.08
+sandy loam,17.5,SL,0.18
+sand,5,S,0.3
