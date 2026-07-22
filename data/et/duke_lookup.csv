@@ -1,0 +1,12 @@
+﻿soil_texture_code,soil_texture_name,phi,Sr,ha_cm,lambda
+S,Sand,0.437,0.02,7.26,0.592
+LS,Loamy Sand,0.437,0.035,8.69,0.474
+SL,Sandy Loam,0.453,0.041,14.66,0.322
+L,Loam,0.463,0.027,11.15,0.22
+SIL,Silt Loam,0.501,0.015,20.76,0.211
+SCL,Sandy Clay Loam,0.398,0.068,28.08,0.25
+CL,Clay Loam,0.464,0.075,25.89,0.194
+SICL,Silty Clay Loam,0.471,0.04,32.56,0.151
+SC,Sandy Clay,0.43,0.109,29.17,0.168
+SIC,Silty Clay,0.479,0.056,34.19,0.127
+C,Clay,0.475,0.09,37.3,0.131

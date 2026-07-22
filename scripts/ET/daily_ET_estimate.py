@@ -23,6 +23,8 @@ import matplotlib.dates as mdates
 import sys
 from pathlib import Path
 import numpy as np
+import matplotlib.dates as mdates
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
@@ -58,11 +60,14 @@ pet_well_data_filepath = pet_well_data_dir / 'pet_by_well_results.csv'
 pet_station_data_dir = PROJECT_ROOT / 'data/et'
 pet_station_data_filepath = pet_station_data_dir / 'pet_station_results.csv'
 
-save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_avg/'
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Avg/'
 save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
 
+duky_sy_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
 # TODO: add data_dir and filepath for Sy stuff
 
+lai_data_dir = PROJECT_ROOT / 'data/field_observations/vegetation/LAI/'
+lai_data_filepath = lai_data_dir / 'LAI_2025_Corrected.csv'
 # ---- FUNCTIONS ---
 
 ## TODO: Split out as a weather_util.py for the project
@@ -345,9 +350,118 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
         ]
     ].dropna()
 
+def estimate_ET_White_Duke_Sy(
+    daily_df: pd.DataFrame, 
+    soil_df: pd.DataFrame, 
+    rawls_df: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Calculates ET using Duke's equation for Specific Yield (Sy), based strictly on 
+    the soil parameters of the single horizon where the water table is currently fluctuating.
+    """
+    METHOD_ID = "White_Duke"
+    
+    # Create clean copies
+    df = daily_df.copy()
+    soil_clean = soil_df.copy()
+    df = calculate_storage_recharge(df)
+    
+    # Create dictionary lookup for Rawls parameters
+    rawls_lookup = rawls_df.set_index('soil_texture_code').to_dict(orient='index')
+
+    calculated_sy_list = []
+
+    # LOOP THROUGH EACH DAILY GROUNDWATER RECORD
+    for _, row in df.iterrows():
+        current_well = row['well_id']
+        
+        # Groundwater depth is stored in mm in 'gw_00'. Convert it to cm to match soil depths.
+        wt_depth_cm = row['gw_00'] / 10.0
+
+        # Filter the soil survey to find horizons belonging to ONLY this well
+        well_horizons = soil_clean[soil_clean['well_id'] == current_well].copy()
+
+        if well_horizons.empty:
+            calculated_sy_list.append(np.nan)
+            continue
+
+        # FIND THE SINGLE HORIZON CONTAINING THE WATER TABLE
+        # The water table sits between the start and stop depth of this horizon
+        active_horizon = well_horizons[
+            (well_horizons['start_depth_cm'] <= wt_depth_cm) & 
+            (well_horizons['stop_depth_cm'] > wt_depth_cm)
+        ]
+
+        # Fallback: If the water table dropped deeper than the lowest recorded log,
+        # use the very bottom horizon so the script doesn't break.
+        if active_horizon.empty:
+            active_horizon = well_horizons.sort_values('stop_depth_cm').tail(1)
+
+        # Extract the single row as a Series
+        horizon = active_horizon.iloc[0]
+
+        # Extract soil texture code and gravel fraction
+        texture_code = str(horizon['soil_texture_code']).strip()
+        gravel_pct = float(horizon.get('gravel_amount_percent', 0.0))
+
+        # Calculate Specific Yield using Duke
+        
+        # Special Case 1: Pure Gravel (100% Gravel or code 'GR')
+        if texture_code == 'GR' or gravel_pct >= 1.0:
+            # Average Specific Yield for Medium Gravel = 23% (0.23)
+            layer_sy = 0.23
+
+        # Special Case 2: Standard Soil Matrix (with optional embedded gravel)
+        else:
+            params = rawls_lookup.get(texture_code, rawls_lookup.get('C', {}))
+            phi = params.get('phi', 0.475)
+            sr = params.get('Sr', 0.090)
+            ha_cm = params.get('ha_cm', 37.3)
+            lam = params.get('lambda', 0.131)
+
+            # Reduce porosity parameters by the volume fraction of gravel displacement
+            phi_bulk = phi * (1.0 - gravel_pct)
+            sr_bulk = sr * (1.0 - gravel_pct)
+            max_sy_bulk = phi_bulk - sr_bulk
+
+            # Apply Duke's Depth-Scaling Equation
+            if wt_depth_cm <= ha_cm:
+                # Water table is entirely inside capillary fringe -> No yield release
+                layer_sy = 0.0
+            else:
+                # Scale down maximum yield based on depth and air-entry pressure
+                depth_factor = 1.0 - ((ha_cm / wt_depth_cm) ** lam)
+                layer_sy = max_sy_bulk * depth_factor
+
+        # Append the calculated Sy to our daily list
+        calculated_sy_list.append(layer_sy)
+
+    # Attach the array of calculated values as a new column (Standardized lowercase 's')
+    df['Sy_star'] = calculated_sy_list
+    df['method_id'] = METHOD_ID
+    
+    # Calculate daily ET (Formula is perfectly correct!)
+    df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
+    df = update_wells(df)
+    
+    return df[
+        [
+            "date",
+            "doy",
+            "year",
+            "well_id",
+            "ET_gw_mm",
+            "R_mm",
+            "S_mm",
+            "Sy_star",
+            "method_id"
+        ]
+    ].dropna()
+
 def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_mm: float = 8.0, recovery_days: int = 3) -> pd.DataFrame:
     """
-    Filters out storage and recharge terms on days with heavy precipitation and subsequent recovery days.
+    Filters out storage and recharge terms on days with heavy precipitation and subsequent recovery days
+    by setting target columns to NaN.
 
     Parameters:
     et_df: populated ET estimate dataframe to filter
@@ -389,18 +503,18 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
     dropped_records = filtered_df[filtered_df["exclude_ET"]]
     
     if not dropped_records.empty:
-        print(f"\n--- Dropping {len(dropped_records)} ET records due to precip >= {threshold_mm} mm + {recovery_days} recovery days ---")
+        print(f"\n--- Masking {len(dropped_records)} ET records to NaN due to precip >= {threshold_mm} mm + {recovery_days} recovery days ---")
         
         # Use .unique() before .tolist() to get only the unique dates
         dates = dropped_records["date"].dt.strftime("%Y-%m-%d").unique().tolist()
         
-        print(f"Zeroing records for {len(dates)} days -> {dates} \n"
+        print(f"Setting records to NaN for {len(dates)} days -> {dates} \n"
         "--------------------------------------------------------------------------------------------------\n")
     else:
-        print(f"\n--- No ET records dropped due to precipitation (threshold = {threshold_mm} mm) ---\n")
+        print(f"\n--- No ET records masked due to precipitation (threshold = {threshold_mm} mm) ---\n")
     
-    # Set 'ET_gw_mm' to 0 for the flagged rows using .loc
-    filtered_df.loc[filtered_df["exclude_ET"], ["ET_gw_mm"]] = 0.0
+    # Set target columns to NaN for the flagged rows using .loc
+    filtered_df.loc[filtered_df["exclude_ET"], ["ET_gw_mm", "R_mm", "S_mm"]] = 0
     
     # Drop the temporary "exclude_ET" column to keep the dataframe clean.
     filtered_df = filtered_df.drop(columns=["exclude_ET"])
@@ -410,7 +524,7 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
 def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: pd.DataFrame, buffer_mm: float = 50.0) -> pd.DataFrame:
     """
     Filters out storage and recharge terms for days when the groundwater level drops 
-    below the total depth of the well, minus a safety buffer.
+    below the total depth of the well, minus a safety buffer by setting columns to NaN.
 
     Parameters:
     et_df: populated ET estimate dataframe to filter
@@ -438,19 +552,19 @@ def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: p
     # ---- 4. PRINT DROPPED DAYS SUMMARY ----
     dry_records = mask_df[mask_df["is_dry"]]
     if not dry_records.empty:
-        print(f"\n--- Zeroing {len(dry_records)} records due to dry well conditions (buffer = {buffer_mm} mm) ---")
+        print(f"\n--- Setting {len(dry_records)} records to NaN due to dry well conditions (buffer = {buffer_mm} mm) ---")
         for well, group in dry_records.groupby("well_id"):
             dates = group["date"].dt.strftime("%Y-%m-%d").tolist()
-            print(f"{well}: Dropped {len(dates)} days -> {dates}")
+            print(f"{well}: Masked {len(dates)} days -> {dates}")
         print("----------------------------------------------------------------------------------\n")
     else:
-        print(f"\n--- No ET records dropped due to dry well conditions (buffer = {buffer_mm} mm) ---\n") 
+        print(f"\n--- No ET records masked due to dry well conditions (buffer = {buffer_mm} mm) ---\n") 
 
     # ---- 5. APPLY THE MASK TO ET DATA ----
     filtered_et = et_df.merge(mask_df[["well_id", "date", "is_dry"]], on=["well_id", "date"], how="left")
     
-    # Set ET to 0 for flagged rows
-    filtered_et.loc[filtered_et["is_dry"], ["ET_gw_mm" ]] = 0.0
+    # Set target columns to NaN for flagged rows
+    filtered_et.loc[filtered_et["is_dry"], ["ET_gw_mm", "R_mm", "S_mm"]] = 0
     
     # Drop the temporary column
     filtered_et = filtered_et.drop(columns=["is_dry"]) 
@@ -832,17 +946,16 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
 
 def plot_ET_cat(
     ET_df: pd.DataFrame, 
-    precip_df: pd.DataFrame = None, 
+    lai_df: pd.DataFrame = None, 
     pet_df: pd.DataFrame = None,
     year: int = None, 
+    save_dir=None,
     end_date: str = None,
-    save_dir=None
 ):
     """
     Creates a separate plot (figure) for each category: meadow_id, plant_type, and hydrogeo_zone.
     Within each figure, generates a vertically stacked subplot for each designation showing 
-    the daily mean ET as a line, with a shaded infill for the daily min/max range. 
-    Plots PET as a dashed line and Precipitation as bars.
+    the daily mean ET as a line. Plots PET as a dashed line and LAI.rmWAI on the secondary Y-axis.
     Places the designation name as the title of each individual subplot.
     """
     categories = {
@@ -850,6 +963,8 @@ def plot_ET_cat(
         "plant_type": "Plant Type",
         "hydrogeo_zone": "Hydrogeological Zone"
     }
+    
+    # Categorize ET data
     ET_df = well_utils.get_well_categories(ET_df)
 
     # Ensure datetime format for plotting
@@ -870,38 +985,36 @@ def plot_ET_cat(
         
     valid_et_dates = ET_df["date"].unique()
 
-    # --- Process & filter precipitation dataframe ---
-    p_data = None
-    if precip_df is not None:
-        precip_df = precip_df.copy()
-        if not pd.api.types.is_datetime64_any_dtype(precip_df["date"]):
-            precip_df["date"] = pd.to_datetime(precip_df["date"])
+    # --- Process & filter LAI dataframe ---
+    lai_data = None
+    if lai_df is not None:
+        lai_df = lai_df.copy()
+        
+        # Categorize LAI data so we can filter it by designation in the loop
+        lai_df = well_utils.get_well_categories(lai_df)
+        
+        # Strip time to get just the date
+        lai_df["date_only"] = pd.to_datetime(lai_df["datetime"]).dt.normalize()
         
         if year is not None:
-            precip_df = precip_df[precip_df["date"].dt.year == year]
-        
-        # Keep ONLY dates that exist in the ET_df to avoid empty gaps
-        precip_df = precip_df[precip_df["date"].isin(valid_et_dates)]
-        p_data = precip_df.sort_values('date')
+            lai_df = lai_df[lai_df["date_only"].dt.year == year]
+            
+        lai_data = lai_df
 
     # --- Process & filter PET dataframe ---
     pet_data = None
     if pet_df is not None:
         pet_df = pet_df.copy()
-        
-        # Handle capital 'Date' column if present
-        if 'Date' in pet_df.columns and 'date' not in pet_df.columns:
-            pet_df = pet_df.rename(columns={'Date': 'date'})
             
-        if not pd.api.types.is_datetime64_any_dtype(pet_df["date"]):
-            pet_df["date"] = pd.to_datetime(pet_df["date"])
+        if not pd.api.types.is_datetime64_any_dtype(pet_df["Date"]):
+            pet_df["Date"] = pd.to_datetime(pet_df["Date"])
             
         if year is not None:
-            pet_df = pet_df[pet_df["date"].dt.year == year]
+            pet_df = pet_df[pet_df["Date"].dt.year == year]
             
         # Keep ONLY dates that exist in the ET_df to avoid empty gaps
-        pet_df = pet_df[pet_df["date"].isin(valid_et_dates)]
-        pet_data = pet_df.sort_values('date')
+        pet_df = pet_df[pet_df["Date"].isin(valid_et_dates)]
+        pet_data = pet_df.sort_values('Date')
 
     # Loop through each category to create a separate figure
     for col, title in categories.items():
@@ -937,21 +1050,14 @@ def plot_ET_cat(
             if agg_data.empty:
                 continue
             
-            # # 1. Plot the range infill (Min/Max range)
-            # ax.fill_between(
-            #     agg_data['date'], 
-            #     agg_data['min'], 
-            #     agg_data['max'], 
-            #     color='tab:orange', 
-            #     alpha=0.3, 
-            #     label='Min/Max Range'
-            # )
+            # Calculate a 7-day rolling average to smooth the ET line
+            smoothed_et = agg_data['mean'].rolling(window=4, center=True, min_periods=1).mean()
             
-            # 2. Plot the Mean ET line on top
+            # 2. Plot ONLY the Smoothed Mean ET line
             ax.plot(
                 agg_data['date'], 
-                agg_data['mean'], 
-                color='tab:orange', 
+                smoothed_et, 
+                color='blue', 
                 linewidth=1.5, 
                 label='Mean ET'
             )
@@ -960,9 +1066,9 @@ def plot_ET_cat(
             if pet_data is not None and not pet_data.empty:
                 pet_col = 'PET_mm_day' if 'PET_mm_day' in pet_data.columns else pet_data.columns[-1]
                 ax.plot(
-                    pet_data['date'], 
+                    pet_data['Date'], 
                     pet_data[pet_col], 
-                    color='crimson', 
+                    color='grey', 
                     linestyle='--', 
                     linewidth=1.5, 
                     label='Station PET'
@@ -971,49 +1077,55 @@ def plot_ET_cat(
             ax.set_ylabel("ET & PET (mm)")
             
             # --- SET DESIGNATION AS SUBPLOT TITLE ---
-            # loc='left' keeps it neatly aligned with the y-axis
             ax.set_title(f"{designation}", fontsize=12, fontweight='bold', loc='left')
             
-            # 4. Secondary Y-axis (Precipitation Bars)
-            if p_data is not None and not p_data.empty:
-                ax2 = ax.twinx()
-                ax2.bar(
-                    p_data['date'], 
-                    p_data['precip_mm_day'], 
-                    alpha=0.3, 
-                    width=1.0, 
-                    color='tab:blue',
-                    label='Precipitation'
-                )
-                ax2.set_ylabel("Precip (mm)")
-                ax2.set_ylim(bottom=0)
+            # 4. Secondary Y-axis (LAI.rmWAI)
+            if lai_data is not None and not lai_data.empty:
+                # Filter LAI data specifically for this subplot's designation FIRST
+                desig_lai = lai_data[lai_data[col] == designation].copy()
                 
-                # Combine legends from both axes, only on the FIRST subplot to avoid repeating
-                if ax == axes[0]:
-                    lines_1, labels_1 = ax.get_legend_handles_labels()
-                    lines_2, labels_2 = ax2.get_legend_handles_labels()
-                    # Place a single legend above the first plot, pushed up to clear the new title
-                    ax.legend(
-                        lines_1 + lines_2, labels_1 + labels_2, 
-                        loc='lower center', 
-                        bbox_to_anchor=(0.5, 1.25), 
-                        ncol=4, 
-                        frameon=False
+                if not desig_lai.empty:
+                    # Sort chronologically within the designation
+                    desig_lai = desig_lai.sort_values('date_only')
+                    
+                    # AGGREGATE CAMPAIGNS BY DESIGNATION:
+                    desig_lai['campaign_group'] = (desig_lai['date_only'].diff().dt.days > 3).cumsum()
+                    desig_lai['plot_date'] = desig_lai.groupby('campaign_group')['date_only'].transform('min')
+                    
+                    # Group by our newly clustered 'plot_date' to get the mean LAI.rmWAI
+                    agg_lai = desig_lai.groupby('plot_date')['LAI.rmWAI'].mean().reset_index()
+                    
+                    ax2 = ax.twinx()
+                    
+                    # DIRECT PLOT: No circles (marker removed), standard smooth connecting line
+                    ax2.plot(
+                        agg_lai['plot_date'], 
+                        agg_lai['LAI.rmWAI'], 
+                        color='tab:green', 
+                        linestyle='-',
+                        linewidth=1.5,
+                        label='LAI'
                     )
-                
-                # Force the ET lines/ranges to draw on top of the precip bars
-                ax.set_zorder(ax2.get_zorder() + 1)
-                ax.patch.set_visible(False)
-                
-            else:
-                # If no precip data, just add the legend for ET/PET on the first plot
-                if ax == axes[0]:
-                    ax.legend(
-                        loc='lower center', 
-                        bbox_to_anchor=(0.5, 1.25), 
-                        ncol=3, 
-                        frameon=False
-                    )
+
+                    ax2.set_ylabel("LAI")
+                    ax2.set_ylim(bottom=0)
+# Collect unique handles and labels from all axes (including the LAI twin axes)
+        handles, labels = [], []
+        for a in fig.axes:
+            for handle, label in zip(*a.get_legend_handles_labels()):
+                if label not in labels:
+                    handles.append(handle)
+                    labels.append(label)
+                    
+        # Place one global legend outside the subplots, just below the suptitle
+        fig.legend(
+            handles, 
+            labels, 
+            loc='upper center', 
+            bbox_to_anchor=(0.5, 1.02), 
+            ncol=3, 
+            frameon=False
+        )
         
         # Format the shared bottom X-axis
         axes[-1].set_xlabel("Date")
@@ -1026,12 +1138,19 @@ def plot_ET_cat(
         if save_dir is not None:
             save_path = Path(save_dir)
             year_str = f"_{year}" if year is not None else ""
-            fname = f"ET_Subplots_omit_Oct{col}{year_str}.png"
-            fig.savefig(save_path / fname, format="png", bbox_inches="tight", dpi=300)
+            
+            # Define the base filename WITHOUT the extension
+            base_fname = f"ET_Subplots_Avg_smooth_{col}{year_str}"
+            
+            # Save as PNG
+            fig.savefig(save_path / f"{base_fname}.png", format="png", bbox_inches="tight", dpi=300)
+            
+            # Save as EPS
+            fig.savefig(save_path / f"{base_fname}.eps", format="eps", bbox_inches="tight", dpi=300)
+            
             plt.close(fig)
         else:
             plt.show()
-
 
 def plot_gw_ET_overlay(gw_df, et_df, year):
     # See DRAFT in chatgpt here: https://chatgpt.com/s/t_6988e9118c34819181d813da8c21634b
@@ -1076,8 +1195,9 @@ def main():
     daily_gw_df = get_daily_gw_levels(subdaily_gw_df)
     print("got gw levels")
   
-    #calculate average Sy for each well
+    # #calculate average Sy for each well
     df_soil_sy = pd.read_csv(sy_data_filepath)
+    duke_df = pd.read_csv(duky_sy_data_dir)
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
 
@@ -1085,8 +1205,8 @@ def main():
     # calculated_sy_df.to_csv(sy_save_filepath, index=False)
 
     # 1. Calculate raw ET for ALL days
+    #raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
     raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
-
     # # 2. Filter out the storm events
     ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
 
@@ -1096,27 +1216,28 @@ def main():
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
     #weather_df = get_daily_temperature(weather_subdaily_filepath)
+    lai_df = pd.read_csv(lai_data_filepath)
 
-    # # Plot
-    # plot_ET_cat(
-    #     ET_df=daily_ET_df, 
-    #     precip_df=daily_precip_df, 
-    #     pet_df=pet_station_df,  
-    #     year=2025, 
-    #     end_date="2025-10-01",
-    #     save_dir=save_plots_dir
-    # )
-    # print("ET category plots with PET generated successfully!")
+    # Plot
+    plot_ET_cat(
+        ET_df=daily_ET_df, 
+        lai_df = lai_df,
+        pet_df=pet_station_df,
+        year=2025, 
+        end_date=None,
+        save_dir=save_plots_dir
+    )
+    print("ET category plots with PET generated successfully!")
 
-    plot_ET_prop_bar(daily_ET_df, 
-            PET_df,
-            pet_station_df,
-            subdaily_gw_df,
-            "White_wavg", 
-            2025,  
-            df_well_logs, 
-            save_dir=save_plots_dir)
-    print("ET plotted for White average Sy")
+    # plot_ET_prop_bar(daily_ET_df, 
+    #         PET_df,
+    #         pet_station_df,
+    #         subdaily_gw_df,
+    #         "White_Duke", 
+    #         2025,  
+    #         df_well_logs, 
+    #         save_dir=save_plots_dir)
+    # print("ET plotted for White average Sy")
 
    
     # Save to csv? Do we want a new one or write over the one from above?
