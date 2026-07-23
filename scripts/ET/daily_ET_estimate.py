@@ -60,7 +60,7 @@ pet_well_data_filepath = pet_well_data_dir / 'pet_by_well_results.csv'
 pet_station_data_dir = PROJECT_ROOT / 'data/et'
 pet_station_data_filepath = pet_station_data_dir / 'pet_station_results.csv'
 
-save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Duke/'
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Avg/'
 save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
 
 duky_sy_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
@@ -1218,7 +1218,9 @@ def apply_et_capillary_limits(
     pet_df: pd.DataFrame,
     df_well_logs: pd.DataFrame, 
     df_extinction: pd.DataFrame, 
-    pet_col: str = "PET_mm_day" 
+    station_PET_df: pd.DataFrame = None,
+    pet_col: str = "PET_mm_day" ,
+    year: int = 2025,
 ) -> pd.DataFrame:
     """
     Filters ET_df for 2025, merges PET and groundwater depth data, 
@@ -1230,30 +1232,45 @@ def apply_et_capillary_limits(
     
     # 2. Filter strictly for the year 2025 where PET data is available
     df['year'] = pd.to_numeric(df['year'], errors='coerce')
-    df_2025 = df[df['year'] == 2025].copy()
+    df_2025 = df[df['year'] == year].copy()
     
-    # 3. Standardize dates for merging
+
+# 3. Standardize dates for merging
     df_2025['date'] = pd.to_datetime(df_2025['date'])
     
     pet_clean = pet_df.copy()
     pet_clean['Date'] = pd.to_datetime(pet_clean['Date'])
-    
 
-    # 4. Merge PET and Groundwater Data into ET_df matching by date and well_id
+    if station_PET_df is not None:
+        station_PET_clean = station_PET_df.copy()
+        station_PET_clean['Date'] = pd.to_datetime(station_PET_clean['Date'])
+        
+        # Extract year directly from the parsed 'Date' column
+        station_PET_clean_year = station_PET_clean[station_PET_clean['Date'].dt.year == year].copy()
+        station_PET_clean_year = station_PET_clean_year.rename(columns={pet_col: 'station_PET_mm_day'})
+   
+    # 4. Merge PET and ET data matching by date and well_id
     merged_df = df_2025.merge(
         pet_clean[['Date', 'well_id', pet_col]], 
         left_on=['date', 'well_id'], 
         right_on=['Date', 'well_id'], 
         how='left'
     )
-
+# Merge station PET data if provided
+    if station_PET_df is not None:
+        merged_df = merged_df.merge(
+        station_PET_clean_year[['Date', 'station_PET_mm_day']],
+        left_on=['date'],
+        right_on=['Date'],
+        how='left'
+    )
+        
     # 5. Map specific plant types to the broad categories (Grass/Forest)
     def map_to_cover(plant):
         if plant in ["Sedge", "Mixed Herbaceous"]:
             return "Grass"
         elif plant in ["Willow", "Lodgepole Pine"]:
             return "Forest"
-        return "Grass" # Fallback
         
     merged_df['cover_type'] = merged_df['plant_type'].apply(map_to_cover)
     
@@ -1268,14 +1285,15 @@ def apply_et_capillary_limits(
         wtd_mm = row['gw_00'] 
         well = row['well_id']
         cover = row['cover_type']
+        station_PET = row['station_PET_mm_day']
         current_et = row['ET_gw_mm']
         date_str = row['date'].strftime('%Y-%m-%d')
         
-        # Pull merged PET, fallback to current ET if missing
-        pet = row[pet_col] if pd.notna(row[pet_col]) else current_et
+        # Pull merged PET, fallback to current Station_PET if missing
+        pet = row[pet_col] if pd.notna(row[pet_col]) else station_PET
         
         if pd.isna(wtd_mm):
-            return current_et
+            return station_PET
             
         # Filter well logs for layers ABOVE the water table
         vadose_zone = logs[(logs['well_id'] == well) & (logs['start_depth_mm'] < wtd_mm)]
@@ -1365,9 +1383,9 @@ def main():
     # calculated_sy_df.to_csv(sy_save_filepath, index=False)
     df_extinction = pd.read_csv(extinction_data_filepath)
     # 1. Calculate raw ET for ALL days
-    raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
-    #raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
-    raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_col="PET_mm_day")
+    #raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
+    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
+    raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_station_df, pet_col="PET_mm_day")
     # # 2. Filter out the storm events
     ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=1.0, recovery_days=3)
 
