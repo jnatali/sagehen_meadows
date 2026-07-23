@@ -60,7 +60,7 @@ pet_well_data_filepath = pet_well_data_dir / 'pet_by_well_results.csv'
 pet_station_data_dir = PROJECT_ROOT / 'data/et'
 pet_station_data_filepath = pet_station_data_dir / 'pet_station_results.csv'
 
-save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Avg/'
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Duke/'
 save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
 
 duky_sy_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
@@ -1176,7 +1176,7 @@ def plot_ET_cat(
             year_str = f"_{year}" if year is not None else ""
             
             # Define the base filename WITHOUT the extension
-            base_fname = f"ET_Subplots_smooth_{col}{year_str}"
+            base_fname = f"ET_Subplots_smooth_with_cap_limits_{col}{year_str}"
             
             # Save as PNG
             fig.savefig(save_path / f"{base_fname}.png", format="png", bbox_inches="tight", dpi=300)
@@ -1294,23 +1294,23 @@ def apply_et_capillary_limits(
             
         # Identify the limiting layer (the one with the SMALLEST d'')
         d_double_prime_col = f"{cover} d'' (mm)"
-        d_prime_col = f"{cover} d' (mm)"
+        e_prime = f"{cover} e (mm)"
         
         min_d_double_prime = ext_params[d_double_prime_col].min()
         
         # Extract thresholds
         limiting_row = ext_params[ext_params[d_double_prime_col] == min_d_double_prime].iloc[0]
-        d_prime = limiting_row[d_prime_col]
+        e_prime = limiting_row[e_prime]
         d_double_prime = limiting_row[d_double_prime_col]
         
         # Apply the thresholds and print the updates
-        if wtd_mm <= d_prime:
+        if wtd_mm <= d_double_prime:
             # Fully coupled: ET operates at potential
-            print(f"Well: {well} | Date: {date_str} -> Converted to PET. Value: {pet:.3f} mm")
+            print(f"Well: {well} | Date: {date_str} | GW level {wtd_mm} -> Converted to PET. Value: {pet:.3f} mm")
             return pet
-        elif wtd_mm >= d_double_prime:
+        elif wtd_mm >= e_prime:
             # Fully decoupled: Capillary connection broken
-            print(f"Well: {well} | Date: {date_str} -> Converted to 0. Value: 0.0 mm")
+            print(f"Well: {well} | Date: {date_str} | GW level {wtd_mm} -> Converted to 0. Value: 0.0 mm")
             return 0.0
         else:
             # Falling rate stage: leave as originally calculated
@@ -1365,12 +1365,11 @@ def main():
     # calculated_sy_df.to_csv(sy_save_filepath, index=False)
     df_extinction = pd.read_csv(extinction_data_filepath)
     # 1. Calculate raw ET for ALL days
-    #raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
-    #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_col="PET_mm_day")
-    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
-    #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_col="PET_mm_day")
+    raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
+    #raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
+    raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_col="PET_mm_day")
     # # 2. Filter out the storm events
-    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=3.0, recovery_days=3)
+    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=1.0, recovery_days=3)
 
     # 3. Filter out days where the well went dry (dropping data when water is within 7cm of bottom)
     daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=100.0)

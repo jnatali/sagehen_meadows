@@ -1,13 +1,13 @@
-﻿Soil Type,Soil Texture Code,Grass d' (mm),Grass d'' (mm),Forest d' (mm),Forest d'' (mm)
-Sand,S,300,270,390,310
-Loamy sand,LS,380,290,510,360
-Sandy loam,SL,600,350,820,500
-Sandy clay loam,SCL,700,310,1020,560
-Sandy clay,SC,660,350,1450,870
-Loam,L,850,390,1280,660
-Silty clay,SIC,900,780,1810,1580
-Clay loam,CL,920,350,1590,840
-Silt loam,SIL,1100,400,1670,820
-Silt,SI,1040,490,1090,940
-Silty clay loam,SICL,940,490,1820,940
-Clay,C,880,700,1860,960
+﻿Soil Type,Soil Texture Code,Grass e (mm),Grass d'' (mm),Forest e (mm),Forest d'' (mm)
+Sand,S,1450,270,2500,310
+Loamy sand,LS,1700,290,2700,360
+Sandy loam,SL,2300,350,3300,500
+Sandy clay loam,SCL,3000,310,4000,560
+Sandy clay,SC,3100,350,4100,870
+Loam,L,3700,390,4700,660
+Silty clay,SIC,4300,780,5300,1580
+Clay loam,CL,5050,350,6100,840
+Silt loam,SIL,5150,400,6150,820
+Silt,SI,5300,490,6300,940
+Silty clay loam,SICL,5500,490,6550,940
+Clay,C,7150,700,8200,960
