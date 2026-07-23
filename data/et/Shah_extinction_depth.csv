@@ -1,0 +1,13 @@
+﻿Soil Type,Soil Texture Code,Grass d' (mm),Grass d'' (mm),Forest d' (mm),Forest d'' (mm)
+Sand,S,300,270,390,310
+Loamy sand,LS,380,290,510,360
+Sandy loam,SL,600,350,820,500
+Sandy clay loam,SCL,700,310,1020,560
+Sandy clay,SC,660,350,1450,870
+Loam,L,850,390,1280,660
+Silty clay,SIC,900,780,1810,1580
+Clay loam,CL,920,350,1590,840
+Silt loam,SIL,1100,400,1670,820
+Silt,SI,1040,490,1090,940
+Silty clay loam,SICL,940,490,1820,940
+Clay,C,880,700,1860,960

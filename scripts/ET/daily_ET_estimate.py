@@ -68,6 +68,9 @@ duky_sy_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
 
 lai_data_dir = PROJECT_ROOT / 'data/field_observations/vegetation/LAI/'
 lai_data_filepath = lai_data_dir / 'LAI_2025_Corrected.csv'
+
+extinction_data_dir = PROJECT_ROOT / 'data/et/'
+extinction_data_filepath = extinction_data_dir / 'Shah_extinction_depth.csv'
 # ---- FUNCTIONS ---
 
 ## TODO: Split out as a weather_util.py for the project
@@ -299,6 +302,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
             "S_mm",
             "Sy_star",
             "method_id",
+            "gw_00"
         ]
     ].dropna()
 
@@ -346,30 +350,36 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
             "R_mm",
             "S_mm",
             "Sy_star",
-            "method_id"
+            "method_id",
+            "gw_00"
         ]
     ].dropna()
 
 def estimate_ET_White_Duke_Sy(
     daily_df: pd.DataFrame, 
     soil_df: pd.DataFrame, 
-    rawls_df: pd.DataFrame
+    rawls_df: pd.DataFrame,   
 ) -> pd.DataFrame:
     """
     Calculates ET using Duke's equation for Specific Yield (Sy), based strictly on 
     the soil parameters of the single horizon where the water table is currently fluctuating.
+    If the water table is inside the capillary fringe, the White method is bypassed and
+    ET is set to equal atmospheric PET.
     """
     METHOD_ID = "White_Duke"
     
     # Create clean copies
     df = daily_df.copy()
     soil_clean = soil_df.copy()
+    
+    
     df = calculate_storage_recharge(df)
     
     # Create dictionary lookup for Rawls parameters
     rawls_lookup = rawls_df.set_index('soil_texture_code').to_dict(orient='index')
 
     calculated_sy_list = []
+    shallow_wt_flag_list = []      
 
     # LOOP THROUGH EACH DAILY GROUNDWATER RECORD
     for _, row in df.iterrows():
@@ -383,10 +393,10 @@ def estimate_ET_White_Duke_Sy(
 
         if well_horizons.empty:
             calculated_sy_list.append(np.nan)
+            shallow_wt_flag_list.append(False) 
             continue
 
         # FIND THE SINGLE HORIZON CONTAINING THE WATER TABLE
-        # The water table sits between the start and stop depth of this horizon
         active_horizon = well_horizons[
             (well_horizons['start_depth_cm'] <= wt_depth_cm) & 
             (well_horizons['stop_depth_cm'] > wt_depth_cm)
@@ -400,18 +410,18 @@ def estimate_ET_White_Duke_Sy(
         # Extract the single row as a Series
         horizon = active_horizon.iloc[0]
 
-        # Extract soil texture code and gravel fraction
+        # Extract soil texture code 
         texture_code = str(horizon['soil_texture_code']).strip()
-        gravel_pct = float(horizon.get('gravel_amount_percent', 0.0))
 
         # Calculate Specific Yield using Duke
         
-        # Special Case 1: Pure Gravel (100% Gravel or code 'GR')
-        if texture_code == 'GR' or gravel_pct >= 1.0:
+        # Special Case 1: Pure Gravel (Code 'GR')
+        if texture_code == 'GR' or texture_code == 'HO':
             # Average Specific Yield for Medium Gravel = 23% (0.23)
             layer_sy = 0.23
+            shallow_wt_flag_list.append(False) 
 
-        # Special Case 2: Standard Soil Matrix (with optional embedded gravel)
+        # Special Case 2: Standard Soil Matrix 
         else:
             params = rawls_lookup.get(texture_code, rawls_lookup.get('C', {}))
             phi = params.get('phi', 0.475)
@@ -419,29 +429,29 @@ def estimate_ET_White_Duke_Sy(
             ha_cm = params.get('ha_cm', 37.3)
             lam = params.get('lambda', 0.131)
 
-            # Reduce porosity parameters by the volume fraction of gravel displacement
-            phi_bulk = phi * (1.0 - gravel_pct)
-            sr_bulk = sr * (1.0 - gravel_pct)
-            max_sy_bulk = phi_bulk - sr_bulk
+            max_sy = phi - sr
 
             # Apply Duke's Depth-Scaling Equation
             if wt_depth_cm <= ha_cm:
                 # Water table is entirely inside capillary fringe -> No yield release
                 layer_sy = 0.0
+                shallow_wt_flag_list.append(True) 
             else:
                 # Scale down maximum yield based on depth and air-entry pressure
                 depth_factor = 1.0 - ((ha_cm / wt_depth_cm) ** lam)
-                layer_sy = max_sy_bulk * depth_factor
+                layer_sy = max_sy * depth_factor
+                shallow_wt_flag_list.append(False) 
 
         # Append the calculated Sy to our daily list
         calculated_sy_list.append(layer_sy)
 
-    # Attach the array of calculated values as a new column (Standardized lowercase 's')
-    df['Sy_star'] = calculated_sy_list
+    # Attach the array of calculated values as a new column 
+    df['Sy_star'] = calculated_sy_list 
     df['method_id'] = METHOD_ID
     
-    # Calculate daily ET (Formula is perfectly correct!)
+    # Calculate daily ET (Standard White Method)
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
+
     df = update_wells(df)
     
     return df[
@@ -454,7 +464,8 @@ def estimate_ET_White_Duke_Sy(
             "R_mm",
             "S_mm",
             "Sy_star",
-            "method_id"
+            "method_id",
+            "gw_00"
         ]
     ].dropna()
 
@@ -514,7 +525,7 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
         print(f"\n--- No ET records masked due to precipitation (threshold = {threshold_mm} mm) ---\n")
     
     # Set target columns to NaN for the flagged rows using .loc
-    filtered_df.loc[filtered_df["exclude_ET"], ["ET_gw_mm", "R_mm", "S_mm"]] = 0
+    filtered_df.loc[filtered_df["exclude_ET"], ["ET_gw_mm", "R_mm", "S_mm"]] = np.nan
     
     # Drop the temporary "exclude_ET" column to keep the dataframe clean.
     filtered_df = filtered_df.drop(columns=["exclude_ET"])
@@ -564,7 +575,7 @@ def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: p
     filtered_et = et_df.merge(mask_df[["well_id", "date", "is_dry"]], on=["well_id", "date"], how="left")
     
     # Set target columns to NaN for flagged rows
-    filtered_et.loc[filtered_et["is_dry"], ["ET_gw_mm", "R_mm", "S_mm"]] = 0
+    filtered_et.loc[filtered_et["is_dry"], ["ET_gw_mm", "R_mm", "S_mm"]] = np.nan
     
     # Drop the temporary column
     filtered_et = filtered_et.drop(columns=["is_dry"]) 
@@ -1001,6 +1012,14 @@ def plot_ET_cat(
             
         lai_data = lai_df
 
+    # --- Determine Global Max LAI for uniform scaling ---
+    global_max_lai = 1.0 # Default fallback
+    if lai_data is not None and not lai_data.empty:
+        # Get the absolute max LAI across all data for this year
+        global_max_lai = lai_data['LAI.rmWAI'].max()
+        # Add a 10% buffer to the top for visual breathing room
+        global_max_lai = global_max_lai * 1.1 
+
     # --- Process & filter PET dataframe ---
     pet_data = None
     if pet_df is not None:
@@ -1050,7 +1069,7 @@ def plot_ET_cat(
             if agg_data.empty:
                 continue
             
-            # Calculate a 7-day rolling average to smooth the ET line
+            # Calculate a 4-day rolling average to smooth the ET line
             smoothed_et = agg_data['mean'].rolling(window=4, center=True, min_periods=1).mean()
             
             # 2. Plot ONLY the Smoothed Mean ET line
@@ -1059,7 +1078,22 @@ def plot_ET_cat(
                 smoothed_et, 
                 color='blue', 
                 linewidth=1.5, 
-                label='Mean ET'
+                label='ET'
+            )
+            
+            # --- SHADE NaN VALUES ---
+            # Create a boolean mask looking for NaNs in the un-smoothed aggregated mean
+            nan_mask = agg_data['mean'].isna()
+            
+            ax.fill_between(
+                agg_data['date'], 
+                0, 1, 
+                where=nan_mask, 
+                transform=ax.get_xaxis_transform(), 
+                facecolor='lightgrey', 
+                alpha=0.5, 
+                zorder=0,
+                label='Filtered / Missing'
             )
             
             # 3. Plot Station PET
@@ -1108,8 +1142,10 @@ def plot_ET_cat(
                     )
 
                     ax2.set_ylabel("LAI")
-                    ax2.set_ylim(bottom=0)
-# Collect unique handles and labels from all axes (including the LAI twin axes)
+                    # Force every subplot to use the exact same LAI scale
+                    ax2.set_ylim(0, global_max_lai) 
+
+        # Collect unique handles and labels from all axes (including the LAI twin axes)
         handles, labels = [], []
         for a in fig.axes:
             for handle, label in zip(*a.get_legend_handles_labels()):
@@ -1123,7 +1159,7 @@ def plot_ET_cat(
             labels, 
             loc='upper center', 
             bbox_to_anchor=(0.5, 1.02), 
-            ncol=3, 
+            ncol=4, # Increased to 4 to nicely fit the new "Filtered / Missing" label 
             frameon=False
         )
         
@@ -1140,7 +1176,7 @@ def plot_ET_cat(
             year_str = f"_{year}" if year is not None else ""
             
             # Define the base filename WITHOUT the extension
-            base_fname = f"ET_Subplots_Avg_smooth_{col}{year_str}"
+            base_fname = f"ET_Subplots_smooth_{col}{year_str}"
             
             # Save as PNG
             fig.savefig(save_path / f"{base_fname}.png", format="png", bbox_inches="tight", dpi=300)
@@ -1177,6 +1213,126 @@ def update_wells(df: pd.DataFrame) -> pd.DataFrame:
     df = well_utils.validate_well_ids(df, id_col="well_id")
     return  df 
 
+def apply_et_capillary_limits(
+    ET_df: pd.DataFrame, 
+    pet_df: pd.DataFrame,
+    df_well_logs: pd.DataFrame, 
+    df_extinction: pd.DataFrame, 
+    pet_col: str = "PET_mm_day" 
+) -> pd.DataFrame:
+    """
+    Filters ET_df for 2025, merges PET and groundwater depth data, 
+    identifies the limiting soil layer above the water table, 
+    and adjusts ET_gw_mm based on decoupling (d') and extinction (d'') thresholds.
+    """
+    # 1. Apply your existing function to get 'plant_type'
+    df = well_utils.get_well_categories(ET_df)
+    
+    # 2. Filter strictly for the year 2025 where PET data is available
+    df['year'] = pd.to_numeric(df['year'], errors='coerce')
+    df_2025 = df[df['year'] == 2025].copy()
+    
+    # 3. Standardize dates for merging
+    df_2025['date'] = pd.to_datetime(df_2025['date'])
+    
+    pet_clean = pet_df.copy()
+    pet_clean['Date'] = pd.to_datetime(pet_clean['Date'])
+    
+
+    # 4. Merge PET and Groundwater Data into ET_df matching by date and well_id
+    merged_df = df_2025.merge(
+        pet_clean[['Date', 'well_id', pet_col]], 
+        left_on=['date', 'well_id'], 
+        right_on=['Date', 'well_id'], 
+        how='left'
+    )
+
+    # 5. Map specific plant types to the broad categories (Grass/Forest)
+    def map_to_cover(plant):
+        if plant in ["Sedge", "Mixed Herbaceous"]:
+            return "Grass"
+        elif plant in ["Willow", "Lodgepole Pine"]:
+            return "Forest"
+        return "Grass" # Fallback
+        
+    merged_df['cover_type'] = merged_df['plant_type'].apply(map_to_cover)
+    
+    # 6. Prepare well logs: Convert depth from cm to mm to match gw_00
+    logs = df_well_logs.copy()
+    if 'start_depth_mm' not in logs.columns:
+        logs['start_depth_mm'] = logs['start_depth_cm'] * 10.0
+        logs['stop_depth_mm'] = logs['stop_depth_cm'] * 10.0
+
+    # 7. Define the row-by-row logic
+    def calculate_adjusted_et(row):
+        wtd_mm = row['gw_00'] 
+        well = row['well_id']
+        cover = row['cover_type']
+        current_et = row['ET_gw_mm']
+        date_str = row['date'].strftime('%Y-%m-%d')
+        
+        # Pull merged PET, fallback to current ET if missing
+        pet = row[pet_col] if pd.notna(row[pet_col]) else current_et
+        
+        if pd.isna(wtd_mm):
+            return current_et
+            
+        # Filter well logs for layers ABOVE the water table
+        vadose_zone = logs[(logs['well_id'] == well) & (logs['start_depth_mm'] < wtd_mm)]
+        
+        # Exclude Highly Organic (HO) layers
+        vadose_mineral = vadose_zone[vadose_zone['soil_texture_code'] != 'HO']
+        
+        if vadose_mineral.empty:
+            return current_et 
+            
+        textures = vadose_mineral['soil_texture_code'].unique()
+        ext_params = df_extinction[df_extinction['Soil Texture Code'].isin(textures)]
+        
+        if ext_params.empty:
+            return current_et
+            
+        # Identify the limiting layer (the one with the SMALLEST d'')
+        d_double_prime_col = f"{cover} d'' (mm)"
+        d_prime_col = f"{cover} d' (mm)"
+        
+        min_d_double_prime = ext_params[d_double_prime_col].min()
+        
+        # Extract thresholds
+        limiting_row = ext_params[ext_params[d_double_prime_col] == min_d_double_prime].iloc[0]
+        d_prime = limiting_row[d_prime_col]
+        d_double_prime = limiting_row[d_double_prime_col]
+        
+        # Apply the thresholds and print the updates
+        if wtd_mm <= d_prime:
+            # Fully coupled: ET operates at potential
+            print(f"Well: {well} | Date: {date_str} -> Converted to PET. Value: {pet:.3f} mm")
+            return pet
+        elif wtd_mm >= d_double_prime:
+            # Fully decoupled: Capillary connection broken
+            print(f"Well: {well} | Date: {date_str} -> Converted to 0. Value: 0.0 mm")
+            return 0.0
+        else:
+            # Falling rate stage: leave as originally calculated
+            return current_et
+
+    # 8. Apply the function across all rows to create the adjusted column
+    merged_df['ET_gw_mm'] = merged_df.apply(calculate_adjusted_et, axis=1)
+    
+    return merged_df[
+    [
+        "date",
+        "doy",
+        "year",
+        "well_id",
+        "ET_gw_mm",
+        "R_mm",
+        "S_mm",
+        "Sy_star",
+        "method_id",
+        "gw_00"
+    ]
+].dropna()
 
     # ---- MAIN PROCEDURES ---
 
@@ -1201,22 +1357,25 @@ def main():
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
 
-    # #save average Sy values for each well 
-    # calculated_sy_df.to_csv(sy_save_filepath, index=False)
-
-    # 1. Calculate raw ET for ALL days
-    #raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
-    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
-    # # 2. Filter out the storm events
-    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=8.0, recovery_days=3)
-
-    # 3. Filter out days where the well went dry (dropping data when water is within 7cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=50.0)
-
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
     #weather_df = get_daily_temperature(weather_subdaily_filepath)
     lai_df = pd.read_csv(lai_data_filepath)
+    # #save average Sy values for each well 
+    # calculated_sy_df.to_csv(sy_save_filepath, index=False)
+    df_extinction = pd.read_csv(extinction_data_filepath)
+    # 1. Calculate raw ET for ALL days
+    #raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
+    #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_col="PET_mm_day")
+    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
+    #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_col="PET_mm_day")
+    # # 2. Filter out the storm events
+    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=3.0, recovery_days=3)
+
+    # 3. Filter out days where the well went dry (dropping data when water is within 7cm of bottom)
+    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=100.0)
+
+
 
     # Plot
     plot_ET_cat(
