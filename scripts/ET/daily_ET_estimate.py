@@ -25,6 +25,8 @@ from pathlib import Path
 import numpy as np
 import matplotlib.dates as mdates
 
+import seaborn as sns
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
@@ -1343,6 +1345,9 @@ def apply_et_capillary_limits(
         "doy",
         "year",
         "well_id",
+        "meadow_id",       # Added
+        "hydrogeo_zone",   # Added
+        "plant_type",      # Added
         "ET_gw_mm",
         "R_mm",
         "S_mm",
@@ -1351,6 +1356,99 @@ def apply_et_capillary_limits(
         "gw_00"
     ]
 ].dropna()
+
+def plot_cumulative_et(df: pd.DataFrame, save_dir: str = None, et_col: str = "ET_gw_mm", date_col: str = "date", figsize: tuple = (8, 6)):
+    """
+    Calculates the daily mean ET for each category (averaging across wells), 
+    then sums those daily means to get the cumulative ET, plotting them as individual bar charts.
+    Saves each chart separately if save_dir is provided.
+    """
+    # 1. Define configuration with refined, earth-tone color palettes
+    meadow_palette = ["#D1C09F", "#487158"]                           # Muted tan, forest green
+    hydro_palette = ["#C77464", "#5F748D", "#89AB8D"]                 # Muted brick red, slate blue, sage
+    plant_palette = ["#859B6A", "#DDB73B", "#8C638A", "#A98471"]      # Olive green, mustard, muted purple, rust
+
+    plot_config = [
+        {"col": "meadow_id", "title": "Meadow", "palette": meadow_palette},
+        {"col": "hydrogeo_zone", "title": "Hydrogeomorphic Zone", "palette": hydro_palette},
+        {"col": "plant_type", "title": "Plant Functional Type", "palette": plant_palette}
+    ]
+    
+    # 2. Ensure the necessary columns exist
+    required_columns = [item["col"] for item in plot_config] + [et_col, date_col]
+    missing_cols = [col for col in required_columns if col not in df.columns]
+    
+    if missing_cols:
+        raise ValueError(
+            f"Missing columns: {missing_cols}. "
+            "Make sure the dataframe contains date and category columns."
+        )
+
+    sns.set_theme(style="whitegrid")
+
+    # 3. Loop through configuration to create INDIVIDUAL plots
+    for config in plot_config:
+        col = config["col"]
+        title = config["title"]
+        
+        # Step A: Get the mean ET for the category for each individual day
+        daily_mean_df = df.groupby([date_col, col])[et_col].mean().reset_index()
+        
+        # Step B: Sum those daily means to get the cumulative total for the period
+        cumulative_et = daily_mean_df.groupby(col)[et_col].sum().reset_index()
+
+        # Create a new figure for EACH category
+        fig, ax = plt.subplots(figsize=figsize)
+
+        # Generate bar plot
+        sns.barplot(
+            data=cumulative_et, 
+            x=col, 
+            y=et_col, 
+            ax=ax, 
+            palette=config["palette"],
+            hue=col,
+            legend=False
+        )
+        
+        # Place the cumulative amount at the top of each bar
+        for container in ax.containers:
+            ax.bar_label(container, fmt='%.1f', padding=3, fontweight='bold', color='#333333')
+
+        # Apply formatting
+        ax.set_title(f'Cumulative ET by {title}', fontsize=14, fontweight='bold', pad=15)
+        ax.set_xlabel(f'{title}', fontsize=12)
+        ax.set_ylabel('Cumulative Daily Mean ET (mm)', fontsize=12)
+        
+        # Ensure x-axis labels are horizontal (rotation=0)
+        ax.tick_params(axis='x', rotation=0) 
+
+        # Add line breaks to long plant type labels so horizontal text doesn't overlap
+        if col == "plant_type":
+            labels = [text.get_text().replace(' ', '\n') for text in ax.get_xticklabels()]
+            ax.set_xticklabels(labels)
+
+        # Adjust layout before saving/showing
+        plt.tight_layout()
+
+        # 4. Save or display the individual figure
+        if save_dir is not None:
+            save_path = Path(save_dir)
+            save_path.mkdir(parents=True, exist_ok=True) # Ensure the directory exists
+            
+            # Define the base filename specific to the current category
+            base_fname = f"ET_bar_plot_{col}"
+            
+            # Save as PNG
+            fig.savefig(save_path / f"{base_fname}.png", format="png", bbox_inches="tight", dpi=300)
+            
+            # Save as EPS
+            fig.savefig(save_path / f"{base_fname}.eps", format="eps", bbox_inches="tight")
+            
+            # Close the figure to free up memory
+            plt.close(fig)
+        else:
+            plt.show()
 
     # ---- MAIN PROCEDURES ---
 
@@ -1393,16 +1491,16 @@ def main():
     daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=100.0)
 
 
-
-    # Plot
-    plot_ET_cat(
-        ET_df=daily_ET_df, 
-        lai_df = lai_df,
-        pet_df=pet_station_df,
-        year=2025, 
-        end_date=None,
-        save_dir=save_plots_dir
-    )
+    plot_cumulative_et(daily_ET_df, save_dir=save_plots_dir)
+    # # Plot
+    # plot_ET_cat(
+    #     ET_df=daily_ET_df, 
+    #     lai_df = lai_df,
+    #     pet_df=pet_station_df,
+    #     year=2025, 
+    #     end_date=None,
+    #     save_dir=save_plots_dir
+    # )
     print("ET category plots with PET generated successfully!")
 
     # plot_ET_prop_bar(daily_ET_df, 
