@@ -299,7 +299,7 @@ If you find anything useful (or not), please share so we can keep these guidelin
 - [Basic Git Guide](https://github.com/git-guides), says it's "everything you need to know"
 - [GitHub Documentation](https://docs.github.com/en) includes a "Get Started" guide. You'll mainly need to work with repositories, branches, commits and pull requests, but at a very simple level.
 - [Intro to Github online course](https://github.com/skills/introduction-to-github)
-- [90-min GitHub Fundamentals Workshop](https://dlab-berkeley.github.io/dlab-workshops/workshop/git-fundamentals/) from UCB's D-Lab
+- [90-min GitHub Fundamentals Workshop](https://dlab-berkeley.github.io/dlab-workshops/workshop/git-fundamentals/) from UCB's D-Lab (check their website for [upcoming D-Lab workshops](https://dlab.my.salesforce-sites.com/events?_gl=1*1020t6u*_ga*NDQyNjIzODQzLjE3ODg5OTcyODQ.*_ga_4FP3KBY1V9*czE3OTAwOTI2MjYkbzEkZzAkdDE3OTAwOTI2MzkkajQ3JGwwJGgw)!)
 - [Software Carpentry Git Lessons](https://swcarpentry.github.io/git-novice/?utm_source=chatgpt.com)
 
 ### Using Git with Visual Studio
