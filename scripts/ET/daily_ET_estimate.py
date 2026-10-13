@@ -19,11 +19,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 # import well_utils to process well_ids for Sy data
-
 import sys
 from pathlib import Path
 import numpy as np
-import matplotlib.dates as mdates
 
 import seaborn as sns
 
@@ -62,7 +60,8 @@ pet_well_data_filepath = pet_well_data_dir / 'pet_by_well_results.csv'
 pet_station_data_dir = PROJECT_ROOT / 'data/et'
 pet_station_data_filepath = pet_station_data_dir / 'pet_station_results.csv'
 
-save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Avg/'
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/Shah/'
+
 save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
 
 duky_sy_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
@@ -1178,7 +1177,7 @@ def plot_ET_cat(
             year_str = f"_{year}" if year is not None else ""
             
             # Define the base filename WITHOUT the extension
-            base_fname = f"ET_Subplots_smooth_with_cap_limits_{col}{year_str}"
+            base_fname = f"ET_Subplots_{col}{year_str}"
             
             # Save as PNG
             fig.savefig(save_path / f"{base_fname}.png", format="png", bbox_inches="tight", dpi=300)
@@ -1215,149 +1214,252 @@ def update_wells(df: pd.DataFrame) -> pd.DataFrame:
     df = well_utils.validate_well_ids(df, id_col="well_id")
     return  df 
 
-def apply_et_capillary_limits(
-    ET_df: pd.DataFrame, 
+import numpy as np
+import pandas as pd
+
+
+def _prepare_merged_et_df(
+    df_input: pd.DataFrame,
     pet_df: pd.DataFrame,
-    df_well_logs: pd.DataFrame, 
-    df_extinction: pd.DataFrame, 
+    df_well_logs: pd.DataFrame,
     station_PET_df: pd.DataFrame = None,
-    pet_col: str = "PET_mm_day" ,
+    pet_col: str = "PET_mm_day",
     year: int = 2025,
-) -> pd.DataFrame:
-    """
-    Filters ET_df for 2025, merges PET and groundwater depth data, 
-    identifies the limiting soil layer above the water table, 
-    and adjusts ET_gw_mm based on decoupling (d') and extinction (d'') thresholds.
-    """
-    # 1. Apply your existing function to get 'plant_type'
-    df = well_utils.get_well_categories(ET_df)
-    
-    # 2. Filter strictly for the year 2025 where PET data is available
-    df['year'] = pd.to_numeric(df['year'], errors='coerce')
-    df_2025 = df[df['year'] == year].copy()
-    
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Helper function to perform shared data cleaning, filtering, PET merging,
 
-# 3. Standardize dates for merging
-    df_2025['date'] = pd.to_datetime(df_2025['date'])
-    
+    cover mapping, and well log depth conversions.
+    """
+    # Retrieve 'plant_type' and other well categories using your utility function
+    df = well_utils.get_well_categories(df_input)
+
+    # Ensure the 'year' column is numeric so we can filter exactly for the target year
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
+    df_year = df[df["year"] == year].copy()
+
+    # Convert dates to standard pandas datetime objects to ensure accurate merging
+    df_year["date"] = pd.to_datetime(df_year["date"])
+
+    # Clean and standardize the primary PET dataframe dates
     pet_clean = pet_df.copy()
-    pet_clean['Date'] = pd.to_datetime(pet_clean['Date'])
+    pet_clean["Date"] = pd.to_datetime(pet_clean["Date"])
 
+    # If a fallback station PET dataframe is provided, clean and standardize it too
     if station_PET_df is not None:
         station_PET_clean = station_PET_df.copy()
-        station_PET_clean['Date'] = pd.to_datetime(station_PET_clean['Date'])
-        
-        # Extract year directly from the parsed 'Date' column
-        station_PET_clean_year = station_PET_clean[station_PET_clean['Date'].dt.year == year].copy()
-        station_PET_clean_year = station_PET_clean_year.rename(columns={pet_col: 'station_PET_mm_day'})
-   
-    # 4. Merge PET and ET data matching by date and well_id
-    merged_df = df_2025.merge(
-        pet_clean[['Date', 'well_id', pet_col]], 
-        left_on=['date', 'well_id'], 
-        right_on=['Date', 'well_id'], 
-        how='left'
+        station_PET_clean["Date"] = pd.to_datetime(
+            station_PET_clean["Date"]
+        )
+
+        # Filter the fallback station PET data strictly for the requested year
+        station_PET_clean_year = station_PET_clean[
+            station_PET_clean["Date"].dt.year == year
+        ].copy()
+
+        # Rename the PET column here so it doesn't collide with the primary PET column during merge
+        station_PET_clean_year = station_PET_clean_year.rename(
+            columns={pet_col: "station_PET_mm_day"}
+        )
+
+    # MERGE DATASETS
+    # Left merge the primary PET data into the daily groundwater dataframe
+    # Match on both 'date' and 'well_id' so each well gets its specific daily PET
+    merged_df = df_year.merge(
+        pet_clean[["Date", "well_id", pet_col]],
+        left_on=["date", "well_id"],
+        right_on=["Date", "well_id"],
+        how="left",
     )
-# Merge station PET data if provided
+
+    # Left merge the fallback station PET data (matches only by date, as station applies globally)
     if station_PET_df is not None:
         merged_df = merged_df.merge(
-        station_PET_clean_year[['Date', 'station_PET_mm_day']],
-        left_on=['date'],
-        right_on=['Date'],
-        how='left'
-    )
-        
-    # 5. Map specific plant types to the broad categories (Grass/Forest)
+            station_PET_clean_year[["Date", "station_PET_mm_day"]],
+            left_on=["date"],
+            right_on=["Date"],
+            how="left",
+        )
+
+    # DEFINE LAND COVER & PREPARE SOIL LOGS
     def map_to_cover(plant):
         if plant in ["Sedge", "Mixed Herbaceous"]:
             return "Grass"
         elif plant in ["Willow", "Lodgepole Pine"]:
             return "Forest"
-        
-    merged_df['cover_type'] = merged_df['plant_type'].apply(map_to_cover)
-    
-    # 6. Prepare well logs: Convert depth from cm to mm to match gw_00
+        return "Bare Soil"  # Fallback if plant type is unrecognized
+
+    merged_df["cover_type"] = merged_df["plant_type"].apply(map_to_cover)
+
+    # Prepare well logs: Ensure depths are in millimeters to match the water table depth (gw_00)
     logs = df_well_logs.copy()
-    if 'start_depth_mm' not in logs.columns:
-        logs['start_depth_mm'] = logs['start_depth_cm'] * 10.0
-        logs['stop_depth_mm'] = logs['stop_depth_cm'] * 10.0
+    if "start_depth_mm" not in logs.columns:
+        logs["start_depth_mm"] = logs["start_depth_cm"] * 10.0
+        logs["stop_depth_mm"] = logs["stop_depth_cm"] * 10.0
 
-    # 7. Define the row-by-row logic
-    def calculate_adjusted_et(row):
-        wtd_mm = row['gw_00'] 
-        well = row['well_id']
-        cover = row['cover_type']
-        station_PET = row['station_PET_mm_day']
-        current_et = row['ET_gw_mm']
-        date_str = row['date'].strftime('%Y-%m-%d')
-        
-        # Pull merged PET, fallback to current Station_PET if missing
-        pet = row[pet_col] if pd.notna(row[pet_col]) else station_PET
-        
-        if pd.isna(wtd_mm):
-            return station_PET
-            
-        # Filter well logs for layers ABOVE the water table
-        vadose_zone = logs[(logs['well_id'] == well) & (logs['start_depth_mm'] < wtd_mm)]
-        
-        # Exclude Highly Organic (HO) layers
-        vadose_mineral = vadose_zone[vadose_zone['soil_texture_code'] != 'HO']
-        
-        if vadose_mineral.empty:
-            return current_et 
-            
-        textures = vadose_mineral['soil_texture_code'].unique()
-        ext_params = df_extinction[df_extinction['Soil Texture Code'].isin(textures)]
-        
-        if ext_params.empty:
-            return current_et
-            
-        # Identify the limiting layer (the one with the SMALLEST d'')
-        d_double_prime_col = f"{cover} d'' (mm)"
-        e_prime = f"{cover} e (mm)"
-        
-        min_d_double_prime = ext_params[d_double_prime_col].min()
-        
-        # Extract thresholds
-        limiting_row = ext_params[ext_params[d_double_prime_col] == min_d_double_prime].iloc[0]
-        e_prime = limiting_row[e_prime]
-        d_double_prime = limiting_row[d_double_prime_col]
-        
-        # Apply the thresholds and print the updates
-        if wtd_mm <= d_double_prime:
-            # Fully coupled: ET operates at potential
-            print(f"Well: {well} | Date: {date_str} | GW level {wtd_mm} -> Converted to PET. Value: {pet:.3f} mm")
-            return pet
-        elif wtd_mm >= e_prime:
-            # Fully decoupled: Capillary connection broken
-            print(f"Well: {well} | Date: {date_str} | GW level {wtd_mm} -> Converted to 0. Value: 0.0 mm")
-            return 0.0
+    return merged_df, logs
+
+
+def calculate_GWET_shaw(
+    daily_df: pd.DataFrame,
+    pet_df: pd.DataFrame,
+    df_well_logs: pd.DataFrame,
+    df_extinction: pd.DataFrame,
+    station_PET_df: pd.DataFrame = None,
+    pet_col: str = "PET_mm_day",
+    year: int = 2025,
+) -> pd.DataFrame:
+    """Calculates Groundwater Evapotranspiration (GWET) based on the Shaw method
+
+    (Equation 17). This function evaluates the limiting soil layer in the
+    vadose zone and calculates ET directly from Potential Evapotranspiration
+    (PET). If specific well PET is missing, it falls back to station PET and
+    notifies the user.
+    """
+
+    # PREPARE AND FILTER DATA USING HELPER
+    merged_df, logs = _prepare_merged_et_df(
+        df_input=daily_df,
+        pet_df=pet_df,
+        df_well_logs=df_well_logs,
+        station_PET_df=station_PET_df,
+        pet_col=pet_col,
+        year=year,
+    )
+
+
+    def apply_shaw_equation(row):
+        """Applies Equation 17 for a single day at a single well.
+
+        GWET/PET = 1 (for d <= d'') GWET/PET = y0 + exp(-b(d - d'')) (for d >
+        d'')
+        """
+        wtd_mm = row["gw_00"]
+        well = row["well_id"]
+        cover = row["cover_type"]
+        date_str = row["date"].strftime("%Y-%m-%d")
+
+        # Safely extract the fallback station PET, returning NaN if it doesn't exist
+        station_PET = (
+            row["station_PET_mm_day"]
+            if "station_PET_mm_day" in row
+            else np.nan
+        )
+
+        # Determine the active PET to use for the calculation
+        if pd.notna(row[pet_col]):
+            # Primary PET data is available
+            active_pet = row[pet_col]
+        elif pd.notna(station_PET):
+            # Primary is missing, use fallback and print a notification statement
+            active_pet = station_PET
+            print(
+                f"Notice: Missing specific PET for Well {well} on {date_str}. Substituted with Station PET ({active_pet:.3f} mm)."
+            )
         else:
-            # Falling rate stage: leave as originally calculated
-            return current_et
+            # No PET data available at all to drive ET, return NaN
+            return np.nan
 
-    # 8. Apply the function across all rows to create the adjusted column
-    merged_df['ET_gw_mm'] = merged_df.apply(calculate_adjusted_et, axis=1)
-    
+        # If water table depth is missing, we cannot calculate GWET
+        if pd.isna(wtd_mm):
+            return np.nan
+
+        # ISOLATE VADOSE ZONE: Filter soil logs to only include layers ABOVE the current water table
+        vadose_zone = logs[
+            (logs["well_id"] == well) & (logs["start_depth_mm"] < wtd_mm)
+        ]
+
+        # Exclude Highly Organic ('HO') layers as they usually don't dictate the capillary block
+        vadose_mineral = vadose_zone[vadose_zone["soil_texture_code"] != "HO"]
+
+        # If there are no mineral layers above the water table, ET is fully coupled to PET
+        if vadose_mineral.empty:
+            return active_pet
+
+        # Get the unique soil texture codes currently present in the vadose zone
+        textures = vadose_mineral["soil_texture_code"].unique()
+
+        # Lookup the extinction parameters (y0, b, d'') for these specific textures
+        ext_params = df_extinction[
+            df_extinction["Soil Texture Code"].isin(textures)
+        ]
+
+        # If no matching parameters are found in the lookup table, assume fully coupled
+        if ext_params.empty:
+            return active_pet
+
+        # DYNAMIC COLUMN NAMES: Identify the correct columns based on the land cover type
+        d_double_prime_col = f"{cover} d'' (mm)"
+        y0_col = f"{cover} y0"           # Removed the underscore
+        b_col = f"{cover} b (cm-1)"      # Added the units to match the header exactly
+
+        # IDENTIFY LIMITING LAYER: The layer with the tightest capillary constraint (smallest d'')
+        min_d_double_prime = ext_params[d_double_prime_col].min()
+
+        # Isolate the row in the parameters table corresponding to this limiting layer
+        limiting_row = ext_params[
+            ext_params[d_double_prime_col] == min_d_double_prime
+        ].iloc[0]
+
+        # Extract the specific parameters needed for Equation 17
+        d_double_prime_mm = limiting_row[d_double_prime_col]
+        y0 = limiting_row[y0_col]
+        b = limiting_row[b_col]
+
+        # APPLY EQUATION 17
+        if wtd_mm <= d_double_prime_mm:
+            # Phase 1: Water table is shallower than d''. Roots have full access to water.
+            # GWET / PET = 1 -> GWET = PET
+            return active_pet
+        else:
+            # Phase 2: Water table is deeper than d''. Roots rely on decaying capillary rise.
+            # Equation uses 'b' which is in units of cm^-1 (per Table 3).
+            # Therefore, we MUST convert the depth difference (d - d'') from mm to cm!
+            depth_diff_cm = (wtd_mm - d_double_prime_mm) / 10.0
+
+            # Calculate the ratio: y0 + e^(-b * (d - d''))
+            ratio = y0 + np.exp(-b * depth_diff_cm)
+
+            # Mathematical safeguard: y0 can be slightly negative (e.g., -0.012).
+            # At extreme depths, the exponential term approaches 0, which could make the total ratio negative.
+            # ET cannot be negative, so we floor the ratio at 0.0.
+            ratio = max(0.0, ratio)
+
+            # Final GWET is the calculated ratio multiplied by the active PET
+            return active_pet * ratio
+
+
+    # Apply the row-by-row function across the entire dataframe to generate the new ET column
+    merged_df["ET_gw_mm"] = merged_df.apply(apply_shaw_equation, axis=1)
+
+    # Explicitly label the method used for future tracking
+    merged_df["method_id"] = "Shaw_Eq17"
+
+    # Ensure structural columns exist even if they weren't in the original daily_df
+    # This prevents KeyError during the final column selection
+    for col in ["R_mm", "S_mm", "Sy_star", "meadow_id", "hydrogeo_zone"]:
+        if col not in merged_df.columns:
+            merged_df[col] = np.nan
+
+    # Return the final organized dataframe, dropping any rows where ET could not be calculated
     return merged_df[
-    [
-        "date",
-        "doy",
-        "year",
-        "well_id",
-        "meadow_id",       # Added
-        "hydrogeo_zone",   # Added
-        "plant_type",      # Added
-        "ET_gw_mm",
-        "R_mm",
-        "S_mm",
-        "Sy_star",
-        "method_id",
-        "gw_00"
-    ]
-].dropna()
+        [
+            "date",
+            "doy",
+            "year",
+            "well_id",
+            "meadow_id",
+            "hydrogeo_zone",
+            "plant_type",
+            "ET_gw_mm",
+            "R_mm",
+            "S_mm",
+            "Sy_star",
+            "method_id",
+            "gw_00",
+        ]
+    ].dropna(subset=["ET_gw_mm"])
 
-def plot_cumulative_et(df: pd.DataFrame, save_dir: str = None, et_col: str = "ET_gw_mm", date_col: str = "date", figsize: tuple = (8, 6)):
+def plot_cumulative_et_bar(df: pd.DataFrame, save_dir: str = None, et_col: str = "ET_gw_mm", date_col: str = "date", figsize: tuple = (8, 6)):
     """
     Calculates the daily mean ET for each category (averaging across wells), 
     then sums those daily means to get the cumulative ET, plotting them as individual bar charts.
@@ -1450,6 +1552,102 @@ def plot_cumulative_et(df: pd.DataFrame, save_dir: str = None, et_col: str = "ET
         else:
             plt.show()
 
+
+def plot_cumulative_et_box(df: pd.DataFrame, well_col: str = "well_id", save_dir: str = None, et_col: str = "ET_gw_mm", figsize: tuple = (8, 6)):
+    """
+    Calculates the cumulative ET for each well, then creates box plots
+    showing the distribution of those cumulative totals across categories.
+    Saves each chart separately if save_dir is provided.
+    """
+    # 1. Define configuration with refined, earth-tone color palettes
+    meadow_palette = ["#D1C09F", "#487158"]                           # Muted tan, forest green
+    hydro_palette = ["#C77464", "#5F748D", "#89AB8D"]                 # Muted brick red, slate blue, sage
+    plant_palette = ["#859B6A", "#DDB73B", "#8C638A", "#A98471"]      # Olive green, mustard, muted purple, rust
+
+    plot_config = [
+        {"col": "meadow_id", "title": "Meadow", "palette": meadow_palette},
+        {"col": "hydrogeo_zone", "title": "Hydrogeomorphic Zone", "palette": hydro_palette},
+        {"col": "plant_type", "title": "Plant Functional Type", "palette": plant_palette}
+    ]
+    
+    # 2. Ensure the necessary columns exist
+    required_columns = [item["col"] for item in plot_config] + [et_col, well_col]
+    missing_cols = [col for col in required_columns if col not in df.columns]
+    
+    if missing_cols:
+        raise ValueError(
+            f"Missing columns: {missing_cols}. "
+            "Make sure the dataframe contains the well identifier and category columns."
+        )
+
+    sns.set_theme(style="whitegrid")
+
+    # 3. Loop through configuration to create INDIVIDUAL plots
+    for config in plot_config:
+        col = config["col"]
+        title = config["title"]
+        
+        # Step A: Get cumulative ET for each individual well
+        # We group by the category AND the well to sum the ET over the entire period
+        cumulative_et_per_well = df.groupby([col, well_col])[et_col].sum().reset_index()
+
+        # Create a new figure for EACH category
+        fig, ax = plt.subplots(figsize=figsize)
+
+        sns.boxplot(
+            data=cumulative_et_per_well, 
+            x=col, 
+            y=et_col, 
+            ax=ax, 
+            palette=config["palette"],
+            hue=col,
+            legend=False,
+            width=0.6,
+            fliersize=5,
+            showmeans=True, # Turns on the mean marker
+            meanprops={
+                "marker": "D", # Diamond shape
+                "markerfacecolor": "white", 
+                "markeredgecolor": "black",
+                "markersize": 6
+            }
+        )
+        
+        # Apply formatting
+        ax.set_title(f'Distribution of Cumulative ET by {title}', fontsize=14, fontweight='bold', pad=15)
+        ax.set_xlabel(f'{title}', fontsize=12)
+        ax.set_ylabel('Cumulative ET per Well (mm)', fontsize=12)
+        
+        # Ensure x-axis labels are horizontal (rotation=0)
+        ax.tick_params(axis='x', rotation=0) 
+
+        # Add line breaks to long plant type labels so horizontal text doesn't overlap
+        if col == "plant_type":
+            labels = [text.get_text().replace(' ', '\n') for text in ax.get_xticklabels()]
+            ax.set_xticklabels(labels)
+
+        # Adjust layout before saving/showing
+        plt.tight_layout()
+
+        # 4. Save or display the individual figure
+        if save_dir is not None:
+            save_path = Path(save_dir)
+            save_path.mkdir(parents=True, exist_ok=True) # Ensure the directory exists
+            
+            # Define the base filename specific to the current category
+            base_fname = f"ET_boxplot_{col}"
+            
+            # Save as PNG
+            fig.savefig(save_path / f"{base_fname}.png", format="png", bbox_inches="tight", dpi=300)
+            
+            # Save as EPS
+            fig.savefig(save_path / f"{base_fname}.eps", format="eps", bbox_inches="tight")
+            
+            # Close the figure to free up memory
+            plt.close(fig)
+        else:
+            plt.show()
+
     # ---- MAIN PROCEDURES ---
 
 def main():
@@ -1472,35 +1670,34 @@ def main():
     duke_df = pd.read_csv(duky_sy_data_dir)
     df_well_logs = pd.read_csv(well_data_filepath)
     calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
-
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
     #weather_df = get_daily_temperature(weather_subdaily_filepath)
     lai_df = pd.read_csv(lai_data_filepath)
-    # #save average Sy values for each well 
-    # calculated_sy_df.to_csv(sy_save_filepath, index=False)
+  
     df_extinction = pd.read_csv(extinction_data_filepath)
     # 1. Calculate raw ET for ALL days
     #raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
-    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
-    raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_station_df, pet_col="PET_mm_day")
+
+    raw_ET_df = calculate_GWET_shaw(daily_gw_df, PET_df, df_well_logs, df_extinction, pet_station_df)
+    #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_station_df, pet_col="PET_mm_day")
     # # 2. Filter out the storm events
     ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=1.0, recovery_days=3)
 
-    # 3. Filter out days where the well went dry (dropping data when water is within 7cm of bottom)
+    # 3. Filter out days where the well went dry (dropping data when water is within 10cm of bottom)
     daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=100.0)
+    print(daily_ET_df['date'].min(), "to", daily_ET_df['date'].max())
 
-
-    plot_cumulative_et(daily_ET_df, save_dir=save_plots_dir)
-    # # Plot
-    # plot_ET_cat(
-    #     ET_df=daily_ET_df, 
-    #     lai_df = lai_df,
-    #     pet_df=pet_station_df,
-    #     year=2025, 
-    #     end_date=None,
-    #     save_dir=save_plots_dir
-    # )
+    #plot_cumulative_et_box(daily_ET_df, save_dir=save_plots_dir)
+    # Plot
+    plot_ET_cat(
+        ET_df=daily_ET_df, 
+        lai_df = lai_df,
+        pet_df=pet_station_df,
+        year=2025, 
+        end_date=None,
+        save_dir=save_plots_dir
+    )
     print("ET category plots with PET generated successfully!")
 
     # plot_ET_prop_bar(daily_ET_df, 
