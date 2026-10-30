@@ -17,7 +17,9 @@ Ten-minute data is available (as of 01/21/2026) at: https://wrcc.dri.edu/cgi-bin
 On the lefthand side of the page, click on the link labeled “Data Lister” and you can pull the data for the range you are looking for.
 Contact is Allison Krantz, wrcc@dri.edu
 
-NOTE: This data source has precipitation data in length scale after 07/14/2020. 
+NOTE: This data source has precipitation data in length scale after 07/14/2020.
+
+We retrieved the full 1997-2025 series of temperature and relative humidity (_Weather_1997_2025_SagehenTower1.xls_). The data spans 04/02/1997 to 12/31/2025. Ten-minute frequency data begins on 09/19/2001. The following months are missing: 1/1997, 2/1997, 3/1997, 11/1997, 4/2005, 5/2005.
 
 #### Hobo_temperature
 
