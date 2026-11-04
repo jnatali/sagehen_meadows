@@ -46,26 +46,26 @@ weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenT
 ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
 ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
 
-sy_data_dir = PROJECT_ROOT / 'data/et/'
-sy_data_filepath = sy_data_dir / 'sy_lookup.csv' 
+et_data_dir = PROJECT_ROOT / 'data/et/'
+sy_data_filepath = et_data_dir / 'sy_lookup.csv' 
 
-sy_save_filepath = sy_data_dir / 'sy_by_well.csv'
+sy_save_filepath = et_data_dir / 'sy_by_well.csv'
 
-well_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
-well_data_filepath = well_data_dir / 'soil_survey_PROCESSED.csv'
+soil_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
+soil_data_filepath = soil_data_dir / 'soil_survey_PROCESSED.csv'
 
-pet_well_data_dir = PROJECT_ROOT / 'data/et'
-pet_well_data_filepath = pet_well_data_dir / 'pet_by_well_results.csv'
+pet_well_data_filepath = et_data_dir / 'pet_by_well_results.csv'
 
-pet_station_data_dir = PROJECT_ROOT / 'data/et'
-pet_station_data_filepath = pet_station_data_dir / 'pet_station_results.csv'
+pet_station_data_filepath = et_data_dir / 'pet_station_results.csv'
 
-save_plots_dir = PROJECT_ROOT / 'results/plots/ET/Shah/'
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Van_Gun/'
 
 save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
 
-duky_sy_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
-# TODO: add data_dir and filepath for Sy stuff
+duky_et_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
+
+
+van_guch_filepath = PROJECT_ROOT / et_data_dir / 'van_genuchten_lookup.csv'
 
 lai_data_dir = PROJECT_ROOT / 'data/field_observations/vegetation/LAI/'
 lai_data_filepath = lai_data_dir / 'LAI_2025_Corrected.csv'
@@ -73,6 +73,14 @@ lai_data_filepath = lai_data_dir / 'LAI_2025_Corrected.csv'
 extinction_data_dir = PROJECT_ROOT / 'data/et/'
 extinction_data_filepath = extinction_data_dir / 'Shah_extinction_depth.csv'
 # ---- FUNCTIONS ---
+
+# 1. Define typical root depths for your plant functional types (in cm).
+# Adjust these values based on your site's specific ecology.
+PLANT_ROOT_DEPTHS = {
+    'Willow': 0.0,             # Deep-rooted: bypasses shallow gravel
+    'Sedge': 0.0,               # Medium-rooted
+    'Mixed Herbaceous': 0.0     # Shallow-rooted
+}
 
 ## TODO: Split out as a weather_util.py for the project
 
@@ -174,7 +182,7 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     
     
     Returns:
-    a validated ataframe with daily groundwater variables 
+    a validated dataframe with daily groundwater variables 
         (needed to calculate ET)for each well_id
     """
     df = gw_df.copy()
@@ -185,7 +193,6 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     df["date"] = df["datetime"].dt.floor("D")
     df["time"] = df["datetime"].dt.strftime("%H:%M")
 
-    
     # get groundwater levels for the following times
     times=("00:00", "04:00")
     
@@ -215,9 +222,9 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     
     daily["doy"] = daily["date"].dt.dayofyear
     daily["year"] = daily["date"].dt.year
-    
-    daily = update_wells(daily)
 
+    #ensure that wells are updated with their most recent names
+    daily = update_wells(daily)
     return daily
 
 def get_daily_temperature(weather_subdaily_filepath: str) -> pd.DataFrame:
@@ -267,6 +274,77 @@ def calculate_storage_recharge(df: pd.DataFrame) -> pd.DataFrame:
     df["S_mm"] = df["gw_24"] - df["gw_00"] 
     
     return df
+import pandas as pd
+
+def calculate_short_deployment_white_vars(daily_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Applies the 3-day White method workaround for short 2021 logger deployments.
+    Uses 'R_mm' and 'S_mm' columns to match downstream Duke Sy requirements.
+    Fails loudly if critical data or dates are missing.
+    """
+    # ==========================================
+    # 1. STRICT DATA TRIPWIRES
+    # ==========================================
+    if daily_df.empty:
+        raise ValueError("DATA ERROR: The provided dataframe is completely empty.")
+        
+    if daily_df['date'].isna().any():
+        raise ValueError("DATA ERROR: Found missing (NaT/NaN) dates in the dataset. Clean your dates before running.")
+        
+    # Updated to look for the specific R_mm and S_mm columns
+    required_cols = ['R_mm', 'S_mm']
+    for col in required_cols:
+        if col not in daily_df.columns:
+            raise ValueError(f"DATA ERROR: Missing required column '{col}' in the dataset.")
+
+    # ==========================================
+    # 2. ISOLATE DEPLOYMENT CHUNKS
+    # ==========================================
+    df = daily_df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+    df = df.sort_values(by=['well_id', 'date'])
+    
+    # Calculate days between rows to find gaps
+    df['gap_days'] = df.groupby('well_id')['date'].diff().dt.days
+    df['is_new_deployment'] = (df['gap_days'] > 1) | df['gap_days'].isna()
+    df['deployment_id'] = df.groupby('well_id')['is_new_deployment'].cumsum()
+    
+    processed_frames = []
+    
+   
+    # 3. APPLY 3-DAY WORKAROUND
+   
+    for (well, dep_id), dep_data in df.groupby(['well_id', 'deployment_id']):
+        
+        if len(dep_data) == 3:
+            # Tripwire specifically for the 3-day calculation using R_mm and S_mm
+            if dep_data[['R_mm', 'S_mm']].isna().any().any():
+                 raise ValueError(f"DATA ERROR: Well {well} has a 3-day deployment but is missing R_mm or S_mm data.")
+                 
+            # --- RECHARGE (R) CALCULATION ---
+            # Extract the nightly recharge for the first two nights using the correct column
+            r_night_1 = dep_data.iloc[0]['R_mm']
+            r_night_2 = dep_data.iloc[1]['R_mm']
+            r_avg = (r_night_1 + r_night_2) / 2.0
+            
+            # --- STORAGE (S) CALCULATION ---
+            # Extract the full 24-hour storage change from the middle day
+            s_single_day = dep_data.iloc[1]['S_mm']
+            
+            # Overwrite the middle day's values with the processed 3-day workaround values
+            dep_data.loc[dep_data.index[1], 'R_mm'] = r_avg
+            dep_data.loc[dep_data.index[1], 'S_mm'] = s_single_day
+            
+            # PHYSICALLY DELETE DAY 1 AND DAY 3
+            # By slicing the dataframe to only include the middle row (index 1), 
+            # the partial days are dropped before being added to processed_frames
+            dep_data = dep_data.iloc[[1]]
+            
+        processed_frames.append(dep_data)
+        
+    final_df = pd.concat(processed_frames, ignore_index=True)
+    
+    return final_df.drop(columns=['gap_days', 'is_new_deployment', 'deployment_id'])
 
 def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     """
@@ -356,104 +434,232 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
         ]
     ].dropna()
 
+import pandas as pd
+
 def estimate_ET_White_Duke_Sy(
     daily_df: pd.DataFrame, 
     soil_df: pd.DataFrame, 
-    rawls_df: pd.DataFrame,   
+    rawls_df: pd.DataFrame,
+    pet_df: pd.DataFrame,
+    station_PET_df: pd.DataFrame = None,
+    year: int = 2025   
 ) -> pd.DataFrame:
     """
-    Calculates ET using Duke's equation for Specific Yield (Sy), based strictly on 
+    Calculates ET using Duke's equation for Specific Yield (Sy), based on 
     the soil parameters of the single horizon where the water table is currently fluctuating.
-    If the water table is inside the capillary fringe, the White method is bypassed and
-    ET is set to equal atmospheric PET.
+    
+    Includes a capillary truncation check for overlying gravel layers ('GR').
+    If the water table is inside the effective capillary fringe, the White method is bypassed 
+    and ET is set to equal atmospheric PET.
+    
+    Includes a strict fail-fast design: the script will crash and raise a ValueError 
+    if any required data (soil horizons, water table, PET, or recharge parameters) is missing.
     """
     METHOD_ID = "White_Duke"
     
     # Create clean copies
     df = daily_df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+    df = df[df['date'].dt.year == year].copy()
+    # Assuming update_wells is a custom function defined elsewhere in your script
+    df = update_wells(df)
+
     soil_clean = soil_df.copy()
-    
-    
+
     df = calculate_storage_recharge(df)
-    
+    df = calculate_short_deployment_white_vars(df)
+    df = get_PET(df, pet_df, station_PET_df, year)
+
     # Create dictionary lookup for Rawls parameters
     rawls_lookup = rawls_df.set_index('soil_texture_code').to_dict(orient='index')
-
+    
+    # Store calculated values
     calculated_sy_list = []
-    shallow_wt_flag_list = []      
+    calculated_et_list = []      
 
-    # LOOP THROUGH EACH DAILY GROUNDWATER RECORD
+    # Loop through each daily groundwater record
     for _, row in df.iterrows():
         current_well = row['well_id']
+        current_date = row['date'].date()
         
+        # Ensure groundwater depth exists before calculating
+        if 'gw_00' not in row or pd.isna(row['gw_00']):
+            raise ValueError(f"DATA ERROR: Missing groundwater depth (gw_00) for well '{current_well}' on {current_date}.")
+            
         # Groundwater depth is stored in mm in 'gw_00'. Convert it to cm to match soil depths.
-        wt_depth_cm = row['gw_00'] / 10.0
+        raw_wt_cm = row['gw_00'] / 10.0
+        
+        # ---------------------------------------------------------
+        # REGIME 0: STANDING WATER (Negative or Zero Depth)
+        # ---------------------------------------------------------
+        if raw_wt_cm <= 0.0:
+            # Water is at or above the ground surface. Bypass soil properties entirely.
+            layer_sy = 0.0 
+            
+            pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
+            station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
+            
+            if pd.notna(pet_val):
+                daily_et = pet_val
+            elif pd.notna(station_pet_val):
+                daily_et = station_pet_val
+            else:
+                raise ValueError(
+                    f"DATA ERROR: Missing both local and station PET data for well '{current_well}' "
+                    f"on {current_date} during a standing water event."
+                )
+            
+            # Append the results and immediately skip to the next day
+            calculated_sy_list.append(layer_sy)
+            calculated_et_list.append(daily_et)
+            continue
+            
+        # ---------------------------------------------------------
+        # For all normal days, wt_depth_cm is safely strictly positive
+        wt_depth_cm = raw_wt_cm
 
         # Filter the soil survey to find horizons belonging to ONLY this well
         well_horizons = soil_clean[soil_clean['well_id'] == current_well].copy()
-
+        
         if well_horizons.empty:
+            print(f"DATA ERROR: No soil horizons defined for well '{current_well}'.")
+            # Append NaNs and continue to the next day here so the script doesn't crash below
             calculated_sy_list.append(np.nan)
-            shallow_wt_flag_list.append(False) 
+            calculated_et_list.append(np.nan)
             continue
 
-        # FIND THE SINGLE HORIZON CONTAINING THE WATER TABLE
+        # Find the single horizon containing the current water table
         active_horizon = well_horizons[
             (well_horizons['start_depth_cm'] <= wt_depth_cm) & 
             (well_horizons['stop_depth_cm'] > wt_depth_cm)
         ]
 
-        # Fallback: If the water table dropped deeper than the lowest recorded log,
-        # use the very bottom horizon so the script doesn't break.
         if active_horizon.empty:
-            active_horizon = well_horizons.sort_values('stop_depth_cm').tail(1)
+            print(
+                f"DATA ERROR: Water table depth ({wt_depth_cm} cm) for well '{current_well}' on {current_date} "
+                f"falls completely outside the recorded soil logs. Cannot calculate Sy. Skipping day."
+            )
+            # Append NaNs to keep the lists exactly the same length as the DataFrame
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            
+            # skip to the next day in the loop
+            continue
 
-        # Extract the single row as a Series
+        # Extract the single row as a Series and get texture code
         horizon = active_horizon.iloc[0]
-
-        # Extract soil texture code 
         texture_code = str(horizon['soil_texture_code']).strip()
 
-        # Calculate Specific Yield using Duke
-        
-        # Special Case 1: Pure Gravel (Code 'GR')
-        if texture_code == 'GR' or texture_code == 'HO':
-            # Average Specific Yield for Medium Gravel = 23% (0.23)
-            layer_sy = 0.23
-            shallow_wt_flag_list.append(False) 
+        # Capillary Truncation Check: Find any gravel sitting ABOVE the active water table.
+        # Gravel has pores too large to support a capillary fringe, acting as a hydraulic barrier.
+        gravel_above = well_horizons[
+            (well_horizons['stop_depth_cm'] < wt_depth_cm) & 
+            (well_horizons['soil_texture_code'].isin(['GR']))
+        ]
 
-        # Special Case 2: Standard Soil Matrix 
+        # Fetch Parameters and Set Effective Air-Entry Pressure (ha)
+        if texture_code in ['GR', 'HO']:
+            # The water table is currently inside a gravel layer. 
+            # Gravel cannot hold a capillary fringe above the water table.
+            is_gravel_active = True
+            ha_eff = 0.0
+            layer_sy = 0.23 # Fixed generic specific yield for medium gravel
         else:
-            params = rawls_lookup.get(texture_code, rawls_lookup.get('C', {}))
-            phi = params.get('phi', 0.475)
-            sr = params.get('Sr', 0.090)
-            ha_cm = params.get('ha_cm', 37.3)
-            lam = params.get('lambda', 0.131)
-
+            is_gravel_active = False
+            
+            if texture_code not in rawls_lookup:
+                raise ValueError(f"DATA ERROR: Soil code '{texture_code}' for well '{current_well}' not in Rawls lookup.")
+            
+            params = rawls_lookup[texture_code]
+            
+            try:
+                # Physical Soil Parameters (from Rawls)
+                # phi (Porosity): The total volume fraction of empty space in the soil.
+                phi = params['phi']
+                
+                # Sr (Residual Saturation): The fraction of water permanently held by tight capillary forces.
+                sr = params['Sr']
+                
+                # ha_cm (Air-entry pressure): The maximum natural height of the saturated capillary fringe.
+                ha_cm = params['ha_cm']
+                
+                # lam (Lambda): Pore-size distribution index. Controls how fast water drains as suction increases.
+                lam = params['lambda']
+            except KeyError as missing_key:
+                raise ValueError(f"DATA ERROR: Parameter {missing_key} missing for soil texture '{texture_code}'.")
+                
+            # max_sy: The absolute maximum water the soil can release if drained completely by gravity.
             max_sy = phi - sr
 
-            # Apply Duke's Depth-Scaling Equation
-            if wt_depth_cm <= ha_cm:
-                # Water table is entirely inside capillary fringe -> No yield release
-                layer_sy = 0.0
-                shallow_wt_flag_list.append(True) 
+            # Calculate Effective Air-Entry Pressure (ha_eff)
+            # If gravel sits above the water table, the capillary fringe stops at the gravel boundary.
+            # We shrink the air-entry pressure to match the available vertical space.
+            if not gravel_above.empty:
+                gravel_bottom_cm = gravel_above['stop_depth_cm'].max()
+                dist_to_gravel = wt_depth_cm - gravel_bottom_cm
+                ha_eff = min(ha_cm, max(0.0, dist_to_gravel))
             else:
-                # Scale down maximum yield based on depth and air-entry pressure
-                depth_factor = 1.0 - ((ha_cm / wt_depth_cm) ** lam)
-                layer_sy = max_sy * depth_factor
-                shallow_wt_flag_list.append(False) 
+                ha_eff = ha_cm
 
-        # Append the calculated Sy to our daily list
+        # Calculate Specific Yield and ET
+        
+        if is_gravel_active:
+            # GRAVEL REGIME: No capillary rise, fixed Sy. 
+            # Bypasses PET and Duke's equation entirely.
+            daily_et = layer_sy * (row["R_mm"] + row["S_mm"])
+            
+        elif wt_depth_cm <= ha_eff:
+            # REGIME 1: Normal soil saturated to surface
+            layer_sy = 0.0
+            
+            pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
+            station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
+            
+            if pd.notna(pet_val):
+                daily_et = pet_val
+            elif pd.notna(station_pet_val):
+                daily_et = station_pet_val
+            else:
+                raise ValueError(
+                    f"DATA ERROR: Missing both local and station PET data for well '{current_well}' "
+                    f"on {current_date} during a surface-saturated event."
+                )
+                
+        else:
+            # REGIME 2: Normal soil unsaturated drainage
+            if 'R_mm' not in row or pd.isna(row['R_mm']) or 'S_mm' not in row or pd.isna(row['S_mm']):
+                raise ValueError(
+                    f"DATA ERROR: Missing recharge (R_mm) or storage (S_mm) for well '{current_well}' on {current_date}."
+                )
+                
+            # Apply Duke's equation
+            depth_factor = 1.0 - ((ha_eff / wt_depth_cm) ** lam)
+            layer_sy = max_sy * depth_factor
+            daily_et = layer_sy * (row["R_mm"] + row["S_mm"])
+
+        # --- NEW CHECK: Calculated ET vs PET ---
+        pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
+        station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
+        
+        # Use local PET if available, otherwise use station PET
+        active_pet = pet_val if pd.notna(pet_val) else station_pet_val
+        
+        if pd.notna(active_pet) and daily_et > active_pet:
+            print(
+                f"WARNING: Calculated ET ({daily_et:.2f} mm) > PET ({active_pet:.2f} mm) "
+                f"for well '{current_well}' on {current_date}. Soil Layer: '{texture_code} at depth {wt_depth_cm} cm'."
+            )
+
+        # Append to our daily lists
         calculated_sy_list.append(layer_sy)
+        calculated_et_list.append(daily_et)
 
-    # Attach the array of calculated values as a new column 
+    # Attach the arrays of calculated values as new columns 
     df['Sy_star'] = calculated_sy_list 
+    df['ET_gw_mm'] = calculated_et_list
     df['method_id'] = METHOD_ID
     
-    # Calculate daily ET (Standard White Method)
-    df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
 
-    df = update_wells(df)
     
     return df[
         [
@@ -468,7 +674,7 @@ def estimate_ET_White_Duke_Sy(
             "method_id",
             "gw_00"
         ]
-    ].dropna()
+    ]
 
 def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_mm: float = 8.0, recovery_days: int = 3) -> pd.DataFrame:
     """
@@ -799,14 +1005,14 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
     ET_df = process_date_and_year(ET_df, 'date', year)
     ET_df = ET_df[ET_df['method_id'] == method_id]
 
-    #filter the other dataframes to the same year for consistency
+    # Filter the other dataframes to the same year for consistency
     gw_df = process_date_and_year(gw_df, 'datetime', year)
     PET_well_df = process_date_and_year(PET_well_df, 'Date', year)
     pet_station_df = process_date_and_year(pet_station_df, 'Date', year)
 
-    #calculate proportion storage and recharge
-    ET_df['S_mm_proportion'] = ET_df['Sy_star']*ET_df['S_mm'] 
-    ET_df['R_mm_proportion'] = ET_df['Sy_star']*ET_df['R_mm']
+    # Calculate proportion storage and recharge (Will result in NaNs for Shaw method)
+    ET_df['S_mm_proportion'] = ET_df['Sy_star'] * ET_df['S_mm'] 
+    ET_df['R_mm_proportion'] = ET_df['Sy_star'] * ET_df['R_mm']
 
     # Combine dataframes using left joins on the true datetime
     filtered_df = ET_df.merge(PET_well_df, how='left', on=['well_id', 'date_dt'])
@@ -824,27 +1030,32 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
 
-        #isolate the groundwater data for the current well_id
+        # Isolate the groundwater data for the current well_id
         well_gw = gw_df[gw_df['well_id'] == well_id].sort_values('date_dt')
-        
         dates = well_df['date_dt'].tolist()
 
-        # Calculate Net ET and absolute totals
+        # Calculate Net ET
         ET_net = well_df['ET_gw_mm']
-        total_abs = well_df['S_mm_proportion'].abs() + well_df['R_mm_proportion'].abs()
 
-        # Calculate proportions safely (avoiding zero-division)
-        s_prop = np.where(total_abs == 0, 0, well_df['S_mm_proportion'].abs() / total_abs)
-        r_prop = np.where(total_abs == 0, 0, well_df['R_mm_proportion'].abs() / total_abs)
+        # ---- PLOTTING LEFT AXIS (ax1): Stacking or Single Bars ----
+        # Check if S and R columns are mostly NaN (e.g., Shaw Method)
+        if well_df[['S_mm', 'R_mm']].isna().all().all() or method_id == "Shaw_Eq17":
+            # Plot a single solid bar for Total ET
+            ax1.bar(dates, ET_net, width=1.0, color='mediumpurple', label='Total ET')
+        else:
+            # White Methods: Plot Stacked Proportional Bars
+            total_abs = well_df['S_mm_proportion'].abs() + well_df['R_mm_proportion'].abs()
 
-        # Scale proportions to the Net ET bar height
-        s_bar_heights = ET_net * s_prop
-        r_bar_heights = ET_net * r_prop
+            # Calculate proportions safely (avoiding zero-division)
+            s_prop = np.where(total_abs == 0, 0, well_df['S_mm_proportion'].abs() / total_abs)
+            r_prop = np.where(total_abs == 0, 0, well_df['R_mm_proportion'].abs() / total_abs)
 
-        # ---- PLOTTING ----
-        # 1. Left Axis (ax1): Stacking Bars
-        ax1.bar(dates, s_bar_heights, width=1.0, color='teal', label='Storage')
-        ax1.bar(dates, r_bar_heights, bottom=s_bar_heights, width=1.0, color='cornflowerblue', label='Recharge')
+            # Scale proportions to the Net ET bar height (Works flawlessly with VG_Smoothed scaling logic)
+            s_bar_heights = ET_net * s_prop
+            r_bar_heights = ET_net * r_prop
+
+            ax1.bar(dates, s_bar_heights, width=1.0, color='teal', label='Storage')
+            ax1.bar(dates, r_bar_heights, bottom=s_bar_heights, width=1.0, color='cornflowerblue', label='Recharge')
 
         # 2. Overlay PET Line
         if 'PET_mm_day' in well_df.columns:
@@ -874,50 +1085,46 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
         ax2_max = 40.0
         
         # Scale the lower temp bound exactly proportional to the left axis lower bound
-        ax2_min = ax1_min * (ax2_max / ax1_max)
-        
+        if ax1_max != 0:
+            ax2_min = ax1_min * (ax2_max / ax1_max)
+        else:
+            ax2_min = 0
+            
         # Apply the balanced limits
         ax2.set_ylim(ax2_min, ax2_max)
 
-# ---- PLOTTING GROUNDWATER (ax3) ----
+        # ---- PLOTTING GROUNDWATER (ax3) ----
         if not well_gw.empty:
             ax3.plot(well_gw['date_dt'], well_gw['ground_to_water_m'], color='navy', linewidth=1.2, label='10-Min Water Level', zorder=2)
             
-            # --- NEW: Plot Soil Horizon Boundaries & Staggered Labels ---
+            # Plot Soil Horizon Boundaries & Staggered Labels
             if soil_df is not None:
                 well_soil = soil_df[soil_df['well_id'] == well_id].copy()
                 
                 if not well_soil.empty:
-                    # Sort by depth just in case the CSV is out of order
                     well_soil = well_soil.sort_values('stop_depth_cm')
                     
-                    last_depth = -999  # Dummy variable to track the previous depth
-                    x_pos = 0.01       # Starting X position (far left)
+                    last_depth = -999  
+                    x_pos = 0.01       
                     
                     for _, row in well_soil.iterrows():
                         depth_m = row['stop_depth_cm'] / 100.0
                         texture = str(row['soil_texture_code']) + ' ' + str(row['gravel_amount_percent'])
                         
-                        # If this line is within 0.06m of the last one, shift text right
                         if abs(depth_m - last_depth) < 0.06:
                             x_pos += 0.09 
                         else:
-                            x_pos = 0.01  # Reset to far left if there's plenty of space
+                            x_pos = 0.01  
                         
-                        # Plot the red horizontal line
                         ax3.axhline(depth_m, color='red', linestyle='--', linewidth=1.0, zorder=3)
-                        
-                        # Add the text label using the dynamic x_pos
                         ax3.text(x_pos, depth_m, texture, 
                                  transform=ax3.get_yaxis_transform(), 
                                  color='red', fontsize=8, fontweight='bold', 
                                  va='bottom', ha='left', zorder=4)
                         
-                        last_depth = depth_m  # Update last_depth for the next loop iteration
+                        last_depth = depth_m  
 
             ax3.invert_yaxis()
-            
-        ax3.set_ylabel('Depth to Water (m)')
             
         ax3.set_ylabel('Depth to Water (m)')
         ax3.set_xlabel('Date')
@@ -938,18 +1145,15 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
         # Unified single title assignment
         ax1.set_title(f'Daily ET {method_id} {well_id}', fontsize=12, fontweight='bold')
 
-        plt.tight_layout() # Added to prevent the new bottom labels from overlapping the top graph
+        plt.tight_layout()
 
         # SAVING LOGIC 
         if save_dir is not None:
             save_path = Path(save_dir)
-            
-            # save eps
-            fname_eps = f"ET_bar_horizon{method_id}_{well_id}_{year}_GW.eps"
+            fname_eps = f"ET_bar_{method_id}_{well_id}_{year}.eps"
             fig.savefig(save_path / fname_eps, format="eps", bbox_inches="tight")
             
-            # save png
-            fname_png = f"ET_bar_horizon{method_id}_{well_id}_{year}_GW.png"
+            fname_png = f"ET_bar_{method_id}_{well_id}_{year}.png"
             fig.savefig(save_path / fname_png, format="png", bbox_inches="tight", dpi=300)
             
             plt.close(fig)
@@ -1177,7 +1381,7 @@ def plot_ET_cat(
             year_str = f"_{year}" if year is not None else ""
             
             # Define the base filename WITHOUT the extension
-            base_fname = f"ET_Subplots_{col}{year_str}"
+            base_fname = f"ET_Subplots_{col}{year_str}_attempt2"
             
             # Save as PNG
             fig.savefig(save_path / f"{base_fname}.png", format="png", bbox_inches="tight", dpi=300)
@@ -1214,22 +1418,86 @@ def update_wells(df: pd.DataFrame) -> pd.DataFrame:
     df = well_utils.validate_well_ids(df, id_col="well_id")
     return  df 
 
-import numpy as np
-import pandas as pd
+def get_PET(data_df: pd.DataFrame,
+            pet_df: pd.DataFrame, 
+            station_PET_df: pd.DataFrame, 
+            year: int, 
+            pet_col: str = "PET_mm_day") -> pd.DataFrame:
+    """
+    Merges well-specific PET and station PET dataframes for a given year.
 
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        DataFrame containing the main dataset.
+    pet_df : pd.DataFrame
+        DataFrame containing well-specific PET data.
+    station_PET_df : pd.DataFrame
+        DataFrame containing station PET data.
+    year : int
+        Year to filter the data on.
+    pet_col : str, optional
+        Column name for PET values in the input dataframes. Default is "PET_mm_day".
 
-def _prepare_merged_et_df(
+    Returns
+    -------
+    pd.DataFrame
+        Merged DataFrame with well-specific and station PET values for the specified year.
+    """
+    # Clean and standardize the primary PET dataframe dates
+    pet_clean = pet_df.copy()
+    pet_clean["Date"] = pd.to_datetime(pet_clean["Date"])
+
+    # If a station PET dataframe is provided, clean and standardize it too
+    if station_PET_df is not None:
+        station_PET_clean = station_PET_df.copy()
+
+        station_PET_clean["Date"] = pd.to_datetime(
+            station_PET_clean["Date"]
+        )
+
+        # Filter the station PET data strictly for the requested year
+        station_PET_clean_year = station_PET_clean[
+            station_PET_clean["Date"].dt.year == year
+        ].copy()
+
+        # Rename the station PET column to differentiate it from the well-specific PET column during merge
+        station_PET_clean_year = station_PET_clean_year.rename(
+            columns={pet_col: "station_PET_mm_day"}
+        )
+
+    # MERGE DATASETS
+    # Left merge the primary PET data into the daily groundwater dataframe
+    # Match on both 'date' and 'well_id' so each well gets its specific daily PET
+    merged_df = data_df.merge(
+        pet_clean[["Date", "well_id", pet_col]],
+        left_on=["date", "well_id"],
+        right_on=["Date", "well_id"],
+        how="left",
+    )
+
+    # Left merge the station PET data (matches only by date, as station applies globally)
+    if station_PET_df is not None:
+        merged_df = merged_df.merge(
+            station_PET_clean_year[["Date", "station_PET_mm_day"]],
+            left_on=["date"],
+            right_on=["Date"],
+            how="left",
+        )
+    return merged_df
+
+def prepare_merged_et_df(
     df_input: pd.DataFrame,
     pet_df: pd.DataFrame,
-    df_well_logs: pd.DataFrame,
     station_PET_df: pd.DataFrame = None,
+    df_well_logs: pd.DataFrame = None,
     pet_col: str = "PET_mm_day",
     year: int = 2025,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Helper function to perform shared data cleaning, filtering, PET merging,
-
+    """Helper function to perform shared data cleaning, filtering, PET merging, 
     cover mapping, and well log depth conversions.
     """
+    ##TODO ensure that all of the datetimes work out correctly and that the merge is correct.
     # Retrieve 'plant_type' and other well categories using your utility function
     df = well_utils.get_well_categories(df_input)
 
@@ -1239,46 +1507,46 @@ def _prepare_merged_et_df(
 
     # Convert dates to standard pandas datetime objects to ensure accurate merging
     df_year["date"] = pd.to_datetime(df_year["date"])
+    merged_df = get_PET(df_year, pet_df, station_PET_df, year)
+    # # Clean and standardize the primary PET dataframe dates
+    # pet_clean = pet_df.copy()
+    # pet_clean["Date"] = pd.to_datetime(pet_clean["Date"])
 
-    # Clean and standardize the primary PET dataframe dates
-    pet_clean = pet_df.copy()
-    pet_clean["Date"] = pd.to_datetime(pet_clean["Date"])
+    # If a station PET dataframe is provided, clean and standardize it too
+    # if station_PET_df is not None:
+    #     station_PET_clean = station_PET_df.copy()
+    #     station_PET_clean["Date"] = pd.to_datetime(
+    #         station_PET_clean["Date"]
+    #     )
 
-    # If a fallback station PET dataframe is provided, clean and standardize it too
-    if station_PET_df is not None:
-        station_PET_clean = station_PET_df.copy()
-        station_PET_clean["Date"] = pd.to_datetime(
-            station_PET_clean["Date"]
-        )
+    #     # Filter the station PET data strictly for the requested year
+    #     station_PET_clean_year = station_PET_clean[
+    #         station_PET_clean["Date"].dt.year == year
+    #     ].copy()
 
-        # Filter the fallback station PET data strictly for the requested year
-        station_PET_clean_year = station_PET_clean[
-            station_PET_clean["Date"].dt.year == year
-        ].copy()
+    #     # Rename the PET column here so it doesn't collide with the primary PET column during merge
+    #     station_PET_clean_year = station_PET_clean_year.rename(
+    #         columns={pet_col: "station_PET_mm_day"}
+    #     )
 
-        # Rename the PET column here so it doesn't collide with the primary PET column during merge
-        station_PET_clean_year = station_PET_clean_year.rename(
-            columns={pet_col: "station_PET_mm_day"}
-        )
+    # # MERGE DATASETS
+    # # Left merge the primary PET data into the daily groundwater dataframe
+    # # Match on both 'date' and 'well_id' so each well gets its specific daily PET
+    # merged_df = df_year.merge(
+    #     pet_clean[["Date", "well_id", pet_col]],
+    #     left_on=["date", "well_id"],
+    #     right_on=["Date", "well_id"],
+    #     how="left",
+    # )
 
-    # MERGE DATASETS
-    # Left merge the primary PET data into the daily groundwater dataframe
-    # Match on both 'date' and 'well_id' so each well gets its specific daily PET
-    merged_df = df_year.merge(
-        pet_clean[["Date", "well_id", pet_col]],
-        left_on=["date", "well_id"],
-        right_on=["Date", "well_id"],
-        how="left",
-    )
-
-    # Left merge the fallback station PET data (matches only by date, as station applies globally)
-    if station_PET_df is not None:
-        merged_df = merged_df.merge(
-            station_PET_clean_year[["Date", "station_PET_mm_day"]],
-            left_on=["date"],
-            right_on=["Date"],
-            how="left",
-        )
+    # # Left merge the station PET data (matches only by date, as station applies globally)
+    # if station_PET_df is not None:
+    #     merged_df = merged_df.merge(
+    #         station_PET_clean_year[["Date", "station_PET_mm_day"]],
+    #         left_on=["date"],
+    #         right_on=["Date"],
+    #         how="left",
+    #     )
 
     # DEFINE LAND COVER & PREPARE SOIL LOGS
     def map_to_cover(plant):
@@ -1286,7 +1554,8 @@ def _prepare_merged_et_df(
             return "Grass"
         elif plant in ["Willow", "Lodgepole Pine"]:
             return "Forest"
-        return "Bare Soil"  # Fallback if plant type is unrecognized
+        # If the plant isn't explicitly defined above, crash and name the culprit
+        raise ValueError(f"DATA ERROR: Unrecognized plant type '{plant}' found in dataset. Cannot map to cover_type.")
 
     merged_df["cover_type"] = merged_df["plant_type"].apply(map_to_cover)
 
@@ -1317,11 +1586,11 @@ def calculate_GWET_shaw(
     """
 
     # PREPARE AND FILTER DATA USING HELPER
-    merged_df, logs = _prepare_merged_et_df(
+    merged_df, logs = prepare_merged_et_df(
         df_input=daily_df,
         pet_df=pet_df,
-        df_well_logs=df_well_logs,
         station_PET_df=station_PET_df,
+        df_well_logs=df_well_logs,
         pet_col=pet_col,
         year=year,
     )
@@ -1362,18 +1631,17 @@ def calculate_GWET_shaw(
         # If water table depth is missing, we cannot calculate GWET
         if pd.isna(wtd_mm):
             return np.nan
-
-        # ISOLATE VADOSE ZONE: Filter soil logs to only include layers ABOVE the current water table
-        vadose_zone = logs[
-            (logs["well_id"] == well) & (logs["start_depth_mm"] < wtd_mm)
-        ]
-
-        # Exclude Highly Organic ('HO') layers as they usually don't dictate the capillary block
-        vadose_mineral = vadose_zone[vadose_zone["soil_texture_code"] != "HO"]
-
-        # If there are no mineral layers above the water table, ET is fully coupled to PET
-        if vadose_mineral.empty:
-            return active_pet
+        try:
+            # ISOLATE VADOSE ZONE: Filter soil logs to only include layers ABOVE the current water table
+            vadose_zone = logs[
+                (logs["well_id"] == well) & (logs["start_depth_mm"] < wtd_mm)
+            ]
+            # Exclude Highly Organic ('HO') layers as they usually don't dictate the capillary block
+            vadose_mineral = vadose_zone[vadose_zone["soil_texture_code"] != "HO"]
+        except KeyError as missing_key:
+                raise ValueError(
+                    f"DATA ERROR: The data is missing for  {well} on {date_str}. Please check the soil logs and ensure all required columns are present."
+                )
 
         # Get the unique soil texture codes currently present in the vadose zone
         textures = vadose_mineral["soil_texture_code"].unique()
@@ -1475,7 +1743,7 @@ def plot_cumulative_et_bar(df: pd.DataFrame, save_dir: str = None, et_col: str =
         {"col": "hydrogeo_zone", "title": "Hydrogeomorphic Zone", "palette": hydro_palette},
         {"col": "plant_type", "title": "Plant Functional Type", "palette": plant_palette}
     ]
-    
+    df = well_utils.get_well_categories(df)
     # 2. Ensure the necessary columns exist
     required_columns = [item["col"] for item in plot_config] + [et_col, date_col]
     missing_cols = [col for col in required_columns if col not in df.columns]
@@ -1569,6 +1837,7 @@ def plot_cumulative_et_box(df: pd.DataFrame, well_col: str = "well_id", save_dir
         {"col": "hydrogeo_zone", "title": "Hydrogeomorphic Zone", "palette": hydro_palette},
         {"col": "plant_type", "title": "Plant Functional Type", "palette": plant_palette}
     ]
+    df = well_utils.get_well_categories(df)
     
     # 2. Ensure the necessary columns exist
     required_columns = [item["col"] for item in plot_config] + [et_col, well_col]
@@ -1648,7 +1917,226 @@ def plot_cumulative_et_box(df: pd.DataFrame, well_col: str = "well_id", save_dir
         else:
             plt.show()
 
-    # ---- MAIN PROCEDURES ---
+def calculate_vg_theta(h, theta_r, theta_s, alpha, n):
+    """
+    Calculates the volumetric water content (theta) at a specific suction head (h) 
+    using the Mualem-van Genuchten soil water retention model.
+    """
+    # If the soil is at or below the water table, it is fully saturated.
+    if h <= 0:
+        return theta_s
+        
+    # The m parameter is derived directly from n using the standard Mualem assumption.
+    m = 1.0 - (1.0 / n)
+    return theta_r + (theta_s - theta_r) / ((1.0 + (alpha * h)**n)**m)
+
+def get_composite_sy_kinematic(wt_depth_cm, well_horizons, vg_lookup, observation_time_days=1.0):
+    """
+    Numerically integrates the soil column over a fixed control volume to calculate 
+    the effective specific yield (Sy) for a 1 cm water table drop. This applies a 
+    kinematic drainage correction to account for slow-draining soils based on their 
+    saturated hydraulic conductivity (Ks).
+    """
+    # A water table above the ground surface means open water, which has a specific yield of 0 for soil modeling purposes.
+    if wt_depth_cm <= 0:
+        return 0.0
+        
+    # Capillary Check: Determine if a gravel or open hole layer breaks the capillary rise. 
+    # Any coarse layer completely above the water table will break the hydraulic connection.
+    gravel_above = well_horizons[
+        (well_horizons['stop_depth_cm'] < wt_depth_cm) & 
+        (well_horizons['soil_texture_code'].isin(['GR', 'HO']))
+    ]
+    
+    # Set the top boundary for integration. If a capillary break exists, we only integrate from the bottom of that break.
+    top_integration_boundary = gravel_above['stop_depth_cm'].max() if not gravel_above.empty else 0.0
+    
+    total_effective_sy = 0.0
+    
+    # Divide the soil column into 1 cm slices from the top integration boundary down to the newly dropped water table.
+    slices = np.arange(top_integration_boundary, wt_depth_cm + 1.0, 1.0)
+    
+    for z in slices:
+        # Identify which soil horizon the current 1 cm slice falls into.
+        layer = well_horizons[
+            (well_horizons['start_depth_cm'] <= z) & 
+            (well_horizons['stop_depth_cm'] > z)
+        ]
+        if layer.empty:
+            continue
+            
+        texture_code = str(layer.iloc[0]['soil_texture_code']).strip()
+        
+        # Gravel and holes have a fixed, immediate specific yield and do not follow van Genuchten curves.
+        if texture_code in ['GR', 'HO']:
+            total_effective_sy += (0.23 / len(slices)) 
+            continue
+            
+        # Ensure the soil texture exists in the van Genuchten lookup table to avoid silent failures.
+        if texture_code not in vg_lookup:
+            raise KeyError(f"DATA ERROR: Soil code '{texture_code}' not in lookup.")
+            
+        params = vg_lookup[texture_code]
+        
+        # Calculate the suction head and resulting moisture content before the 1 cm water table drop.
+        h_current = wt_depth_cm - z 
+        theta_current = calculate_vg_theta(
+            h_current, params['theta_r'], params['theta_s'], params['alpha'], params['n']
+        )
+        
+        # Calculate the suction head and resulting moisture content after the 1 cm water table drop.
+        h_dropped = (wt_depth_cm + 1.0) - z
+        theta_dropped = calculate_vg_theta(
+            h_dropped, params['theta_r'], params['theta_s'], params['alpha'], params['n']
+        )
+        
+        # The theoretical maximum specific yield if the soil is given infinite time to drain completely.
+        sy_ultimate = max(0.0, theta_current - theta_dropped)
+        
+        # Ensure saturated hydraulic conductivity (Ks) exists to scale the drainage time.
+        if 'Ks' not in params or pd.isna(params['Ks']):
+            raise KeyError(f"DATA ERROR: 'Ks' (Conductivity) is missing for soil texture '{texture_code}' in van_genuchten_lookup.")
+        ks_cm_day = params['Ks']
+        
+        if ks_cm_day > 0 and sy_ultimate > 0:
+            # Calculate the characteristic drainage time for this specific 1 cm slice of soil.
+            t_c = (sy_ultimate * 1.0) / ks_cm_day 
+            
+            # Scale the ultimate specific yield based on how much water can physically drain within the 24-hour observation window.
+            sy_effective = sy_ultimate * (1.0 - np.exp(-observation_time_days / t_c))
+        else:
+            sy_effective = 0.0
+            
+        total_effective_sy += sy_effective
+        
+    # Ensure the final composite Sy remains bounded between physically possible limits (0 to 1).
+    return max(0.0, min(total_effective_sy, 1.0))
+
+def estimate_ET_White_VG_Smoothed(
+    daily_df: pd.DataFrame, 
+    soil_df: pd.DataFrame, 
+    vg_df: pd.DataFrame, 
+    pet_df: pd.DataFrame,
+    station_PET_df: pd.DataFrame = None,
+    year: int = 2025,
+    smoothing_window: int = 2  
+) -> pd.DataFrame:
+    """
+    Calculates daily groundwater evapotranspiration (ET_g) using a modified White method.
+    This dynamically calculates specific yield using van Genuchten parameters and a 
+    kinematic drainage time correction to account for delayed yield in heavy soils.
+    """
+    
+    METHOD_ID = "White_VG"
+    
+    df = daily_df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+    df = df[df['date'].dt.year == year].copy()
+    
+    df = df.sort_values(by=['well_id', 'date'])
+    df = update_wells(df)
+    soil_clean = soil_df.copy()
+
+
+    df['gw_00_smooth'] = df.groupby('well_id')['gw_00'].transform(
+        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
+    )
+    
+    # 2. OVERWRITE THE RAW DATA SO THE WHITE METHOD ONLY SEES THE CLEAN SIGNAL
+    df['gw_00'] = df['gw_00_smooth']
+
+    # 3.  CALCULATE RECHARGE
+    df = calculate_storage_recharge(df)
+    df = get_PET(df, pet_df, station_PET_df, year)
+
+    # 4. Smooth the resulting daily components 
+    df['R_mm_smooth'] = df.groupby('well_id')['R_mm'].transform(
+        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
+    )
+    df['S_mm_smooth'] = df.groupby('well_id')['S_mm'].transform(
+        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
+    )
+
+    vg_lookup = vg_df.set_index('soil_texture_code').to_dict(orient='index')
+    
+    calculated_sy_list = []
+    calculated_et_list = []      
+
+    for _, row in df.iterrows():
+        current_well = row['well_id']
+        
+        # Skip calculations if the smoothed groundwater data is missing for the day.
+        if 'gw_00_smooth' not in row or pd.isna(row['gw_00_smooth']):
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+            
+        wt_depth_cm = row['gw_00_smooth'] / 10.0
+        
+        # Determine the most localized Potential Evapotranspiration (PET) value available.
+        pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
+        station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
+        active_pet = pet_val if pd.notna(pet_val) else station_pet_val
+
+        # If the water table is at or above the ground surface, bypass the soil mechanics and set ET directly to PET.
+        if wt_depth_cm <= 0.0:
+            calculated_sy_list.append(0.0)
+            calculated_et_list.append(active_pet if pd.notna(active_pet) else 0.0)
+            continue
+            
+        well_horizons = soil_clean[soil_clean['well_id'] == current_well].copy()
+        
+        # Skip if no soil profile data is available for this well.
+        if well_horizons.empty:
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+
+        active_horizon = well_horizons[
+            (well_horizons['start_depth_cm'] <= wt_depth_cm) & 
+            (well_horizons['stop_depth_cm'] > wt_depth_cm)
+        ]
+        
+        # Skip if the water table sits outside the defined soil profile depths.
+        if active_horizon.empty:
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+
+        # Calculate the dynamically scaled specific yield based on soil texture and drainage time.
+        layer_sy = get_composite_sy_kinematic(wt_depth_cm, well_horizons, vg_lookup, observation_time_days=1.0)
+        
+        # Convert the observed storage and recharge signals into physical water depth using the calculated specific yield.
+        raw_daily_et = layer_sy * (row["R_mm_smooth"] + row["S_mm_smooth"])
+        
+        # Prevent ET from dropping below zero due to noise or sudden positive storage fluctuations.
+        daily_et = max(0.0, raw_daily_et)
+        
+        # # Cap the calculated evapotranspiration so it does not exceed the maximum atmospheric demand (PET).
+        # if pd.notna(active_pet):
+        #     daily_et = min(daily_et, active_pet)
+
+        calculated_sy_list.append(layer_sy)
+        calculated_et_list.append(daily_et)
+
+    df['Sy_star'] = calculated_sy_list 
+    df['ET_gw_mm'] = calculated_et_list
+    df['method_id'] = METHOD_ID
+    
+    return df[
+        [
+            "date",
+            "doy",
+            "year",
+            "well_id",
+            "ET_gw_mm",
+            "R_mm",
+            "S_mm",
+            "Sy_star",
+            "method_id",
+            "gw_00"
+        ]
+    ]
 
 def main():
    
@@ -1664,51 +2152,55 @@ def main():
     # pre-process gw from subdaily into key daily values
     daily_gw_df = get_daily_gw_levels(subdaily_gw_df)
     print("got gw levels")
-  
+
     # #calculate average Sy for each well
     df_soil_sy = pd.read_csv(sy_data_filepath)
-    duke_df = pd.read_csv(duky_sy_data_dir)
-    df_well_logs = pd.read_csv(well_data_filepath)
-    calculated_sy_df = average_sy(df_soil_sy, df_well_logs)
+    duke_df = pd.read_csv(duky_et_data_dir)
+    df_soil_log = pd.read_csv(soil_data_filepath)
+    calculated_sy_df = average_sy(df_soil_sy, df_soil_log)
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
-    #weather_df = get_daily_temperature(weather_subdaily_filepath)
+    weather_df = get_daily_temperature(weather_subdaily_filepath)
     lai_df = pd.read_csv(lai_data_filepath)
-  
+    van_genuchten_df = pd.read_csv(van_guch_filepath)
+
     df_extinction = pd.read_csv(extinction_data_filepath)
     # 1. Calculate raw ET for ALL days
-    #raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_well_logs, duke_df)
+    # raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_soil_log, duke_df, PET_df, pet_station_df, 2025)
+    raw_ET_df = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log,  van_genuchten_df, PET_df, pet_station_df, 2025)
 
-    raw_ET_df = calculate_GWET_shaw(daily_gw_df, PET_df, df_well_logs, df_extinction, pet_station_df)
-    #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_well_logs, df_extinction, pet_station_df, pet_col="PET_mm_day")
+    #raw_ET_df = calculate_GWET_shaw(daily_gw_df, PET_df, df_soil_log, df_extinction, pet_station_df)
+    #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_soil_log, df_extinction, pet_station_df, pet_col="PET_mm_day")
     # # 2. Filter out the storm events
     ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=1.0, recovery_days=3)
 
     # 3. Filter out days where the well went dry (dropping data when water is within 10cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_well_logs, buffer_mm=100.0)
+    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_soil_log, buffer_mm=100.0)
     print(daily_ET_df['date'].min(), "to", daily_ET_df['date'].max())
 
     #plot_cumulative_et_box(daily_ET_df, save_dir=save_plots_dir)
     # Plot
-    plot_ET_cat(
-        ET_df=daily_ET_df, 
-        lai_df = lai_df,
-        pet_df=pet_station_df,
-        year=2025, 
-        end_date=None,
-        save_dir=save_plots_dir
-    )
-    print("ET category plots with PET generated successfully!")
-
-    # plot_ET_prop_bar(daily_ET_df, 
-    #         PET_df,
-    #         pet_station_df,
-    #         subdaily_gw_df,
-    #         "White_Duke", 
-    #         2025,  
-    #         df_well_logs, 
-    #         save_dir=save_plots_dir)
-    # print("ET plotted for White average Sy")
+    # plot_ET_cat(
+    #     ET_df=daily_ET_df, 
+    #     lai_df = lai_df,
+    #     pet_df=pet_station_df,
+    #     year=2021, 
+    #     end_date=None,
+    #     save_dir=save_plots_dir
+    # )
+    
+    #print("ET category plots with PET generated successfully!")
+    #plot_cumulative_et_box(daily_ET_df, "well_id", save_plots_dir)
+    plot_ET_prop_bar(daily_ET_df, 
+            PET_df,
+            pet_station_df,
+            subdaily_gw_df,
+            "White_VG", 
+            2025,  
+            df_soil_log, 
+            weather_df,
+            save_dir=save_plots_dir)
+    print("ET plotted for White average Sy")
 
    
     # Save to csv? Do we want a new one or write over the one from above?
