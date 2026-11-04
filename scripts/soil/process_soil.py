@@ -20,6 +20,7 @@ TODOs documented in github repo issue tracking.
 - Can we safely change check for 'G' to 'GR' to be more specific?
 
 RECENT UPDATES:
+    10/23/2026 JN broaded size range for GR from (5, 20) to (2, 76)
     06/02/2026 JN added a "clean" function to prep data for plotting
                 via the R script
     06/01/2026 JN added comments and documentation;
@@ -101,8 +102,8 @@ word_to_code_mapping = {
 gravel_size_map = {
     #left end exclusive
     # General, Very, and Extremely Gravelly (>2 - 76 mm)
-    'GR': (5, 20), 'VGR': (5, 20), 'XGR': (5, 20),
-    'GRV': (5, 20), 'GRX': (5, 20),
+    'GR': (2, 76), 'VGR': (2, 76), 'XGR': (2, 76),
+    'GRV': (2, 76), 'GRX': (2, 76),
     
     # Fine Gravelly (>2 - 5 mm)
     'FGR': (2, 5), 'GRF': (2, 5),
