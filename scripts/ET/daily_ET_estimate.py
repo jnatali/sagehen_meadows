@@ -25,11 +25,11 @@ import numpy as np
 
 import seaborn as sns
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
 
 import scripts.groundwater.well_utils as well_utils
+
 # ---- INITIALIZE GLOBAL VARIABLES ---
 
 SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
@@ -40,38 +40,32 @@ SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
 groundwater_data_dir = PROJECT_ROOT / 'data/field_observations/groundwater/loggers/PROCESSED/'
 groundwater_subdaily_filepath = groundwater_data_dir / 'groundwater_subdaily.csv'
 
-weather_data_dir = PROJECT_ROOT / 'data/station_instrumentation/climate/'
-weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenTower1.csv'
-
-ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
-ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
-
-et_data_dir = PROJECT_ROOT / 'data/et/'
-sy_data_filepath = et_data_dir / 'sy_lookup.csv' 
-
-sy_save_filepath = et_data_dir / 'sy_by_well.csv'
-
 soil_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
 soil_data_filepath = soil_data_dir / 'soil_survey_PROCESSED.csv'
 
+weather_data_dir = PROJECT_ROOT / 'data/station_instrumentation/climate/'
+weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenTower1.csv'
+
+et_data_dir = PROJECT_ROOT / 'data/et/'
+sy_data_filepath = et_data_dir / 'sy_lookup.csv' 
+sy_save_filepath = et_data_dir / 'sy_by_well.csv'
+extinction_data_filepath = et_data_dir / 'Shah_extinction_depth.csv'
+duke_lookup_filepath = et_data_dir / 'duke_lookup.csv'
+vangen_lookup_filepath = et_data_dir / 'van_genuchten_lookup.csv'
+
 pet_well_data_filepath = et_data_dir / 'pet_by_well_results.csv'
-
 pet_station_data_filepath = et_data_dir / 'pet_station_results.csv'
-
-save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Van_Gun/'
-
-save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
-
-duke_et_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
-
-van_guch_filepath = PROJECT_ROOT / et_data_dir / 'van_genuchten_lookup.csv'
 
 lai_data_dir = PROJECT_ROOT / 'data/field_observations/vegetation/LAI/'
 lai_data_filepath = lai_data_dir / 'LAI_2025_Corrected.csv'
 
-extinction_data_dir = PROJECT_ROOT / 'data/et/'
-extinction_data_filepath = extinction_data_dir / 'Shah_extinction_depth.csv'
+# JN 11/15/26 Plotting directory should match method_id
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/'
 
+# JN 11/15/26 Not used, should match method_id
+#save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
+#ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
+#ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
 
 # Define typical root depths for plant functional types (in cm).
 # Adjust these values based on your site's specific ecology.
@@ -112,7 +106,8 @@ def load_precip_for_years(
     df = pd.read_csv(
         precip_csv_path,
         usecols=["time", "precipitation-geonor-mm"],
-        parse_dates=["time"]
+        parse_dates=["time"],
+        date_format="%m/%d/%y %H:%M"
     ).rename(columns={"precipitation-geonor-mm": "precip_mm"})
 
     # --- Filter to the desired years ---
@@ -248,6 +243,7 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     daily = update_wells(daily)
     return daily
 
+# TODO: To improve performance, only open the weather csv 1x for  precip, temp
 def get_daily_temperature(weather_subdaily_filepath: str) -> pd.DataFrame:
     """
     Loads massive sub-daily weather data, extracts the 25ft air temp, 
@@ -366,7 +362,8 @@ def calculate_storage_recharge(df: pd.DataFrame) -> pd.DataFrame:
 
 def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculates the average specific yield for each well based on soil texture and thickness.
+    Calculates the average specific yield for each well 
+        based on soil texture and thickness.
 
     Parameters:
     df_sy: a dataframe with specific yield information for each soil texture
@@ -381,7 +378,6 @@ def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
 
     #  Data Cleaning
     df_wells = df_wells.dropna(subset=['well_id']).copy()
-    
     df_wells = update_wells(df_wells)
 
     #  Math and Calculations
@@ -468,9 +464,13 @@ def calculate_short_deployment_white_vars(daily_df: pd.DataFrame) -> pd.DataFram
 
 def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     """
-    Calculate ET in mm/day for each well in subdaily groundwater logger data.
+    Calculates ET in mm/day
+        for each well in subdaily groundwater logger data
+        uses White (1932) WTF equation: ET = Sy * (R + S)
+        with a constant Sy (0.04) for all wells, 
+        SY_STAR = center of sand, silt and clay in Loheide et al 2005 Fig 10
 
-    Parameters: daily groundwater dataframe with gw levels at key times
+    Parameters: daily groundwater dataframe with gw level at 0h, 4h, 24h
     
     Returns:
     populated "ET estimate" dataframe
@@ -488,6 +488,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
     
+    # Validate/correct well_ids
     df = update_wells(df)
 
     return df[
@@ -507,10 +508,12 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
 
 def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculate ET in mm/day for each well in subdaily groundwater logger data
-    using White (1932) method and a specific yield for each well that's a weighted
-    average based on soil profile field data and Sy* estimates from 
-    Loheide et al (2008) <to verify> and <who else?>
+    Calculate ET in mm/day
+        for each well in subdaily groundwater logger data
+        uses White (1932) WTF equation: ET = Sy * (R + S)
+        with Sy for each well that's a weighted
+        average based on soil profile field data and Sy* estimates from 
+        Loheide et al (2008) <to verify> and <who else?>
 
     Parameters:
     daily_df: daily groundwater dataframe with gw levels at key times
@@ -537,6 +540,7 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
     
+    # Validate/correct well_ids
     df = update_wells(df)
 
     return df[
@@ -2162,8 +2166,8 @@ def main():
     
     
     # Load lookup tables for all ET methods
-    duke_df = pd.read_csv(duke_et_data_dir)
-    van_genuchten_df = pd.read_csv(van_guch_filepath)
+    duke_df = pd.read_csv(duke_lookup_filepath)
+    van_genuchten_df = pd.read_csv(vangen_lookup_filepath)
     df_extinction = pd.read_csv(extinction_data_filepath)\
         
     # Load soil data for Sy calcs
@@ -2171,7 +2175,7 @@ def main():
     df_soil_log = pd.read_csv(soil_data_filepath)    
     
     # -- CALCS
-    # Calculate avg Sy for each well
+    # Calculate Sy for each well, a weighted average of each soil layer/texture
     calculated_sy_df = average_sy(df_soil_sy, df_soil_log)
     
     # Pre-process gw from subdaily into key daily values
@@ -2180,10 +2184,19 @@ def main():
 
     
     # Calculate raw ET for ALL days
+    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
+    method_ids = raw_ET_df["method_id"].dropna().unique()
+
+    if len(method_ids) != 1:
+        raise ValueError(
+            f"Expected exactly one method_id, but found: {method_ids}"
+        )
+    method_id = method_ids[0]
+    
     # raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_soil_log, duke_df, PET_df, pet_station_df, 2025)
-    raw_ET_df = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log, 
-                                              van_genuchten_df, PET_df, 
-                                              pet_station_df, 2025)
+    # raw_ET_df = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log, 
+    #                                           van_genuchten_df, PET_df, 
+    #                                           pet_station_df, 2025)
 
     #raw_ET_df = estimate_ET_Shaw(daily_gw_df, PET_df, df_soil_log, df_extinction, pet_station_df)
     #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_soil_log, df_extinction, pet_station_df, pet_col="PET_mm_day")
@@ -2217,15 +2230,16 @@ def main():
             PET_df,
             pet_station_df,
             subdaily_gw_df,
-            "White_VG", 
+            "White_wavg", 
             2025,  
             df_soil_log, 
             weather_df,
-            save_dir=save_plots_dir)
-    print("ET plotted for White average Sy")
+            save_dir=save_plots_dir / f"{method_id}/")
+    print("ET plotted.")
 
     # Save to csv? Do we want a new one or write over the one from above?
-    # Then plot this new estimate, use an appropriate name, check if the 2nd param affects filename and not just the title
+    # Then plot this new estimate, use an appropriate name, 
+    #   check if the 2nd param affects filename and not just the title
     print("COMPLETE!!")
    
 
