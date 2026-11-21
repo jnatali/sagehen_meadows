@@ -20,6 +20,9 @@ TODOs documented in github repo issue tracking.
 - Can we safely change check for 'G' to 'GR' to be more specific?
 
 RECENT UPDATES:
+    11/15/2026 JN removed references to _RENAMED.csv since we validate and 
+                  update names before saving to _PROCESSED; no other
+                  scripts use _RENAMED.csv; so simplifying.
     10/23/2026 JN broaded size range for GR from (5, 20) to (2, 76)
     06/02/2026 JN added a "clean" function to prep data for plotting
                 via the R script
@@ -59,7 +62,7 @@ from scripts.groundwater.well_utils import process_well_ids
 
 # Define Source File
 OUTPUT_DIR = PROJECT_ROOT /  'data/field_observations/soil'
-OUTPUT_FILE_PATTERN_RENAMED = OUTPUT_DIR / 'soil_survey_RENAMED.csv'
+#OUTPUT_FILE_PATTERN_RENAMED = OUTPUT_DIR / 'soil_survey_RENAMED.csv'
 OUTPUT_FILE_PATTERN_CLEANED = OUTPUT_DIR / 'soil_survey_PROCESSED.csv'
 
 # Define Source File
@@ -97,6 +100,7 @@ word_to_code_mapping = {
     'mgr': 'GR',
     'xgr': 'GR',
     'xst': 'GR',
+    'cgr': 'GR'
 }
 
 gravel_size_map = {
@@ -318,64 +322,74 @@ def clean_for_plotting(df_valid):
     df = df[[col for col in desired_cols if col in df.columns]]
     
     df = merge_identical_rows(df)
+    df = df.sort_values(
+        by=["well_id", "start_depth_cm"],
+        ascending=[True, True]
+        ).reset_index(drop=True)
+
     
     return df
     
-# ---- MAIN PROCEDURES---
+# ---- MAIN ---
 
-# Load files
-file_path = SOURCE_FILE_PATTERN
-print(f"Loading data from: {file_path}")
-df_raw = pd.read_csv(file_path)
-
-output_path_validated = OUTPUT_FILE_PATTERN_RENAMED
-output_path_cleaned = OUTPUT_FILE_PATTERN_CLEANED
-
-
-# Validate and correct well_ids (well names), also drops invalid well_ids
-df = process_well_ids(df_raw, datetime_col="date")
-print('\nProcessed well_ids\n')
-
-# Make sure the start and stop depths are all converted to cm
-df = populate_depths_cm(df)
-
-# Split the 'soil texture' column at the first comma and expand into two columns
-df[['texture', 'sub-class']] = df['soil texture'].str.split(
-                                                        ',', n=1, expand=True)
-#strip any leftover whitespace 
-df['texture'] = df['texture'].str.strip().str.lower()
-df['sub-class'] = df['sub-class'].str.strip()
-
-# takes the full words in 'soil texture', creates new column with short codes
-df['soil texture code'] = df['texture'].map(word_to_code_mapping)
-
-# Use warning to print out unmatched soil textures
-unmatched = (
-    df.loc[
-        df['texture'].notna() &
-        df['soil texture code'].isna(),
-        'texture'
-    ]
-    .unique()
-)
-
-if len(unmatched) > 0:
-    warnings.warn(
-        f"\nUnmatched soil texture values: {sorted(unmatched)}\n",
-        UserWarning,
-        stacklevel=2,
+def main():
+    
+    # Load files
+    file_path = SOURCE_FILE_PATTERN
+    print(f"Loading data from: {file_path}")
+    df_raw = pd.read_csv(file_path)
+    
+    #output_path_validated = OUTPUT_FILE_PATTERN_RENAMED
+    output_path_cleaned = OUTPUT_FILE_PATTERN_CLEANED
+    
+    # Validate and correct well_ids (well names), also drops invalid well_ids
+    df = process_well_ids(df_raw, datetime_col="date")
+    print('\nProcessed well_ids\n')
+    
+    # Make sure the start and stop depths are all converted to cm
+    df = populate_depths_cm(df)
+    
+    # Split the 'soil texture' column at the first comma and expand into two columns
+    df[['texture', 'sub-class']] = df['soil texture'].str.split(
+                                                            ',', n=1, expand=True)
+    #strip any leftover whitespace 
+    df['texture'] = df['texture'].str.strip().str.lower()
+    df['sub-class'] = df['sub-class'].str.strip()
+    
+    # takes the full words in 'soil texture', creates new column with short codes
+    df['soil texture code'] = df['texture'].map(word_to_code_mapping)
+    
+    # Use warning to print out unmatched soil textures
+    unmatched = (
+        df.loc[
+            df['texture'].notna() &
+            df['soil texture code'].isna(),
+            'texture'
+        ]
+        .unique()
     )
+    
+    if len(unmatched) > 0:
+        warnings.warn(
+            f"\nUnmatched soil texture values: {sorted(unmatched)}\n",
+            UserWarning,
+            stacklevel=2,
+        )
+    
+    #Apply the function to create the two new columns
+    df[['gravel size', 'gravel amount']] = df['sub-class'].apply(extract_gravel_info)
+    
+    #df.to_csv(output_path_validated, index=False)
+    #print(f"\nSaved renamed RAW data to: {output_path_validated}\n")
+    
+    # Clean and save data
+    df_clean = clean_for_plotting(df)
+    df_clean.to_csv(output_path_cleaned, index=False)
+    print(f"\nSaved cleaned data for plotting: {output_path_cleaned}\n")
 
-#Apply the function to create the two new columns
-df[['gravel size', 'gravel amount']] = df['sub-class'].apply(extract_gravel_info)
-
-df.to_csv(output_path_validated, index=False)
-print(f"\nSaved renamed RAW data to: {output_path_validated}\n")
-
-# Clean and save data
-df_clean = clean_for_plotting(df)
-df_clean.to_csv(output_path_cleaned, index=False)
-print(f"\nSaved cleaned data for plotting: {output_path_cleaned}\n")
 
 
+# --- END FUNCTIONS
 
+if __name__ == "__main__":
+    main()
