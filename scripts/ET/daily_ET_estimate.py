@@ -33,10 +33,9 @@ import scripts.groundwater.well_utils as well_utils
 # ---- INITIALIZE GLOBAL VARIABLES ---
 
 SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
-
+# TODO: Add well depth buffer here as a global var, was 10
+    
 ## Directory and Filenames based on structure in github
-# TODO: update source file
-# TODO: where is 2025-only processed logger data or filter for 2025 only or get ET for ALL years?
 groundwater_data_dir = PROJECT_ROOT / 'data/field_observations/groundwater/loggers/PROCESSED/'
 groundwater_subdaily_filepath = groundwater_data_dir / 'groundwater_subdaily.csv'
 
@@ -49,8 +48,16 @@ weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenT
 et_data_dir = PROJECT_ROOT / 'data/et/'
 sy_data_filepath = et_data_dir / 'sy_lookup.csv' 
 sy_save_filepath = et_data_dir / 'sy_by_well.csv'
+
+# TODO: Source of Shah_extinction_depth.csv is ??
 extinction_data_filepath = et_data_dir / 'Shah_extinction_depth.csv'
+
+# Source of duke_lookup.csv is Rawls and Brakensiek 1989
+# TODO: What is source of Rawls and Brakensiek's estimates? Copy in Zotero
+# Potential constradiction: Duke 1972 says lambda typically 0.5 for clay, 4.0 for uniform clean sand
 duke_lookup_filepath = et_data_dir / 'duke_lookup.csv'
+
+# TODO: Source of van_genucthen_lookup.csv is ??
 vangen_lookup_filepath = et_data_dir / 'van_genuchten_lookup.csv'
 
 pet_well_data_filepath = et_data_dir / 'pet_by_well_results.csv'
@@ -67,6 +74,7 @@ save_plots_dir = PROJECT_ROOT / 'results/plots/ET/'
 #ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
 #ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
 
+# TODO: For root depths, use direct field observation of root depth in soil profile date
 # Define typical root depths for plant functional types (in cm).
 # Adjust these values based on your site's specific ecology.
 PLANT_ROOT_DEPTHS = {
@@ -77,8 +85,10 @@ PLANT_ROOT_DEPTHS = {
 
 # ---- FUNCTIONS ---
 
-## TODO: Split out as a weather_util.py for the project
+## TODO: Split out a weather_util.py for the entire project (longer-term goal)
 
+# TODO: rm from plot to improve performance, otherwise loading weather data 2x
+#       but keep code for future use.
 def load_precip_for_years(
     precip_csv_path: str,
     years: int | list[int],
@@ -570,14 +580,16 @@ def estimate_ET_White_Duke_Sy(
 ) -> pd.DataFrame:
     """
     Calculates ET using Duke's equation for Specific Yield (Sy), based on 
-    the soil parameters of the single horizon where the water table is currently fluctuating.
+    the soil parameters of the single horizon where the water table 
+    is currently fluctuating.
     
     Includes a capillary truncation check for overlying gravel layers ('GR').
-    If the water table is inside the effective capillary fringe, the White method is bypassed 
-    and ET is set to equal atmospheric PET.
+    If the water table is inside the effective capillary fringe, 
+    the White method is bypassed and ET is set to equal atmospheric PET.
     
-    Includes a strict fail-fast design: the script will crash and raise a ValueError 
-    if any required data (soil horizons, water table, PET, or recharge parameters) is missing.
+    if any required data is missing
+    (e.g. soil horizons, water table, PET, or recharge parameters)
+    the script will crash and raise a ValueError
     """
     METHOD_ID = "White_Duke"
     
@@ -585,12 +597,18 @@ def estimate_ET_White_Duke_Sy(
     df = daily_df.copy()
     df['date'] = pd.to_datetime(df['date'])
     df = df[df['date'].dt.year == year].copy()
-    # Assuming update_wells is a custom function defined elsewhere in your script
-    df = update_wells(df)
+    
+    # SKIP: validate and rename wells, already done in get_daily_gw_levels()
+    #df = update_wells(df)
 
     soil_clean = soil_df.copy()
-
+    
+    # Get R and S for White WTF
     df = calculate_storage_recharge(df)
+    
+    # TODO: should this be calculated in storage_recharge function rather
+    # than a separate call each time? Or is it specific to Duke calcs? and 
+    # if so, why?
     df = calculate_short_deployment_white_vars(df)
     df = get_PET(df, pet_df, station_PET_df, year)
 
@@ -610,14 +628,23 @@ def estimate_ET_White_Duke_Sy(
         if 'gw_00' not in row or pd.isna(row['gw_00']):
             raise ValueError(f"DATA ERROR: Missing groundwater depth (gw_00) for well '{current_well}' on {current_date}.")
             
-        # Groundwater depth is stored in mm in 'gw_00'. Convert it to cm to match soil depths.
+        # Groundwater depth at midnight is stored in mm in 'gw_00'. 
+        # Convert to cm to match soil depths.
         raw_wt_cm = row['gw_00'] / 10.0
         
         # ---------------------------------------------------------
-        # REGIME 0: STANDING WATER (Negative or Zero Depth)
+        # REGIME 0: STANDING WATER (Negative or Zero Depth) ET=PET
         # ---------------------------------------------------------
+        # TODO: Address two questions:
+        # 1. Is it valid to assume that ET=PET when standing water?
+        # Some plants may close stomata in response to flooding,
+        # unclear of the extent. Some sedges have adaptations, but MH and Willow?
+        # 2. If WTD is 0 at midnight, 
+        #   is it fair to assume ET=PET for the whole day?
         if raw_wt_cm <= 0.0:
-            # Water is at or above the ground surface. Bypass soil properties entirely.
+            
+            # Water is at or above the ground surface at midnight,
+            # bypass soil properties entirely.
             layer_sy = 0.0 
             
             pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
@@ -636,10 +663,14 @@ def estimate_ET_White_Duke_Sy(
             # Append the results and immediately skip to the next day
             calculated_sy_list.append(layer_sy)
             calculated_et_list.append(daily_et)
+            
+            # TODO: confirm that continue drops out of "for" loop, skips to next day
             continue
             
         # ---------------------------------------------------------
-        # For all normal days, wt_depth_cm is safely strictly positive
+        # Otherwise wt_depth_cm is safely strictly positive?
+        # TODO: should the end of the previous "if" return, not continue?
+        # or should there be an "else" statement?
         wt_depth_cm = raw_wt_cm
 
         # Filter the soil survey to find horizons belonging to ONLY this well
@@ -652,7 +683,8 @@ def estimate_ET_White_Duke_Sy(
             calculated_et_list.append(np.nan)
             continue
 
-        # Find the single horizon containing the current water table
+        # Find the single horizon containing the water table at midnight
+        # TODO: Why only consider single horizon at midnight?
         active_horizon = well_horizons[
             (well_horizons['start_depth_cm'] <= wt_depth_cm) & 
             (well_horizons['stop_depth_cm'] > wt_depth_cm)
@@ -676,17 +708,23 @@ def estimate_ET_White_Duke_Sy(
 
         # Capillary Truncation Check: Find any gravel sitting ABOVE the active water table.
         # Gravel has pores too large to support a capillary fringe, acting as a hydraulic barrier.
+        # TODO: This is cool, but we may have gravel documented where there's a single large rock,
+        #       not in a horizontal band. Does that have the same effect when surrounded by soil?
+        # TODO: Consider how/when we document and assign GR if we use this approach.
         gravel_above = well_horizons[
             (well_horizons['stop_depth_cm'] < wt_depth_cm) & 
             (well_horizons['soil_texture_code'].isin(['GR']))
         ]
 
-        # Fetch Parameters and Set Effective Air-Entry Pressure (ha)
+        # Get Parameters to Set Effective Air-Entry Pressure (ha)
         if texture_code in ['GR', 'HO']:
             # The water table is currently inside a gravel layer. 
             # Gravel cannot hold a capillary fringe above the water table.
             is_gravel_active = True
             ha_eff = 0.0
+            # TODO: for GR and HO use consistent Sy for all ET calc methods
+            #       as defined in a shared sy_lookup table (sy_data_filepath);
+            #       consider a generic method for getting the Sy from it?
             layer_sy = 0.23 # Fixed generic specific yield for medium gravel
         else:
             is_gravel_active = False
@@ -694,25 +732,31 @@ def estimate_ET_White_Duke_Sy(
             if texture_code not in rawls_lookup:
                 raise ValueError(f"DATA ERROR: Soil code '{texture_code}' for well '{current_well}' not in Rawls lookup.")
             
+            # Get params per soil texture
             params = rawls_lookup[texture_code]
             
             try:
                 # Physical Soil Parameters (from Rawls)
-                # phi (Porosity): The total volume fraction of empty space in the soil.
+                # phi (Porosity): The total volume fraction of soil pores.
                 phi = params['phi']
                 
-                # Sr (Residual Saturation): The fraction of water permanently held by tight capillary forces.
+                # Sr (Residual Saturation): fraction of the bulk volume 
+                #                           occupied by immobile wetting phase,
+                #                           held by capillary/matric tension.
                 sr = params['Sr']
                 
-                # ha_cm (Air-entry pressure): The maximum natural height of the saturated capillary fringe.
+                # ha_cm (Air-entry or bubble pressure): approx. the capillary
+                #       head pressure when air phase first becomes continuous.
                 ha_cm = params['ha_cm']
                 
-                # lam (Lambda): Pore-size distribution index. Controls how fast water drains as suction increases.
+                # lam (Lambda): Pore-size distribution index; controls
+                #               how fast water drains as tension increases.
                 lam = params['lambda']
             except KeyError as missing_key:
                 raise ValueError(f"DATA ERROR: Parameter {missing_key} missing for soil texture '{texture_code}'.")
                 
-            # max_sy: The absolute maximum water the soil can release if drained completely by gravity.
+            # max_sy: The absolute maximum water the soil can release 
+            #         if drained completely by gravity.
             max_sy = phi - sr
 
             # Calculate Effective Air-Entry Pressure (ha_eff)
@@ -734,6 +778,12 @@ def estimate_ET_White_Duke_Sy(
             
         elif wt_depth_cm <= ha_eff:
             # REGIME 1: Normal soil saturated to surface
+            # TODO: Soil only saturated to surface if wt_depth_cm <= 0
+            #       Otherwise,if wt_depth_cm <= ha_eff,
+            #       Would Sy be 0 or Sy_a?
+            #       Should be based on soil texture in delta_z,
+            #       the profile within change in WT depth for that day,
+            #       or delta_z + h_eff, the full region of drainage.
             layer_sy = 0.0
             
             pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
@@ -761,6 +811,8 @@ def estimate_ET_White_Duke_Sy(
             layer_sy = max_sy * depth_factor
             daily_et = layer_sy * (row["R_mm"] + row["S_mm"])
 
+
+        # TODO: Move to a more generalized validation function for all ET calcs
         # --- NEW CHECK: Calculated ET vs PET ---
         pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
         station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
@@ -783,7 +835,6 @@ def estimate_ET_White_Duke_Sy(
     df['ET_gw_mm'] = calculated_et_list
     df['method_id'] = METHOD_ID
     
-
     
     return df[
         [
