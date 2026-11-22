@@ -1010,7 +1010,7 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
     PET_well_df = process_date_and_year(PET_well_df, 'Date', year)
     pet_station_df = process_date_and_year(pet_station_df, 'Date', year)
 
-    # Calculate proportion storage and recharge (Will result in NaNs for Shaw method)
+    # Calculate proportion storage and recharge
     ET_df['S_mm_proportion'] = ET_df['Sy_star'] * ET_df['S_mm'] 
     ET_df['R_mm_proportion'] = ET_df['Sy_star'] * ET_df['R_mm']
 
@@ -1030,79 +1030,59 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
     for well_id, well_df in filtered_df.groupby('well_id'):
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(8, 10), sharex=True)
 
-        # Isolate the groundwater data for the current well_id
         well_gw = gw_df[gw_df['well_id'] == well_id].sort_values('date_dt')
         dates = well_df['date_dt'].tolist()
 
-        # Calculate Net ET
         ET_net = well_df['ET_gw_mm']
 
-        # ---- PLOTTING LEFT AXIS (ax1): Stacking or Single Bars ----
-        # Check if S and R columns are mostly NaN (e.g., Shaw Method)
         if well_df[['S_mm', 'R_mm']].isna().all().all() or method_id == "Shaw_Eq17":
-            # Plot a single solid bar for Total ET
             ax1.bar(dates, ET_net, width=1.0, color='mediumpurple', label='Total ET')
         else:
-            # White Methods: Plot Stacked Proportional Bars
             total_abs = well_df['S_mm_proportion'].abs() + well_df['R_mm_proportion'].abs()
-
-            # Calculate proportions safely (avoiding zero-division)
             s_prop = np.where(total_abs == 0, 0, well_df['S_mm_proportion'].abs() / total_abs)
             r_prop = np.where(total_abs == 0, 0, well_df['R_mm_proportion'].abs() / total_abs)
 
-            # Scale proportions to the Net ET bar height (Works flawlessly with VG_Smoothed scaling logic)
             s_bar_heights = ET_net * s_prop
             r_bar_heights = ET_net * r_prop
 
             ax1.bar(dates, s_bar_heights, width=1.0, color='teal', label='Storage')
             ax1.bar(dates, r_bar_heights, bottom=s_bar_heights, width=1.0, color='cornflowerblue', label='Recharge')
 
-        # 2. Overlay PET Line
         if 'PET_mm_day' in well_df.columns:
             pet_mm = well_df['PET_mm_day'] 
             ax1.plot(dates, pet_mm, color='crimson', linewidth=2, label='PET (mm)')
 
-        # -Overlay Station PET Line (Dotted)  
         if 'PET_station_mm_day' in well_df.columns:
             pet_station_mm = well_df['PET_station_mm_day']
             ax1.plot(dates, pet_station_mm, color='darkred', linestyle=':', linewidth=2, label='Station PET (mm)')   
 
-        # Add zero-line to clearly anchor positive/negative days
         ax1.axhline(0, color='black', linewidth=0.5)
-
-        # Formatting Left Axis
         ax1.set(ylabel='Net ET / PET (mm)')
         
-        # 3. Right Axis (ax2): Temperature context (Celsius)
         ax2 = ax1.twinx() 
         if 'temp_25ft_C' in well_df.columns:
             ax2.plot(dates, well_df['temp_25ft_C'], color='darkorange', linestyle='--', linewidth=1.25, alpha=0.5, label='Temp 25ft (°C)')
         
         ax2.set_ylabel('Air Temperature (°C)')
         
-        # CALCULATE PERFECT ZERO ALIGNMENT
         ax1_min, ax1_max = ax1.get_ylim()
         ax2_max = 40.0
-        
-        # Scale the lower temp bound exactly proportional to the left axis lower bound
-        if ax1_max != 0:
-            ax2_min = ax1_min * (ax2_max / ax1_max)
-        else:
-            ax2_min = 0
-            
-        # Apply the balanced limits
+        ax2_min = ax1_min * (ax2_max / ax1_max) if ax1_max != 0 else 0
         ax2.set_ylim(ax2_min, ax2_max)
 
         # ---- PLOTTING GROUNDWATER (ax3) ----
         if not well_gw.empty:
             ax3.plot(well_gw['date_dt'], well_gw['ground_to_water_m'], color='navy', linewidth=1.2, label='10-Min Water Level', zorder=2)
             
-            # Plot Soil Horizon Boundaries & Staggered Labels
             if soil_df is not None:
-                well_soil = soil_df[soil_df['well_id'] == well_id].copy()
+                well_soil = soil_df.copy()
+                well_soil = well_soil[well_soil['well_id'] == well_id].copy()
                 
                 if not well_soil.empty:
-                    well_soil = well_soil.sort_values('stop_depth_cm')
+                    # FIX: DROP DUPLICATE HORIZON ENTRIES FOR THIS WELL
+                    well_soil = well_soil.drop_duplicates(
+                        subset=['stop_depth_cm', 'soil_texture_code', 'gravel_amount_percent']
+                    ).sort_values('stop_depth_cm')
                     
                     last_depth = -999  
                     x_pos = 0.01       
@@ -1130,24 +1110,20 @@ def plot_ET_prop_bar(ET_df: pd.DataFrame,
         ax3.set_xlabel('Date')
         ax3.grid(True, linestyle=':', alpha=0.6)
         
-        # Apply automatic datetime spacing and formatting
         auto_locator = mdates.AutoDateLocator(minticks=4, maxticks=10)
         auto_formatter = mdates.AutoDateFormatter(auto_locator)
         ax3.xaxis.set_major_locator(auto_locator)
         ax3.xaxis.set_major_formatter(auto_formatter)
         plt.setp(ax3.get_xticklabels(), rotation=0, ha='center')
 
-        # ---- COMBINED LEGEND ----
         lines_1, labels_1 = ax1.get_legend_handles_labels()
         lines_2, labels_2 = ax2.get_legend_handles_labels()
         ax1.legend(lines_1 + lines_2, labels_1 + labels_2, bbox_to_anchor=(1.15, 1), loc='upper left')
 
-        # Unified single title assignment
         ax1.set_title(f'Daily ET {method_id} {well_id}', fontsize=12, fontweight='bold')
 
         plt.tight_layout()
 
-        # SAVING LOGIC 
         if save_dir is not None:
             save_path = Path(save_dir)
             fname_eps = f"ET_bar_{method_id}_{well_id}_{year}.eps"
@@ -1568,7 +1544,7 @@ def prepare_merged_et_df(
     return merged_df, logs
 
 
-def calculate_GWET_shaw(
+def calculate_GWET_shah(
     daily_df: pd.DataFrame,
     pet_df: pd.DataFrame,
     df_well_logs: pd.DataFrame,
@@ -1577,7 +1553,7 @@ def calculate_GWET_shaw(
     pet_col: str = "PET_mm_day",
     year: int = 2025,
 ) -> pd.DataFrame:
-    """Calculates Groundwater Evapotranspiration (GWET) based on the Shaw method
+    """Calculates Groundwater Evapotranspiration (GWET) based on the Shah method
 
     (Equation 17). This function evaluates the limiting soil layer in the
     vadose zone and calculates ET directly from Potential Evapotranspiration
@@ -1596,7 +1572,7 @@ def calculate_GWET_shaw(
     )
 
 
-    def apply_shaw_equation(row):
+    def apply_shah_equation(row):
         """Applies Equation 17 for a single day at a single well.
 
         GWET/PET = 1 (for d <= d'') GWET/PET = y0 + exp(-b(d - d'')) (for d >
@@ -1697,10 +1673,10 @@ def calculate_GWET_shaw(
 
 
     # Apply the row-by-row function across the entire dataframe to generate the new ET column
-    merged_df["ET_gw_mm"] = merged_df.apply(apply_shaw_equation, axis=1)
+    merged_df["ET_gw_mm"] = merged_df.apply(apply_shah_equation, axis=1)
 
     # Explicitly label the method used for future tracking
-    merged_df["method_id"] = "Shaw_Eq17"
+    merged_df["method_id"] = "Shah_Eq17"
 
     # Ensure structural columns exist even if they weren't in the original daily_df
     # This prevents KeyError during the final column selection
@@ -1967,9 +1943,11 @@ def get_composite_sy_kinematic(wt_depth_cm, well_horizons, vg_lookup, observatio
             
         texture_code = str(layer.iloc[0]['soil_texture_code']).strip()
         
-        # Gravel and holes have a fixed, immediate specific yield and do not follow van Genuchten curves.
         if texture_code in ['GR', 'HO']:
-            total_effective_sy += (0.23 / len(slices)) 
+            # Only the 1 cm slice directly at the water table actually drains.
+            # All gravel slices above it are already dry and contribute 0.0.
+            if z >= wt_depth_cm:
+                total_effective_sy += 0.23
             continue
             
         # Ensure the soil texture exists in the van Genuchten lookup table to avoid silent failures.
@@ -2019,7 +1997,7 @@ def estimate_ET_White_VG_Smoothed(
     pet_df: pd.DataFrame,
     station_PET_df: pd.DataFrame = None,
     year: int = 2025,
-    smoothing_window: int = 2  
+    smoothing_window: int = 1  
 ) -> pd.DataFrame:
     """
     Calculates daily groundwater evapotranspiration (ET_g) using a modified White method.
@@ -2036,19 +2014,21 @@ def estimate_ET_White_VG_Smoothed(
     df = df.sort_values(by=['well_id', 'date'])
     df = update_wells(df)
     soil_clean = soil_df.copy()
-
-
+    
     df['gw_00_smooth'] = df.groupby('well_id')['gw_00'].transform(
         lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
     )
+    df['gw_04_smooth'] = df.groupby('well_id')['gw_04'].transform(
+        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
+    )
     
-    # 2. OVERWRITE THE RAW DATA SO THE WHITE METHOD ONLY SEES THE CLEAN SIGNAL
     df['gw_00'] = df['gw_00_smooth']
+    df['gw_04'] = df['gw_04_smooth']  
 
     # 3.  CALCULATE RECHARGE
     df = calculate_storage_recharge(df)
     df = get_PET(df, pet_df, station_PET_df, year)
-
+    # ---> MAKE SURE THIS IS STILL HERE <---
     # 4. Smooth the resulting daily components 
     df['R_mm_smooth'] = df.groupby('well_id')['R_mm'].transform(
         lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
@@ -2067,6 +2047,7 @@ def estimate_ET_White_VG_Smoothed(
         
         # Skip calculations if the smoothed groundwater data is missing for the day.
         if 'gw_00_smooth' not in row or pd.isna(row['gw_00_smooth']):
+            raise ValueError(f"DATA ERROR: Missing smoothed groundwater data for well '{current_well}' on {row['date']}. Cannot calculate ET.")
             calculated_sy_list.append(np.nan)
             calculated_et_list.append(np.nan)
             continue
@@ -2088,6 +2069,7 @@ def estimate_ET_White_VG_Smoothed(
         
         # Skip if no soil profile data is available for this well.
         if well_horizons.empty:
+            print(f"DATA ERROR: No soil profile data found for well '{current_well}'. Cannot calculate ET.")
             calculated_sy_list.append(np.nan)
             calculated_et_list.append(np.nan)
             continue
@@ -2099,6 +2081,7 @@ def estimate_ET_White_VG_Smoothed(
         
         # Skip if the water table sits outside the defined soil profile depths.
         if active_horizon.empty:
+            print (f"DATA ERROR: Water table depth ({wt_depth_cm} cm) for well '{current_well}' is outside the defined soil profile depths. Cannot calculate ET.")
             calculated_sy_list.append(np.nan)
             calculated_et_list.append(np.nan)
             continue
