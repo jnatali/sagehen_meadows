@@ -14,16 +14,15 @@ starting with simplest (White 1932 with constant Sy* with best guess
 
 # import basic libraries
 import pandas as pd
-#import os
-#import datetime
+import os
+import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-# import well_utils to process well_ids for Sy data
 import sys
 from pathlib import Path
 import numpy as np
-
 import seaborn as sns
+from matplotlib.gridspec import GridSpec
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
@@ -58,7 +57,7 @@ extinction_data_filepath = et_data_dir / 'Shah_extinction_depth.csv'
 duke_lookup_filepath = et_data_dir / 'duke_lookup.csv'
 
 # TODO: Source of van_genucthen_lookup.csv is ??
-vangen_lookup_filepath = et_data_dir / 'van_genuchten_lookup.csv'
+vangen_lookup_filepath = et_data_dir / 'ROSETTA_Van_Genuchten_Lookup.csv'
 
 pet_well_data_filepath = et_data_dir / 'pet_by_well_results.csv'
 pet_station_data_filepath = et_data_dir / 'pet_station_results.csv'
@@ -1896,7 +1895,7 @@ def calculate_GWET_shaw(
     pet_col: str = "PET_mm_day",
     year: int = 2025,
 ) -> pd.DataFrame:
-    """Calculates Groundwater Evapotranspiration (GWET) based on the Shaw method
+    """Calculates Groundwater Evapotranspiration (GWET) based on the Shah method
 
     (Equation 17). This function evaluates the limiting soil layer in the
     vadose zone and calculates ET directly from Potential Evapotranspiration
@@ -2459,103 +2458,239 @@ def estimate_ET_White_VG_Smoothed(
         ]
     ]
 
-def main():
-   
-    # -- I/O
-    # load subdaily groundwater input (source data) file
-    subdaily_gw_df = pd.read_csv(groundwater_subdaily_filepath,
-                                 parse_dates=["DateTime"]
-                                 ).rename(columns={"DateTime": "datetime"})   
+def plot_ET_methods_side_by_side(
+    compiled_ET_df: pd.DataFrame, 
+    PET_well_df: pd.DataFrame, 
+    pet_station_df: pd.DataFrame, 
+    gw_df: pd.DataFrame, 
+    year: int, 
+    soil_df: pd.DataFrame = None,
+    save_dir=None,
+    weather_df: pd.DataFrame = None
+):
+    """
+    Plots proportional Net ET bars for all methods side-by-side (horizontally).
+    The top row displays the ET methods, and the bottom row displays the aligned 
+    groundwater and soil data for each corresponding column.
+    """
+    # Filter by year and calculate proportions
+    ET_df = process_date_and_year(compiled_ET_df.copy(), 'date', year)
+    gw_df = process_date_and_year(gw_df, 'datetime', year)
+    PET_well_df = process_date_and_year(PET_well_df, 'Date', year)
+    pet_station_df = process_date_and_year(pet_station_df, 'Date', year)
     
-    # Load and calculate cumulative precip per day
+    if weather_df is not None and not weather_df.empty:
+        weather_df = process_date_and_year(weather_df, 'date', year)
+
+    ET_df['S_mm_proportion'] = ET_df['Sy_star'] * ET_df['S_mm'] 
+    ET_df['R_mm_proportion'] = ET_df['Sy_star'] * ET_df['R_mm']
+
+    # Merge external variables
+    ET_df = ET_df.merge(PET_well_df, how='left', on=['well_id', 'date_dt'])
+    
+    if weather_df is not None and not weather_df.empty:
+        ET_df = ET_df.merge(weather_df, how='left', on='date_dt')
+        
+    station_subset = pet_station_df[['date_dt', 'PET_mm_day']].rename(columns={'PET_mm_day': 'PET_station_mm_day'})
+    ET_df = ET_df.merge(station_subset, how='left', on='date_dt')
+
+    methods = ET_df['method_id'].dropna().unique()
+    num_methods = len(methods)
+
+    # Generate a figure for each well
+    for well_id, well_df in ET_df.groupby('well_id'):
+        well_gw = gw_df[gw_df['well_id'] == well_id].sort_values('date_dt')
+        
+        # Create a grid: 2 rows (ET top, GW bottom), N columns (one for each method)
+        fig, axes = plt.subplots(
+            2, num_methods, 
+            figsize=(5 * num_methods, 8), 
+            sharex=True, 
+            sharey='row' # Shared Y axes horizontally so heights are directly comparable
+        )
+        
+        # Ensure axes is a 2D array even if there's only 1 method
+        if num_methods == 1:
+            axes = np.array([[axes[0]], [axes[1]]])
+            
+        fig.suptitle(f'ET Method Proportional Comparison - {well_id} ({year})', fontsize=16, fontweight='bold')
+
+        for i, method_id in enumerate(methods):
+            ax1 = axes[0, i]
+            ax3 = axes[1, i]
+            
+            method_df = well_df[well_df['method_id'] == method_id].sort_values('date_dt')
+            dates = method_df['date_dt'].tolist()
+            ET_net = method_df['ET_gw_mm']
+
+            # ---- TOP ROW (ax1): ET BARS & PET ----
+            if method_df[['S_mm', 'R_mm']].isna().all().all() or method_id == "Shaw_Eq17":
+                ax1.bar(dates, ET_net, width=1.0, color='mediumpurple', label='Total ET')
+            else:
+                total_abs = method_df['S_mm_proportion'].abs() + method_df['R_mm_proportion'].abs()
+                s_prop = np.where(total_abs == 0, 0, method_df['S_mm_proportion'].abs() / total_abs)
+                r_prop = np.where(total_abs == 0, 0, method_df['R_mm_proportion'].abs() / total_abs)
+
+                s_bar_heights = ET_net * s_prop
+                r_bar_heights = ET_net * r_prop
+
+                ax1.bar(dates, s_bar_heights, width=1.0, color='teal', label='Storage')
+                ax1.bar(dates, r_bar_heights, bottom=s_bar_heights, width=1.0, color='cornflowerblue', label='Recharge')
+
+            if 'PET_mm_day' in method_df.columns:
+                ax1.plot(dates, method_df['PET_mm_day'], color='crimson', linewidth=2, label='PET (mm)')
+
+            if 'PET_station_mm_day' in method_df.columns:
+                ax1.plot(dates, method_df['PET_station_mm_day'], color='darkred', linestyle=':', linewidth=2, label='Station PET')   
+
+            ax1.axhline(0, color='black', linewidth=0.5)
+            ax1.set_title(method_id, fontsize=12, fontweight='bold')
+            if i == 0: ax1.set_ylabel('Net ET / PET (mm)')
+
+            # ---- BOTTOM ROW (ax3): GROUNDWATER & SOIL ----
+            if not well_gw.empty:
+                ax3.plot(well_gw['date_dt'], well_gw['ground_to_water_m'], color='navy', linewidth=1.2, label='10-Min Water Level', zorder=2)
+                
+                if soil_df is not None:
+                    well_soil = soil_df[soil_df['well_id'] == well_id].copy()
+                    
+                    if not well_soil.empty:
+                        well_soil = well_soil.drop_duplicates(
+                            subset=['stop_depth_cm', 'soil_texture_code', 'gravel_amount_percent']
+                        ).sort_values('stop_depth_cm')
+                        
+                        last_depth = -999  
+                        x_pos = 0.01       
+                        
+                        for _, row in well_soil.iterrows():
+                            depth_m = row['stop_depth_cm'] / 100.0
+                            texture = f"{row['soil_texture_code']} {row['gravel_amount_percent']}"
+                            
+                            if abs(depth_m - last_depth) < 0.06:
+                                x_pos += 0.09 
+                            else:
+                                x_pos = 0.01  
+                            
+                            ax3.axhline(depth_m, color='red', linestyle='--', linewidth=1.0, zorder=3)
+                            # Only label soil horizons on the far left plot to avoid clutter
+                            if i == 0:
+                                ax3.text(x_pos, depth_m, texture, 
+                                         transform=ax3.get_yaxis_transform(), 
+                                         color='red', fontsize=8, fontweight='bold', 
+                                         va='bottom', ha='left', zorder=4)
+                            last_depth = depth_m  
+                            
+            if i == 0 and not ax3.yaxis_inverted():
+                ax3.invert_yaxis()
+                
+            if i == 0: ax3.set_ylabel('Depth to Water (m)')
+            ax3.set_xlabel('Date')
+            ax3.grid(True, linestyle=':', alpha=0.6)
+            
+            auto_locator = mdates.AutoDateLocator(minticks=3, maxticks=6)
+            ax3.xaxis.set_major_locator(auto_locator)
+            ax3.xaxis.set_major_formatter(mdates.AutoDateFormatter(auto_locator))
+            plt.setp(ax3.get_xticklabels(), rotation=45, ha='right')
+
+            # Consolidate legend on the first column
+            if i == 0:
+                lines_1, labels_1 = ax1.get_legend_handles_labels()
+                lines_3, labels_3 = ax3.get_legend_handles_labels()
+                ax1.legend(lines_1, labels_1, loc='upper left')
+                ax3.legend(lines_3, labels_3, loc='lower left')
+
+        plt.tight_layout()
+
+        if save_dir is not None:
+            save_path = Path(save_dir)
+            save_path.mkdir(parents=True, exist_ok=True)
+            fname = f"ET_new_van_genuchten_{well_id}_{year}.png"
+            fig.savefig(save_path / fname, format="png", bbox_inches="tight", dpi=300)
+            plt.close(fig)
+        else:
+            plt.show()
+
+
+def main():
+    """
+    Calculates all ET methods, compiles them, saves the results, 
+    and generates a side-by-side proportional bar chart for all methods.
+    """
+    # -- 1. I/O & DATA LOADING --
+    subdaily_gw_df = pd.read_csv(groundwater_subdaily_filepath, parse_dates=["DateTime"]).rename(columns={"DateTime": "datetime"})   
+    
     precip_df = load_precip_for_years(weather_subdaily_filepath, 2025)
     daily_precip_df = daily_cumulative_precip(precip_df)
     
-    # Load PET and temp data
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
-    weather_df = get_daily_temperature(weather_subdaily_filepath)
     
-    
-    # Load lookup tables for all ET methods
     duke_df = pd.read_csv(duke_lookup_filepath)
     van_genuchten_df = pd.read_csv(vangen_lookup_filepath)
-    df_extinction = pd.read_csv(extinction_data_filepath)\
+    df_extinction = pd.read_csv(extinction_data_filepath)
         
-    # Load soil data for Sy calcs
     df_soil_sy = pd.read_csv(sy_data_filepath)
     df_soil_log = pd.read_csv(soil_data_filepath)    
     
-    # -- CALCS
-    # Calculate Sy for each well, a weighted average of each soil layer/texture
+    # -- 2. PRE-PROCESSING --
     calculated_sy_df = average_sy(df_soil_sy, df_soil_log)
-    
-    # Pre-process gw from subdaily into key daily values
     daily_gw_df = get_daily_gw_levels(subdaily_gw_df)
-    print("got gw levels")
+    print("Groundwater daily levels pre-processed.")
 
+    # -- 3. CALCULATE ET VIA ALL METHODS --
+    print("Calculating ET via White (Constant Sy)...")
+    et_const = estimate_ET_White_constant_Sy(daily_gw_df)
     
-    # Calculate raw ET for ALL days
-    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
-    method_ids = raw_ET_df["method_id"].dropna().unique()
-
-    if len(method_ids) != 1:
-        raise ValueError(
-            f"Expected exactly one method_id, but found: {method_ids}"
-        )
-    method_id = method_ids[0]
+    print("Calculating ET via White (Weighted Avg Sy)...")
+    et_wavg = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
     
-    # raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_soil_log, duke_df, PET_df, pet_station_df, 2025)
-    # raw_ET_df = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log, 
-    #                                           van_genuchten_df, PET_df, 
-    #                                           pet_station_df, 2025)
-
-    #raw_ET_df = estimate_ET_Shaw(daily_gw_df, PET_df, df_soil_log, df_extinction, pet_station_df)
-    #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_soil_log, df_extinction, pet_station_df, pet_col="PET_mm_day")
+    print("Calculating ET via White (Duke Sy)...")
+    et_duke = estimate_ET_White_Duke_Sy(daily_gw_df, df_soil_log, duke_df, PET_df, pet_station_df, 2025)
     
-    # -- FILTER ET ESTIMATES
-    # Filter days with precipitation plus a recovery buffer
-    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, 
-                                     threshold_mm=1.0, recovery_days=3)
-
-    # Filter days where the well went dry 
-    #    (dropping data when water is within 10cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, 
-                                          df_soil_log, buffer_mm=100.0)
+    print("Calculating ET via White (Van Genuchten Smoothed)...")
+    et_vg = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log, van_genuchten_df, PET_df, pet_station_df, 2025)
     
-    print(daily_ET_df['date'].min(), "to", daily_ET_df['date'].max())
-
-    #plot_cumulative_et_box(daily_ET_df, save_dir=save_plots_dir)
-    # Plot
-    # plot_ET_cat(
-    #     ET_df=daily_ET_df, 
-    #     lai_df = pd.read_csv(lai_data_filepath),
-    #     pet_df=pet_station_df,
-    #     year=2021, 
-    #     end_date=None,
-    #     save_dir=save_plots_dir
-    # )
+    print("Calculating ET via Shaw (Eq 17)...")
+    et_shaw = estimate_ET_Shaw(daily_gw_df, PET_df, df_soil_log, df_extinction, pet_station_df, pet_col="PET_mm_day", year=2025)
     
-    #print("ET category plots with PET generated successfully!")
-    #plot_cumulative_et_box(daily_ET_df, "well_id", save_plots_dir)
-    plot_ET_prop_bar(daily_ET_df, 
-            PET_df,
-            pet_station_df,
-            subdaily_gw_df,
-            "White_wavg", 
-            2025,  
-            df_soil_log, 
-            weather_df,
-            save_dir=save_plots_dir / f"{method_id}/")
-    print("ET plotted.")
+    # -- 4. COMPILE ET RESULTS --
+    print("Compiling all ET results...")
+    compiled_ET_df = pd.concat([et_const, et_wavg, et_duke, et_vg, et_shaw], ignore_index=True)
+    
+    # -- 5. FILTER ET ESTIMATES --
+    ET_no_rain = filter_ET_by_precip(
+        compiled_ET_df, daily_precip_df, threshold_mm=1.0, recovery_days=3
+    )
 
-    # Save to csv? Do we want a new one or write over the one from above?
-    # Then plot this new estimate, use an appropriate name, 
-    #   check if the 2nd param affects filename and not just the title
+    final_ET_df = filter_ET_by_well_depth(
+        ET_no_rain, daily_gw_df, df_soil_log, buffer_mm=100.0
+    )
+    
+    print(f"Final Data Date Range: {final_ET_df['date'].min()} to {final_ET_df['date'].max()}")
+
+    # -- 6. SAVE COMPILED DATA TO CSV --
+    target_columns = ['well_id', 'date', 'doy', 'year', 'method_id', 'ET_gw_mm', 'R_mm', 'S_mm', 'Sy_star']
+    existing_cols = [c for c in target_columns if c in final_ET_df.columns]
+    
+    csv_out_path = et_data_dir / 'Compiled_ET_estimates_2025.csv'
+    final_ET_df[existing_cols].to_csv(csv_out_path, index=False)
+    print(f"Saved compiled ET results to: {csv_out_path}")
+    
+    # -- 7. PLOT SIDE-BY-SIDE METHOD COMPARISON --
+    print("Generating ET side-by-side proportional bar plots...")
+    plot_dir = save_plots_dir / "Method_Comparisons"
+    
+    plot_ET_methods_side_by_side(
+        compiled_ET_df=final_ET_df, 
+        PET_well_df=PET_df, 
+        pet_station_df=pet_station_df, 
+        gw_df=subdaily_gw_df, 
+        year=2025, 
+        soil_df=df_soil_log,
+        save_dir=plot_dir
+    )
+    
     print("COMPLETE!!")
-   
-
-# --- END FUNCTIONS
 
 if __name__ == "__main__":
     main()
