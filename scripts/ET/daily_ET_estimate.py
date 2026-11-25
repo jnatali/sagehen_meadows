@@ -496,7 +496,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
-    
+    df["ET_gw_mm"] = df["ET_gw_mm"].clip(lower=0)   
     # Validate/correct well_ids
     df = update_wells(df)
 
@@ -548,7 +548,7 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
 
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
-    
+    df["ET_gw_mm"] = df["ET_gw_mm"].clip(lower=0)
     # Validate/correct well_ids
     df = update_wells(df)
 
@@ -832,6 +832,7 @@ def estimate_ET_White_Duke_Sy(
     # Attach the arrays of calculated values as new columns 
     df['Sy_star'] = calculated_sy_list 
     df['ET_gw_mm'] = calculated_et_list
+    df["ET_gw_mm"] = df["ET_gw_mm"].clip(lower=0)
     df['method_id'] = METHOD_ID
     
     
@@ -2604,12 +2605,163 @@ def plot_ET_methods_side_by_side(
         if save_dir is not None:
             save_path = Path(save_dir)
             save_path.mkdir(parents=True, exist_ok=True)
-            fname = f"ET_new_van_genuchten_{well_id}_{year}.png"
+            fname = f"ET_comparison_{well_id}_{year}.png"
             fig.savefig(save_path / fname, format="png", bbox_inches="tight", dpi=300)
             plt.close(fig)
         else:
             plt.show()
+def plot_K_methods_side_by_side(
+    compiled_ET_df: pd.DataFrame,
+    PET_well_df: pd.DataFrame,
+    pet_station_df: pd.DataFrame,
+    gw_df: pd.DataFrame,
+    year: int,
+    soil_df: pd.DataFrame = None,
+    save_dir=None,
+):
+    """
+    Plots daily K (ET / PET) as a line graph for all methods side-by-side (horizontally),
+    leaving gaps blank where K is NaN or 0.
+    The top row displays K = ET / PET, and the bottom row displays the aligned
+    groundwater and soil data for each corresponding column.
+    """
+    # Filter by year
+    ET_df = process_date_and_year(compiled_ET_df.copy(), 'date', year)
+    gw_df = process_date_and_year(gw_df, 'datetime', year)
+    PET_well_df = process_date_and_year(PET_well_df, 'Date', year)
+    pet_station_df = process_date_and_year(pet_station_df, 'Date', year)
 
+    # Merge well-specific PET and station PET (if not already in ET_df)
+    if 'PET_mm_day' not in ET_df.columns:
+        ET_df = ET_df.merge(
+            PET_well_df[['well_id', 'date_dt', 'PET_mm_day']],
+            how='left',
+            on=['well_id', 'date_dt']
+        )
+
+    station_subset = pet_station_df[['date_dt', 'PET_mm_day']].rename(
+        columns={'PET_mm_day': 'PET_station_mm_day'}
+    )
+    ET_df = ET_df.merge(station_subset, how='left', on='date_dt')
+
+    # Use well PET where available, otherwise fall back to station PET
+    ET_df['active_PET'] = ET_df['PET_mm_day'].fillna(ET_df['PET_station_mm_day'])
+
+    # Calculate K = ET / PET (avoid division by zero)
+    ET_df['K'] = np.where(
+        ET_df['active_PET'] > 0,
+        ET_df['ET_gw_mm'] / ET_df['active_PET'],
+        np.nan
+    )
+
+    methods = ET_df['method_id'].dropna().unique()
+    num_methods = len(methods)
+
+    for well_id, well_df in ET_df.groupby('well_id'):
+        well_gw = gw_df[gw_df['well_id'] == well_id].sort_values('date_dt')
+
+        fig, axes = plt.subplots(
+            2, num_methods,
+            figsize=(5 * num_methods, 8),
+            sharex=True,
+            sharey='row'
+        )
+
+        if num_methods == 1:
+            axes = np.array([[axes[0]], [axes[1]]])
+
+        fig.suptitle(f'Crop/Groundwater Coefficient (K = ET / PET) - {well_id} ({year})', fontsize=16, fontweight='bold')
+
+        for i, method_id in enumerate(methods):
+            ax1 = axes[0, i]
+            ax3 = axes[1, i]
+
+            method_df = well_df[well_df['method_id'] == method_id].sort_values('date_dt')
+
+            # ---- TOP ROW (ax1): K = ET / PET (LINE GRAPH) ----
+            full_dates = pd.date_range(method_df['date_dt'].min(), method_df['date_dt'].max(), freq='D')
+            method_daily = method_df.set_index('date_dt').reindex(full_dates)
+
+            # Replace 0 with NaN so both 0 and NaN values are left completely blank
+            k_series = method_daily['K'].replace(0, np.nan)
+
+            ax1.plot(
+                method_daily.index,
+                k_series,
+                color='steelblue',
+                linestyle='-',
+                linewidth=1.5,
+                marker='o',
+                markersize=2.5,
+                label='K (ET / PET)'
+            )
+
+            ax1.axhline(1.0, color='crimson', linestyle='--', linewidth=1.2, label='K = 1.0 (ET = PET)')
+            ax1.axhline(0.0, color='black', linewidth=0.5)
+            ax1.set_title(method_id, fontsize=12, fontweight='bold')
+            if i == 0:
+                ax1.set_ylabel('K (ET / PET)')
+
+            # ---- BOTTOM ROW (ax3): GROUNDWATER & SOIL ----
+            if not well_gw.empty:
+                ax3.plot(well_gw['date_dt'], well_gw['ground_to_water_m'], color='navy', linewidth=1.2, label='10-Min Water Level', zorder=2)
+
+                if soil_df is not None:
+                    well_soil = soil_df[soil_df['well_id'] == well_id].copy()
+                    if not well_soil.empty:
+                        well_soil = well_soil.drop_duplicates(
+                            subset=['stop_depth_cm', 'soil_texture_code', 'gravel_amount_percent']
+                        ).sort_values('stop_depth_cm')
+
+                        last_depth = -999
+                        x_pos = 0.01
+
+                        for _, row in well_soil.iterrows():
+                            depth_m = row['stop_depth_cm'] / 100.0
+                            texture = f"{row['soil_texture_code']} {row['gravel_amount_percent']}"
+
+                            if abs(depth_m - last_depth) < 0.06:
+                                x_pos += 0.09
+                            else:
+                                x_pos = 0.01
+
+                            ax3.axhline(depth_m, color='red', linestyle='--', linewidth=1.0, zorder=3)
+                            if i == 0:
+                                ax3.text(x_pos, depth_m, texture,
+                                         transform=ax3.get_yaxis_transform(),
+                                         color='red', fontsize=8, fontweight='bold',
+                                         va='bottom', ha='left', zorder=4)
+                            last_depth = depth_m
+
+            if i == 0 and not ax3.yaxis_inverted():
+                ax3.invert_yaxis()
+
+            if i == 0:
+                ax3.set_ylabel('Depth to Water (m)')
+            ax3.set_xlabel('Date')
+            ax3.grid(True, linestyle=':', alpha=0.6)
+
+            auto_locator = mdates.AutoDateLocator(minticks=3, maxticks=6)
+            ax3.xaxis.set_major_locator(auto_locator)
+            ax3.xaxis.set_major_formatter(mdates.AutoDateFormatter(auto_locator))
+            plt.setp(ax3.get_xticklabels(), rotation=45, ha='right')
+
+            if i == 0:
+                lines_1, labels_1 = ax1.get_legend_handles_labels()
+                lines_3, labels_3 = ax3.get_legend_handles_labels()
+                ax1.legend(lines_1, labels_1, loc='upper left')
+                ax3.legend(lines_3, labels_3, loc='lower left')
+
+        plt.tight_layout()
+
+        if save_dir is not None:
+            save_path = Path(save_dir)
+            save_path.mkdir(parents=True, exist_ok=True)
+            fname = f"K_SideBySide_{well_id}_{year}.png"
+            fig.savefig(save_path / fname, format="png", bbox_inches="tight", dpi=300)
+            plt.close(fig)
+        else:
+            plt.show()
 
 def main():
     """
@@ -2663,7 +2815,7 @@ def main():
     )
 
     final_ET_df = filter_ET_by_well_depth(
-        ET_no_rain, daily_gw_df, df_soil_log, buffer_mm=100.0
+        ET_no_rain, daily_gw_df, df_soil_log, buffer_mm=50.0
     )
     
     print(f"Final Data Date Range: {final_ET_df['date'].min()} to {final_ET_df['date'].max()}")
@@ -2675,7 +2827,10 @@ def main():
     csv_out_path = et_data_dir / 'Compiled_ET_estimates_2025.csv'
     final_ET_df[existing_cols].to_csv(csv_out_path, index=False)
     print(f"Saved compiled ET results to: {csv_out_path}")
-    
+    # -- 8. PLOT SIDE-BY-SIDE K (ET/PET) COMPARISON FROM SAVED CSV --
+    print("Generating K = ET/PET side-by-side comparison plots...")
+    compiled_from_csv = pd.read_csv(csv_out_path)
+
     # -- 7. PLOT SIDE-BY-SIDE METHOD COMPARISON --
     print("Generating ET side-by-side proportional bar plots...")
     plot_dir = save_plots_dir / "Method_Comparisons"
@@ -2686,6 +2841,17 @@ def main():
         pet_station_df=pet_station_df, 
         gw_df=subdaily_gw_df, 
         year=2025, 
+        soil_df=df_soil_log,
+        save_dir=plot_dir
+    )
+
+        
+    plot_K_methods_side_by_side(
+        compiled_ET_df=compiled_from_csv,
+        PET_well_df=PET_df,
+        pet_station_df=pet_station_df,
+        gw_df=subdaily_gw_df,
+        year=2025,
         soil_df=df_soil_log,
         save_dir=plot_dir
     )
