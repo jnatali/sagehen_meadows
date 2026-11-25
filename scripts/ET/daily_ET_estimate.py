@@ -3,7 +3,7 @@
 """
 DAILY ET CALCULATION SCRIPT
 Created on  Sat 7 Feb 11:37 AM
-@author: jnatali
+@author: jnatali, klsmittle
 
 Calculates daily ET (from groundwater, in mm) according to different methods, 
 starting with simplest (White 1932 with constant Sy* with best guess 
@@ -25,56 +25,57 @@ import numpy as np
 
 import seaborn as sns
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
 
 import scripts.groundwater.well_utils as well_utils
+
 # ---- INITIALIZE GLOBAL VARIABLES ---
 
 SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
-
+# TODO: Add well depth buffer here as a global var, was 10
+    
 ## Directory and Filenames based on structure in github
-# TODO: update source file
-# TODO: where is 2025-only processed logger data or filter for 2025 only or get ET for ALL years?
 groundwater_data_dir = PROJECT_ROOT / 'data/field_observations/groundwater/loggers/PROCESSED/'
 groundwater_subdaily_filepath = groundwater_data_dir / 'groundwater_subdaily.csv'
-
-weather_data_dir = PROJECT_ROOT / 'data/station_instrumentation/climate/'
-weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenTower1.csv'
-
-ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
-ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
-
-et_data_dir = PROJECT_ROOT / 'data/et/'
-sy_data_filepath = et_data_dir / 'sy_lookup.csv' 
-
-sy_save_filepath = et_data_dir / 'sy_by_well.csv'
 
 soil_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
 soil_data_filepath = soil_data_dir / 'soil_survey_PROCESSED.csv'
 
+weather_data_dir = PROJECT_ROOT / 'data/station_instrumentation/climate/'
+weather_subdaily_filepath = weather_data_dir / 'Weather_2010_2025_10min_SagehenTower1.csv'
+
+et_data_dir = PROJECT_ROOT / 'data/et/'
+sy_data_filepath = et_data_dir / 'sy_lookup.csv' 
+sy_save_filepath = et_data_dir / 'sy_by_well.csv'
+
+# TODO: Source of Shah_extinction_depth.csv is ??
+extinction_data_filepath = et_data_dir / 'Shah_extinction_depth.csv'
+
+# Source of duke_lookup.csv is Rawls and Brakensiek 1989
+# TODO: What is source of Rawls and Brakensiek's estimates? Copy in Zotero
+# Potential constradiction: Duke 1972 says lambda typically 0.5 for clay, 4.0 for uniform clean sand
+duke_lookup_filepath = et_data_dir / 'duke_lookup.csv'
+
+# TODO: Source of van_genucthen_lookup.csv is ??
+vangen_lookup_filepath = et_data_dir / 'van_genuchten_lookup.csv'
+
 pet_well_data_filepath = et_data_dir / 'pet_by_well_results.csv'
-
 pet_station_data_filepath = et_data_dir / 'pet_station_results.csv'
-
-save_plots_dir = PROJECT_ROOT / 'results/plots/ET/White_Van_Gun/'
-
-save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
-
-duky_et_data_dir = PROJECT_ROOT / 'data/et/duke_lookup.csv'
-
-
-van_guch_filepath = PROJECT_ROOT / et_data_dir / 'van_genuchten_lookup.csv'
 
 lai_data_dir = PROJECT_ROOT / 'data/field_observations/vegetation/LAI/'
 lai_data_filepath = lai_data_dir / 'LAI_2025_Corrected.csv'
 
-extinction_data_dir = PROJECT_ROOT / 'data/et/'
-extinction_data_filepath = extinction_data_dir / 'Shah_extinction_depth.csv'
-# ---- FUNCTIONS ---
+# JN 11/15/26 Plotting directory should match method_id
+save_plots_dir = PROJECT_ROOT / 'results/plots/ET/'
 
-# 1. Define typical root depths for your plant functional types (in cm).
+# JN 11/15/26 Not used, should match method_id
+#save_csv_dir = PROJECT_ROOT / 'data/calculated_time_series/ET/ET_daily_2025_White_constantSy.csv'
+#ET_calc_data_dir = PROJECT_ROOT / 'data/ET_calculations/'
+#ET_calc_filepath = ET_calc_data_dir / 'ET_daily_2025_White_constantSy.csv'
+
+# TODO: For root depths, use direct field observation of root depth in soil profile date
+# Define typical root depths for plant functional types (in cm).
 # Adjust these values based on your site's specific ecology.
 PLANT_ROOT_DEPTHS = {
     'Willow': 0.0,             # Deep-rooted: bypasses shallow gravel
@@ -82,8 +83,12 @@ PLANT_ROOT_DEPTHS = {
     'Mixed Herbaceous': 0.0     # Shallow-rooted
 }
 
-## TODO: Split out as a weather_util.py for the project
+# ---- FUNCTIONS ---
 
+## TODO: Split out a weather_util.py for the entire project (longer-term goal)
+
+# TODO: rm from plot to improve performance, otherwise loading weather data 2x
+#       but keep code for future use.
 def load_precip_for_years(
     precip_csv_path: str,
     years: int | list[int],
@@ -111,7 +116,8 @@ def load_precip_for_years(
     df = pd.read_csv(
         precip_csv_path,
         usecols=["time", "precipitation-geonor-mm"],
-        parse_dates=["time"]
+        parse_dates=["time"],
+        date_format="%m/%d/%y %H:%M"
     ).rename(columns={"precipitation-geonor-mm": "precip_mm"})
 
     # --- Filter to the desired years ---
@@ -154,6 +160,26 @@ def daily_cumulative_precip(precip_df) -> pd.DataFrame:
 
     return daily
 
+
+def update_wells(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Validates files with well_ids
+    Returns a valided dataframe with corrected well_ids.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame with well_ids 
+    """
+    # Validate the well_ids to ensure no bad data slipped through
+    #Load Sy data
+
+    # Correct the well_ids using the STATIC function 
+    df = well_utils.correct_well_ids_static(df)
+    
+    # Validate the well_ids to ensure no bad data slipped through
+    df = well_utils.validate_well_ids(df, id_col="well_id")
+    return  df 
 
 def load_all_groundwater(gw_dir) -> pd.DataFrame:
     """
@@ -227,6 +253,7 @@ def get_daily_gw_levels(gw_df) -> pd.DataFrame:
     daily = update_wells(daily)
     return daily
 
+# TODO: To improve performance, only open the weather csv 1x for  precip, temp
 def get_daily_temperature(weather_subdaily_filepath: str) -> pd.DataFrame:
     """
     Loads massive sub-daily weather data, extracts the 25ft air temp, 
@@ -255,6 +282,74 @@ def get_daily_temperature(weather_subdaily_filepath: str) -> pd.DataFrame:
     # Return the dataframe 
     return daily_weather[['year', 'date', 'temp_25ft_C']]
 
+def get_PET(data_df: pd.DataFrame,
+            pet_df: pd.DataFrame, 
+            station_PET_df: pd.DataFrame, 
+            year: int, 
+            pet_col: str = "PET_mm_day") -> pd.DataFrame:
+    """
+    Merges well-specific PET and station PET dataframes for a given year.
+
+    Parameters
+    ----------
+    data_df : pd.DataFrame
+        DataFrame containing the main dataset.
+    pet_df : pd.DataFrame
+        DataFrame containing well-specific PET data.
+    station_PET_df : pd.DataFrame
+        DataFrame containing station PET data.
+    year : int
+        Year to filter the data on.
+    pet_col : str, optional
+        Column name for PET values in the input dataframes. Default is "PET_mm_day".
+
+    Returns
+    -------
+    pd.DataFrame
+        Merged DataFrame with well-specific and station PET values for the specified year.
+    """
+    # Clean and standardize the primary PET dataframe dates
+    pet_clean = pet_df.copy()
+    pet_clean["Date"] = pd.to_datetime(pet_clean["Date"])
+
+    # If a station PET dataframe is provided, clean and standardize it too
+    if station_PET_df is not None:
+        station_PET_clean = station_PET_df.copy()
+
+        station_PET_clean["Date"] = pd.to_datetime(
+            station_PET_clean["Date"]
+        )
+
+        # Filter the station PET data strictly for the requested year
+        station_PET_clean_year = station_PET_clean[
+            station_PET_clean["Date"].dt.year == year
+        ].copy()
+
+        # Rename the station PET column to differentiate it from the well-specific PET column during merge
+        station_PET_clean_year = station_PET_clean_year.rename(
+            columns={pet_col: "station_PET_mm_day"}
+        )
+
+    # MERGE DATASETS
+    # Left merge the primary PET data into the daily groundwater dataframe
+    # Match on both 'date' and 'well_id' so each well gets its specific daily PET
+    merged_df = data_df.merge(
+        pet_clean[["Date", "well_id", pet_col]],
+        left_on=["date", "well_id"],
+        right_on=["Date", "well_id"],
+        how="left",
+    )
+
+    # Left merge the station PET data (matches only by date, as station applies globally)
+    if station_PET_df is not None:
+        merged_df = merged_df.merge(
+            station_PET_clean_year[["Date", "station_PET_mm_day"]],
+            left_on=["date"],
+            right_on=["Date"],
+            how="left",
+        )
+    return merged_df
+
 def calculate_storage_recharge(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate storage and recharge terms for ET calculations.
@@ -274,7 +369,38 @@ def calculate_storage_recharge(df: pd.DataFrame) -> pd.DataFrame:
     df["S_mm"] = df["gw_24"] - df["gw_00"] 
     
     return df
-import pandas as pd
+
+def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculates the average specific yield for each well 
+        based on soil texture and thickness.
+
+    Parameters:
+    df_sy: a dataframe with specific yield information for each soil texture
+    df_wells: a data frame with well information including soil texture and depth
+    
+    Returns:
+    a dataframe with the average specific yield for each well
+    """
+
+    # Set the key column as the index, select the value column, and convert to dict
+    soil_sy_dict = df_sy.set_index('soil_texture')['Sy'].to_dict()
+
+    #  Data Cleaning
+    df_wells = df_wells.dropna(subset=['well_id']).copy()
+    df_wells = update_wells(df_wells)
+
+    #  Math and Calculations
+    df_wells['Sy'] = df_wells['soil_texture_code'].map(soil_sy_dict)
+    df_wells['thickness'] = df_wells['stop_depth_cm'] - df_wells['start_depth_cm']
+    df_wells['Sy_weighted'] = df_wells['Sy'] * df_wells['thickness']
+
+
+    #  Grouping and Averaging
+    well_summary = df_wells.groupby('well_id')[['Sy_weighted', 'thickness']].sum()
+    well_summary['average_Sy'] = well_summary['Sy_weighted'] / well_summary['thickness']
+
+    return well_summary[['average_Sy']].reset_index()
 
 def calculate_short_deployment_white_vars(daily_df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -348,9 +474,13 @@ def calculate_short_deployment_white_vars(daily_df: pd.DataFrame) -> pd.DataFram
 
 def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     """
-    Calculate ET in mm/day for each well in subdaily groundwater logger data.
+    Calculates ET in mm/day
+        for each well in subdaily groundwater logger data
+        uses White (1932) WTF equation: ET = Sy * (R + S)
+        with a constant Sy (0.04) for all wells, 
+        SY_STAR = center of sand, silt and clay in Loheide et al 2005 Fig 10
 
-    Parameters: daily groundwater dataframe with gw levels at key times
+    Parameters: daily groundwater dataframe with gw level at 0h, 4h, 24h
     
     Returns:
     populated "ET estimate" dataframe
@@ -368,6 +498,7 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
     
+    # Validate/correct well_ids
     df = update_wells(df)
 
     return df[
@@ -387,10 +518,12 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
 
 def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Calculate ET in mm/day for each well in subdaily groundwater logger data
-    using White (1932) method and a specific yield for each well that's a weighted
-    average based on soil profile field data and Sy* estimates from 
-    Loheide et al (2008) <to verify> and <who else?>
+    Calculate ET in mm/day
+        for each well in subdaily groundwater logger data
+        uses White (1932) WTF equation: ET = Sy * (R + S)
+        with Sy for each well that's a weighted
+        average based on soil profile field data and Sy* estimates from 
+        Loheide et al (2008) <to verify> and <who else?>
 
     Parameters:
     daily_df: daily groundwater dataframe with gw levels at key times
@@ -417,6 +550,7 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
     
+    # Validate/correct well_ids
     df = update_wells(df)
 
     return df[
@@ -446,14 +580,16 @@ def estimate_ET_White_Duke_Sy(
 ) -> pd.DataFrame:
     """
     Calculates ET using Duke's equation for Specific Yield (Sy), based on 
-    the soil parameters of the single horizon where the water table is currently fluctuating.
+    the soil parameters of the single horizon where the water table 
+    is currently fluctuating.
     
     Includes a capillary truncation check for overlying gravel layers ('GR').
-    If the water table is inside the effective capillary fringe, the White method is bypassed 
-    and ET is set to equal atmospheric PET.
+    If the water table is inside the effective capillary fringe, 
+    the White method is bypassed and ET is set to equal atmospheric PET.
     
-    Includes a strict fail-fast design: the script will crash and raise a ValueError 
-    if any required data (soil horizons, water table, PET, or recharge parameters) is missing.
+    if any required data is missing
+    (e.g. soil horizons, water table, PET, or recharge parameters)
+    the script will crash and raise a ValueError
     """
     METHOD_ID = "White_Duke"
     
@@ -461,12 +597,18 @@ def estimate_ET_White_Duke_Sy(
     df = daily_df.copy()
     df['date'] = pd.to_datetime(df['date'])
     df = df[df['date'].dt.year == year].copy()
-    # Assuming update_wells is a custom function defined elsewhere in your script
-    df = update_wells(df)
+    
+    # SKIP: validate and rename wells, already done in get_daily_gw_levels()
+    #df = update_wells(df)
 
     soil_clean = soil_df.copy()
-
+    
+    # Get R and S for White WTF
     df = calculate_storage_recharge(df)
+    
+    # TODO: should this be calculated in storage_recharge function rather
+    # than a separate call each time? Or is it specific to Duke calcs? and 
+    # if so, why?
     df = calculate_short_deployment_white_vars(df)
     df = get_PET(df, pet_df, station_PET_df, year)
 
@@ -486,14 +628,23 @@ def estimate_ET_White_Duke_Sy(
         if 'gw_00' not in row or pd.isna(row['gw_00']):
             raise ValueError(f"DATA ERROR: Missing groundwater depth (gw_00) for well '{current_well}' on {current_date}.")
             
-        # Groundwater depth is stored in mm in 'gw_00'. Convert it to cm to match soil depths.
+        # Groundwater depth at midnight is stored in mm in 'gw_00'. 
+        # Convert to cm to match soil depths.
         raw_wt_cm = row['gw_00'] / 10.0
         
         # ---------------------------------------------------------
-        # REGIME 0: STANDING WATER (Negative or Zero Depth)
+        # REGIME 0: STANDING WATER (Negative or Zero Depth) ET=PET
         # ---------------------------------------------------------
+        # TODO: Address two questions:
+        # 1. Is it valid to assume that ET=PET when standing water?
+        # Some plants may close stomata in response to flooding,
+        # unclear of the extent. Some sedges have adaptations, but MH and Willow?
+        # 2. If WTD is 0 at midnight, 
+        #   is it fair to assume ET=PET for the whole day?
         if raw_wt_cm <= 0.0:
-            # Water is at or above the ground surface. Bypass soil properties entirely.
+            
+            # Water is at or above the ground surface at midnight,
+            # bypass soil properties entirely.
             layer_sy = 0.0 
             
             pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
@@ -512,10 +663,14 @@ def estimate_ET_White_Duke_Sy(
             # Append the results and immediately skip to the next day
             calculated_sy_list.append(layer_sy)
             calculated_et_list.append(daily_et)
+            
+            # TODO: confirm that continue drops out of "for" loop, skips to next day
             continue
             
         # ---------------------------------------------------------
-        # For all normal days, wt_depth_cm is safely strictly positive
+        # Otherwise wt_depth_cm is safely strictly positive?
+        # TODO: should the end of the previous "if" return, not continue?
+        # or should there be an "else" statement?
         wt_depth_cm = raw_wt_cm
 
         # Filter the soil survey to find horizons belonging to ONLY this well
@@ -528,7 +683,8 @@ def estimate_ET_White_Duke_Sy(
             calculated_et_list.append(np.nan)
             continue
 
-        # Find the single horizon containing the current water table
+        # Find the single horizon containing the water table at midnight
+        # TODO: Why only consider single horizon at midnight?
         active_horizon = well_horizons[
             (well_horizons['start_depth_cm'] <= wt_depth_cm) & 
             (well_horizons['stop_depth_cm'] > wt_depth_cm)
@@ -552,17 +708,23 @@ def estimate_ET_White_Duke_Sy(
 
         # Capillary Truncation Check: Find any gravel sitting ABOVE the active water table.
         # Gravel has pores too large to support a capillary fringe, acting as a hydraulic barrier.
+        # TODO: This is cool, but we may have gravel documented where there's a single large rock,
+        #       not in a horizontal band. Does that have the same effect when surrounded by soil?
+        # TODO: Consider how/when we document and assign GR if we use this approach.
         gravel_above = well_horizons[
             (well_horizons['stop_depth_cm'] < wt_depth_cm) & 
             (well_horizons['soil_texture_code'].isin(['GR']))
         ]
 
-        # Fetch Parameters and Set Effective Air-Entry Pressure (ha)
+        # Get Parameters to Set Effective Air-Entry Pressure (ha)
         if texture_code in ['GR', 'HO']:
             # The water table is currently inside a gravel layer. 
             # Gravel cannot hold a capillary fringe above the water table.
             is_gravel_active = True
             ha_eff = 0.0
+            # TODO: for GR and HO use consistent Sy for all ET calc methods
+            #       as defined in a shared sy_lookup table (sy_data_filepath);
+            #       consider a generic method for getting the Sy from it?
             layer_sy = 0.23 # Fixed generic specific yield for medium gravel
         else:
             is_gravel_active = False
@@ -570,25 +732,31 @@ def estimate_ET_White_Duke_Sy(
             if texture_code not in rawls_lookup:
                 raise ValueError(f"DATA ERROR: Soil code '{texture_code}' for well '{current_well}' not in Rawls lookup.")
             
+            # Get params per soil texture
             params = rawls_lookup[texture_code]
             
             try:
                 # Physical Soil Parameters (from Rawls)
-                # phi (Porosity): The total volume fraction of empty space in the soil.
+                # phi (Porosity): The total volume fraction of soil pores.
                 phi = params['phi']
                 
-                # Sr (Residual Saturation): The fraction of water permanently held by tight capillary forces.
+                # Sr (Residual Saturation): fraction of the bulk volume 
+                #                           occupied by immobile wetting phase,
+                #                           held by capillary/matric tension.
                 sr = params['Sr']
                 
-                # ha_cm (Air-entry pressure): The maximum natural height of the saturated capillary fringe.
+                # ha_cm (Air-entry or bubble pressure): approx. the capillary
+                #       head pressure when air phase first becomes continuous.
                 ha_cm = params['ha_cm']
                 
-                # lam (Lambda): Pore-size distribution index. Controls how fast water drains as suction increases.
+                # lam (Lambda): Pore-size distribution index; controls
+                #               how fast water drains as tension increases.
                 lam = params['lambda']
             except KeyError as missing_key:
                 raise ValueError(f"DATA ERROR: Parameter {missing_key} missing for soil texture '{texture_code}'.")
                 
-            # max_sy: The absolute maximum water the soil can release if drained completely by gravity.
+            # max_sy: The absolute maximum water the soil can release 
+            #         if drained completely by gravity.
             max_sy = phi - sr
 
             # Calculate Effective Air-Entry Pressure (ha_eff)
@@ -610,6 +778,12 @@ def estimate_ET_White_Duke_Sy(
             
         elif wt_depth_cm <= ha_eff:
             # REGIME 1: Normal soil saturated to surface
+            # TODO: Soil only saturated to surface if wt_depth_cm <= 0
+            #       Otherwise,if wt_depth_cm <= ha_eff,
+            #       Would Sy be 0 or Sy_a?
+            #       Should be based on soil texture in delta_z,
+            #       the profile within change in WT depth for that day,
+            #       or delta_z + h_eff, the full region of drainage.
             layer_sy = 0.0
             
             pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
@@ -637,6 +811,8 @@ def estimate_ET_White_Duke_Sy(
             layer_sy = max_sy * depth_factor
             daily_et = layer_sy * (row["R_mm"] + row["S_mm"])
 
+
+        # TODO: Move to a more generalized validation function for all ET calcs
         # --- NEW CHECK: Calculated ET vs PET ---
         pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
         station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
@@ -659,7 +835,6 @@ def estimate_ET_White_Duke_Sy(
     df['ET_gw_mm'] = calculated_et_list
     df['method_id'] = METHOD_ID
     
-
     
     return df[
         [
@@ -675,6 +850,290 @@ def estimate_ET_White_Duke_Sy(
             "gw_00"
         ]
     ]
+
+def estimate_ET_White_VG_Smoothed(
+    daily_df: pd.DataFrame, 
+    soil_df: pd.DataFrame, 
+    vg_df: pd.DataFrame, 
+    pet_df: pd.DataFrame,
+    station_PET_df: pd.DataFrame = None,
+    year: int = 2025,
+    smoothing_window: int = 2  
+) -> pd.DataFrame:
+    """
+    Calculates daily groundwater evapotranspiration (ET_g) using a modified White method.
+    This dynamically calculates specific yield using van Genuchten parameters and a 
+    kinematic drainage time correction to account for delayed yield in heavy soils.
+    """
+    
+    METHOD_ID = "White_VG"
+    
+    df = daily_df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+    df = df[df['date'].dt.year == year].copy()
+    
+    df = df.sort_values(by=['well_id', 'date'])
+    df = update_wells(df)
+    soil_clean = soil_df.copy()
+
+
+    df['gw_00_smooth'] = df.groupby('well_id')['gw_00'].transform(
+        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
+    )
+    
+    # 2. OVERWRITE THE RAW DATA SO THE WHITE METHOD ONLY SEES THE CLEAN SIGNAL
+    df['gw_00'] = df['gw_00_smooth']
+
+    # 3.  CALCULATE RECHARGE
+    df = calculate_storage_recharge(df)
+    df = get_PET(df, pet_df, station_PET_df, year)
+
+    # 4. Smooth the resulting daily components 
+    df['R_mm_smooth'] = df.groupby('well_id')['R_mm'].transform(
+        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
+    )
+    df['S_mm_smooth'] = df.groupby('well_id')['S_mm'].transform(
+        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
+    )
+
+    vg_lookup = vg_df.set_index('soil_texture_code').to_dict(orient='index')
+    
+    calculated_sy_list = []
+    calculated_et_list = []      
+
+    for _, row in df.iterrows():
+        current_well = row['well_id']
+        
+        # Skip calculations if the smoothed groundwater data is missing for the day.
+        if 'gw_00_smooth' not in row or pd.isna(row['gw_00_smooth']):
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+            
+        wt_depth_cm = row['gw_00_smooth'] / 10.0
+        
+        # Determine the most localized Potential Evapotranspiration (PET) value available.
+        pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
+        station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
+        active_pet = pet_val if pd.notna(pet_val) else station_pet_val
+
+        # If the water table is at or above the ground surface, bypass the soil mechanics and set ET directly to PET.
+        if wt_depth_cm <= 0.0:
+            calculated_sy_list.append(0.0)
+            calculated_et_list.append(active_pet if pd.notna(active_pet) else 0.0)
+            continue
+            
+        well_horizons = soil_clean[soil_clean['well_id'] == current_well].copy()
+        
+        # Skip if no soil profile data is available for this well.
+        if well_horizons.empty:
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+
+        active_horizon = well_horizons[
+            (well_horizons['start_depth_cm'] <= wt_depth_cm) & 
+            (well_horizons['stop_depth_cm'] > wt_depth_cm)
+        ]
+        
+        # Skip if the water table sits outside the defined soil profile depths.
+        if active_horizon.empty:
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+
+        # Calculate the dynamically scaled specific yield based on soil texture and drainage time.
+        layer_sy = get_composite_sy_kinematic(wt_depth_cm, well_horizons, vg_lookup, observation_time_days=1.0)
+        
+        # Convert the observed storage and recharge signals into physical water depth using the calculated specific yield.
+        raw_daily_et = layer_sy * (row["R_mm_smooth"] + row["S_mm_smooth"])
+        
+        # Prevent ET from dropping below zero due to noise or sudden positive storage fluctuations.
+        daily_et = max(0.0, raw_daily_et)
+        
+        # # Cap the calculated evapotranspiration so it does not exceed the maximum atmospheric demand (PET).
+        # if pd.notna(active_pet):
+        #     daily_et = min(daily_et, active_pet)
+
+        calculated_sy_list.append(layer_sy)
+        calculated_et_list.append(daily_et)
+
+    df['Sy_star'] = calculated_sy_list 
+    df['ET_gw_mm'] = calculated_et_list
+    df['method_id'] = METHOD_ID
+    
+    return df[
+        [
+            "date",
+            "doy",
+            "year",
+            "well_id",
+            "ET_gw_mm",
+            "R_mm",
+            "S_mm",
+            "Sy_star",
+            "method_id",
+            "gw_00"
+        ]
+    ]
+
+def estimate_ET_Shaw(
+    daily_df: pd.DataFrame,
+    pet_df: pd.DataFrame,
+    df_well_logs: pd.DataFrame,
+    df_extinction: pd.DataFrame,
+    station_PET_df: pd.DataFrame = None,
+    pet_col: str = "PET_mm_day",
+    year: int = 2025,
+) -> pd.DataFrame:
+    """Calculates Groundwater Evapotranspiration (GWET) based on the Shaw method
+    (Equation 17). This function evaluates the limiting soil layer in the
+    vadose zone and calculates ET directly from Potential Evapotranspiration
+    (PET). If specific well PET is missing, it falls back to station PET and
+    notifies the user.
+    """
+
+    # PREPARE AND FILTER DATA USING HELPER
+    merged_df, logs = prepare_merged_et_df(
+        df_input=daily_df,
+        pet_df=pet_df,
+        station_PET_df=station_PET_df,
+        df_well_logs=df_well_logs,
+        pet_col=pet_col,
+        year=year,
+    )
+
+
+    def apply_shaw_equation(row):
+        """Applies Equation 17 for a single day at a single well.
+
+        GWET/PET = 1 (for d <= d'') GWET/PET = y0 + exp(-b(d - d'')) (for d >
+        d'')
+        """
+        wtd_mm = row["gw_00"]
+        well = row["well_id"]
+        cover = row["cover_type"]
+        date_str = row["date"].strftime("%Y-%m-%d")
+
+        # Safely extract the fallback station PET, returning NaN if it doesn't exist
+        station_PET = (
+            row["station_PET_mm_day"]
+            if "station_PET_mm_day" in row
+            else np.nan
+        )
+
+        # Determine the active PET to use for the calculation
+        if pd.notna(row[pet_col]):
+            # Primary PET data is available
+            active_pet = row[pet_col]
+        elif pd.notna(station_PET):
+            # Primary is missing, use fallback and print a notification statement
+            active_pet = station_PET
+            print(
+                f"Notice: Missing specific PET for Well {well} on {date_str}. Substituted with Station PET ({active_pet:.3f} mm)."
+            )
+        else:
+            # No PET data available at all to drive ET, return NaN
+            return np.nan
+
+        # If water table depth is missing, we cannot calculate GWET
+        if pd.isna(wtd_mm):
+            return np.nan
+        try:
+            # ISOLATE VADOSE ZONE: Filter soil logs to only include layers ABOVE the current water table
+            vadose_zone = logs[
+                (logs["well_id"] == well) & (logs["start_depth_mm"] < wtd_mm)
+            ]
+            # Exclude Highly Organic ('HO') layers as they usually don't dictate the capillary block
+            vadose_mineral = vadose_zone[vadose_zone["soil_texture_code"] != "HO"]
+        except KeyError as missing_key:
+                raise ValueError(
+                    f"DATA ERROR: The data is missing for  {well} on {date_str}. Please check the soil logs and ensure all required columns are present."
+                )
+
+        # Get the unique soil texture codes currently present in the vadose zone
+        textures = vadose_mineral["soil_texture_code"].unique()
+
+        # Lookup the extinction parameters (y0, b, d'') for these specific textures
+        ext_params = df_extinction[
+            df_extinction["Soil Texture Code"].isin(textures)
+        ]
+
+        # If no matching parameters are found in the lookup table, assume fully coupled
+        if ext_params.empty:
+            return active_pet
+
+        # DYNAMIC COLUMN NAMES: Identify the correct columns based on the land cover type
+        d_double_prime_col = f"{cover} d'' (mm)"
+        y0_col = f"{cover} y0"           # Removed the underscore
+        b_col = f"{cover} b (cm-1)"      # Added the units to match the header exactly
+
+        # IDENTIFY LIMITING LAYER: The layer with the tightest capillary constraint (smallest d'')
+        min_d_double_prime = ext_params[d_double_prime_col].min()
+
+        # Isolate the row in the parameters table corresponding to this limiting layer
+        limiting_row = ext_params[
+            ext_params[d_double_prime_col] == min_d_double_prime
+        ].iloc[0]
+
+        # Extract the specific parameters needed for Equation 17
+        d_double_prime_mm = limiting_row[d_double_prime_col]
+        y0 = limiting_row[y0_col]
+        b = limiting_row[b_col]
+
+        # APPLY EQUATION 17
+        if wtd_mm <= d_double_prime_mm:
+            # Phase 1: Water table is shallower than d''. Roots have full access to water.
+            # GWET / PET = 1 -> GWET = PET
+            return active_pet
+        else:
+            # Phase 2: Water table is deeper than d''. Roots rely on decaying capillary rise.
+            # Equation uses 'b' which is in units of cm^-1 (per Table 3).
+            # Therefore, we MUST convert the depth difference (d - d'') from mm to cm!
+            depth_diff_cm = (wtd_mm - d_double_prime_mm) / 10.0
+
+            # Calculate the ratio: y0 + e^(-b * (d - d''))
+            ratio = y0 + np.exp(-b * depth_diff_cm)
+
+            # Mathematical safeguard: y0 can be slightly negative (e.g., -0.012).
+            # At extreme depths, the exponential term approaches 0, which could make the total ratio negative.
+            # ET cannot be negative, so we floor the ratio at 0.0.
+            ratio = max(0.0, ratio)
+
+            # Final GWET is the calculated ratio multiplied by the active PET
+            return active_pet * ratio
+
+
+    # Apply the row-by-row function across the entire dataframe to generate the new ET column
+    merged_df["ET_gw_mm"] = merged_df.apply(apply_shaw_equation, axis=1)
+
+    # Explicitly label the method used for future tracking
+    merged_df["method_id"] = "Shaw_Eq17"
+
+    # Ensure structural columns exist even if they weren't in the original daily_df
+    # This prevents KeyError during the final column selection
+    for col in ["R_mm", "S_mm", "Sy_star", "meadow_id", "hydrogeo_zone"]:
+        if col not in merged_df.columns:
+            merged_df[col] = np.nan
+
+    # Return the final organized dataframe, dropping any rows where ET could not be calculated
+    return merged_df[
+        [
+            "date",
+            "doy",
+            "year",
+            "well_id",
+            "meadow_id",
+            "hydrogeo_zone",
+            "plant_type",
+            "ET_gw_mm",
+            "R_mm",
+            "S_mm",
+            "Sy_star",
+            "method_id",
+            "gw_00",
+        ]
+    ].dropna(subset=["ET_gw_mm"])
 
 def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_mm: float = 8.0, recovery_days: int = 3) -> pd.DataFrame:
     """
@@ -789,37 +1248,6 @@ def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: p
 
     return filtered_et
 
-def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calculates the average specific yield for each well based on soil texture and thickness.
-
-    Parameters:
-    df_sy: a dataframe with specific yield information for each soil texture
-    df_wells: a data frame with well information including soil texture and depth
-    
-    Returns:
-    a dataframe with the average specific yield for each well
-    """
-
-    # Set the key column as the index, select the value column, and convert to dict
-    soil_sy_dict = df_sy.set_index('soil_texture')['Sy'].to_dict()
-
-    #  Data Cleaning
-    df_wells = df_wells.dropna(subset=['well_id']).copy()
-    
-    df_wells = update_wells(df_wells)
-
-    #  Math and Calculations
-    df_wells['Sy'] = df_wells['soil_texture_code'].map(soil_sy_dict)
-    df_wells['thickness'] = df_wells['stop_depth_cm'] - df_wells['start_depth_cm']
-    df_wells['Sy_weighted'] = df_wells['Sy'] * df_wells['thickness']
-
-
-    #  Grouping and Averaging
-    well_summary = df_wells.groupby('well_id')[['Sy_weighted', 'thickness']].sum()
-    well_summary['average_Sy'] = well_summary['Sy_weighted'] / well_summary['thickness']
-
-    return well_summary[['average_Sy']].reset_index()
   
 def plot_ET_bywell(
         ET_df,
@@ -1374,93 +1802,8 @@ def plot_gw_ET_overlay(gw_df, et_df, year):
     
     return
 
-def update_wells(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Validates files with well_ids
-    Returns a valided dataframe with corrected well_ids.
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        DataFrame with well_ids 
-    """
-    # Validate the well_ids to ensure no bad data slipped through
-    #Load Sy data
 
-    # Correct the well_ids using the STATIC function 
-    df = well_utils.correct_well_ids_static(df)
-    
-    # Validate the well_ids to ensure no bad data slipped through
-    df = well_utils.validate_well_ids(df, id_col="well_id")
-    return  df 
-
-def get_PET(data_df: pd.DataFrame,
-            pet_df: pd.DataFrame, 
-            station_PET_df: pd.DataFrame, 
-            year: int, 
-            pet_col: str = "PET_mm_day") -> pd.DataFrame:
-    """
-    Merges well-specific PET and station PET dataframes for a given year.
-
-    Parameters
-    ----------
-    data_df : pd.DataFrame
-        DataFrame containing the main dataset.
-    pet_df : pd.DataFrame
-        DataFrame containing well-specific PET data.
-    station_PET_df : pd.DataFrame
-        DataFrame containing station PET data.
-    year : int
-        Year to filter the data on.
-    pet_col : str, optional
-        Column name for PET values in the input dataframes. Default is "PET_mm_day".
-
-    Returns
-    -------
-    pd.DataFrame
-        Merged DataFrame with well-specific and station PET values for the specified year.
-    """
-    # Clean and standardize the primary PET dataframe dates
-    pet_clean = pet_df.copy()
-    pet_clean["Date"] = pd.to_datetime(pet_clean["Date"])
-
-    # If a station PET dataframe is provided, clean and standardize it too
-    if station_PET_df is not None:
-        station_PET_clean = station_PET_df.copy()
-
-        station_PET_clean["Date"] = pd.to_datetime(
-            station_PET_clean["Date"]
-        )
-
-        # Filter the station PET data strictly for the requested year
-        station_PET_clean_year = station_PET_clean[
-            station_PET_clean["Date"].dt.year == year
-        ].copy()
-
-        # Rename the station PET column to differentiate it from the well-specific PET column during merge
-        station_PET_clean_year = station_PET_clean_year.rename(
-            columns={pet_col: "station_PET_mm_day"}
-        )
-
-    # MERGE DATASETS
-    # Left merge the primary PET data into the daily groundwater dataframe
-    # Match on both 'date' and 'well_id' so each well gets its specific daily PET
-    merged_df = data_df.merge(
-        pet_clean[["Date", "well_id", pet_col]],
-        left_on=["date", "well_id"],
-        right_on=["Date", "well_id"],
-        how="left",
-    )
-
-    # Left merge the station PET data (matches only by date, as station applies globally)
-    if station_PET_df is not None:
-        merged_df = merged_df.merge(
-            station_PET_clean_year[["Date", "station_PET_mm_day"]],
-            left_on=["date"],
-            right_on=["Date"],
-            how="left",
-        )
-    return merged_df
 
 def prepare_merged_et_df(
     df_input: pd.DataFrame,
@@ -1544,7 +1887,7 @@ def prepare_merged_et_df(
     return merged_df, logs
 
 
-def calculate_GWET_shah(
+def calculate_GWET_shaw(
     daily_df: pd.DataFrame,
     pet_df: pd.DataFrame,
     df_well_logs: pd.DataFrame,
@@ -1553,7 +1896,7 @@ def calculate_GWET_shah(
     pet_col: str = "PET_mm_day",
     year: int = 2025,
 ) -> pd.DataFrame:
-    """Calculates Groundwater Evapotranspiration (GWET) based on the Shah method
+    """Calculates Groundwater Evapotranspiration (GWET) based on the Shaw method
 
     (Equation 17). This function evaluates the limiting soil layer in the
     vadose zone and calculates ET directly from Potential Evapotranspiration
@@ -1572,7 +1915,7 @@ def calculate_GWET_shah(
     )
 
 
-    def apply_shah_equation(row):
+    def apply_shaw_equation(row):
         """Applies Equation 17 for a single day at a single well.
 
         GWET/PET = 1 (for d <= d'') GWET/PET = y0 + exp(-b(d - d'')) (for d >
@@ -1673,10 +2016,10 @@ def calculate_GWET_shah(
 
 
     # Apply the row-by-row function across the entire dataframe to generate the new ET column
-    merged_df["ET_gw_mm"] = merged_df.apply(apply_shah_equation, axis=1)
+    merged_df["ET_gw_mm"] = merged_df.apply(apply_shaw_equation, axis=1)
 
     # Explicitly label the method used for future tracking
-    merged_df["method_id"] = "Shah_Eq17"
+    merged_df["method_id"] = "Shaw_Eq17"
 
     # Ensure structural columns exist even if they weren't in the original daily_df
     # This prevents KeyError during the final column selection
@@ -1997,7 +2340,7 @@ def estimate_ET_White_VG_Smoothed(
     pet_df: pd.DataFrame,
     station_PET_df: pd.DataFrame = None,
     year: int = 2025,
-    smoothing_window: int = 1  
+    smoothing_window: int = 2  
 ) -> pd.DataFrame:
     """
     Calculates daily groundwater evapotranspiration (ET_g) using a modified White method.
@@ -2014,21 +2357,19 @@ def estimate_ET_White_VG_Smoothed(
     df = df.sort_values(by=['well_id', 'date'])
     df = update_wells(df)
     soil_clean = soil_df.copy()
-    
+
+
     df['gw_00_smooth'] = df.groupby('well_id')['gw_00'].transform(
         lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
     )
-    df['gw_04_smooth'] = df.groupby('well_id')['gw_04'].transform(
-        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
-    )
     
+    # 2. OVERWRITE THE RAW DATA SO THE WHITE METHOD ONLY SEES THE CLEAN SIGNAL
     df['gw_00'] = df['gw_00_smooth']
-    df['gw_04'] = df['gw_04_smooth']  
 
     # 3.  CALCULATE RECHARGE
     df = calculate_storage_recharge(df)
     df = get_PET(df, pet_df, station_PET_df, year)
-    # ---> MAKE SURE THIS IS STILL HERE <---
+
     # 4. Smooth the resulting daily components 
     df['R_mm_smooth'] = df.groupby('well_id')['R_mm'].transform(
         lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
@@ -2047,7 +2388,6 @@ def estimate_ET_White_VG_Smoothed(
         
         # Skip calculations if the smoothed groundwater data is missing for the day.
         if 'gw_00_smooth' not in row or pd.isna(row['gw_00_smooth']):
-            raise ValueError(f"DATA ERROR: Missing smoothed groundwater data for well '{current_well}' on {row['date']}. Cannot calculate ET.")
             calculated_sy_list.append(np.nan)
             calculated_et_list.append(np.nan)
             continue
@@ -2069,7 +2409,6 @@ def estimate_ET_White_VG_Smoothed(
         
         # Skip if no soil profile data is available for this well.
         if well_horizons.empty:
-            print(f"DATA ERROR: No soil profile data found for well '{current_well}'. Cannot calculate ET.")
             calculated_sy_list.append(np.nan)
             calculated_et_list.append(np.nan)
             continue
@@ -2081,7 +2420,6 @@ def estimate_ET_White_VG_Smoothed(
         
         # Skip if the water table sits outside the defined soil profile depths.
         if active_horizon.empty:
-            print (f"DATA ERROR: Water table depth ({wt_depth_cm} cm) for well '{current_well}' is outside the defined soil profile depths. Cannot calculate ET.")
             calculated_sy_list.append(np.nan)
             calculated_et_list.append(np.nan)
             continue
@@ -2123,49 +2461,75 @@ def estimate_ET_White_VG_Smoothed(
 
 def main():
    
-
-    # I/O: load subdaily groundwater input (source data) file
+    # -- I/O
+    # load subdaily groundwater input (source data) file
     subdaily_gw_df = pd.read_csv(groundwater_subdaily_filepath,
                                  parse_dates=["DateTime"]
                                  ).rename(columns={"DateTime": "datetime"})   
-    # Load precipitation data
+    
+    # Load and calculate cumulative precip per day
     precip_df = load_precip_for_years(weather_subdaily_filepath, 2025)
     daily_precip_df = daily_cumulative_precip(precip_df)
     
-    # pre-process gw from subdaily into key daily values
-    daily_gw_df = get_daily_gw_levels(subdaily_gw_df)
-    print("got gw levels")
-
-    # #calculate average Sy for each well
-    df_soil_sy = pd.read_csv(sy_data_filepath)
-    duke_df = pd.read_csv(duky_et_data_dir)
-    df_soil_log = pd.read_csv(soil_data_filepath)
-    calculated_sy_df = average_sy(df_soil_sy, df_soil_log)
+    # Load PET and temp data
     PET_df = pd.read_csv(pet_well_data_filepath)
     pet_station_df = pd.read_csv(pet_station_data_filepath)
     weather_df = get_daily_temperature(weather_subdaily_filepath)
-    lai_df = pd.read_csv(lai_data_filepath)
-    van_genuchten_df = pd.read_csv(van_guch_filepath)
+    
+    
+    # Load lookup tables for all ET methods
+    duke_df = pd.read_csv(duke_lookup_filepath)
+    van_genuchten_df = pd.read_csv(vangen_lookup_filepath)
+    df_extinction = pd.read_csv(extinction_data_filepath)\
+        
+    # Load soil data for Sy calcs
+    df_soil_sy = pd.read_csv(sy_data_filepath)
+    df_soil_log = pd.read_csv(soil_data_filepath)    
+    
+    # -- CALCS
+    # Calculate Sy for each well, a weighted average of each soil layer/texture
+    calculated_sy_df = average_sy(df_soil_sy, df_soil_log)
+    
+    # Pre-process gw from subdaily into key daily values
+    daily_gw_df = get_daily_gw_levels(subdaily_gw_df)
+    print("got gw levels")
 
-    df_extinction = pd.read_csv(extinction_data_filepath)
-    # 1. Calculate raw ET for ALL days
+    
+    # Calculate raw ET for ALL days
+    raw_ET_df = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
+    method_ids = raw_ET_df["method_id"].dropna().unique()
+
+    if len(method_ids) != 1:
+        raise ValueError(
+            f"Expected exactly one method_id, but found: {method_ids}"
+        )
+    method_id = method_ids[0]
+    
     # raw_ET_df = estimate_ET_White_Duke_Sy(daily_gw_df, df_soil_log, duke_df, PET_df, pet_station_df, 2025)
-    raw_ET_df = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log,  van_genuchten_df, PET_df, pet_station_df, 2025)
+    # raw_ET_df = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log, 
+    #                                           van_genuchten_df, PET_df, 
+    #                                           pet_station_df, 2025)
 
-    #raw_ET_df = calculate_GWET_shaw(daily_gw_df, PET_df, df_soil_log, df_extinction, pet_station_df)
+    #raw_ET_df = estimate_ET_Shaw(daily_gw_df, PET_df, df_soil_log, df_extinction, pet_station_df)
     #raw_ET_df = apply_et_capillary_limits(raw_ET_df, PET_df, df_soil_log, df_extinction, pet_station_df, pet_col="PET_mm_day")
-    # # 2. Filter out the storm events
-    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, threshold_mm=1.0, recovery_days=3)
+    
+    # -- FILTER ET ESTIMATES
+    # Filter days with precipitation plus a recovery buffer
+    ET_no_rain = filter_ET_by_precip(raw_ET_df, daily_precip_df, 
+                                     threshold_mm=1.0, recovery_days=3)
 
-    # 3. Filter out days where the well went dry (dropping data when water is within 10cm of bottom)
-    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, df_soil_log, buffer_mm=100.0)
+    # Filter days where the well went dry 
+    #    (dropping data when water is within 10cm of bottom)
+    daily_ET_df = filter_ET_by_well_depth(ET_no_rain , daily_gw_df, 
+                                          df_soil_log, buffer_mm=100.0)
+    
     print(daily_ET_df['date'].min(), "to", daily_ET_df['date'].max())
 
     #plot_cumulative_et_box(daily_ET_df, save_dir=save_plots_dir)
     # Plot
     # plot_ET_cat(
     #     ET_df=daily_ET_df, 
-    #     lai_df = lai_df,
+    #     lai_df = pd.read_csv(lai_data_filepath),
     #     pet_df=pet_station_df,
     #     year=2021, 
     #     end_date=None,
@@ -2178,16 +2542,16 @@ def main():
             PET_df,
             pet_station_df,
             subdaily_gw_df,
-            "White_VG", 
+            "White_wavg", 
             2025,  
             df_soil_log, 
             weather_df,
-            save_dir=save_plots_dir)
-    print("ET plotted for White average Sy")
+            save_dir=save_plots_dir / f"{method_id}/")
+    print("ET plotted.")
 
-   
     # Save to csv? Do we want a new one or write over the one from above?
-    # Then plot this new estimate, use an appropriate name, check if the 2nd param affects filename and not just the title
+    # Then plot this new estimate, use an appropriate name, 
+    #   check if the 2nd param affects filename and not just the title
     print("COMPLETE!!")
    
 
