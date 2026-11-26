@@ -173,10 +173,10 @@ def update_wells(df: pd.DataFrame) -> pd.DataFrame:
     # Rename well_ids and validate
 
     # Correct the well_ids using the STATIC function 
-    df = well_utils.correct_well_ids_static(df)
+    #df = well_utils.correct_well_ids_static(df)
     
     # TODO: Correct well_ids with the original function (capture E5S to KHT-1)
-    #df = well_utils.correct_well_ids(df, datetime_name="date")
+    df = well_utils.correct_well_ids(df, datetime_name="date")
     
     # Validate the well_ids to ensure no bad data slipped through
     df = well_utils.validate_well_ids(df, id_col="well_id")
@@ -499,8 +499,10 @@ def estimate_ET_White_constant_Sy(daily_df) -> pd.DataFrame:
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
     df["ET_gw_mm"] = df["ET_gw_mm"].clip(lower=0)   
+    
+    # JN 11/26/26 redundant, already updated wells
     # Validate/correct well_ids
-    df = update_wells(df)
+    #df = update_wells(df)
 
     return df[
         [
@@ -551,8 +553,10 @@ def estimate_ET_White_wavg_Sy(daily_df: pd.DataFrame, sy_df: pd.DataFrame) -> pd
     # Calculate daily ET
     df["ET_gw_mm"] = df["Sy_star"] * (df["R_mm"] + df["S_mm"])
     df["ET_gw_mm"] = df["ET_gw_mm"].clip(lower=0)
+    
+    # JN 11/26/26 redundant, already updated/validated well_ids
     # Validate/correct well_ids
-    df = update_wells(df)
+    #df = update_wells(df)
 
     return df[
         [
@@ -813,19 +817,19 @@ def estimate_ET_White_Duke_Sy(
             daily_et = layer_sy * (row["R_mm"] + row["S_mm"])
 
 
-        # TODO: Move to a more generalized validation function for all ET calcs
+        # JN 11/26/26 Move to a more generalized validation function for all ET calcs
         # --- NEW CHECK: Calculated ET vs PET ---
-        pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
-        station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
+        # pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
+        # station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
         
-        # Use local PET if available, otherwise use station PET
-        active_pet = pet_val if pd.notna(pet_val) else station_pet_val
+        # # Use local PET if available, otherwise use station PET
+        # active_pet = pet_val if pd.notna(pet_val) else station_pet_val
         
-        if pd.notna(active_pet) and daily_et > active_pet:
-            print(
-                f"WARNING: Calculated ET ({daily_et:.2f} mm) > PET ({active_pet:.2f} mm) "
-                f"for well '{current_well}' on {current_date}. Soil Layer: '{texture_code} at depth {wt_depth_cm} cm'."
-            )
+        # if pd.notna(active_pet) and daily_et > active_pet:
+        #     print(
+        #         f"WARNING: Calculated ET ({daily_et:.2f} mm) > PET ({active_pet:.2f} mm) "
+        #         f"for well '{current_well}' on {current_date}. Soil Layer: '{texture_code} at depth {wt_depth_cm} cm'."
+        #     )
 
         # Append to our daily lists
         calculated_sy_list.append(layer_sy)
@@ -875,7 +879,9 @@ def estimate_ET_White_VG_Smoothed(
     df = df[df['date'].dt.year == year].copy()
     
     df = df.sort_values(by=['well_id', 'date'])
-    df = update_wells(df)
+    # JN 11/26/26 redundant, already updated/validated well_ids
+    #df = update_wells(df)
+    
     soil_clean = soil_df.copy()
 
 
@@ -2357,7 +2363,10 @@ def estimate_ET_White_VG_Smoothed(
     df = df[df['date'].dt.year == year].copy()
     
     df = df.sort_values(by=['well_id', 'date'])
-    df = update_wells(df)
+    
+    # JN 11/26/26 redundant, already validated this data
+    #df = update_wells(df)
+    
     soil_clean = soil_df.copy()
 
 
