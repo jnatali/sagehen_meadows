@@ -170,8 +170,7 @@ def update_wells(df: pd.DataFrame) -> pd.DataFrame:
     df : pd.DataFrame
         DataFrame with well_ids 
     """
-    # Validate the well_ids to ensure no bad data slipped through
-    #Load Sy data
+    # Rename well_ids and validate
 
     # Correct the well_ids using the STATIC function 
     df = well_utils.correct_well_ids_static(df)
@@ -2792,6 +2791,7 @@ def main():
     # -- 3. CALCULATE ET VIA ALL METHODS --
     print("Calculating ET via White (Constant Sy)...")
     et_const = estimate_ET_White_constant_Sy(daily_gw_df)
+    # TODO: Why return ET for 25 well_ids vs et_wavg has 24 vs Duke only 17?
     
     print("Calculating ET via White (Weighted Avg Sy)...")
     et_wavg = estimate_ET_White_wavg_Sy(daily_gw_df, calculated_sy_df)
@@ -2827,9 +2827,11 @@ def main():
     csv_out_path = et_data_dir / 'Compiled_ET_estimates_2025.csv'
     final_ET_df[existing_cols].to_csv(csv_out_path, index=False)
     print(f"Saved compiled ET results to: {csv_out_path}")
+    
     # -- 8. PLOT SIDE-BY-SIDE K (ET/PET) COMPARISON FROM SAVED CSV --
     print("Generating K = ET/PET side-by-side comparison plots...")
-    compiled_from_csv = pd.read_csv(csv_out_path)
+    # JN 11/16/26 No need to read from csv; use final_ET_df
+    #compiled_from_csv = pd.read_csv(csv_out_path)
 
     # -- 7. PLOT SIDE-BY-SIDE METHOD COMPARISON --
     print("Generating ET side-by-side proportional bar plots...")
@@ -2847,7 +2849,9 @@ def main():
 
         
     plot_K_methods_side_by_side(
-        compiled_ET_df=compiled_from_csv,
+        # JN 11/16/26 No need to read from csv; use final_ET_df
+        #compiled_ET_df=compiled_from_csv,
+        compiled_ET=final_ET_df,
         PET_well_df=PET_df,
         pet_station_df=pet_station_df,
         gw_df=subdaily_gw_df,
