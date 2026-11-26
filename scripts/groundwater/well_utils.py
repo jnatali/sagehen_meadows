@@ -160,7 +160,7 @@ def correct_well_ids(df, datetime_name: str) -> pd.DataFrame:
     if not pd.api.types.is_datetime64_any_dtype(df[datetime_name]):
         df[datetime_name] = pd.to_datetime(df[datetime_name])
     
-    # get corrections datafram from load_well_id_corrections(path)
+    # get corrections dataframe from load_well_id_corrections(path)
     corrections_df = load_well_id_corrections(CORRECTIONS_PATH)
     
     # Ensure effective_date is datetime

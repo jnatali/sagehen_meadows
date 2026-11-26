@@ -199,7 +199,7 @@
 ,E8S,6/6/21,yellow p49,100,115,,,C,,"sandy clay, VGR",saturated,,"7.5 YR, 4/3",,
 ,E8S,6/6/21,yellow p49,115,121,,,,,"sand, XGR",saturated,,"7.5 YR, 4/6",,
 ,,,,,,,,,,,,,,,
-26,"D6N, partial",6/29/21,yellow p55,99,116,,,,,silty clay,moist,"M/VF-F, C/M","7.5 YR, 2.5/3",,deepened well from 99 cm
+25,"D6N, partial",6/29/21,yellow p55,99,116,,,,,silty clay,moist,"M/VF-F, C/M","7.5 YR, 2.5/3",,deepened well from 99 cm
 ,"D6N, partial",6/29/21,yellow p55,116,136,,,,,"sandy clay, FGR",wet non-satiated,C/VF-F,"7.5 YR, 4/2",,
 ,"D6N, partial",6/29/21,yellow p55,136,155,,,,,"clay, FGR",saturated,F/VF-C,"7.5 YR, 4/2","mottled rocks 5 Y, 5/1 + 10 YR 4/6 + 2.5 Y 6/8 (olive yellow)",groundwater level measured at 3.73 ft from ground
 ,"D6N, partial",6/29/21,yellow p55,155,161,,,,,"clay, CGR",saturated,F/VF-F,"10 YR, 5/4",,subangular gravel
@@ -207,7 +207,7 @@
 ,"D6N, partial",6/29/21,yellow p55,177,188,,,,,"sandy clay, VGR",saturated,C/VF-F,"7.5 YR, 5/1","white, rose and orange mottled",large sand and subangular gravel
 ,"D6N, partial",6/29/21,yellow p55,188,196,,,,live root fibers,"sandy clay, VFGR",saturated,C/VF-F,"7.5 YR, 5/1","white, rose and orange mottled",fine gravels and pebbles
 ,,,,,,,,,,,,,,,
-28,EHT-XA5S,7/15/21,yellow p74,0,12,,,O,fibrous,HO,dry,M/VF-C,,,augured completely new well hole; previous well depth was 114.5 cm; this was deepest of 4 trial holes
+26,EHT-XA5S,7/15/21,yellow p74,0,12,,,O,fibrous,HO,dry,M/VF-C,,,augured completely new well hole; previous well depth was 114.5 cm; this was deepest of 4 trial holes
 ,EHT-XA5S,7/15/21,yellow p74,12,32,,,,,silty clay,dry,"M/VF-F, F/M","7.5 YR, 3/1",,
 ,EHT-XA5S,7/15/21,yellow p74,32,42,,,,,silty clay,dry,"M/VF-F, F/M","7.5 YR, 4/1",,
 ,EHT-XA5S,7/15/21,yellow p74,42,63,,,,,silty clay,dry,"C/VF-F, F/M","7.5 YR, 4/1",,
@@ -217,29 +217,29 @@
 ,EHT-XA5S,7/15/21,yellow p74,103,130,,,,fibrous,clay,moist,F/VF,"10 YR, 5/2",orange mottled,coarse gravel <15%
 ,EHT-XA5S,7/15/21,yellow p74,130,131,,,,,GR,,,,,unable to auger past rock and gravel
 ,,,,,,,,,,,,,,,
-29,EWT-1,7/15/21,yellow V1 p77,109,120,,,,,sandy clay,moist,F/VF-F,"10 YR, 5/4",orange mottled,"coarse sand, mottled"
+27,EWT-1,7/15/21,yellow V1 p77,109,120,,,,,sandy clay,moist,F/VF-F,"10 YR, 5/4",orange mottled,"coarse sand, mottled"
 ,EWT-1,7/15/21,yellow V1 p77,120,148,,,,,sandy clay,moist,F/VF,"10 YR, 5/4",orange mottled,"finer sand, mottled"
 ,EWT-1,7/15/21,yellow V1 p77,148,151,,,,,sandy clay,saturated,F/VF,"10 YR, 5/3",,
 ,EWT-1,7/15/21,yellow V1 p77,151,152,,,,,GR,,,,,"hit rock, could not auger beyond it"
 ,,,,,,,,,,,,,,,
-30,EET-2,7/15/21,yellow V1 p77,115,128,,,,,sandy clay,moist,C/VF-F,"2.5 Y, 6/2", yellow-orange-green mottled,
+28,EET-2,7/15/21,yellow V1 p77,115,128,,,,,sandy clay,moist,C/VF-F,"2.5 Y, 6/2", yellow-orange-green mottled,
 ,EET-2,7/15/21,yellow V1 p77,128,130,,,,,GR,moist,,,,thin layer of coarse gravel 28-40 mm
 ,EET-2,7/15/21,yellow V1 p77,130,135,,,,fibrous,sandy clay,moist,C/M,"2.5 Y, 5/2",,coarse sand
 ,EET-2,7/15/21,yellow V1 p77,135,136,,,,,GR,,,,,"hit rock(s), cannot auger beyond"
 ,,,,,,,,,,,,,,,
-31,"A3S, partial",7/16/21,yellow V1 p77,97,98,,,,,GR,,,,,"attempted to deepen well, could not auger deeper than 97 cm, hit rock"
+29,"A3S, partial",7/16/21,yellow V1 p77,97,98,,,,,GR,,,,,"attempted to deepen well, could not auger deeper than 97 cm, hit rock"
 ,,,,,,,,,,,,,,,
-32,A2S,7/16/21,yellow V1 p77,0,17,,,O,,HO,dry,M/VF-C,,,"could not deepen existing well, tried to auger new well"
+30,A2S,7/16/21,yellow V1 p77,0,17,,,O,,HO,dry,M/VF-C,,,"could not deepen existing well, tried to auger new well"
 ,A2S,7/16/21,yellow V1 p77,17,25,,,A,,"clay, VFGR",dry,M/VF-C,"7.5 YR, 2.5/1",,coarse sand to fine gravel; also slightly mucky
 ,A2S,7/16/21,yellow V1 p77,25,45,,,,,"clay, XGR",dry,M/VF-C,,,"hit rocks, could not auger deeper; unclear if abandoned this hole, the previous one was likely deeper"
 ,,,,,,,,,,,,,,,
-33,"E6S, failed",7/16/21,yellow V1 p77,114,115,,,,,sandy clay,moist,C/VF-F,"7.5 YR, 3/3",orange mottled,"10% pebbles; tried to deepen existing well, started at 115 cm but that layer may be mixed origins"
+31,"E6S, failed",7/16/21,yellow V1 p77,114,115,,,,,sandy clay,moist,C/VF-F,"7.5 YR, 3/3",orange mottled,"10% pebbles; tried to deepen existing well, started at 115 cm but that layer may be mixed origins"
 ,"E6S, failed",7/16/21,yellow V1 p77,115,128,,,,,"sandy clay, FGR",moist,F/VF-F,"7.5 YR, 5/3",,gravel subangular
 ,"E6S, failed",7/16/21,yellow V1 p77,128,138,,,,,"sandy clay, VGR",moist,F/VF-F,"7.5 YR, 4/1",,"gravel subangular, coarsening"
 ,"E6S, failed",7/16/21,yellow V1 p77,128,151,,,,,"sandy clay, VGR",moist,F/VF-F,"10 YR, 4/2",,"gravel subangular, coarsening further"
 ,"E6S, failed",7/16/21,yellow V1 p77,151,152,,,,,GR,,,,,"hit rock, seemed big"
 ,,,,,,,,,,,,,,,
-33,E6S,7/16/21,yellow p78,0,13,,,O,humus,HO,dry,M/VF-M,"5 YR, 3/2",,deepened original
+32,E6S,7/16/21,yellow p78,0,13,,,O,humus,HO,dry,M/VF-M,"5 YR, 3/2",,deepened original
 ,E6S,7/16/21,yellow p78,13,32,,,,HO,"clay loam, FGR",dry-moist,"M/VF-F, C/M","5 YR, 2.5/1",,
 ,E6S,7/16/21,yellow p78,32,38,,,,,clay loam,dry,"C/VF, F/F","7.5 YR, 3/2",,fine gravel < 35%
 ,E6S,7/16/21,yellow p78,38,46,,,,,silty clay,dry,F/VF,"7.5 YR, 3/3",,fine gravel < 35%
@@ -257,28 +257,42 @@
 ,E6S,7/16/21,yellow p78,173,182,,,,,"clay, XFGR",saturated,,"10 YR, 3/6",,iron-stained water
 ,E6S,7/16/21,yellow p78,182,183,,,,,GR,saturated,,,,"hit rock(s), could not auger beyond them."
 ,,,,,,,,,,,,,,,
-33,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,0,12,,,O,"moss (green), bulbs 5mm",HO,dry,"VF/C, F/F-M, M/VF","2.5 YR, 2.5/1",,mixed herbaceous veg cover
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,12,25,,,A,,silty clay,dry,"VF/F, C/VF","2.5 YR, 2.5/1",,clay aggregates
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,25,34,,,AB,,silty clay,dry,"VF/F, M/VF","7.5 YR, 4/2",,"clay aggregates, <10% very coarse sand, <15% MGR, <15% CGR, subangular"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,34,44,,,B,,silty clay,dry,"F/F, C/VF","7.5 YR, 4/3",orange-rust mottled nodules,"clay aggregates, <10% very coarse sand, <15% MGR, subangular"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,44,52,,,B,,"silty clay, GR",dry,C/VF,"7.5 YR, 5/3",orange-rust mottled nodules,"clay aggregates, <10% very coarse sand, 15-35% MGR, sub-rounded"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,52,56,,,B,,"silty clay, GR",dry,F/VF,"7.5 YR, 5/3","orange-rust mottled nodules, black nodules may be charcoal","clay aggregates, <10% very coarse sand, 15-35% MGR, 15-35% FGR, sub-rounded"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,56,58,,,E,,CGR,dry,,,,"5 cm rock, subangular"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,58,66,,,E,,"sandy clay, GR",dry,VF/VF,"7.5 YR, 5/3",,"35-50% GR, sub-rounded"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,66,71,,,E,,"sandy clay, XGR",moist,VF/VF,"10 YR, 4/4",orange-rust mottled nodules,">60% GR, full range of sizes"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,71,80,,,E,,"sandy clay, XGR",moist,VF/VF,"10 YR, 5/3","orange-rust mottled nodules esp around rocks, white dry nodules, black nodules might be charcoal",">60% GR, full range of sizes"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,80,82,,,E,,CGR,moist,,,,"5.5 cm rock, subangular"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,82,95,,,E,,"sandy clay, GR",wet,"VF/M, VF/F, F/VF","7.5 YR, 5/6","orange-rust mottled nodules esp around rocks, white dry nodules","15-35% GR, subangular"
-,KHT-XE5S,10/18/26,2025-26 Yellow V2 p48,95,100,,,E,,"sandy clay, GR",wet,"VF/M, C/F","7.5 YR, 5/3",orange mottled nodules,"15-35% GR, subangular; measured water level in well was 47 cm from surface, but soil not saturated anywhere in augered hole within 1m of well suggests subartesian conditions in the well and pontentiometric level of 1.33 m at the bottom of the well screen."
-,KHT-XE5S,7/16/21,yellow V1 p77,100,108,,,E,,"sandy clay, VFGR",wet,C/VF-M,"10 YR, 4/4",,gravel sub-rounded; deepened original well
-,KHT-XE5S,7/16/21,yellow V1 p77,108,113,,,E,,"sandy clay, GR",wet,C/VF-M,"10 YR, 4/1","orange mottled, more gray",gravel sub-rounded to 40 mm
-,KHT-XE5S,7/16/21,yellow V1 p77,113,120,,,E,,"sandy clay, GR",wet,F/VF-F,"10 YR, 4/3 ",orange mottled,gravel sub-rounded to 40 mm
-,KHT-XE5S,7/16/21,yellow V1 p77,120,126,,,E,,"sandy clay, GR",wet,F/VF-F,"10 YR, 3/3",orange mottled,gravel sub-rounded to 40 mm
-,KHT-XE5S,7/16/21,yellow V1 p77,126,130,,,E,,"sandy clay, GR",saturated,C/VF-F,"10 YR, 3/3",orange mottled,gravel sub-rounded to 40 mm
-,KHT-XE5S,7/16/21,yellow V1 p77,130,138,,,E,,"sandy clay, XGR",saturated,F/VF-F,"10 YR, 4/4",,gravel sub-rounded to 40 mm
-,KHT-XE5S,7/16/21,yellow V1 p77,138,150,,,E,,"sandy clay, XFGR",saturated,F/VF-F,"10 YR, 4/4",,finer gravel
-,KHT-XE5S,7/16/21,yellow V1 p77,150,165,,,E,,"sandy clay, XGR",saturated,,"10 YR, 3/6",,"gravel sub-angular, larger to 45 mm"
-,KHT-XE5S,7/16/21,yellow V1 p77,165,179,,,E,,FGR,saturated,,,,"gravel rounded, mostly 2-4 mm, a few to 16 mm"
+33,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,0,12,,,O,"moss (green), bulbs 5mm",HO,dry,"VF/C, F/F-M, M/VF","2.5 YR, 2.5/1",,mixed herbaceous veg cover; actual survey date is 10/18/2026 but using 2021 prior to well being moved to retain E5S naming
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,12,25,,,A,,silty clay,dry,"VF/F, C/VF","2.5 YR, 2.5/1",,clay aggregates
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,25,34,,,AB,,silty clay,dry,"VF/F, M/VF","7.5 YR, 4/2",,"clay aggregates, <10% very coarse sand, <15% MGR, <15% CGR, subangular"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,34,44,,,B,,silty clay,dry,"F/F, C/VF","7.5 YR, 4/3",orange-rust mottled nodules,"clay aggregates, <10% very coarse sand, <15% MGR, subangular"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,44,52,,,B,,"silty clay, GR",dry,C/VF,"7.5 YR, 5/3",orange-rust mottled nodules,"clay aggregates, <10% very coarse sand, 15-35% MGR, sub-rounded"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,52,56,,,B,,"silty clay, GR",dry,F/VF,"7.5 YR, 5/3","orange-rust mottled nodules, black nodules may be charcoal","clay aggregates, <10% very coarse sand, 15-35% MGR, 15-35% FGR, sub-rounded"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,56,58,,,E,,CGR,dry,,,,"5 cm rock, subangular"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,58,66,,,E,,"sandy clay, GR",dry,VF/VF,"7.5 YR, 5/3",,"35-50% GR, sub-rounded"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,66,71,,,E,,"sandy clay, XGR",moist,VF/VF,"10 YR, 4/4",orange-rust mottled nodules,">60% GR, full range of sizes"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,71,80,,,E,,"sandy clay, XGR",moist,VF/VF,"10 YR, 5/3","orange-rust mottled nodules esp around rocks, white dry nodules, black nodules might be charcoal",">60% GR, full range of sizes"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,80,82,,,E,,CGR,moist,,,,"5.5 cm rock, subangular"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,82,95,,,E,,"sandy clay, GR",wet,"VF/M, VF/F, F/VF","7.5 YR, 5/6","orange-rust mottled nodules esp around rocks, white dry nodules","15-35% GR, subangular"
+,KHT-XE5S,7/10/21,2025-26 Yellow V2 p48,95,100,,,E,,"sandy clay, GR",wet,"VF/M, C/F","7.5 YR, 5/3",orange mottled nodules,"15-35% GR, subangular; measured water level in well was 47 cm from surface, but soil not saturated anywhere in augered hole within 1m of well suggests subartesian conditions in the well and pontentiometric level of 1.33 m at the bottom of the well screen."
+,,,,,,,,,,,,,,,
+34,KHT-1,10/18/26,2025-26 Yellow V2 p48,0,12,,,O,"moss (green), bulbs 5mm",HO,dry,"VF/C, F/F-M, M/VF","2.5 YR, 2.5/1",,mixed herbaceous veg cover
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,12,25,,,A,,silty clay,dry,"VF/F, C/VF","2.5 YR, 2.5/1",,clay aggregates
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,25,34,,,AB,,silty clay,dry,"VF/F, M/VF","7.5 YR, 4/2",,"clay aggregates, <10% very coarse sand, <15% MGR, <15% CGR, subangular"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,34,44,,,B,,silty clay,dry,"F/F, C/VF","7.5 YR, 4/3",orange-rust mottled nodules,"clay aggregates, <10% very coarse sand, <15% MGR, subangular"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,44,52,,,B,,"silty clay, GR",dry,C/VF,"7.5 YR, 5/3",orange-rust mottled nodules,"clay aggregates, <10% very coarse sand, 15-35% MGR, sub-rounded"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,52,56,,,B,,"silty clay, GR",dry,F/VF,"7.5 YR, 5/3","orange-rust mottled nodules, black nodules may be charcoal","clay aggregates, <10% very coarse sand, 15-35% MGR, 15-35% FGR, sub-rounded"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,56,58,,,E,,CGR,dry,,,,"5 cm rock, subangular"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,58,66,,,E,,"sandy clay, GR",dry,VF/VF,"7.5 YR, 5/3",,"35-50% GR, sub-rounded"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,66,71,,,E,,"sandy clay, XGR",moist,VF/VF,"10 YR, 4/4",orange-rust mottled nodules,">60% GR, full range of sizes"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,71,80,,,E,,"sandy clay, XGR",moist,VF/VF,"10 YR, 5/3","orange-rust mottled nodules esp around rocks, white dry nodules, black nodules might be charcoal",">60% GR, full range of sizes"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,80,82,,,E,,CGR,moist,,,,"5.5 cm rock, subangular"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,82,95,,,E,,"sandy clay, GR",wet,"VF/M, VF/F, F/VF","7.5 YR, 5/6","orange-rust mottled nodules esp around rocks, white dry nodules","15-35% GR, subangular"
+,KHT-1,10/18/26,2025-26 Yellow V2 p48,95,100,,,E,,"sandy clay, GR",wet,"VF/M, C/F","7.5 YR, 5/3",orange mottled nodules,"15-35% GR, subangular; measured water level in well was 47 cm from surface, but soil not saturated anywhere in augered hole within 1m of well suggests subartesian conditions in the well and pontentiometric level of 1.33 m at the bottom of the well screen."
+,KHT-1,10/18/26,yellow V1 p77,100,108,,,E,,"sandy clay, VFGR",wet,C/VF-M,"10 YR, 4/4",,gravel sub-rounded; deepened original well; actual survey date is 07/26/2021 but changed to 2026 to retain KHT-1 naming
+,KHT-1,10/18/26,yellow V1 p77,108,113,,,E,,"sandy clay, GR",wet,C/VF-M,"10 YR, 4/1","orange mottled, more gray",gravel sub-rounded to 40 mm
+,KHT-1,10/18/26,yellow V1 p77,113,120,,,E,,"sandy clay, GR",wet,F/VF-F,"10 YR, 4/3 ",orange mottled,gravel sub-rounded to 40 mm
+,KHT-1,10/18/26,yellow V1 p77,120,126,,,E,,"sandy clay, GR",wet,F/VF-F,"10 YR, 3/3",orange mottled,gravel sub-rounded to 40 mm
+,KHT-1,10/18/26,yellow V1 p77,126,130,,,E,,"sandy clay, GR",saturated,C/VF-F,"10 YR, 3/3",orange mottled,gravel sub-rounded to 40 mm
+,KHT-1,10/18/26,yellow V1 p77,130,138,,,E,,"sandy clay, XGR",saturated,F/VF-F,"10 YR, 4/4",,gravel sub-rounded to 40 mm
+,KHT-1,10/18/26,yellow V1 p77,138,150,,,E,,"sandy clay, XFGR",saturated,F/VF-F,"10 YR, 4/4",,finer gravel
+,KHT-1,10/18/26,yellow V1 p77,150,165,,,E,,"sandy clay, XGR",saturated,,"10 YR, 3/6",,"gravel sub-angular, larger to 45 mm"
+,KHT-1,10/18/26,yellow V1 p77,165,179,,,E,,FGR,saturated,,,,"gravel rounded, mostly 2-4 mm, a few to 16 mm"
 ,,,,,,,,,,,,,,,
 35,KWF-2- abandoned,6/11/25,2015-25 Or V3 p60,0,7,,,O,,HO,moist,"M/VF, C/F","2.5 YR, 2.5/1",,"augered at Kiln3 camera, but abandoned due to cobbles at 66 cm, which didn't seem deep enough to support a viable well"
 ,KWF-2- abandoned,6/11/25,2015-25 Or V3 p60,7,14,,,Oa,,silty clay,moist,"M/VF, F/F, VF/C","10 YR, 2/1",,"loose, spongy"
@@ -295,7 +309,7 @@
 ,"KWT-2, abandoned",6/14/25,2015-25 Or V3 p62,60,68,,,AB,,"sandy clay, FGR, CGR",wet,C/VF-F,"5 YR, 4/1",multicolor mottle around FGR,gravel subangular
 ,"KWT-2, abandoned",6/14/25,2015-25 Or V3 p62,68,69,,,,,VCB,,,,,"stuck on cobble, could not auger beyond it"
 ,,,,,,,,,,,,,,,
-36,KWT-2,6/14/25,2015-25 Or V3 p62,0,6,,,Oi,,HO,,,,,thatch
+37,KWT-2,6/14/25,2015-25 Or V3 p62,0,6,,,Oi,,HO,,,,,thatch
 ,KWT-2,6/14/25,2015-25 Or V3 p62,6,10,,,Oa,,loam,moist,"F/M-C, M/VF-F","5 YR, 2.5/1",,crumbly
 ,KWT-2,6/14/25,2015-25 Or V3 p62,10,38,,,A,,clay,moist,"M/VF-F, C/M","5 YR, 2.5/1",,
 ,KWT-2,6/14/25,2015-25 Or V3 p62,38,60,,,A,fibrous,"sandy clay, VMGR",saturated,C/VF-F,"5 YR, 2.5/1",,gravel subangular
@@ -303,7 +317,7 @@
 ,KWT-2,6/14/25,2015-25 Or V3 p62,75,91,,,A,many fibrous clumps,clay,saturated,M/VF-F,"5 YR, 2.5/1",,
 ,KWT-2,6/14/25,2015-25 Or V3 p62,91,92,,,,,VCB,,,,,"hit rock, installed well on top"
 ,,,,,,,,,,,,,,,
-37,EWT-2,6/12/25,2015-25 Or V3 p64,0,2.5,,,O,thatch,HO,dry,,,,"bunchgrass at top, mislabeled as EWF-1 in field book but name changed to EWT-2"
+38,EWT-2,6/12/25,2015-25 Or V3 p64,0,2.5,,,O,thatch,HO,dry,,,,"bunchgrass at top, mislabeled as EWF-1 in field book but name changed to EWT-2"
 ,EWT-2,6/12/25,2015-25 Or V3 p64,2.5,8,,,Oi,fibrous,HO,moist,"M/VF-F, VF/M","5 YR, 3/1",,
 ,EWT-2,6/12/25,2015-25 Or V3 p64,8,16,,,Oe,fibrous,HO,moist,"M/VF-F, VF/M","5 YR, 3/1",,
 ,EWT-2,6/12/25,2015-25 Or V3 p64,16,27,,,A,,"sandy clay, MGR",moist,"M/VF-F, F/M","10 YR, 2/1",,gravel subangular
@@ -315,14 +329,14 @@
 ,EWT-2,6/12/25,2015-25 Or V3 p64,98,107,,,B,,"sandy clay, FGR",wet,"M/VF, F/F","10 YR, 4/3","nodules common, 2-20 mm, 7.5 YR 4/4","very coarse sand to FGR, a few MGR"
 ,EWT-2,6/12/25,2015-25 Or V3 p64,107,123,,,,,"sandy clay, XFGR",saturated,F/VF-F,"10 YR, 4/4",mottled 10 YR 7/6,"MGR and CGR present, subangular to sub-rounded"
 ,,,,,,,,,,,,,,,
-38,KER-2,6/15/25,2015-25 Or V3 p66,0,3,,,Oi,thatch,HO,,,,,"augered 5 holes in same area, hit rounded gravel at 65 in all cases, deepest augered to 80 cm where well installed"
+39,KER-2,6/15/25,2015-25 Or V3 p66,0,3,,,Oi,thatch,HO,,,,,"augered 5 holes in same area, hit rounded gravel at 65 in all cases, deepest augered to 80 cm where well installed"
 ,KER-2,6/15/25,2015-25 Or V3 p66,3,15,,,Oea,,sandy clay,moist,"M/VF, C/F","5 YR, 3/1",,
 ,KER-2,6/15/25,2015-25 Or V3 p66,15,42,,,A,,sandy clay,moist,"M/VF-F, C/M","5 YR, 2.5/2",,
 ,KER-2,6/15/25,2015-25 Or V3 p66,42,55,,,A,,silty clay,wet,M/VF-F,"5 YR, 2.5/2",,
 ,KER-2,6/15/25,2015-25 Or V3 p66,55,64,,,A,,"sandy clay, MGR",saturated,"M/VF, C/F","7.5 YR, 4/1",,"gravel rounded, hit CGR or larger at 65 cm"
 ,KER-2,6/15/25,2015-25 Or V3 p66,64,80,,,,,MGR,saturated,"M/VF-F, C/M",,,"10-20% coarse gravel, all enmeshed with coarse roots, interstices filled with fine gravel and coarse sand, all rounded"
 ,,,,,,,,,,,,,,,
-39,EHT-XC5S,10/16/26,2025-26 Yellow V2 p38,0,7,,,O,,HO,dry,"VF/M, F/F/M/VF","5YR, 2.5/1",,
+40,EHT-XC5S,10/16/26,2025-26 Yellow V2 p38,0,7,,,O,,HO,dry,"VF/M, F/F/M/VF","5YR, 2.5/1",,
 ,EHT-XC5S,10/16/26,2025-26 Yellow V2 p38,7,14,,,A,,silty clay,dry,"VF/M, VF/F, C/VF","5YR, 2.5/1",,clay aggregates <5mm
 ,EHT-XC5S,10/16/26,2025-26 Yellow V2 p38,14,28,,,AB,,silty clay,dry,"VF/M, VF/F, F/VF","7.5 YR, 2.5/1",,"clay aggregates 10-15mm, <15% MGR, subangular"
 ,EHT-XC5S,10/16/26,2025-26 Yellow V2 p38,28,39,,,AB,,silty clay,dry,VF/VF,"7.5 YR, 2.5/1",,"clay aggregates 10-15mm, <15% MGR, subangular"

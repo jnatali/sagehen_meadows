@@ -175,6 +175,9 @@ def update_wells(df: pd.DataFrame) -> pd.DataFrame:
     # Correct the well_ids using the STATIC function 
     df = well_utils.correct_well_ids_static(df)
     
+    # TODO: Correct well_ids with the original function (capture E5S to KHT-1)
+    #df = well_utils.correct_well_ids(df, datetime_name="date")
+    
     # Validate the well_ids to ensure no bad data slipped through
     df = well_utils.validate_well_ids(df, id_col="well_id")
     return  df 
@@ -2824,7 +2827,7 @@ def main():
     target_columns = ['well_id', 'date', 'doy', 'year', 'method_id', 'ET_gw_mm', 'R_mm', 'S_mm', 'Sy_star']
     existing_cols = [c for c in target_columns if c in final_ET_df.columns]
     
-    csv_out_path = et_data_dir / 'Compiled_ET_estimates_2025.csv'
+    csv_out_path = et_data_dir / 'Compiled_ET_estimates.csv'
     final_ET_df[existing_cols].to_csv(csv_out_path, index=False)
     print(f"Saved compiled ET results to: {csv_out_path}")
     
@@ -2851,7 +2854,7 @@ def main():
     plot_K_methods_side_by_side(
         # JN 11/16/26 No need to read from csv; use final_ET_df
         #compiled_ET_df=compiled_from_csv,
-        compiled_ET=final_ET_df,
+        compiled_ET_df=final_ET_df,
         PET_well_df=PET_df,
         pet_station_df=pet_station_df,
         gw_df=subdaily_gw_df,
