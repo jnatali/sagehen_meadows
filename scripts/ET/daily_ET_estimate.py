@@ -34,11 +34,13 @@ import scripts.groundwater.well_utils as well_utils
 SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
 SMOOTH = False
 SMOOTH_DAYS = 2 # only if SMOOTH = True
-WELL_DEPTH_BUFFER_mm = 0
+WELL_DEPTH_BUFFER_mm = 10
+NEG_ET_FILTER = False
     
 ## Directory and Filenames based on structure in github
-groundwater_data_dir = PROJECT_ROOT / 'data/field_observations/groundwater/loggers/PROCESSED/'
-groundwater_subdaily_filepath = groundwater_data_dir / 'groundwater_subdaily.csv'
+groundwater_data_dir = PROJECT_ROOT / 'data/field_observations/groundwater/'
+groundwater_subdaily_filepath = groundwater_data_dir / 'loggers/PROCESSED/groundwater_subdaily.csv'
+groundwater_max_filepath = groundwater_data_dir / 'well_depth_max_mud.csv'
 
 soil_data_dir = PROJECT_ROOT / 'data/field_observations/soil/'
 soil_data_filepath = soil_data_dir / 'soil_survey_PROCESSED.csv'
@@ -685,16 +687,14 @@ def estimate_ET_White_Duke_Sy(
             
         # ---------------------------------------------------------
         # Otherwise wt_depth_cm is safely strictly positive?
-        # TODO: should the end of the previous "if" return, not continue?
-        # or should there be an "else" statement?
         wt_depth_cm = raw_wt_cm
 
         # Filter the soil survey to find horizons belonging to ONLY this well
         well_horizons = soil_clean[soil_clean['well_id'] == current_well].copy()
         
         if well_horizons.empty:
-            print(f"DATA ERROR: No soil horizons defined for well '{current_well}'.")
-            # Append NaNs and continue to the next day here so the script doesn't crash below
+            print(f"DATA ERROR: No soil horizon for well '{current_well}'.")
+            # Append NaNs and continue to the next day
             calculated_sy_list.append(np.nan)
             calculated_et_list.append(np.nan)
             continue
@@ -708,10 +708,11 @@ def estimate_ET_White_Duke_Sy(
 
         if active_horizon.empty:
             print(
-                f"DATA ERROR: Water table depth ({wt_depth_cm} cm) for well '{current_well}' on {current_date} "
-                f"falls completely outside the recorded soil logs. Cannot calculate Sy. Skipping day."
+                f"DATA ERROR: Midnight water table depth ({wt_depth_cm} cm) "
+                f"for well '{current_well}' on {current_date} "
+                f"falls outside the soil logs. Cannot calc Sy. Skipping day."
             )
-            # Append NaNs to keep the lists exactly the same length as the DataFrame
+            # Append NaNs to keep lists the same length as the DataFrame
             calculated_sy_list.append(np.nan)
             calculated_et_list.append(np.nan)
             
@@ -733,6 +734,7 @@ def estimate_ET_White_Duke_Sy(
         ]
 
         # Get Parameters to Set Effective Air-Entry Pressure (ha)
+        # TODO: Evidence that HO cannot hold a capillary fringe?
         if texture_code in ['GR', 'HO']:
             # The water table is currently inside a gravel layer. 
             # Gravel cannot hold a capillary fringe above the water table.
@@ -1335,10 +1337,12 @@ def filter_ET_by_precip(et_df: pd.DataFrame, precip_df: pd.DataFrame, threshold_
     
     return filtered_df
 
-def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: pd.DataFrame, buffer_mm: float = 50.0) -> pd.DataFrame:
+def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, 
+                            well_df: pd.DataFrame, 
+                            buffer_mm: float = 50.0) -> pd.DataFrame:
     """
-    Filters out storage and recharge terms for days when the groundwater level drops 
-    below the total depth of the well, minus a safety buffer by setting columns to NaN.
+    Sets storage and recharge terms to NA for days when the groundwater level 
+    drops below the total depth of the well, minus a safety buffer. 
 
     Parameters:
     et_df: populated ET estimate dataframe to filter
@@ -1352,6 +1356,19 @@ def filter_ET_by_well_depth(et_df: pd.DataFrame, gw_df: pd.DataFrame, well_df: p
     # ---- 1. FIND TOTAL WELL DEPTHS (Convert cm to mm) ----
     max_depths = well_df.groupby("well_id")["stop_depth_cm"].max().reset_index()
     max_depths["total_well_depth_mm"] = max_depths["stop_depth_cm"] * 10.0
+    
+    # get alternative max depth for wells with mud present
+    max_depth_alt = pd.read_csv(groundwater_max_filepath)
+    max_depth_alt["well_max_depth_mm"] = max_depth_alt["well_max_cm"] * 10.0
+    max_depths = max_depths.set_index("well_id")
+    max_depth_alt = max_depth_alt.set_index("well_id")
+    # replace matching rows (by well_id) in max_depths from max_depths_alt
+    max_depths.update(
+        max_depth_alt.rename(columns={"well_max_depth_mm": "total_well_depth_mm"})
+    )
+
+    max_depths = max_depths.reset_index()
+    
     
     # ---- 2. GET DAILY GROUNDWATER LEVELS ----
     # Extract just the identifiers and the start-of-day groundwater depth (gw_00 is in mm)
@@ -2096,7 +2113,7 @@ def calculate_GWET_shaw(
             vadose_mineral = vadose_zone[vadose_zone["soil_texture_code"] != "HO"]
         except KeyError as missing_key:
                 raise ValueError(
-                    f"DATA ERROR: The data is missing for  {well} on {date_str}. Please check the soil logs and ensure all required columns are present."
+                    f"DATA ERROR: The data is missing for {well} on {date_str}. Please check the soil logs and ensure all required columns are present."
                 )
 
         # Get the unique soil texture codes currently present in the vadose zone
@@ -2940,7 +2957,7 @@ def main():
     print("Calculating ET via White (Duke Sy)...")
     et_duke = estimate_ET_White_Duke_Sy(daily_gw_df, df_soil_log, duke_df, PET_df, pet_station_df, 2025)
     
-    print("Calculating ET via White (Van Genuchten Smoothed)...")
+    print("Calculating ET via White (Van Genuchten)...")
     #et_vg = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log, van_genuchten_df, PET_df, pet_station_df, 2025)
     et_vg = estimate_ET_White_VG(daily_gw_df, df_soil_log, van_genuchten_df, PET_df, pet_station_df, 2025)
 
