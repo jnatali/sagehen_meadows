@@ -32,7 +32,9 @@ import scripts.groundwater.well_utils as well_utils
 # ---- INITIALIZE GLOBAL VARIABLES ---
 
 SY_STAR = 0.04 # center of sand, silt and clay in Loheide et al 2005 Fig 10
-# TODO: Add well depth buffer here as a global var, was 10
+SMOOTH = False
+SMOOTH_DAYS = 2 # only if SMOOTH = True
+WELL_DEPTH_BUFFER_mm = 0
     
 ## Directory and Filenames based on structure in github
 groundwater_data_dir = PROJECT_ROOT / 'data/field_observations/groundwater/loggers/PROCESSED/'
@@ -369,6 +371,15 @@ def calculate_storage_recharge(df: pd.DataFrame) -> pd.DataFrame:
     # Calculate s, daily storage change (mm)
     df["S_mm"] = df["gw_24"] - df["gw_00"] 
     
+    # if SMOOTH, smooth the resulting daily components 
+    if SMOOTH:
+        df['R_mm'] = df.groupby('well_id')['R_mm'].transform(
+            lambda x: x.rolling(window=SMOOTH_DAYS, min_periods=1, center=False).mean()
+        )
+        df['S_mm'] = df.groupby('well_id')['S_mm'].transform(
+            lambda x: x.rolling(window=SMOOTH_DAYS, min_periods=1, center=False).mean()
+        )
+
     return df
 
 def average_sy(df_sy: pd.DataFrame, df_wells: pd.DataFrame) -> pd.DataFrame:
@@ -857,14 +868,14 @@ def estimate_ET_White_Duke_Sy(
         ]
     ]
 
-def estimate_ET_White_VG_Smoothed(
+
+def estimate_ET_White_VG(
     daily_df: pd.DataFrame, 
     soil_df: pd.DataFrame, 
     vg_df: pd.DataFrame, 
     pet_df: pd.DataFrame,
     station_PET_df: pd.DataFrame = None,
     year: int = 2025,
-    smoothing_window: int = 2  
 ) -> pd.DataFrame:
     """
     Calculates daily groundwater evapotranspiration (ET_g) using a modified White method.
@@ -884,7 +895,132 @@ def estimate_ET_White_VG_Smoothed(
     
     soil_clean = soil_df.copy()
 
+    # JN 11/26/26 Do not want to smooth midnight, smooth R
+    # df['gw_00_smooth'] = df.groupby('well_id')['gw_00'].transform(
+    #     lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
+    # )
+    
+    # 2. OVERWRITE THE RAW DATA SO THE WHITE METHOD ONLY SEES THE CLEAN SIGNAL
+    # df['gw_00'] = df['gw_00_smooth']
 
+    # 3.  CALCULATE RECHARGE
+    df = calculate_storage_recharge(df) #smooth now happens here if SMOOTH=T
+    df = get_PET(df, pet_df, station_PET_df, year)
+
+    vg_lookup = vg_df.set_index('soil_texture_code').to_dict(orient='index')
+    
+    calculated_sy_list = []
+    calculated_et_list = []      
+
+    for _, row in df.iterrows():
+        current_well = row['well_id']
+        
+        # Skip calculations if the smoothed groundwater data is missing for the day.
+        if 'gw_00' not in row or pd.isna(row['gw_00']):
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+            
+        wt_depth_cm = row['gw_00'] / 10.0
+        
+        # Determine the most localized Potential Evapotranspiration (PET) value available.
+        pet_val = row['PET_mm_day'] if 'PET_mm_day' in row else pd.NA
+        station_pet_val = row['station_PET_mm_day'] if 'station_PET_mm_day' in row else pd.NA
+        active_pet = pet_val if pd.notna(pet_val) else station_pet_val
+
+        # If the water table is at or above the ground surface, 
+        # bypass the soil mechanics and set ET directly to PET.
+        if wt_depth_cm <= 0.0:
+            calculated_sy_list.append(0.0)
+            calculated_et_list.append(active_pet if pd.notna(active_pet) else 0.0)
+            continue
+            
+        well_horizons = soil_clean[soil_clean['well_id'] == current_well].copy()
+        
+        # Skip if no soil profile data is available for this well.
+        if well_horizons.empty:
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+
+        active_horizon = well_horizons[
+            (well_horizons['start_depth_cm'] <= wt_depth_cm) & 
+            (well_horizons['stop_depth_cm'] > wt_depth_cm)
+        ]
+        
+        # Skip if the water table sits outside the defined soil profile depths.
+        if active_horizon.empty:
+            calculated_sy_list.append(np.nan)
+            calculated_et_list.append(np.nan)
+            continue
+
+        # Calculate the dynamically scaled specific yield based on soil texture and drainage time.
+        layer_sy = get_composite_sy_kinematic(wt_depth_cm, well_horizons, vg_lookup, observation_time_days=1.0)
+        
+        # Convert the observed storage and recharge signals into physical water depth using the calculated specific yield.
+        daily_et = layer_sy * (row["R_mm"] + row["S_mm"])
+        
+        # JN 11/26/26 Do not overwrite negative ET here, do it for all as a filter
+        # Prevent ET from dropping below zero due to noise or sudden positive storage fluctuations.
+        #daily_et = max(0.0, raw_daily_et)
+        
+        # # Cap the calculated evapotranspiration so it does not exceed the maximum atmospheric demand (PET).
+        # if pd.notna(active_pet):
+        #     daily_et = min(daily_et, active_pet)
+
+        calculated_sy_list.append(layer_sy)
+        calculated_et_list.append(daily_et)
+
+    df['Sy_star'] = calculated_sy_list 
+    df['ET_gw_mm'] = calculated_et_list
+    df['method_id'] = METHOD_ID
+    
+    return df[
+        [
+            "date",
+            "doy",
+            "year",
+            "well_id",
+            "ET_gw_mm",
+            "R_mm",
+            "S_mm",
+            "Sy_star",
+            "method_id",
+            "gw_00"
+        ]
+    ]
+
+def estimate_ET_White_VG_Smoothed(
+    daily_df: pd.DataFrame, 
+    soil_df: pd.DataFrame, 
+    vg_df: pd.DataFrame, 
+    pet_df: pd.DataFrame,
+    station_PET_df: pd.DataFrame = None,
+    year: int = 2025,
+    smoothing_window: int=SMOOTH_DAYS  
+) -> pd.DataFrame:
+    """
+    WARNING: Probably doesn't work anymore because JN moved smoothing
+    to calculate_storage_recharge() method on 11/26/26.
+    
+    Calculates daily groundwater evapotranspiration (ET_g) using a modified White method.
+    This dynamically calculates specific yield using van Genuchten parameters and a 
+    kinematic drainage time correction to account for delayed yield in heavy soils.
+    """
+    
+    METHOD_ID = "White_VG_Smooth"
+    
+    df = daily_df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+    df = df[df['date'].dt.year == year].copy()
+    
+    df = df.sort_values(by=['well_id', 'date'])
+    # JN 11/26/26 redundant, already updated/validated well_ids
+    #df = update_wells(df)
+    
+    soil_clean = soil_df.copy()
+
+    # JN 11/26/26 Do not want to smooth midnight, smooth R
     df['gw_00_smooth'] = df.groupby('well_id')['gw_00'].transform(
         lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
     )
@@ -893,16 +1029,8 @@ def estimate_ET_White_VG_Smoothed(
     df['gw_00'] = df['gw_00_smooth']
 
     # 3.  CALCULATE RECHARGE
-    df = calculate_storage_recharge(df)
+    df = calculate_storage_recharge(df) #smooth now happens here if SMOOTH=T
     df = get_PET(df, pet_df, station_PET_df, year)
-
-    # 4. Smooth the resulting daily components 
-    df['R_mm_smooth'] = df.groupby('well_id')['R_mm'].transform(
-        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
-    )
-    df['S_mm_smooth'] = df.groupby('well_id')['S_mm'].transform(
-        lambda x: x.rolling(window=smoothing_window, min_periods=1, center=False).mean()
-    )
 
     vg_lookup = vg_df.set_index('soil_texture_code').to_dict(orient='index')
     
@@ -954,6 +1082,7 @@ def estimate_ET_White_VG_Smoothed(
         layer_sy = get_composite_sy_kinematic(wt_depth_cm, well_horizons, vg_lookup, observation_time_days=1.0)
         
         # Convert the observed storage and recharge signals into physical water depth using the calculated specific yield.
+        # JN 11/26/26 This will likely puke now!
         raw_daily_et = layer_sy * (row["R_mm_smooth"] + row["S_mm_smooth"])
         
         # Prevent ET from dropping below zero due to noise or sudden positive storage fluctuations.
@@ -2525,7 +2654,7 @@ def plot_ET_methods_side_by_side(
         if num_methods == 1:
             axes = np.array([[axes[0]], [axes[1]]])
             
-        fig.suptitle(f'ET Method Proportional Comparison - {well_id} ({year})', fontsize=16, fontweight='bold')
+        fig.suptitle(f'ET_gw Method Comparison - {well_id} ({year})', fontsize=16, fontweight='bold')
 
         for i, method_id in enumerate(methods):
             ax1 = axes[0, i]
@@ -2557,7 +2686,7 @@ def plot_ET_methods_side_by_side(
 
             ax1.axhline(0, color='black', linewidth=0.5)
             ax1.set_title(method_id, fontsize=12, fontweight='bold')
-            if i == 0: ax1.set_ylabel('Net ET / PET (mm)')
+            if i == 0: ax1.set_ylabel('ET_gw (mm)')
 
             # ---- BOTTOM ROW (ax3): GROUNDWATER & SOIL ----
             if not well_gw.empty:
@@ -2812,8 +2941,9 @@ def main():
     et_duke = estimate_ET_White_Duke_Sy(daily_gw_df, df_soil_log, duke_df, PET_df, pet_station_df, 2025)
     
     print("Calculating ET via White (Van Genuchten Smoothed)...")
-    et_vg = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log, van_genuchten_df, PET_df, pet_station_df, 2025)
-    
+    #et_vg = estimate_ET_White_VG_Smoothed(daily_gw_df, df_soil_log, van_genuchten_df, PET_df, pet_station_df, 2025)
+    et_vg = estimate_ET_White_VG(daily_gw_df, df_soil_log, van_genuchten_df, PET_df, pet_station_df, 2025)
+
     print("Calculating ET via Shaw (Eq 17)...")
     et_shaw = estimate_ET_Shaw(daily_gw_df, PET_df, df_soil_log, df_extinction, pet_station_df, pet_col="PET_mm_day", year=2025)
     
@@ -2827,8 +2957,7 @@ def main():
     )
 
     final_ET_df = filter_ET_by_well_depth(
-        ET_no_rain, daily_gw_df, df_soil_log, buffer_mm=50.0
-    )
+        ET_no_rain, daily_gw_df, df_soil_log, buffer_mm=WELL_DEPTH_BUFFER_mm)
     
     print(f"Final Data Date Range: {final_ET_df['date'].min()} to {final_ET_df['date'].max()}")
 
